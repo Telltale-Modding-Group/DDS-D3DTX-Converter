@@ -4,7 +4,7 @@ using System.Text;
 
 namespace D3DTX_TextureConverter
 {
-    //NOTE TO SELF: IF THERE IS AN EASIER WAY OF DOING THIS, LET ME KNOW PLEASE
+    //NOTE TO SELF: IF THERE IS AN EASIER WAY OF DOING THIS, DO IT SINCE THIS IS A RATHER LAZY WAY
     //DDS Docs - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-header
     //DDS PIXEL FORMAT - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-pixelformat
 

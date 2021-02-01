@@ -182,7 +182,7 @@ namespace D3DTX_TextureConverter
             //7. get image width
             //8. get image height
 
-            //--------------------------STEP 1 = DWORD--------------------------
+            //--------------------------1 = DWORD--------------------------
             //offset location of the DWORD
             bytePointerPosition = 0;
 
@@ -194,7 +194,7 @@ namespace D3DTX_TextureConverter
 
             //Console.WriteLine("DWORD = {0}", parsed_dword);
 
-            //--------------------------STEP 2 = COMPRESSION TYPE--------------------------
+            //--------------------------2 = COMPRESSION TYPE--------------------------
             //offset location of the compression type byte
             bytePointerPosition = 4;
 
@@ -206,7 +206,7 @@ namespace D3DTX_TextureConverter
 
             Console.WriteLine("Compression Type = {0}", parsed_compressionType.ToString());
 
-            //--------------------------STEP 3 = UNKNOWN 1--------------------------
+            //--------------------------3 = UNKNOWN 1--------------------------
             //offset location of the unknown 1
             bytePointerPosition = 8;
 
@@ -219,7 +219,7 @@ namespace D3DTX_TextureConverter
             if(!ignoreUnknownValues)
                 Console.WriteLine("UNKNOWN 1 = {0}", parsed_unknown1.ToString());
 
-            //--------------------------STEP 4 = TEXTURE BYTE SIZE--------------------------
+            //--------------------------4 = TEXTURE BYTE SIZE--------------------------
             //offset location of the file size
             bytePointerPosition = 12;
 
@@ -231,7 +231,7 @@ namespace D3DTX_TextureConverter
 
             Console.WriteLine("Texture Byte Size = {0}", parsed_fileSize.ToString());
 
-            //--------------------------STEP 5 = UNKNOWN 2--------------------------
+            //--------------------------5 = UNKNOWN 2--------------------------
             //offset location of the unknown 2
             bytePointerPosition = 16;
 
@@ -244,7 +244,7 @@ namespace D3DTX_TextureConverter
             if (!ignoreUnknownValues)
                 Console.WriteLine("UNKNOWN 2 = {0}", parsed_unknown2.ToString());
 
-            //--------------------------STEP 6 = CHECK FILE NAME STRING--------------------------
+            //--------------------------6 = CHECK FILE NAME STRING--------------------------
             bytePointerPosition = 20;
 
             int telltaleScrewyHeaderLength = 84; //screwy header offset length (goes all the way until it hits the first byte of the filename string in the file)
@@ -277,7 +277,7 @@ namespace D3DTX_TextureConverter
             //move the cursor past the filename.extension byte string
             bytePointerPosition += fileNameBytes.Length;
 
-            //--------------------------STEP 7 = GET IMAGE WIDTH--------------------------
+            //--------------------------7 = GET IMAGE WIDTH--------------------------
             //Image Pixel Width offset location
             bytePointerPosition += 17;
 
@@ -289,7 +289,7 @@ namespace D3DTX_TextureConverter
 
             Console.WriteLine("Image Width = {0}", parsed_imageWidth.ToString());
 
-            //--------------------------STEP 8 = GET IMAGE HEIGHT--------------------------
+            //--------------------------8 = GET IMAGE HEIGHT--------------------------
             //Image Pixel Height offset location
             bytePointerPosition += 4;
 
@@ -301,13 +301,19 @@ namespace D3DTX_TextureConverter
 
             Console.WriteLine("Image Height = {0}", parsed_imageHeight.ToString());
 
+            //--------------------------BUILDING DDS TEXTURE--------------------------
             //calculating header length, parsed texture byte size - source byte size
             int headerLength = sourceByteFile.Length - parsed_fileSize;
+
+            //allocate our byte array to contain our texture data
             byte[] textureData = new byte[parsed_fileSize];
+
+            //copy the bytes from the source byte file after the header length, and copy that data to the texture data byte array
             Array.Copy(sourceByteFile, headerLength, textureData, 0, parsed_fileSize);
 
             //get our dds file ready
             DDS_File dds_File = new DDS_File();
+
             //assign our parsed values from the d3dtx to new dds file
             dds_File.dwWidth = (uint)parsed_imageWidth;
             dds_File.dwHeight = (uint)parsed_imageHeight;
@@ -315,6 +321,7 @@ namespace D3DTX_TextureConverter
             //build the header
             byte[] ddsHeader = dds_File.Build_DDSHeader_ByteArray();
             
+            //write the data to the file
             File.WriteAllBytes(destinationFile, Combine(ddsHeader, textureData));
         }
 

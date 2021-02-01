@@ -7,10 +7,27 @@ namespace D3DTX_TextureConverter
     public class D3DTX_File
     {
         public readonly string dword = "6VSM";
-        public uint compressionType = 0; //4 bytes
-        public uint fileSize = 0; //4 bytes
-        public uint width = 0; //4 bytes
-        public uint height = 0; //4 bytes
+
+        //Compression Type [4 bytes]
+        public uint compressionType = 0;
+
+        //[4 bytes]
+        public uint unknown1 = 0;
+
+        //Texture Byte Size [4 bytes]
+        public uint fileSize = 0;
+
+        //[4 bytes]
+        public uint unknown2 = 0;
+
+        //File Name + Extension [varied bytes]
+        public string fileName = "";
+
+        //Texture Width Pixels [4 bytes]
+        public uint width = 0;
+
+        //Texture Height Pixels [4 bytes]
+        public uint height = 0;
 
         /// <summary>
         /// Manually builds a byte array of a dds header

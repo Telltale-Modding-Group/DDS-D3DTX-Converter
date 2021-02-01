@@ -172,7 +172,7 @@ namespace D3DTX_TextureConverter
             //which byte offset we are on
             int bytePointerPosition = 0;
 
-            //steps to converting file
+            //values to converting d3dtx file
             //1. get dword
             //2. get compression type
             //3. get unknown 1
@@ -187,12 +187,12 @@ namespace D3DTX_TextureConverter
             bytePointerPosition = 0;
 
             //allocate 4 byte array (int32)
-           // byte[] source_dword = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
+            byte[] source_dword = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
 
             //parse the byte array to int32
-            //string parsed_dword = BitConverter.(source_dword);
+            string parsed_dword = BitConverter.ToChar(source_dword).ToString();
 
-            //Console.WriteLine("DWORD = {0}", parsed_dword);
+            Console.WriteLine("DWORD = {0}", parsed_dword);
 
             //--------------------------2 = COMPRESSION TYPE--------------------------
             //offset location of the compression type byte
@@ -244,13 +244,35 @@ namespace D3DTX_TextureConverter
             if (!ignoreUnknownValues)
                 Console.WriteLine("UNKNOWN 2 = {0}", parsed_unknown2.ToString());
 
-            //--------------------------6 = CHECK FILE NAME STRING--------------------------
+            //--------------------------6 = SCREWY TELLTALE DATA--------------------------
             bytePointerPosition = 20;
 
-            int telltaleScrewyHeaderLength = 84; //screwy header offset length (goes all the way until it hits the first byte of the filename string in the file)
-            bytePointerPosition += 28; //skip the potentially 7 (4 bytes) data
-            bytePointerPosition += telltaleScrewyHeaderLength; //skip the chunk of data since it doesn't seem to change
+            int telltaleScrewyHeaderLength = 84; //screwy header offset length
 
+            byte[] screwyHeaderData = new byte[telltaleScrewyHeaderLength];
+
+            for(int i = 0; i < telltaleScrewyHeaderLength; i++)
+            {
+                screwyHeaderData[i] = sourceByteFile[bytePointerPosition + i];
+            }
+
+            //move the pointer past the screwy header
+            bytePointerPosition += telltaleScrewyHeaderLength;
+
+            //--------------------------7 = dwFlags --------------------------
+            bytePointerPosition += 14;
+
+            //allocate 4 byte array (int32)
+            byte[] source_dwFlags = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
+
+            //parse the byte array to int32
+            int parsed_dwFlags = BitConverter.ToInt32(source_dwFlags);
+
+            Console.WriteLine("dwFlags = {0}", parsed_dwFlags.ToString());
+
+            bytePointerPosition += 14;
+
+            //--------------------------14 = TEXTURE FILE NAME--------------------------
             //get our file name and convert it to a byte array (since d3dtx has the filename.extension written in the file)
             byte[] fileNameBytes = Encoding.ASCII.GetBytes(sourceFileName);
 
@@ -277,7 +299,7 @@ namespace D3DTX_TextureConverter
             //move the cursor past the filename.extension byte string
             bytePointerPosition += fileNameBytes.Length;
 
-            //--------------------------7 = GET IMAGE WIDTH--------------------------
+            //--------------------------15 = GET IMAGE WIDTH--------------------------
             //Image Pixel Width offset location
             bytePointerPosition += 17;
 
@@ -289,7 +311,7 @@ namespace D3DTX_TextureConverter
 
             Console.WriteLine("Image Width = {0}", parsed_imageWidth.ToString());
 
-            //--------------------------8 = GET IMAGE HEIGHT--------------------------
+            //--------------------------16 = GET IMAGE HEIGHT--------------------------
             //Image Pixel Height offset location
             bytePointerPosition += 4;
 
@@ -317,6 +339,37 @@ namespace D3DTX_TextureConverter
             //assign our parsed values from the d3dtx to new dds file
             dds_File.dwWidth = (uint)parsed_imageWidth;
             dds_File.dwHeight = (uint)parsed_imageHeight;
+            dds_File.dwFlags = (uint)parsed_dwFlags;
+            dds_File.dwMipMapCount = (uint)7;
+
+            //NOTE TO SELF
+            //BIGGEST ISSUE RIGHT NOW IS MIP MAPS, NEED TO PARSE MORE INFORMATION FROM D3DTX TO BE ABLE TO EXTRACT MIP MAPS PROPERLY
+
+            //SET DDS COMPRESSION TYPE
+            if (parsed_compressionType == 210 || parsed_compressionType == 402)
+            {
+                //DXT1 COMPRESSION
+                dds_File.ddspf_dwFourCC = "DXT1";
+            }
+            else if (parsed_compressionType == 200)
+            {
+                //DXT5 COMPRESSION
+                dds_File.ddspf_dwFourCC = "DXT5";
+            }
+            else if (parsed_compressionType == 409 || parsed_compressionType == 414 || parsed_compressionType == 406)
+            {
+                //DXT3 COMPRESSION
+                dds_File.ddspf_dwFourCC = "DXT3";
+            }
+            else if (parsed_compressionType == 388)
+            {
+                dds_File.ddspf_dwFourCC = "ATI2";
+            }
+            else if (parsed_compressionType == 413)
+            {
+                dds_File.ddspf_dwFourCC = "ATI1";
+            }
+
 
             //build the header
             byte[] ddsHeader = dds_File.Build_DDSHeader_ByteArray();

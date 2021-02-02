@@ -1,6 +1,6 @@
 # DDS-D3DTX-Converter
 
-#### What is this?
+### What is this?
 
 **This is an experimental application** containing a WIP console script application for converting **.d3dtx textures (Telltale Tool Textures)**, to standard **.dds (Direct Draw Surface)**. 
 

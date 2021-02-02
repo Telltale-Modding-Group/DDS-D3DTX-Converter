@@ -7,6 +7,7 @@ namespace D3DTX_TextureConverter
     //NOTE TO SELF: IF THERE IS AN EASIER WAY OF DOING THIS, DO IT SINCE THIS IS A RATHER LAZY WAY
     //DDS Docs - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-header
     //DDS PIXEL FORMAT - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-pixelformat
+    //DDS File Layout https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-file-layout-for-textures
 
     /// <summary>
     /// Main class for generating a dds byte header
@@ -60,6 +61,7 @@ namespace D3DTX_TextureConverter
         public uint ddspf_flags = 4;
 
         //Four-character codes for specifying compressed or custom formats. [4 bytes]
+        //DXT1, DXT2, DXT3, DXT4, DXT5, ATI1, ATI2
         public string ddspf_dwFourCC = "DXT1";
 
         //Number of bits in an RGB (possibly including alpha) format. [4 bytes]

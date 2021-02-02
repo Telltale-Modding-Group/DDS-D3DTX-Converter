@@ -136,7 +136,7 @@ namespace D3DTX_TextureConverter
             }
 
             Console.WriteLine("Found {0} Textures.", textures.Count.ToString()); //notify the user we found x amount of d3dtx files in the array
-            Console.WriteLine("Starting...");//notify the user we found x amount of d3dtx files in the array
+            Console.WriteLine("Starting...");//notify the user we are starting
 
             //run a loop through each of the found textures and convert each one
             foreach (string texture in textures)
@@ -191,7 +191,7 @@ namespace D3DTX_TextureConverter
             //offset byte pointer location to get the DWORD
             bytePointerPosition = 0;
 
-            //allocate 4 byte array (int32)
+            //allocate 4 byte array (string)
             byte[] source_dword = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
 
             //parse the byte array to string
@@ -353,18 +353,18 @@ namespace D3DTX_TextureConverter
                 //dds_File.ddspf_dwFourCC = "ATI1";
             }
 
-            //estimate how many total bytes are in the largest texture mip level (main one)
-            int mainTextureByteSize_Estimation = CalculateDDS_ByteSize(parsed_imageWidth, parsed_imageHeight, parsed_dxtType == 64);
-
-            //write the result to the console for viewing
-            Console.WriteLine("calculated Largest Mip Level Byte Size = {0}", mainTextureByteSize_Estimation.ToString());
-
             //build the header and store it in a byte array
             byte[] ddsHeader = dds_File.Build_DDSHeader_ByteArray();
 
             //--------------------------EXTRACTING TEXTURE DATA FROM D3DTX--------------------------
             //calculating header length, parsed texture byte size - source byte size
             int headerLength = sourceByteFile.Length - parsed_textureDataByteSize;
+
+            //estimate how many total bytes are in the largest texture mip level (main one)
+            int mainTextureByteSize_Estimation = CalculateDDS_ByteSize(parsed_imageWidth, parsed_imageHeight, parsed_dxtType == 64);
+
+            //write the result to the console for viewing
+            Console.WriteLine("calculated Largest Mip Level Byte Size = {0}", mainTextureByteSize_Estimation.ToString());
 
             //initalize our start offset, this is used to offset the array copy
             int startOffset = 0;
@@ -378,11 +378,12 @@ namespace D3DTX_TextureConverter
                 //offset the byte pointer position just past the header
                 startOffset = headerLength;
 
-                //calculate main texture level
+                //allocate byte array with the parsed length of the total texture byte data from the header
                 textureData = new byte[parsed_textureDataByteSize];
             }
-            else //if our estimation is accurate, then just extract the last mip map
+            else
             {
+                //if our estimation is accurate, then just extract the last mip map
                 //note to self, this will change later.
                 //as a test for self, create multiple child dds files that each have the mip map data extracted into each single one
 
@@ -396,7 +397,7 @@ namespace D3DTX_TextureConverter
             //copy all the bytes from the source byte file after the header length, and copy that data to the texture data byte array
             Array.Copy(sourceByteFile, startOffset, textureData, 0, textureData.Length);
 
-            //write the data to the file
+            //write the data to the file, combine the generted DDS header and our new texture byte data and we are done!
             File.WriteAllBytes(destinationFile, Combine(ddsHeader, textureData));
         }
 
@@ -432,9 +433,16 @@ namespace D3DTX_TextureConverter
         /// <returns></returns>
         public static byte[] Combine(byte[] first, byte[] second)
         {
+            //allocate a byte array with both total lengths combined to accomodate both
             byte[] bytes = new byte[first.Length + second.Length];
+
+            //copy the data from the first array into the new array
             Buffer.BlockCopy(first, 0, bytes, 0, first.Length);
+
+            //copy the data from the second array into the new array (offset by the total length of the first array)
             Buffer.BlockCopy(second, 0, bytes, first.Length, second.Length);
+
+            //return the final byte array
             return bytes;
         }
 

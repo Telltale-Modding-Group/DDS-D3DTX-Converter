@@ -174,72 +174,59 @@ namespace D3DTX_TextureConverter
             //get our file name and convert it to a byte array (since d3dtx has the filename.extension written in the file)
             byte[] fileNameBytes = Encoding.ASCII.GetBytes(sourceFileName);
 
+            //initalize our variables, this data will be parsed and assigned
+            string parsed_dword; //magic dword
+            int parsed_textureDataByteSize; //total byte size of the texture data, used to calculate the header length
+            int parsed_compressionType; //compression type? not 100% certain
+            int parsed_imageMipMapCount; //image mip map count
+            int parsed_imageMipMapCount_decremented; //image mip map count - 1 (since images with no mip maps have this value set to 1)
+            int parsed_imageWidth; //main image pixel width
+            int parsed_imageHeight; //main image pixel height
+            int parsed_dxtType; //dxt type?
+
             //which byte offset we are on
             int bytePointerPosition = 0;
 
             //--------------------------1 = DWORD--------------------------
-            //offset location of the DWORD
+            //offset byte pointer location to get the DWORD
             bytePointerPosition = 0;
 
             //allocate 4 byte array (int32)
             byte[] source_dword = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
 
             //parse the byte array to string
-            string parsed_dword = Encoding.ASCII.GetString(source_dword);
+            parsed_dword = Encoding.ASCII.GetString(source_dword);
 
+            //write the result to the console for viewing
             Console.WriteLine("DWORD = {0}", parsed_dword);
-
             //--------------------------2 = COMPRESISON TYPE?--------------------------
-            //offset location of the compression type byte
+            //offset byte pointer location to get the COMPRESISON TYPE
             bytePointerPosition = 4;
 
             //allocate 4 byte array (int32)
             byte[] source_compressionType = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
 
             //parse the byte array to int32
-            int parsed_compressionType = BitConverter.ToInt32(source_compressionType);
+            parsed_compressionType = BitConverter.ToInt32(source_compressionType);
 
+            //write the result to the console for viewing
             Console.WriteLine("Compression Type = {0}", parsed_compressionType.ToString());
-
-            //--------------------------3 = UNKNOWN 1--------------------------
-            //offset location of the unknown 1
-            bytePointerPosition = 8;
-
-            //allocate 4 byte array (int32)
-            byte[] source_unknown1 = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
-
-            //parse the byte array to int32
-            int parsed_unknown1 = BitConverter.ToInt32(source_unknown1);
-
-            if(!ignoreUnknownValues)
-                Console.WriteLine("UNKNOWN 1 = {0}", parsed_unknown1.ToString());
-
-            //--------------------------4 = TEXTURE BYTE SIZE--------------------------
-            //offset location of the file size
+            //--------------------------3 = TEXTURE BYTE SIZE--------------------------
+            //offset byte pointer location to get the TEXTURE BYTE SIZE
             bytePointerPosition = 12;
 
             //allocate 4 byte array (int32)
             byte[] source_fileSize = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
 
             //parse the byte array to int32
-            int parsed_fileSize = BitConverter.ToInt32(source_fileSize);
+            parsed_textureDataByteSize = BitConverter.ToInt32(source_fileSize);
 
-            Console.WriteLine("Texture Byte Size = {0}", parsed_fileSize.ToString());
+            //write the result to the console for viewing
+            Console.WriteLine("Texture Byte Size = {0}", parsed_textureDataByteSize.ToString());
+            //--------------------------4 = SCREWY TELLTALE DATA--------------------------
+            //NOTE TO SELF - no need to parse this byte data, we can extract the entire header later with this info included and just change what we need
 
-            //--------------------------5 = UNKNOWN 2--------------------------
-            //offset location of the unknown 2
-            bytePointerPosition = 16;
-
-            //allocate 4 byte array (int32)
-            byte[] source_unknown2 = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
-
-            //parse the byte array to int32
-            int parsed_unknown2 = BitConverter.ToInt32(source_unknown2);
-
-            if (!ignoreUnknownValues)
-                Console.WriteLine("UNKNOWN 2 = {0}", parsed_unknown2.ToString());
-
-            //--------------------------6 = SCREWY TELLTALE DATA--------------------------
+            //offset byte pointer location to get the SCREWY TELLTALE DATA
             bytePointerPosition = 20;
 
             int telltaleScrewyHeaderLength = 84; //screwy header offset length
@@ -254,41 +241,9 @@ namespace D3DTX_TextureConverter
             //move the pointer past the screwy header
             bytePointerPosition += telltaleScrewyHeaderLength;
 
-            //--------------------------7 = main texture size data --------------------------
-            //goes past the file name bytes
-            bytePointerPosition = (20 + telltaleScrewyHeaderLength + 28) + fileNameBytes.Length;
-            bytePointerPosition += 16;
-            //bytePointerPosition += 20;
-            //bytePointerPosition += 212;
-            //bytePointerPosition += 11;
-            //bytePointerPosition += 9;
-            //bytePointerPosition += 55;
-            //bytePointerPosition += 125;
-
-
-            //after the screwy header and before the file name
-            //bytePointerPosition += 14; //for env road tile bus wreck
-
-            //allocate 4 byte array (int32)
-            byte[] source_mainTexSize = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
-
-            //parse the byte array to int32
-            int parsed_mainTexSize = BitConverter.ToInt32(source_mainTexSize);
-
-            Console.WriteLine("Main Texture Size (212) = {0}", parsed_mainTexSize.ToString());
-
-            //testing
-            bytePointerPosition = (20 + telltaleScrewyHeaderLength + 28) + fileNameBytes.Length;
-            bytePointerPosition += 16;
-            Console.WriteLine("Main Texture Size (16) = {0}", BitConverter.ToInt32(AllocateByteArray(4, sourceByteFile, bytePointerPosition)).ToString());
-
-            //testing
-            bytePointerPosition = (20 + telltaleScrewyHeaderLength + 28) + fileNameBytes.Length;
-            bytePointerPosition += 20;
-            Console.WriteLine("Main Texture Size (20) = {0}", BitConverter.ToInt32(AllocateByteArray(4, sourceByteFile, bytePointerPosition)).ToString());
-
-            //--------------------------8 = TEXTURE FILE NAME--------------------------
-            bytePointerPosition = (20 + telltaleScrewyHeaderLength) + 28;
+            //--------------------------5 = TEXTURE FILE NAME--------------------------
+            //offset byte pointer location to get the TEXTURE FILE NAME
+            bytePointerPosition += 28;
 
             //the number of 'byte matches' from the source that match the bytes in the fileName
             int byteMatches = 0;
@@ -313,62 +268,61 @@ namespace D3DTX_TextureConverter
             //move the cursor past the filename.extension byte string
             bytePointerPosition += fileNameBytes.Length;
 
-            //--------------------------9 = MIP MAP COUNT--------------------------
-            //Image Mip Map Count
+            //--------------------------6 = MIP MAP COUNT--------------------------
+            //offset byte pointer location to get the MIP MAP COUNT
             bytePointerPosition += 13;
 
             //allocate 4 byte array (int32)
             byte[] source_imageMipMapCount = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
 
             //parse the byte array to int32
-            int parsed_imageMipMapCount = BitConverter.ToInt32(source_imageMipMapCount);
-            int parsed_imageMipMapCount_decremented = parsed_imageMipMapCount - 1;
+            parsed_imageMipMapCount = BitConverter.ToInt32(source_imageMipMapCount);
+            parsed_imageMipMapCount_decremented = parsed_imageMipMapCount - 1;
 
+            //write the result to the console for viewing
             Console.WriteLine("Mip Map Count = {0} ({1})", parsed_imageMipMapCount.ToString(), parsed_imageMipMapCount_decremented.ToString());
-
-            //--------------------------10 = GET IMAGE WIDTH--------------------------
-            //Image Pixel Width offset location
+            //--------------------------7 = MAIN IMAGE WIDTH--------------------------
+            //offset byte pointer location to get the MAIN IMAGE WIDTH
             bytePointerPosition += 4;
 
             //allocate 4 byte array (int32)
             byte[] source_imageWidth = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
 
             //parse the byte array to int32
-            int parsed_imageWidth = BitConverter.ToInt32(source_imageWidth);
+            parsed_imageWidth = BitConverter.ToInt32(source_imageWidth);
 
+            //write the result to the console for viewing
             Console.WriteLine("Image Width = {0}", parsed_imageWidth.ToString());
-
-            //--------------------------11 = GET IMAGE HEIGHT--------------------------
-            //Image Pixel Height offset location
+            //--------------------------8 = MAIN IMAGE HEIGHT--------------------------
+            //offset byte pointer location to get the MAIN IMAGE HEIGHT
             bytePointerPosition += 4;
 
             //allocate 4 byte array (int32)
             byte[] source_imageHeight = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
 
             //parse the byte array to int32
-            int parsed_imageHeight = BitConverter.ToInt32(source_imageHeight);
+            parsed_imageHeight = BitConverter.ToInt32(source_imageHeight);
 
+            //write the result to the console for viewing
             Console.WriteLine("Image Height = {0}", parsed_imageHeight.ToString());
-
-            //--------------------------12 = DXT TYPE?--------------------------
-            //Image Pixel Height offset location
-            //bytePointerPosition += 4;
-            //bytePointerPosition += 8;
+            //--------------------------9 = DXT TYPE?--------------------------
+            //offset byte pointer location to get the DXT TYPE
             bytePointerPosition += 12;
 
             //allocate 4 byte array (int32)
             byte[] source_dxtType = AllocateByteArray(4, sourceByteFile, bytePointerPosition);
 
             //parse the byte array to int32
-            int parsed_dxtType = BitConverter.ToInt32(source_dxtType);
+            parsed_dxtType = BitConverter.ToInt32(source_dxtType);
 
+            //write the result to the console for viewing
             Console.WriteLine("DXT TYPE = {0}", parsed_dxtType.ToString());
-
             //--------------------------BUILDING DDS TEXTURE HEADER--------------------------
-            //NOTE TO SELF - BIGGEST ISSUE RIGHT NOW IS MIP MAPS, NEED TO PARSE MORE INFORMATION FROM D3DTX TO BE ABLE TO EXTRACT MIP MAPS PROPERLY
-            //NOTE TO SELF - largest mip map (main texture) extraction is successful, the next step is getting the lower mip levels seperately, thank you microsoft for the byte size calculation forumla
+            //NOTE TO SELF 1 - BIGGEST ISSUE RIGHT NOW IS MIP MAPS, NEED TO PARSE MORE INFORMATION FROM D3DTX TO BE ABLE TO EXTRACT MIP MAPS PROPERLY
+            //NOTE TO SELF 2 - largest mip map (main texture) extraction is successful, the next step is getting the lower mip levels seperately, thank you microsoft for the byte size calculation forumla
 
-            //get our dds file ready
+
+            //get our dds file object ready
             DDS_File dds_File = new DDS_File();
 
             //assign our parsed values from the d3dtx to new dds file
@@ -376,6 +330,7 @@ namespace D3DTX_TextureConverter
             dds_File.dwHeight = (uint)parsed_imageHeight;
             //dds_File.dwFlags = (uint)parsed_dwFlags;
             dds_File.dwMipMapCount = (uint)parsed_imageMipMapCount_decremented;
+
 
             //this section needs some reworking, still can't track down exactly what the compression types are, parsed_compressionType and parsed_dxtType are close
             //SET DDS COMPRESSION TYPES
@@ -398,33 +353,36 @@ namespace D3DTX_TextureConverter
                 //dds_File.ddspf_dwFourCC = "ATI1";
             }
 
+            //estimate how many total bytes are in the largest texture mip level (main one)
             int mainTextureByteSize_Estimation = CalculateDDS_ByteSize(parsed_imageWidth, parsed_imageHeight, parsed_dxtType == 64);
-            Console.WriteLine("calculated main size test = {0}", mainTextureByteSize_Estimation.ToString());
+
+            //write the result to the console for viewing
+            Console.WriteLine("calculated Largest Mip Level Byte Size = {0}", mainTextureByteSize_Estimation.ToString());
 
             //build the header and store it in a byte array
             byte[] ddsHeader = dds_File.Build_DDSHeader_ByteArray();
 
             //--------------------------EXTRACTING TEXTURE DATA FROM D3DTX--------------------------
             //calculating header length, parsed texture byte size - source byte size
-            int headerLength = sourceByteFile.Length - parsed_fileSize;
+            int headerLength = sourceByteFile.Length - parsed_textureDataByteSize;
+
+            //initalize our start offset, this is used to offset the array copy
             int startOffset = 0;
 
             //allocate our byte array to contain our texture data
             byte[] textureData;
 
-            if (mainTextureByteSize_Estimation > parsed_fileSize)
+            //if our estimation is not accurate, then just extract the whole fuckin thing
+            if (mainTextureByteSize_Estimation > parsed_textureDataByteSize)
             {
-                //if our estimation is not accurate, then just extract the whole fuckin thing
-
                 //offset the byte pointer position just past the header
                 startOffset = headerLength;
 
                 //calculate main texture level
-                textureData = new byte[parsed_fileSize];
+                textureData = new byte[parsed_textureDataByteSize];
             }
-            else
+            else //if our estimation is accurate, then just extract the last mip map
             {
-                //if our estimation is accurate, then just extract the last mip map
                 //note to self, this will change later.
                 //as a test for self, create multiple child dds files that each have the mip map data extracted into each single one
 

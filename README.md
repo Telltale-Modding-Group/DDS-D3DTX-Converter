@@ -1,5 +1,9 @@
 # DDS-D3DTX-Converter
 
+### DISCLAIMER
+
+**NOTE**: This is currently being developed and tested with ***"The Walking Dead Telltale Definitive Series"*** textures.
+
 ### What is this?
 
 **This is an experimental application** containing a WIP console script application for converting **.d3dtx textures (Telltale Tool Textures)**, to standard **.dds (Direct Draw Surface)**. 
@@ -17,7 +21,7 @@ When this script improves and matures, I will turn it into a full on custom appl
 
 ### How to use?
 
-This is likely to change, but if you wish to try you need to download the IDE (You will need Visual Studio Community 2020) and this project as well and open it in the IDE. 
+This is likely to change, and I will not put out a build (exe) until the script becomes more advanced and stable enough (I will also be writing a GUI application for it). But if you wish to try you need to download the IDE (Visual Studio Community 2020) and download this project as well and open it with the IDE (the .sln project file).
 
 1. Run the application through the editor and it will open up a console window. 
 2. It will ask you to indentify a path for where your .d3dtx textures are stored. Make sure you have a folder with only the .d3dtx textures you want to convert, enter the folder path in the console.
@@ -26,7 +30,3 @@ This is likely to change, but if you wish to try you need to download the IDE (Y
 The script will then run through and convert all textures to be found in the source folder. 
 
 **NOTE:*** Not all .d3dtx textures will work or show up properly and might even look corrupted after conversion. This is simply because once again, this is a very new script and I have yet to support more d3dtx texture variants. For the most part, any diffuse/albedo textures should work.
-
-### DISCLAIMER
-
-**NOTE**: This is currently being developed and tested with ***"The Walking Dead Telltale Definitive Series"*** textures.

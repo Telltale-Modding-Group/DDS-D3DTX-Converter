@@ -8,7 +8,7 @@ This is currently being developed and tested only with ***"The Walking Dead Tell
 
 **This is an experimental application** containing a WIP console script application for converting **.d3dtx textures (Telltale Tool Textures)**, to standard **.dds (Direct Draw Surface)**. 
 
-It can also do the opposite and can be used to do texture mods for a Telltale Tool Game.
+It can also do the opposite and can be used to do texture mods for a Telltale Tool Game, which is the final goal.
 
 ### When will you release it?
 

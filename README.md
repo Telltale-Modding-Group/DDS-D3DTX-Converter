@@ -20,7 +20,7 @@ It can also do the opposite and can be used to do texture mods for a Telltale To
 
 ### How to use?
 
-This is likely to change, and I will not put out a build (exe) until the script becomes more advanced and stable enough (I will also be writing a GUI application for it). But if you wish to try you need to download the IDE (Visual Studio Community 2020) and download this project as well and open it with the IDE (the .sln project file).
+This is likely to change, and I will not put out a build (exe) with a GUI until the script becomes more advanced and stable enough (The reason being that a console app is much faster for iteration and testing). But if you wish to try you need to download the IDE (Visual Studio Community 2020) and download this project as well and open it with the IDE (the .sln project file).
 
 1. Run the application through the editor and it will open up a console window. 
 2. It will ask you to indentify a path for where your .d3dtx textures are stored. Make sure you have a folder with only the .d3dtx textures you want to convert, enter the folder path in the console.

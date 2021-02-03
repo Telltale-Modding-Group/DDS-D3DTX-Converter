@@ -16,7 +16,7 @@ It can also do the opposite and can be used to do texture mods for a Telltale To
 
 It's worth noting that I don't have the script for the .d3dtx to .dds conversion finished just yet, it will be made and complete but the goal currently is to understand the .d3dtx format to the best of my ability. Once that is complete I can focus on converting said .dds to .d3dtx which should be simple and straight forward once the format is understood well enough. *(I will also write another page explaining the extraction/building process and the d3dtx format for those intrested as well. Information is power!)*
 
-**More information will be written and explained at a later date.** Currently focused on the functionality of the script but also understanding and extracting the data from the .d3dtx format itself which is the first goal, the second being then converting a dds into a d3dtx. *(For the life of me I cannot fathom how there are already a few .d3dtx converters out there, (which most don't have their source revealed) but no one has bothered to do one in reverse, hence also why I am writing this script)*.
+**More information will be written and explained at a later date.** Currently focused on the functionality of the script but also understanding and extracting the data from the .d3dtx format itself which is the first goal, the second being then converting a dds into a d3dtx. *For the life of me I cannot fathom how there are already a few .d3dtx converters out there, (which most don't have their source revealed) but no one has bothered to do one in reverse, hence also why I am writing this script*.
 
 ### How to use?
 

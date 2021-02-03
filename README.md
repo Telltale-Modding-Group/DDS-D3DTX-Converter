@@ -2,7 +2,7 @@
 
 ### DISCLAIMER
 
-**NOTE**: This is currently being developed and tested with ***"The Walking Dead Telltale Definitive Series"*** textures.
+This is currently being developed and tested only with ***"The Walking Dead Telltale Definitive Series"*** textures.
 
 ### What is this?
 

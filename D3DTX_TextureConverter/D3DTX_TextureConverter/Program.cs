@@ -163,12 +163,10 @@ namespace D3DTX_TextureConverter
         /// <param name="destinationFile"></param>
         public static void ConvertTexture(string sourceFileName, string sourceFile, string destinationFile)
         {
-            //for me
-            bool ignoreUnknownValues = true;
-
             //read the source file into a byte array
             byte[] sourceByteFile = File.ReadAllBytes(sourceFile);
 
+            //write the result to the console for viewing
             Console.WriteLine("Total File Byte Size = {0}", sourceByteFile.Length);
 
             //get our file name and convert it to a byte array (since d3dtx has the filename.extension written in the file)
@@ -183,8 +181,9 @@ namespace D3DTX_TextureConverter
             int parsed_imageWidth; //main image pixel width
             int parsed_imageHeight; //main image pixel height
             int parsed_dxtType; //dxt type?
+            int headerLength; //length of the telltale d3dtx header
 
-            //which byte offset we are on
+            //which byte offset we are on (will be changed as we go through the file)
             int bytePointerPosition = 0;
 
             //--------------------------1 = DWORD--------------------------
@@ -221,8 +220,12 @@ namespace D3DTX_TextureConverter
             //parse the byte array to int32
             parsed_textureDataByteSize = BitConverter.ToInt32(source_fileSize);
 
+            //calculating header length, parsed texture byte size - source byte size
+            headerLength = sourceByteFile.Length - parsed_textureDataByteSize;
+
             //write the result to the console for viewing
             Console.WriteLine("Texture Byte Size = {0}", parsed_textureDataByteSize.ToString());
+            Console.WriteLine("Header Byte Size = {0}", headerLength.ToString());
             //--------------------------4 = SCREWY TELLTALE DATA--------------------------
             //NOTE TO SELF - no need to parse this byte data, we can extract the entire header later with this info included and just change what we need
 
@@ -320,7 +323,7 @@ namespace D3DTX_TextureConverter
             //--------------------------BUILDING DDS TEXTURE HEADER--------------------------
             //NOTE TO SELF 1 - BIGGEST ISSUE RIGHT NOW IS MIP MAPS, NEED TO PARSE MORE INFORMATION FROM D3DTX TO BE ABLE TO EXTRACT MIP MAPS PROPERLY
             //NOTE TO SELF 2 - largest mip map (main texture) extraction is successful, the next step is getting the lower mip levels seperately, thank you microsoft for the byte size calculation forumla
-
+            //NOTE TO SELF 3 - all mip maps can be extracted sucessfully and implemented into the DDS file
 
             //get our dds file object ready
             DDS_File dds_File = new DDS_File();
@@ -357,9 +360,6 @@ namespace D3DTX_TextureConverter
             byte[] ddsHeader = dds_File.Build_DDSHeader_ByteArray();
 
             //--------------------------EXTRACTING TEXTURE DATA FROM D3DTX--------------------------
-            //calculating header length, parsed texture byte size - source byte size
-            int headerLength = sourceByteFile.Length - parsed_textureDataByteSize;
-
             //estimate how many total bytes are in the largest texture mip level (main one)
             int mainTextureByteSize_Estimation = CalculateDDS_ByteSize(parsed_imageWidth, parsed_imageHeight, parsed_dxtType == 64);
 
@@ -397,8 +397,77 @@ namespace D3DTX_TextureConverter
             //copy all the bytes from the source byte file after the header length, and copy that data to the texture data byte array
             Array.Copy(sourceByteFile, startOffset, textureData, 0, textureData.Length);
 
-            //write the data to the file, combine the generted DDS header and our new texture byte data and we are done!
-            File.WriteAllBytes(destinationFile, Combine(ddsHeader, textureData));
+            byte[] finalDDS_textureData = Combine(ddsHeader, textureData);
+
+            //if there are no mip maps, build the texture file because we are done
+            if (parsed_imageMipMapCount <= 1)
+            {
+                //write the data to the file, combine the generted DDS header and our new texture byte data
+                File.WriteAllBytes(destinationFile, finalDDS_textureData);
+
+                //we are done!
+                return;
+            }
+
+            //--------------------------MIP MAP EXTRACTION AND BUILDING--------------------------
+            //offset for getting mip maps, we are working backwards since d3dtx has their mip maps stored backwards
+            int leftoverOffset = sourceByteFile.Length - mainTextureByteSize_Estimation;
+
+            //get image mip dimensions (will be modified when the loop is iterated)
+            int mipImageWidth = parsed_imageWidth;
+            int mipImageHeight = parsed_imageHeight;
+            int totalMipByteSize = 0;
+
+            //run a loop for the amount of mip maps
+            for (int i = 1; i < parsed_imageMipMapCount; i++)
+            {
+                //write the result to the console for viewing
+                Console.WriteLine("Mip Level = {0}", i.ToString());
+
+                //divide the dimensions by 2 when stepping down on each mip level
+                mipImageWidth /= 2;
+                mipImageHeight /= 2;
+
+                //if the dimensions are greater then 2, get the mip map
+                //if (mipImageWidth > 2 || mipImageHeight > 2)
+                //{
+                    //write the result to the console for viewing
+                    Console.WriteLine("Mip Resolution = {0}x{1}", mipImageWidth.ToString(), mipImageHeight.ToString());
+
+                    //estimate how many total bytes are in the largest texture mip level (main one)
+                    int byteSize_estimation = CalculateDDS_ByteSize(mipImageWidth, mipImageHeight, parsed_dxtType == 64);
+                    leftoverOffset -= byteSize_estimation;
+                    totalMipByteSize += byteSize_estimation;
+
+                    //write the result to the console for viewing
+                    Console.WriteLine("Mip Level Byte Size = {0}", byteSize_estimation.ToString());
+
+                    //allocate a byte array with the estimated byte size
+                    byte[] mipTexData = new byte[byteSize_estimation];
+
+                    //check to see if we are not over the header length (we are working backwards)
+                    if (leftoverOffset > headerLength)
+                    {
+                        //copy all the bytes from the source byte file after the leftoverOffset, and copy that data to the texture data byte array
+                        Array.Copy(sourceByteFile, leftoverOffset, mipTexData, 0, mipTexData.Length);
+
+                        //combine the new mip byte data to the existing texture data byte array
+                        finalDDS_textureData = Combine(finalDDS_textureData, mipTexData);
+                    }
+                //}
+            }
+
+            //write the result to the console for viewing
+            Console.WriteLine("Total Mips Byte Size = {0}", totalMipByteSize.ToString());
+
+            //not required, but just viewing to see if our estimated sizes match up with the parsed texture byte size
+            int totalTexByteSize = totalMipByteSize + mainTextureByteSize_Estimation;
+
+            //write the result to the console for viewing
+            Console.WriteLine("Total Byte Size = {0}", totalTexByteSize.ToString());
+
+            //write the data to the file, combine the generted DDS header and our new texture byte data
+            File.WriteAllBytes(destinationFile, finalDDS_textureData);
         }
 
         /// <summary>

@@ -416,6 +416,8 @@ namespace D3DTX_TextureConverter
             //get image mip dimensions (will be modified when the loop is iterated)
             int mipImageWidth = parsed_imageWidth;
             int mipImageHeight = parsed_imageHeight;
+
+            //not required, just for viewing
             int totalMipByteSize = 0;
 
             //run a loop for the amount of mip maps
@@ -428,33 +430,32 @@ namespace D3DTX_TextureConverter
                 mipImageWidth /= 2;
                 mipImageHeight /= 2;
 
-                //if the dimensions are greater then 2, get the mip map
-                //if (mipImageWidth > 2 || mipImageHeight > 2)
-                //{
-                    //write the result to the console for viewing
-                    Console.WriteLine("Mip Resolution = {0}x{1}", mipImageWidth.ToString(), mipImageHeight.ToString());
+                //write the result to the console for viewing
+                Console.WriteLine("Mip Resolution = {0}x{1}", mipImageWidth.ToString(), mipImageHeight.ToString());
 
-                    //estimate how many total bytes are in the largest texture mip level (main one)
-                    int byteSize_estimation = CalculateDDS_ByteSize(mipImageWidth, mipImageHeight, parsed_dxtType == 64);
-                    leftoverOffset -= byteSize_estimation;
-                    totalMipByteSize += byteSize_estimation;
+                //estimate how many total bytes are in the largest texture mip level (main one)
+                int byteSize_estimation = CalculateDDS_ByteSize(mipImageWidth, mipImageHeight, parsed_dxtType == 64);
+                //offset our variable so we can get to the next mip (we are working backwards from the end of the file)
+                leftoverOffset -= byteSize_estimation;
 
-                    //write the result to the console for viewing
-                    Console.WriteLine("Mip Level Byte Size = {0}", byteSize_estimation.ToString());
+                //not required, just for viewing
+                totalMipByteSize += byteSize_estimation;
 
-                    //allocate a byte array with the estimated byte size
-                    byte[] mipTexData = new byte[byteSize_estimation];
+                //write the result to the console for viewing
+                Console.WriteLine("Mip Level Byte Size = {0}", byteSize_estimation.ToString());
 
-                    //check to see if we are not over the header length (we are working backwards)
-                    if (leftoverOffset > headerLength)
-                    {
-                        //copy all the bytes from the source byte file after the leftoverOffset, and copy that data to the texture data byte array
-                        Array.Copy(sourceByteFile, leftoverOffset, mipTexData, 0, mipTexData.Length);
+                //allocate a byte array with the estimated byte size
+                byte[] mipTexData = new byte[byteSize_estimation];
 
-                        //combine the new mip byte data to the existing texture data byte array
-                        finalDDS_textureData = Combine(finalDDS_textureData, mipTexData);
-                    }
-                //}
+                //check to see if we are not over the header length (we are working backwards)
+                if (leftoverOffset > headerLength)
+                {
+                    //copy all the bytes from the source byte file after the leftoverOffset, and copy that data to the texture data byte array
+                    Array.Copy(sourceByteFile, leftoverOffset, mipTexData, 0, mipTexData.Length);
+
+                    //combine the new mip byte data to the existing texture data byte array
+                    finalDDS_textureData = Combine(finalDDS_textureData, mipTexData);
+                }
             }
 
             //write the result to the console for viewing

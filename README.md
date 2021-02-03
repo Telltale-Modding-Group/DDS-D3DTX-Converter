@@ -28,4 +28,4 @@ This is likely to change, and I will not put out a build (exe) until the script 
 
 The script will then run through and convert all textures to be found in the source folder. 
 
-**NOTE:*** Not all .d3dtx textures will work or show up properly and might even look corrupted after conversion. This is simply because once again, this is a very new script and I have yet to support more d3dtx texture variants. For the most part, any diffuse/albedo textures should work.
+**NOTE:** Not all .d3dtx textures will work or show up properly and might even look corrupted after conversion. This is simply because once again, this is a very new script and I have yet to support more d3dtx texture variants. For the most part, any regular diffuse/albedo textures should work.

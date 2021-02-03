@@ -29,4 +29,4 @@ The script will then run through and convert all textures to be found in the sou
 
 ### DISCLAIMER
 
-**NOTE**: This is currently being developed and tested with ***"The Walking Dead Telltale Definitive Series".****
+**NOTE**: This is currently being developed and tested with ***"The Walking Dead Telltale Definitive Series"*** textures.

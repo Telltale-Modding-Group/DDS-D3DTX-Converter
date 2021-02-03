@@ -7,30 +7,58 @@ namespace D3DTX_TextureConverter
 {
     class Program
     {
+        //for D3DTX Mode, IMPORTANT if you want to convert the dds back to a d3dtx
+        public static bool generateHeader = true;
+
+        //dds image file extension
+        public static string ddsExtension = ".dds";
+
+        //telltale d3dtx texture file extension
+        public static string d3dtxExtension = ".d3dtx";
+
+        //custom header file extension (generated from d3dtx to dds, used to convert dds back to d3dtx)
+        public static string headerExtension = ".header";
+
         /// <summary>
         /// Main application method
         /// </summary>
         /// <param name="args"></param>
         static void Main(string[] args)
         {
+            //remove '//' before App_Convert_D3DTX_Mode to convert d3dtx textures to dds
+            //App_Convert_D3DTX_Mode();
+
+            //remove '//' before App_Convert_DDS_Mode to convert dds textures to d3dtx
+            App_Convert_DDS_Mode();
+        }
+
+        //-----------------------------------------------D3DTX TO DDS-----------------------------------------------
+        //-----------------------------------------------D3DTX TO DDS-----------------------------------------------
+        //-----------------------------------------------D3DTX TO DDS-----------------------------------------------
+
+        /// <summary>
+        /// Application function for converting D3DTX to DDS
+        /// </summary>
+        public static void App_Convert_D3DTX_Mode()
+        {
             //introduction
-            Console.WriteLine("D3DTX Texture Converter");
+            Console.WriteLine("D3DTX to DDS Texture Converter");
 
             //-----------------GET TEXTURE FOLDER PATH-----------------
-            Console.WriteLine("Enter the folder path with the textures.");
+            Console.WriteLine("Enter the folder path with the D3DTX textures.");
 
             //texture folder path (containing the path to the textures to be converted)
             string textureFolderPath = "";
 
             //run a loop until the path is valid
             bool inTexturePathLoop = true;
-            while(inTexturePathLoop)
+            while (inTexturePathLoop)
             {
                 //get path from user
                 textureFolderPath = Console.ReadLine();
 
                 //check if the path is valid
-                if(Directory.Exists(textureFolderPath) == false)
+                if (Directory.Exists(textureFolderPath) == false)
                 {
                     //notify the user and this loop will run again
                     Console.WriteLine("Incorrect Texture Path, try again.");
@@ -43,7 +71,7 @@ namespace D3DTX_TextureConverter
             }
 
             //-----------------GET RESULT FOLDER PATH-----------------
-            Console.WriteLine("Enter the resulting path where converted textures will be stored.");
+            Console.WriteLine("Enter the resulting path where converted DDS textures will be stored.");
 
             //result folder path (will contain the converted textures)
             string resultFolderPath = "";
@@ -74,41 +102,10 @@ namespace D3DTX_TextureConverter
             Console.WriteLine("Conversion Starting...");
 
             //we got our paths, so lets begin
-            BeginProcess(textureFolderPath, resultFolderPath);
+            Convert_D3DTX_Bulk(textureFolderPath, resultFolderPath);
 
             //once BeginProcess is finished, it will come back here and we will notify the user that we are done
             Console.WriteLine("Conversion Finished.");
-        }
-
-        /// <summary>
-        /// Filters an array of files by ".d3dtx" so only files with said extension will be in the array.
-        /// </summary>
-        /// <param name="files"></param>
-        /// <returns></returns>
-        public static List<string> FilterFiles(List<string> files)
-        {
-            //our extension to be filtering by
-            string filterExtension = ".d3dtx";
-
-            //the new filtered list
-            List<string> filteredFiles = new List<string>();
-
-            //run a loop through the existing 'files'
-            foreach(string file in files)
-            {
-                //get the extension of a file
-                string extension = Path.GetExtension(file);
-
-                //if the file's extension matches our filter, add it to the list (naturally anything that doesn't have said filter will be ignored)
-                if(extension.Equals(filterExtension))
-                {
-                    //add the matched extension to the list
-                    filteredFiles.Add(file);
-                }
-            }
-
-            //return the new filtered list
-            return filteredFiles;
         }
 
         /// <summary>
@@ -116,7 +113,7 @@ namespace D3DTX_TextureConverter
         /// </summary>
         /// <param name="texPath"></param>
         /// <param name="resultPath"></param>
-        public static void BeginProcess(string texPath, string resultPath)
+        public static void Convert_D3DTX_Bulk(string texPath, string resultPath)
         {
             Console.WriteLine("Collecting Files..."); //notify the user we are collecting files
 
@@ -126,7 +123,7 @@ namespace D3DTX_TextureConverter
             Console.WriteLine("Filtering Textures..."); //notify the user we are filtering the array
 
             //filter the array so we only get .d3dtx files
-            textures = FilterFiles(textures);
+            textures = FilterFiles(textures, d3dtxExtension);
 
             //if no d3dtx files were found, abort the program from going on any further (we don't have any files to convert!)
             if (textures.Count < 1)
@@ -144,13 +141,12 @@ namespace D3DTX_TextureConverter
                 //build the path for the resulting file
                 string textureFileName = Path.GetFileName(texture); //get the file name of the file + extension
                 string textureFileNameOnly = Path.GetFileNameWithoutExtension(texture);
-                string ddsFileExtension = ".dds";
-                string textureResultPath = resultPath + "/" + textureFileNameOnly + ddsFileExtension; //add the file name to the resulting folder path, this is where our converted file will be placed
+                string textureResultPath = resultPath + "/" + textureFileNameOnly + ddsExtension; //add the file name to the resulting folder path, this is where our converted file will be placed
 
                 Console.WriteLine("Converting '{0}'...", textureFileName); //notify the user are converting 'x' file.
 
                 //runs the main method for converting the texture
-                ConvertTexture(textureFileName, texture, textureResultPath);
+                ConvertTexture_FromD3DTX_ToDDS(textureFileName, texture, textureResultPath);
 
                 Console.WriteLine("Finished converting '{0}'...", textureFileName); //notify the user we finished converting 'x' file.
             }
@@ -161,7 +157,7 @@ namespace D3DTX_TextureConverter
         /// </summary>
         /// <param name="sourceFile"></param>
         /// <param name="destinationFile"></param>
-        public static void ConvertTexture(string sourceFileName, string sourceFile, string destinationFile)
+        public static void ConvertTexture_FromD3DTX_ToDDS(string sourceFileName, string sourceFile, string destinationFile)
         {
             //read the source file into a byte array
             byte[] sourceByteFile = File.ReadAllBytes(sourceFile);
@@ -359,6 +355,23 @@ namespace D3DTX_TextureConverter
             //build the header and store it in a byte array
             byte[] ddsHeader = dds_File.Build_DDSHeader_ByteArray();
 
+            //--------------------------GENERATING D3DTX HEADER FILE--------------------------
+            //generates a .header file that will accompany the .dds on conversion, this .header file will contain the original .d3dtx header for converting the .dds back later
+            if (generateHeader)
+            {
+                //build the header destination path, assuming the extnesion of the destination file path is .dds
+                string headerFilePath = string.Format("{0}{1}", destinationFile.Remove(destinationFile.Length - 4, 4), headerExtension);
+
+                //allocate a byte array to contain the header data
+                byte[] headerData = new byte[headerLength];
+
+                //copy all the bytes from the source byte file after the header length, and copy that data to the texture data byte array
+                Array.Copy(sourceByteFile, 0, headerData, 0, headerData.Length);
+
+                //write the header data to a file
+                File.WriteAllBytes(headerFilePath, headerData);
+            }
+
             //--------------------------EXTRACTING TEXTURE DATA FROM D3DTX--------------------------
             //estimate how many total bytes are in the largest texture mip level (main one)
             int mainTextureByteSize_Estimation = CalculateDDS_ByteSize(parsed_imageWidth, parsed_imageHeight, parsed_dxtType == 64);
@@ -367,7 +380,7 @@ namespace D3DTX_TextureConverter
             Console.WriteLine("calculated Largest Mip Level Byte Size = {0}", mainTextureByteSize_Estimation.ToString());
 
             //initalize our start offset, this is used to offset the array copy
-            int startOffset = 0;
+            int startOffset;
 
             //allocate our byte array to contain our texture data
             byte[] textureData;
@@ -469,6 +482,400 @@ namespace D3DTX_TextureConverter
 
             //write the data to the file, combine the generted DDS header and our new texture byte data
             File.WriteAllBytes(destinationFile, finalDDS_textureData);
+        }
+
+        //-----------------------------------------------DDS TO D3DTX-----------------------------------------------
+        //-----------------------------------------------DDS TO D3DTX-----------------------------------------------
+        //-----------------------------------------------DDS TO D3DTX-----------------------------------------------
+
+        /// <summary>
+        /// Application function for converting DDS to D3DTX
+        /// </summary>
+        public static void App_Convert_DDS_Mode()
+        {
+            //introduction
+            Console.WriteLine("DDS to D3DTX Texture Converter");
+
+            //-----------------GET TEXTURE FOLDER PATH-----------------
+            Console.WriteLine("Enter the folder path with the textures.");
+            Console.WriteLine("NOTE: Make sure each DDS is accompanied with a .header file");
+
+            //texture folder path (containing the path to the textures to be converted)
+            string textureFolderPath = "";
+
+            //run a loop until the path is valid
+            bool inTexturePathLoop = true;
+            while (inTexturePathLoop)
+            {
+                //get path from user
+                textureFolderPath = Console.ReadLine();
+
+                //check if the path is valid
+                if (Directory.Exists(textureFolderPath) == false)
+                {
+                    //notify the user and this loop will run again
+                    Console.WriteLine("Incorrect Texture Path, try again.");
+                }
+                else
+                {
+                    //if it's sucessful, then break out of the loop
+                    inTexturePathLoop = false;
+                }
+            }
+
+            //-----------------GET RESULT FOLDER PATH-----------------
+            Console.WriteLine("Enter the resulting path where converted textures will be stored.");
+
+            //result folder path (will contain the converted textures)
+            string resultFolderPath = "";
+
+            //run a loop until the path is valid
+            bool inResultPathLoop = true;
+            while (inResultPathLoop)
+            {
+                //get path from user
+                resultFolderPath = Console.ReadLine();
+
+                //check if the path is valid
+                if (Directory.Exists(resultFolderPath) == false)
+                {
+                    //notify the user and this loop will run again
+                    Console.WriteLine("Incorrect Result Path, try again.");
+                }
+                else
+                {
+                    //if it's sucessful, then break out of the loop
+                    inResultPathLoop = false;
+                }
+            }
+
+            //-----------------START CONVERSION-----------------
+
+            //notify the user we are starting
+            Console.WriteLine("Conversion Starting...");
+
+            //we got our paths, so lets begin
+            Convert_DDS_Bulk(textureFolderPath, resultFolderPath);
+
+            //once BeginProcess is finished, it will come back here and we will notify the user that we are done
+            Console.WriteLine("Conversion Finished.");
+        }
+
+        /// <summary>
+        /// Begins the conversion process. Gathers the files found in the texture folder path, filters them, and converts each one.
+        /// </summary>
+        /// <param name="texPath"></param>
+        /// <param name="resultPath"></param>
+        public static void Convert_DDS_Bulk(string texPath, string resultPath)
+        {
+            Console.WriteLine("Collecting Files..."); //notify the user we are collecting files
+
+            //gather the files from the texture folder path into an array
+            List<string> files = new List<string>(Directory.GetFiles(texPath));
+
+            //where our dds file paths will be stored
+            List<string> ddsFiles;
+
+            //where our header file paths will be stored
+            List<string> headerFiles;
+
+            Console.WriteLine("Filtering Files..."); //notify the user we are filtering the array
+
+            //filter the array so we only get .dds files
+            ddsFiles = FilterFiles(files, ddsExtension);
+
+            //filter the array so we only get .header files
+            headerFiles = FilterFiles(files, headerExtension);
+
+            //if none of the arrays have any files that were found, abort the program from going on any further (we don't have any files to convert!)
+            if (ddsFiles.Count < 1)
+            {
+                Console.WriteLine("No .d3dtx files were found, aborting.");
+                return;
+            }
+            else if (headerFiles.Count < 1)
+            {
+                Console.WriteLine("No .header files were found.");
+                Console.WriteLine(".header are required and must be generated when converting a .d3dtx to a .dds");
+                Console.WriteLine("aborting...");
+                return;
+            }
+
+            Console.WriteLine("Found {0} Textures.", ddsFiles.Count.ToString()); //notify the user we found x amount of dds files in the array
+            Console.WriteLine("Found {0} Headers.", headerFiles.Count.ToString()); //notify the user we found x amount of header files in the array
+            Console.WriteLine("Starting...");//notify the user we are starting
+
+            //run a loop through each of the found textures and convert each one
+            foreach (string ddsFile in ddsFiles)
+            {
+                //build the path for the resulting d3dtx file
+                string textureFileName = Path.GetFileName(ddsFile); //get the file name of the file + extension
+                string textureFileNameOnly = Path.GetFileNameWithoutExtension(ddsFile);
+                string textureResultPath = resultPath + "/" + textureFileNameOnly + d3dtxExtension; //add the file name to the resulting folder path, this is where our converted file will be placed
+
+                //texture header file path, this is assigned when we find the matching header file with the texture
+                string textureHeaderFile = "";
+
+                //before we start converting, lets check to see we can find the matching header file
+                foreach(string headerFile in headerFiles)
+                {
+                    //get the name for the header file (should match the d3dtx texture we are currently on)
+                    string headerFileNameOnly = Path.GetFileNameWithoutExtension(headerFile); //get the file name with no extension
+
+                    //if the names of both files match (which they should) then we found our header file
+                    if (headerFileNameOnly.Equals(textureFileNameOnly))
+                    {
+                        //assign the path of our header file
+                        textureHeaderFile = headerFile;
+
+                        //break out of this loop since we don't need to iterate any more
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(textureHeaderFile) || !string.IsNullOrWhiteSpace(textureHeaderFile))
+                {
+                    //notify the user are converting 'x' file.
+                    Console.WriteLine("Merging '{0}'...", textureFileName); //notify the user are converting 'x' file.
+                    Console.WriteLine("Merging '{0}'...", Path.GetFileName(textureHeaderFile)); //notify the user are converting 'x' file.
+
+                    //runs the main method for merging both files into a single .d3dtx
+                    ConvertTexture_FromDDS_ToD3DTX(textureFileName, ddsFile, textureHeaderFile, textureResultPath);
+
+                    Console.WriteLine("Finished merging '{0}'...", textureFileNameOnly); //notify the user we finished converting 'x' file.
+                }
+                else
+                {
+                    //notify the user that we can't convert this file, so we have to skip
+                    Console.WriteLine("Can't find the matching header file for '{0}'! Skipping this one.", textureFileName);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The main function for reading and converting said .d3dtx into a .dds file
+        /// </summary>
+        /// <param name="sourceFile"></param>
+        /// <param name="destinationFile"></param>
+        public static void ConvertTexture_FromDDS_ToD3DTX(string sourceFileName, string sourceTexFile, string sourceHeaderFile, string destinationFile)
+        {
+            /*
+             * NOTE TO SELF
+             * DDS --> D3DTX EXTRACTION UNSUCESSFUL, THE BYTES ARE NOT FULLY 1:1 WHEN THERE IS A CONVERSION
+             * MABYE TRY TO CHANGE THE TEXTURE DATA BYTE SIZE IN THE D3DTX HEADER AND SEE IF THAT CHANGES ANYTHING
+             * IF NOT THEN WE NEED TO LOOK INTO THE DDS --> D3DTX AGAIN AND GO THROUGH IT UNTIL WE GET THE EXACT BYTES
+            */
+
+            //read the source texture file into a byte array
+            byte[] sourceTexFileData = File.ReadAllBytes(sourceTexFile);
+
+            //read the source header file into a byte array
+            byte[] sourceHeaderFileData = File.ReadAllBytes(sourceHeaderFile);
+
+            //get our file name and convert it to a byte array (since d3dtx has the filename.extension written in the file)
+            byte[] fileNameBytes = Encoding.ASCII.GetBytes(sourceFileName);
+
+
+            //initalize our variables for the dds header
+            int texture_parsed_headerLength; //total byte size of the header data
+            int texture_parsed_imageWidth; //size of the dds image pixel width
+            int texture_parsed_imageHeight; //size of the dds image height height
+            int texture_parsed_mipMapCount; //total amount of mip maps in the dds file
+            int texture_parsed_compressionType; //compression type of the dds file
+
+            //initalize our variables for the d3dtx header
+            int header_parsed_textureDataByteSize; //total byte size of the texture data, used to calculate the header length
+
+            //write the result to the console for viewing
+            Console.WriteLine("Total Source Texture Byte Size = {0}", sourceTexFileData.Length);
+
+            //write the result to the console for viewing
+            Console.WriteLine("Total Source Header Byte Size = {0}", sourceHeaderFileData.Length);
+
+            //which byte offset we are on for the source texture (will be changed as we go through the file)
+            int texture_bytePointerPosition = 0;
+
+            //which byte offset we are on for the source header (will be changed as we go through the file)
+            int header_bytePointerPosition = 0;
+
+            //--------------------------1 DDS HEADER SIZE--------------------------
+            //skip the dds dword for now because we just want the size of the header
+            texture_bytePointerPosition = 4;
+
+            //allocate 4 byte array (int32)
+            byte[] texture_source_headerLength = AllocateByteArray(4, sourceTexFileData, texture_bytePointerPosition);
+
+            //parse the byte array to int32
+            texture_parsed_headerLength = BitConverter.ToInt32(texture_source_headerLength);
+
+            //write the result to the console for viewing
+            Console.WriteLine("DDS Header Length = {0}", texture_parsed_headerLength.ToString());
+
+            //--------------------------2 DDS IMAGE HEIGHT--------------------------
+            //skip the dds dword for now because we just want the size of the header
+            texture_bytePointerPosition = 12;
+
+            //allocate 4 byte array (int32)
+            byte[] texture_source_imageHeight = AllocateByteArray(4, sourceTexFileData, texture_bytePointerPosition);
+
+            //parse the byte array to int32
+            texture_parsed_imageHeight = BitConverter.ToInt32(texture_source_imageHeight);
+
+            //write the result to the console for viewing
+            Console.WriteLine("DDS Image Height = {0}", texture_parsed_imageHeight.ToString());
+
+            //--------------------------3 DDS IMAGE HEIGHT--------------------------
+            //skip the dds dword for now because we just want the size of the header
+            texture_bytePointerPosition = 16;
+
+            //allocate 4 byte array (int32)
+            byte[] texture_source_imageWidth = AllocateByteArray(4, sourceTexFileData, texture_bytePointerPosition);
+
+            //parse the byte array to int32
+            texture_parsed_imageWidth = BitConverter.ToInt32(texture_source_imageWidth);
+
+            //write the result to the console for viewing
+            Console.WriteLine("DDS Image Width = {0}", texture_parsed_imageWidth.ToString());
+
+            //--------------------------4 DDS MIP MAP COUNT--------------------------
+            //skip ahead to the mip map count
+            texture_bytePointerPosition = 28;
+
+            //allocate 4 byte array (int32)
+            byte[] texture_source_mipMapCount = AllocateByteArray(4, sourceTexFileData, texture_bytePointerPosition);
+
+            //parse the byte array to int32
+            texture_parsed_mipMapCount = BitConverter.ToInt32(texture_source_mipMapCount);
+
+            //write the result to the console for viewing
+            Console.WriteLine("DDS Header Length = {0}", texture_parsed_mipMapCount.ToString());
+
+            //--------------------------5 DDS COMPRESSION TYPE--------------------------
+            //note to self - be sure to get the pixel format header size as well later
+            //skip ahead to the mip map count
+            texture_bytePointerPosition = 84;
+
+            //allocate 4 byte array (int32)
+            byte[] texture_source_compressionType = AllocateByteArray(4, sourceTexFileData, texture_bytePointerPosition);
+
+            //parse the byte array to int32
+            texture_parsed_compressionType = BitConverter.ToInt32(texture_source_compressionType);
+
+            //write the result to the console for viewing
+            Console.WriteLine("DDS Compression Type = {0}", texture_parsed_compressionType.ToString());
+
+            //--------------------------EXTRACT DDS TEXTURE DATA--------------------------
+            //calculate dds header length (we add 4 because we skipped the 4 bytes which contain the dword, it isn't necessary to parse this data)
+            int ddsHeaderLength = 4 + texture_parsed_headerLength;
+            int ddsTextureDataLength = sourceTexFileData.Length - ddsHeaderLength;
+
+            byte[] textureData = new byte[ddsTextureDataLength];
+
+            Array.Copy(sourceTexFileData, ddsHeaderLength, textureData, 0, textureData.Length);
+
+            //--------------------------COMBINE DDS TEXTURE DATA WITH D3DTX HEADER--------------------------
+            int total_d3dtxLength = textureData.Length + sourceHeaderFileData.Length;
+            byte[] final_d3dtxData = new byte[total_d3dtxLength];
+
+            //if there are no mip maps, go ahead and just build the texture
+            if(texture_parsed_mipMapCount < 1)
+            {
+                //write the data to the file, combine the generted DDS header and our new texture byte data
+                File.WriteAllBytes(destinationFile, Combine(sourceHeaderFileData, final_d3dtxData));
+
+                return;
+            }
+
+            //we will work through the texture data backwards, since the d3dtx format has mip map ordered reversed, so we will add it in that way
+            //offset for getting mip maps, we are working backwards since d3dtx has their mip maps stored backwards
+            int leftoverOffset = textureData.Length;
+
+            texture_parsed_mipMapCount += 1;
+
+            //get image mip dimensions (will be modified when the loop is iterated)
+            int mipImageWidth = texture_parsed_imageWidth/texture_parsed_mipMapCount;
+            int mipImageHeight = texture_parsed_imageHeight/texture_parsed_mipMapCount;
+
+            //not required, just for viewing
+            int totalMipByteSize = 0;
+
+            //run a loop for the amount of mip maps
+            for (int i = 1; i < texture_parsed_mipMapCount; i++)
+            {
+                //write the result to the console for viewing
+                Console.WriteLine("Mip Level = {0}", i.ToString());
+
+                //divide the dimensions by 2 when stepping down on each mip level
+                mipImageWidth *= 2;
+                mipImageHeight *= 2;
+
+                //write the result to the console for viewing
+                Console.WriteLine("Mip Resolution = {0}x{1}", mipImageWidth.ToString(), mipImageHeight.ToString());
+
+                //estimate how many total bytes are in the largest texture mip level (main one)
+                int byteSize_estimation = CalculateDDS_ByteSize(mipImageWidth, mipImageHeight, texture_parsed_compressionType == 827611204);
+                //offset our variable so we can get to the next mip (we are working backwards from the end of the file)
+                leftoverOffset -= byteSize_estimation;
+
+                //not required, just for viewing
+                totalMipByteSize += byteSize_estimation;
+
+                //write the result to the console for viewing
+                Console.WriteLine("Mip Level Byte Size = {0}", byteSize_estimation.ToString());
+
+                //allocate a byte array with the estimated byte size
+                byte[] mipTexData = new byte[byteSize_estimation];
+
+                //check to see if we are not over the length of the file (we are working backwards)
+                if (leftoverOffset > 0)
+                {
+                    //copy all the bytes from the source byte file after the leftoverOffset, and copy that data to the texture data byte array
+                    Array.Copy(sourceTexFileData, leftoverOffset, mipTexData, 0, mipTexData.Length);
+
+                    //combine the new mip byte data to the existing texture data byte array
+                    final_d3dtxData = Combine(final_d3dtxData, mipTexData);
+                }
+            }
+
+
+            //combine the d3dtx header with the texture data
+            final_d3dtxData = Combine(sourceHeaderFileData, final_d3dtxData);
+
+
+            //write the data to the file, combine the generted DDS header and our new texture byte data
+            File.WriteAllBytes(destinationFile, final_d3dtxData);
+        }
+
+        //-----------------------------------------------UTILLITIES-----------------------------------------------
+        //-----------------------------------------------UTILLITIES-----------------------------------------------
+        //-----------------------------------------------UTILLITIES-----------------------------------------------
+
+        /// <summary>
+        /// Filters an array of files by ".d3dtx" so only files with said extension will be in the array.
+        /// </summary>
+        /// <param name="files"></param>
+        /// <returns></returns>
+        public static List<string> FilterFiles(List<string> files, string filterExtension)
+        {
+            //the new filtered list
+            List<string> filteredFiles = new List<string>();
+
+            //run a loop through the existing 'files'
+            foreach (string file in files)
+            {
+                //get the extension of a file
+                string extension = Path.GetExtension(file);
+
+                //if the file's extension matches our filter, add it to the list (naturally anything that doesn't have said filter will be ignored)
+                if (extension.Equals(filterExtension))
+                {
+                    //add the matched extension to the list
+                    filteredFiles.Add(file);
+                }
+            }
+
+            //return the new filtered list
+            return filteredFiles;
         }
 
         /// <summary>

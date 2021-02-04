@@ -792,14 +792,26 @@ namespace D3DTX_TextureConverter
             //allocate a byte array to contain our texture data (ordered backwards)
             byte[] final_d3dtxData = new byte[total_d3dtxLength];
 
-            if (texture_parsed_mipMapCount % 2 != 0)
-                texture_parsed_mipMapCount += 1;
 
-            texture_parsed_mipMapCount *= 2;
 
-            //get image mip dimensions (will be modified when the loop is iterated)
-            int mipImageWidth = texture_parsed_imageWidth/texture_parsed_mipMapCount;
-            int mipImageHeight = texture_parsed_imageHeight/texture_parsed_mipMapCount;
+
+            texture_parsed_mipMapCount += 1;
+
+            //because I suck at math, we will generate our mip map resolution using the same method we did in d3dtx to dds
+            int[,] mipImageResolutions = new int[texture_parsed_mipMapCount, 2];
+
+            int mipImageWidth = texture_parsed_imageWidth * 2;
+            int mipImageHeight = texture_parsed_imageHeight * 2;
+
+            //add the resolutions in reverse
+            for (int i = texture_parsed_mipMapCount - 1; i > 0; i--)
+            {
+                mipImageWidth /= 2;
+                mipImageHeight /= 2;
+
+                mipImageResolutions[i, 0] = mipImageWidth;
+                mipImageResolutions[i, 1] = mipImageHeight;
+            }
 
             //not required, just for viewing
             int totalMipByteSize = 0;
@@ -810,15 +822,14 @@ namespace D3DTX_TextureConverter
                 //write the result to the console for viewing
                 Console.WriteLine("Mip Level = {0}", i.ToString());
 
-                //divide the dimensions by 2 when stepping down on each mip level
-                mipImageWidth *= 2;
-                mipImageHeight *= 2;
+                int width = mipImageResolutions[i, 0];
+                int height = mipImageResolutions[i, 1];
 
                 //write the result to the console for viewing
-                Console.WriteLine("Mip Resolution = {0}x{1}", mipImageWidth.ToString(), mipImageHeight.ToString());
+                Console.WriteLine("Mip Resolution = {0}x{1}", width.ToString(), height.ToString());
 
                 //estimate how many total bytes are in the largest texture mip level (main one)
-                int byteSize_estimation = CalculateDDS_ByteSize(mipImageWidth, mipImageHeight, texture_parsed_compressionType == 827611204);
+                int byteSize_estimation = CalculateDDS_ByteSize(width, height, texture_parsed_compressionType == 827611204);
                 //offset our variable so we can get to the next mip (we are working backwards from the end of the file)
                 leftoverOffset -= byteSize_estimation;
 

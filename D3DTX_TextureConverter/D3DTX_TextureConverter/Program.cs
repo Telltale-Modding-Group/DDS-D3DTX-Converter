@@ -661,9 +661,8 @@ namespace D3DTX_TextureConverter
         {
             /*
              * NOTE TO SELF
-             * DDS --> D3DTX EXTRACTION UNSUCESSFUL, THE BYTES ARE NOT FULLY 1:1 WHEN THERE IS A CONVERSION
+             * DDS --> D3DTX EXTRACTION, THE BYTES ARE NOT FULLY 1:1 WHEN THERE IS A CONVERSION (off by 8 bytes)
              * MABYE TRY TO CHANGE THE TEXTURE DATA BYTE SIZE IN THE D3DTX HEADER AND SEE IF THAT CHANGES ANYTHING
-             * IF NOT THEN WE NEED TO LOOK INTO THE DDS --> D3DTX AGAIN AND GO THROUGH IT UNTIL WE GET THE EXACT BYTES
             */
 
             //read the source texture file into a byte array
@@ -673,8 +672,7 @@ namespace D3DTX_TextureConverter
             byte[] sourceHeaderFileData = File.ReadAllBytes(sourceHeaderFile);
 
             //get our file name and convert it to a byte array (since d3dtx has the filename.extension written in the file)
-            byte[] fileNameBytes = Encoding.ASCII.GetBytes(sourceFileName);
-
+            byte[] fileNameBytes = Encoding.ASCII.GetBytes(sourceFileName); //currently unused (but will be)
 
             //initalize our variables for the dds header
             int texture_parsed_headerLength; //total byte size of the header data
@@ -684,7 +682,7 @@ namespace D3DTX_TextureConverter
             string texture_parsed_compressionType; //compression type of the dds file
 
             //initalize our variables for the d3dtx header
-            int header_parsed_textureDataByteSize; //total byte size of the texture data, used to calculate the header length
+            int header_parsed_textureDataByteSize; //total byte size of the texture data, used to calculate the header length (NOT USED, BUT WILL BE)
 
             //write the result to the console for viewing
             Console.WriteLine("Total Source Texture Byte Size = {0}", sourceTexFileData.Length);

@@ -1,0 +1,125 @@
+﻿<mah:MetroWindow x:Class="TextureMod_GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TextureMod_GUI"
+        mc:Ignorable="d"
+        GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
+        ResizeMode="CanResizeWithGrip"
+        Title="Texture Mod Tool" Height="450" Width="800">
+
+    <mah:MetroWindow.LeftWindowCommands>
+        <mah:WindowCommands HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+            <iconPacks:PackIconFontAwesome Width="30" Height="20" Kind="PaintBrushSolid" />
+        </mah:WindowCommands>
+    </mah:MetroWindow.LeftWindowCommands>
+
+    <Grid>
+        <DockPanel VerticalAlignment="Top">
+            <Menu DockPanel.Dock="Top" Margin="0" HorizontalContentAlignment="Stretch">
+                <MenuItem Name="ui_menu_file_menu" Header="File" Margin="5,0,0,0">
+                    <MenuItem Name="ui_menu_file_opentexturefolder_menuItem" Header="Open Texture Folder" Margin="7,0,0,0">
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Name="ui_menu_file_importtexture_menuItem" Header="Import Sound" Margin="7,0,0,0">
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Name="ui_menu_file_save_menuItem" Header="Save" Margin="7,0,0,0">
+                    </MenuItem>
+                    <MenuItem Name="ui_menu_file_saveAs_menuItem" Header="Save As" Margin="7,0,0,0">
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Name="ui_menu_edt_undo_menu" Header="Edit">
+                    <MenuItem Name="ui_menu_edit_undo_menuItem" Header="Undo" Margin="7,0,0,0">
+                    </MenuItem>
+                    <MenuItem Name="ui_menu_edit_redo_menuItem" Header="Redo" Margin="7,0,0,0">
+                    </MenuItem>
+                    <MenuItem Name="ui_menu_edit_delete_menuItem" Header="Undo" Margin="7,0,0,0">
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Name="ui_menu_build_menu" Header="Build">
+                    <MenuItem Name="ui_menu_build_buildMod_menuItem" Header="Build Mod" Margin="7,0,0,0">
+                    </MenuItem>
+                    <MenuItem Name="ui_menu_build_configureMod_menuItem" Header="Configure Mod" Margin="7,0,0,0">
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Name="ui_menu_options_menu" Header="Options">
+                    <MenuItem Name="ui_menu_options_applicationSettings_menuItemm" Header="Application Settings" Margin="7,0,0,0">
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Name="ui_menu_help_menu" Header="Help">
+                    <MenuItem Name="ui_menu_help_about_menuItem" Header="About" Margin="7,0,0,0">
+                    </MenuItem>
+                    <MenuItem Name="ui_menu_help_documentation_menuItem" Header="Documentation" Margin="7,0,0,0">
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+
+        <Separator Margin="0,30,0,0" VerticalAlignment="Top" Height="5"></Separator>
+
+        <Grid Margin="0,35,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="5"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Margin="0,0,0,5" Grid.RowSpan="2">
+
+                    <Label Name="ui_projectview_title_label" Content="Textures Directory" Margin="10,10,42,0" VerticalAlignment="Top"/>
+                    <Button Name="ui_projectview_opendirectory_button" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="27" Height="27" Padding="0" ToolTip="Opens the Project Directory in File Explorer" >
+                        <iconPacks:BootstrapIcons Height="18" Width="18" Kind="Folder"></iconPacks:BootstrapIcons>
+                    </Button>
+
+                    <ListBox Margin="10,42,10,38"/>
+                </Grid>
+
+                <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
+
+                <Grid Grid.Row="2">
+                    <TextBox TextWrapping="NoWrap" IsReadOnly="True" Text="Output" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" Margin="10,10,10,32" ScrollViewer.CanContentScroll="True" UseLayoutRounding="False"/>
+                    <ProgressBar Height="17" Margin="10,0,10,10" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom"/>
+                </Grid>
+
+                <Button Content="Convert To DDS" Margin="10,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="104"/>
+                <Button Content="Convert To D3DTX" Margin="119,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="116"/>
+            </Grid>
+
+
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Width="5" ResizeDirection="Columns"/>
+
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="5"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Label Content="DDS Image Preview" Margin="10,10,10,0" VerticalAlignment="Top" Height="26"/>
+
+                    <Border BorderBrush="Black" BorderThickness="1" Margin="10,41,10,10">
+                        <Image Stretch="UniformToFill"/>
+                    </Border>
+
+                </Grid>
+
+                <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
+
+                <Grid Grid.Row="2">
+                    <Label Name="ui_audioplayer_audiofile_label" Content="Image Properties" Margin="9,9,8,0" VerticalAlignment="Top" Height="25"/>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</mah:MetroWindow>

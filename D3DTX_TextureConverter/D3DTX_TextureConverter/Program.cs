@@ -333,23 +333,25 @@ namespace D3DTX_TextureConverter
 
             //this section needs some reworking, still can't track down exactly what the compression types are, parsed_compressionType and parsed_dxtType are close
             //SET DDS COMPRESSION TYPES
-            if (parsed_compressionType == 200 || parsed_compressionType == 210 || parsed_compressionType == 406)
+            if (parsed_dxtType == 66)//if (parsed_compressionType == 200 || parsed_compressionType == 406)
             {
                 //DXT5 COMPRESSION
                 dds_File.ddspf_dwFourCC = "DXT5";
             }
             else if (parsed_compressionType == 67)
             {
-                //DXT3 COMPRESSION
+                //DDSPF_DXT3 COMPRESSION
                 dds_File.ddspf_dwFourCC = "DXT3";
             }
-            else if (parsed_compressionType == 388)
+            else if (parsed_dxtType == 68)//else if (parsed_compressionType == 388)
             {
-                //dds_File.ddspf_dwFourCC = "ATI2";
+                //DDSPF_BC5_UNORM COMPRESSION
+                dds_File.ddspf_dwFourCC = "BC5U";
             }
-            else if (parsed_compressionType == 413)
+            else if (parsed_dxtType == 67)//else if (parsed_compressionType == 413)
             {
-                //dds_File.ddspf_dwFourCC = "ATI1";
+                //DDSPF_BC4_UNORM COMPRESSION
+                dds_File.ddspf_dwFourCC = "BC4U";
             }
 
             //build the header and store it in a byte array
@@ -795,9 +797,17 @@ namespace D3DTX_TextureConverter
             //allocate a byte array to contain our texture data (ordered backwards)
             byte[] final_d3dtxData = new byte[0];
 
+            //modify the texture file size data in the header
+            sourceHeaderFileData = ModifyBytes(sourceHeaderFileData, BitConverter.GetBytes(ddsTextureData.Length), 12);
+
             //add the d3dtx header
             //note to self - modify the header before adding it
             final_d3dtxData = Combine(sourceHeaderFileData, final_d3dtxData);
+
+            //quick fix for textures not being read properly (they are not the exact same size)
+            //note to self - try to modify the d3dtx header so the texture byte size in the header matches the texture byte size we are inputing
+            //byte[] fillterData = new byte[8];
+            //final_d3dtxData = Combine(final_d3dtxData, fillterData);
 
             //add 1 since the mip map count in dds files tend to start at 0 instead of 1 
             texture_parsed_mipMapCount += 1;
@@ -867,11 +877,6 @@ namespace D3DTX_TextureConverter
             //write results to the console for viewing
             Console.WriteLine("D3DTX Header Byte Size = {0}", sourceHeaderFileData.Length.ToString());
 
-            //quick fix for textures not being read properly (they are not the exact same size)
-            //note to self - try to modify the d3dtx header so the texture byte size in the header matches the texture byte size we are inputing
-            byte[] fillterData = new byte[8];
-            final_d3dtxData = Combine(final_d3dtxData, fillterData);
-
             //write the data to the file, combine the generted DDS header and our new texture byte data
             File.WriteAllBytes(destinationFile, final_d3dtxData);
         }
@@ -879,6 +884,19 @@ namespace D3DTX_TextureConverter
         //-----------------------------------------------UTILLITIES-----------------------------------------------
         //-----------------------------------------------UTILLITIES-----------------------------------------------
         //-----------------------------------------------UTILLITIES-----------------------------------------------
+
+        public static byte[] ModifyBytes(byte[] source, byte[] newBytes, int indexOffset)
+        {
+            //run a loop and begin going through for the lenght of the bytes
+            for (int i = 0; i < newBytes.Length; i++)
+            {
+                //assign the value from the source byte array with the offset
+                source[indexOffset + i] = newBytes[i];
+            }
+
+            //return the final byte array
+            return source;
+        }
 
         /// <summary>
         /// Filters an array of files by ".d3dtx" so only files with said extension will be in the array.

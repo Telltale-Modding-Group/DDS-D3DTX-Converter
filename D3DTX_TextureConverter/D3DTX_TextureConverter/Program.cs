@@ -696,7 +696,7 @@ namespace D3DTX_TextureConverter
             int texture_bytePointerPosition = 0;
 
             //which byte offset we are on for the source header (will be changed as we go through the file)
-            int header_bytePointerPosition = 0;
+            int header_bytePointerPosition = 0; //currently not used (but will be when we start modifying the d3dtx header)
 
             //--------------------------1 DDS HEADER SIZE--------------------------
             //skip the dds dword for now because we just want the size of the header
@@ -774,6 +774,7 @@ namespace D3DTX_TextureConverter
             //allocate a byte array of dds texture length
             byte[] ddsTextureData = new byte[ddsTextureDataLength];
 
+            //copy the data from the source byte array past the header (so we are only getting texture data)
             Array.Copy(sourceTexFileData, ddsHeaderLength, ddsTextureData, 0, ddsTextureData.Length);
 
             //--------------------------COMBINE DDS TEXTURE DATA WITH D3DTX HEADER--------------------------
@@ -785,6 +786,7 @@ namespace D3DTX_TextureConverter
                 //write the data to the file, combine the generted DDS header and our new texture byte data
                 File.WriteAllBytes(destinationFile, Combine(sourceHeaderFileData, ddsTextureData));
 
+                //stop the function as there is no need to continue any further
                 return;
             }
 
@@ -795,6 +797,8 @@ namespace D3DTX_TextureConverter
             //allocate a byte array to contain our texture data (ordered backwards)
             byte[] final_d3dtxData = new byte[0];
 
+            //add the d3dtx header
+            //note to self - modify the header before adding it
             final_d3dtxData = Combine(sourceHeaderFileData, final_d3dtxData);
 
             //add 1 since the mip map count in dds files tend to start at 0 instead of 1 
@@ -803,15 +807,18 @@ namespace D3DTX_TextureConverter
             //because I suck at math, we will generate our mip map resolutions using the same method we did in d3dtx to dds (can't figure out how to calculate them in reverse properly)
             int[,] mipImageResolutions = new int[texture_parsed_mipMapCount, 2];
 
+            //get our mip image dimensions (have to multiply by 2 as the mip calculations will be off by half)
             int mipImageWidth = texture_parsed_imageWidth * 2;
             int mipImageHeight = texture_parsed_imageHeight * 2;
 
             //add the resolutions in reverse
             for (int i = texture_parsed_mipMapCount - 1; i > 0; i--)
             {
+                //divide the resolutions by 2
                 mipImageWidth /= 2;
                 mipImageHeight /= 2;
 
+                //assign the resolutions
                 mipImageResolutions[i, 0] = mipImageWidth;
                 mipImageResolutions[i, 1] = mipImageHeight;
             }

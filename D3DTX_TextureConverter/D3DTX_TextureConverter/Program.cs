@@ -333,7 +333,7 @@ namespace D3DTX_TextureConverter
 
             //this section needs some reworking, still can't track down exactly what the compression types are, parsed_compressionType and parsed_dxtType are close
             //SET DDS COMPRESSION TYPES
-            if (parsed_compressionType == 200 || parsed_compressionType == 210 || parsed_compressionType == 406 || parsed_compressionType == 402)
+            if (parsed_compressionType == 200 || parsed_compressionType == 210 || parsed_compressionType == 406)
             {
                 //DXT5 COMPRESSION
                 dds_File.ddspf_dwFourCC = "DXT5";
@@ -681,7 +681,7 @@ namespace D3DTX_TextureConverter
             int texture_parsed_imageWidth; //size of the dds image pixel width
             int texture_parsed_imageHeight; //size of the dds image height height
             int texture_parsed_mipMapCount; //total amount of mip maps in the dds file
-            int texture_parsed_compressionType; //compression type of the dds file
+            string texture_parsed_compressionType; //compression type of the dds file
 
             //initalize our variables for the d3dtx header
             int header_parsed_textureDataByteSize; //total byte size of the texture data, used to calculate the header length
@@ -759,7 +759,7 @@ namespace D3DTX_TextureConverter
             byte[] texture_source_compressionType = AllocateByteArray(4, sourceTexFileData, texture_bytePointerPosition);
 
             //parse the byte array to int32
-            texture_parsed_compressionType = BitConverter.ToInt32(texture_source_compressionType);
+            texture_parsed_compressionType = Encoding.ASCII.GetString(texture_source_compressionType);
 
             //write the result to the console for viewing
             Console.WriteLine("DDS Compression Type = {0}", texture_parsed_compressionType.ToString());
@@ -767,37 +767,40 @@ namespace D3DTX_TextureConverter
             //--------------------------EXTRACT DDS TEXTURE DATA--------------------------
             //calculate dds header length (we add 4 because we skipped the 4 bytes which contain the dword, it isn't necessary to parse this data)
             int ddsHeaderLength = 4 + texture_parsed_headerLength;
+
+            //calculate the length of just the dds texture data
             int ddsTextureDataLength = sourceTexFileData.Length - ddsHeaderLength;
 
-            byte[] textureData = new byte[ddsTextureDataLength];
+            //allocate a byte array of dds texture length
+            byte[] ddsTextureData = new byte[ddsTextureDataLength];
 
-            Array.Copy(sourceTexFileData, ddsHeaderLength, textureData, 0, textureData.Length);
+            Array.Copy(sourceTexFileData, ddsHeaderLength, ddsTextureData, 0, ddsTextureData.Length);
 
             //--------------------------COMBINE DDS TEXTURE DATA WITH D3DTX HEADER--------------------------
-            int total_d3dtxLength = textureData.Length + sourceHeaderFileData.Length;
+            int total_d3dtxLength = ddsTextureData.Length + sourceHeaderFileData.Length;
 
             //if there are no mip maps, go ahead and just build the texture
             if(texture_parsed_mipMapCount <= 1)
             {
                 //write the data to the file, combine the generted DDS header and our new texture byte data
-                File.WriteAllBytes(destinationFile, Combine(sourceHeaderFileData, textureData));
+                File.WriteAllBytes(destinationFile, Combine(sourceHeaderFileData, ddsTextureData));
 
                 return;
             }
 
             //we will work through the texture data backwards, since the d3dtx format has mip map ordered reversed, so we will add it in that way
             //offset for getting mip maps, we are working backwards since d3dtx has their mip maps stored backwards
-            int leftoverOffset = textureData.Length;
+            int leftoverOffset = ddsTextureData.Length;
 
             //allocate a byte array to contain our texture data (ordered backwards)
-            byte[] final_d3dtxData = new byte[total_d3dtxLength];
+            byte[] final_d3dtxData = new byte[0];
 
+            final_d3dtxData = Combine(sourceHeaderFileData, final_d3dtxData);
 
-
-
+            //add 1 since the mip map count in dds files tend to start at 0 instead of 1 
             texture_parsed_mipMapCount += 1;
 
-            //because I suck at math, we will generate our mip map resolution using the same method we did in d3dtx to dds
+            //because I suck at math, we will generate our mip map resolutions using the same method we did in d3dtx to dds (can't figure out how to calculate them in reverse properly)
             int[,] mipImageResolutions = new int[texture_parsed_mipMapCount, 2];
 
             int mipImageWidth = texture_parsed_imageWidth * 2;
@@ -819,44 +822,50 @@ namespace D3DTX_TextureConverter
             //run a loop for the amount of mip maps
             for (int i = 1; i < texture_parsed_mipMapCount; i++)
             {
-                //write the result to the console for viewing
-                Console.WriteLine("Mip Level = {0}", i.ToString());
+                //not required, just for viewing
+                int mipLevel = texture_parsed_mipMapCount - i;
 
+                //get our mip resolution from the resolution array (the values are reversed, smallest to big)
                 int width = mipImageResolutions[i, 0];
                 int height = mipImageResolutions[i, 1];
 
-                //write the result to the console for viewing
-                Console.WriteLine("Mip Resolution = {0}x{1}", width.ToString(), height.ToString());
-
                 //estimate how many total bytes are in the largest texture mip level (main one)
-                int byteSize_estimation = CalculateDDS_ByteSize(width, height, texture_parsed_compressionType == 827611204);
+                int byteSize_estimation = CalculateDDS_ByteSize(width, height, texture_parsed_compressionType.Equals("DXT1"));
+
                 //offset our variable so we can get to the next mip (we are working backwards from the end of the file)
                 leftoverOffset -= byteSize_estimation;
 
                 //not required, just for viewing
                 totalMipByteSize += byteSize_estimation;
 
-                //write the result to the console for viewing
-                Console.WriteLine("Mip Level Byte Size = {0}", byteSize_estimation.ToString());
-
                 //allocate a byte array with the estimated byte size
                 byte[] mipTexData = new byte[byteSize_estimation];
 
                 //check to see if we are not over the length of the file (we are working backwards)
-                if (leftoverOffset > 0)
+                if (leftoverOffset >= 0)
                 {
-                    //copy all the bytes from the source byte file after the leftoverOffset, and copy that data to the texture data byte array
-                    Array.Copy(sourceTexFileData, leftoverOffset, mipTexData, 0, mipTexData.Length);
+                    //copy all the bytes from the texture byte array after the leftoverOffset, and copy that data to the mip map tex data byte array
+                    Array.Copy(ddsTextureData, leftoverOffset, mipTexData, 0, mipTexData.Length);
 
                     //combine the new mip byte data to the existing texture data byte array
                     final_d3dtxData = Combine(final_d3dtxData, mipTexData);
                 }
+
+                //write results to the console for viewing
+                Console.WriteLine("Leftover Offset = {0}", leftoverOffset.ToString());
+                Console.WriteLine("Mip Level = {0}", mipLevel.ToString());
+                Console.WriteLine("Mip Resolution = {0}x{1}", width.ToString(), height.ToString());
+                Console.WriteLine("Mip Level Byte Size = {0}", byteSize_estimation.ToString());
+                Console.WriteLine("D3DTX Data Length Byte Size = {0}", final_d3dtxData.Length.ToString());
             }
 
+            //write results to the console for viewing
+            Console.WriteLine("D3DTX Header Byte Size = {0}", sourceHeaderFileData.Length.ToString());
 
-            //combine the d3dtx header with the texture data
-            final_d3dtxData = Combine(sourceHeaderFileData, final_d3dtxData);
-
+            //quick fix for textures not being read properly (they are not the exact same size)
+            //note to self - try to modify the d3dtx header so the texture byte size in the header matches the texture byte size we are inputing
+            byte[] fillterData = new byte[8];
+            final_d3dtxData = Combine(final_d3dtxData, fillterData);
 
             //write the data to the file, combine the generted DDS header and our new texture byte data
             File.WriteAllBytes(destinationFile, final_d3dtxData);

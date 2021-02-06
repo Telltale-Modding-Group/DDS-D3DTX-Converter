@@ -8,7 +8,7 @@ This is a application designed for converting **.d3dtx textures (Telltale Tool T
 
 ## DISCLAIMER (Please Read)
 
-**NOTE:** Not all .d3dtx textures will work or show up properly and might even look corrupted after conversion. This is simply because once again, this is very new and I have yet to support more d3dtx texture variants. For the most part, any regular diffuse/albedo textures should work.
+**NOTE:** Not all .d3dtx textures will work or show up properly and might even look corrupted after conversion. This is simply because once again, this is very new and I have yet to support more d3dtx texture variants (there are a lot). For the most part, any regular diffuse/albedo textures should work.
 
 This is currently being developed and tested only with ***"The Walking Dead Telltale Definitive Series"*** textures. (for the time being)
 

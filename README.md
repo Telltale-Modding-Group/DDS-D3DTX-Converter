@@ -1,6 +1,8 @@
 # Texture Mod Tool
 
-This is a application designed for converting **.d3dtx textures (Telltale Tool Textures)**, to standard **.dds (Direct Draw Surface)**. **It can also do the opposite and can be used to do texture mods for a Telltale Tool Game.**
+This is a application designed for converting **.d3dtx textures (Telltale Tool Textures)**, to standard **.dds (Direct Draw Surface)**. **It can also do the opposite and can be used to do texture mods for a Telltale Tool Game.** 
+
+**If there are any issues PLEASE report them to [HERE](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/issues)**
 
 ![Main 1](tutorial-screenshots/mainThumb.png)
 
@@ -14,7 +16,7 @@ This is currently being developed and tested only with ***"The Walking Dead Tell
 
 1. Only supports The Walking Dead Definitive Edition textures (for the time being)
 2. Can't upscale or downscale the texture resolution (for the time being)
-3. Not all textures are supported, textures like 'specular maps' *(some of them)*, 'ink maps', 'normal maps' *(some of them)*. However the majority of the regular color/diffuse/albedo textures are.
+3. Not all textures are supported, textures like **'specular maps'** *(some of them)*, **'ink maps'**, **'normal maps'** *(some of them)* may not be converted by the tool properly. However the majority of the regular color/diffuse/albedo textures should be supported.
 
 ## How to use?
 

@@ -1,8 +1,8 @@
 # Texture Mod Tool
 
-![Main 1](tutorial-screenshots/mainThumb.png)
-
 This is a application designed for converting **.d3dtx textures (Telltale Tool Textures)**, to standard **.dds (Direct Draw Surface)**. **It can also do the opposite and can be used to do texture mods for a Telltale Tool Game.**
+
+![Main 1](tutorial-screenshots/mainThumb.png)
 
 ## DISCLAIMER (Please Read)
 

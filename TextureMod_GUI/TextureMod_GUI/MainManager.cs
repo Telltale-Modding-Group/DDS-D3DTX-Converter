@@ -18,7 +18,7 @@ namespace TextureMod_GUI
         public readonly string appVersion = "v1.0.0";
 
         //web link for getting help with the application
-        public readonly string appHelp_link = "";
+        public readonly string appHelp_link = "https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki";
 
         //our private objects
         private Converter converter;

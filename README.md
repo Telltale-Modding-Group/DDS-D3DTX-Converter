@@ -1,5 +1,8 @@
 # Texture Mod Tool
 
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Telltale-Modding-Group/DDS-D3DTX-Converter)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/releases)
+[![Github All Releases](https://img.shields.io/github/downloads/Telltale-Modding-Group/DDS-D3DTX-Converter/total.svg)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/releases)  
+
 This is an application designed for converting **.d3dtx textures (Telltale Tool Textures)**, to standard **.dds (Direct Draw Surface)**. **It can also do the opposite and can be used to do texture mods for a Telltale Tool Game.** 
 
 **If there are any issues PLEASE read [THIS](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BHelp%5D---Reporting-an-Issue-or-Bug) report them to [HERE](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/issues)**

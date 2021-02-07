@@ -7,6 +7,8 @@ This is an application designed for converting **.d3dtx textures (Telltale Tool 
 
 **[DOWNLOAD HERE](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/releases)**
 
+**[FOR GETTING STARTED, GO HERE](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BTutorial%5D--How-to-make-a-Texture-Mod-(Part-1))**
+
 **If you need help with the application then please [go here](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki)**
 
 **If there are any issues PLEASE read [THIS](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BHelp%5D---Reporting-an-Issue-or-Bug) report them to [HERE](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/issues)**

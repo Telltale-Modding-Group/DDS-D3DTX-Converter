@@ -20,7 +20,7 @@ This is currently being developed and tested only with ***"The Walking Dead Tell
 
 ## How to use?
 
-**[This guides you on the interface of the application.](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BHelp%5D-Application-Guide)**
+**[This guides you on the interface of the application. (It's easy)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BHelp%5D-Application-Guide)**
 
 **[This tutorial describes how to use the application](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BTutorial%5D--How-to-make-a-Texture-Mod-(Part-1))**
 

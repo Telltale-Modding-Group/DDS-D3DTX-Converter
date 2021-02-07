@@ -15,7 +15,7 @@ This is an application designed for converting **.d3dtx textures (Telltale Tool 
 
 ## DISCLAIMER (Please Read)
 
-**NOTE:** Not all **.d3dtx** textures will work or show up properly and might even look corrupted after conversion. This is simply because once again, this is very new and I have yet to support more d3dtx texture variants (there are a lot). For the most part, any regular diffuse/albedo textures should work.
+**NOTE:** Some **.d3dtx** textures will not work or show up properly and might even look corrupted after conversion into **.dds**. This is simply because once again, this is very new and I have yet to support more d3dtx texture variants (there are a lot). For the most part, any regular diffuse/albedo textures should work.
 
 This is currently being developed and tested only with ***"The Walking Dead Telltale Definitive Series"*** textures. (for the time being)
 
@@ -23,7 +23,7 @@ This is currently being developed and tested only with ***"The Walking Dead Tell
 
 1. Only supports **The Walking Dead Definitive Edition** textures *(for the time being)*
 2. Can't upscale or downscale the texture resolution *(for the time being)*
-3. Not all textures are supported, textures like **'specular maps'** *(some of them)*, **'ink maps'**, **'normal maps'** *(some of them)* may not be converted by the tool properly. *(for the time being)* **However the majority of the regular color/diffuse/albedo textures should be supported.**
+3. Not all textures are supported, textures like **'specular maps'** *(some of them)*, **'ink maps'**, **'normal maps'** *(some of them)* may not be converted by the tool properly. *(for the time being)* **However the majority of the regular color/diffuse/albedo and even alpha textures should be supported.**
 
 ## How to use?
 

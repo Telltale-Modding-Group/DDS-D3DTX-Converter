@@ -39,8 +39,8 @@ This is currently being developed and tested only with ***"The Walking Dead Tell
 
 *Only for modders/developers who plan on forking/modifying/downloading the project*
 
-There are 2 projects in this repository, **TextureMod_GUI** being the main application release with a GUI and it has the texture conversion functionality as well. The other project **D3DTX_TextureConverter** being a console application has texture conversion functionality as well but no GUI. However this console application ocassionally will be more up to date and newer than the GUI project's conversion functionality. The reason for that is that it's faster to test and iterate with the console application than the GUI application.
+There are 2 projects in this repository, **TextureMod_GUI** being the main application release with a GUI and it has the texture conversion functionality. The other project **D3DTX_TextureConverter** is a console application has texture conversion functionality as well but no GUI, however this ocassionally will be more up to date and newer than the GUI project's conversion functionality. The reason for that is that it's faster to test and iterate with the console application than the GUI application.
 
 If you are new and don't want to deal with a console application and would rather have a user-friendly interface then use **TextureMod_GUI**, however if your comfortable with using a console application you can use the  **D3DTX_TextureConverter** BUT it will require you to change the code directly to set some parameters or switch to a different mode.
 
-If you want to learn about the file format I suggest you look in the **D3DTX_TextureConverter** Program.cs code which is well documented if you wish to learn about the format and how to read/write to it.
+**If you want to learn about the file format** I suggest you look in the **D3DTX_TextureConverter** and look at the **[Program.cs](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/blob/main/D3DTX_TextureConverter/D3DTX_TextureConverter/Program.cs)** script, it's is well documented and describes the .d3dtx format and .dds format well.

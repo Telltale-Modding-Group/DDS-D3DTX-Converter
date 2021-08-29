@@ -1,0 +1,92 @@
+mImportName
+mNumMipLevels
+mPlatform
+mSamplerState
+mNumMipLevelsAllocated
+mNumSurfacesRequested
+mNumSurfacesRequired
+mNumSurfacesLoaded
+
+mSurfaceFormat
+1. eSurface_Unknown
+2. eSurface_ARGB8
+3. eSurface_RGBA8
+4. eSurface_ARGB16
+5. eSurface_RGB565
+6. eSurface_ARGB1555
+7. eSurface_ARGB4
+8. eSurface_ARGB2101010
+9. eSurface_A8
+10. eSurface_L8
+11. eSurface_AL8
+12. eSurface_L16
+13. eSurface_R16
+14. eSurface_RG16
+15. eSurface_RGBA16
+16. eSurface_RG8
+17. eSurface_R16F
+18. eSurface_RG16F
+19. eSurface_RGBA16F
+20. eSurface_R32F
+21. eSurface_RG32F
+22. eSurface_RGBA32F
+23. eSurface_DepthPCF16
+24. eSurface_DepthPCF24
+25. eSurface_Depth16
+26. eSurface_Depth24
+27. eSurface_DepthStencil32
+28. eSurface_Depth32F
+29. eSurface_Depth32F_Stencil8
+30. eSurface_DXT1
+31. eSurface_DXT3
+32. eSurface_DXT5
+33. eSurface_DXT5A
+34. eSurface_DXN
+35. eSurface_CTX1
+36. eSurface_BC6
+37. eSurface_BC7
+38. eSurface_PVRTC2
+39. eSurface_PVRTC4
+40. eSurface_PVRTC2a
+41. eSurface_PVRTC4a
+42. eSurface_ATC_RGB
+43. eSurface_ATC_RGB1A
+44. eSurface_ATC_RGBA
+45. eSurface_ETC1_RGB
+46. eSurface_ETC2_RGB (ePlatform_None)
+47. eSurface_ETC2_RGB1A (ePlatform_All)
+48. eSurface_ETC2_RGBA (ePlatform_PC)
+49. eSurface_ETC2_R (ePlatform_Wii)
+50. eSurface_ETC2_RG (ePlatform_Xbox)
+51. eSurface_ATSC_RGBA_4x4 (ePlatform_PS3)
+52. eSurface_R8 (ePlatform_Mac)
+
+mPlatform
+1. ePlatform_None
+2. ePlatform_All
+3. ePlatform_PC
+4. ePlatform_Wii
+5. ePlatform_Xbox
+6. ePlatform_PS3
+7. ePlatform_Mac
+8. ePlatform_iPhone
+9. ePlatform_Android
+10. ePlatform_Vita
+11. ePlatform_Linux
+12. ePlatform_PS4
+13. ePlatform_XBOne
+14. ePlatform_WiiU
+15. ePlatform_Win10
+16. ePlatform_NX
+
+mSurfaceGamma
+1. eSurfaceGamma_Unknown
+2. eSurfaceGamma_Linear
+3. eSurfaceGamma_sRGB
+
+mSurfaceMultisample
+1. eSurfaceMultisample_None
+2. eSurfaceMultisample_2x
+3. eSurfaceMultisample_4x
+4. eSurfaceMultisample_8x
+5. eSurfaceMultisample_16x

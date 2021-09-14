@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using D3DTX_TextureConverter.Utilities;
+using D3DTX_TextureConverter.DirectX;
 
 namespace D3DTX_TextureConverter
 {
     class Program
     {
         //----------------------CONVERSION OPTIONS----------------------
+        public static bool d3dtxMode = false; //false = in d3dtx to dds mode, true = dds to d3dtx mode
         public static bool generateHeader = true; //for D3DTX Mode, IMPORTANT if you want to convert the dds back to a d3dtx
 
         //attempts to change the resolution IF the NEW DDS file resolution is DIFFERENT than the original D3DTX (ONLY ON FILES WITH 0 MIP MAPS)
@@ -21,11 +24,16 @@ namespace D3DTX_TextureConverter
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            //remove '//' before App_Convert_D3DTX_Mode to convert d3dtx textures to dds
-            //App_Convert_D3DTX_Mode();
-
-            //remove '//' before App_Convert_DDS_Mode to convert dds textures to d3dtx
-            App_Convert_DDS_Mode();
+            if(d3dtxMode)
+            {
+                //Convert d3dtx textures to dds
+                App_Convert_D3DTX_Mode();
+            }
+            else
+            {
+                //Convert dds textures to d3dtx
+                App_Convert_DDS_Mode();
+            }
         }
 
         //-----------------------------------------------D3DTX TO DDS-----------------------------------------------
@@ -38,11 +46,11 @@ namespace D3DTX_TextureConverter
         public static void App_Convert_D3DTX_Mode()
         {
             //introduction
-            Utilities.SetConsoleColor(ConsoleColor.Blue, ConsoleColor.White); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Blue, ConsoleColor.White); 
             Console.WriteLine("D3DTX to DDS Texture Converter");
 
             //-----------------GET TEXTURE FOLDER PATH-----------------
-            Utilities.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White); 
             Console.WriteLine("Enter the folder path with the D3DTX textures.");
 
             //texture folder path (containing the path to the textures to be converted)
@@ -53,14 +61,14 @@ namespace D3DTX_TextureConverter
             while (inTexturePathLoop)
             {
                 //get path from user
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
                 textureFolderPath = Console.ReadLine();
 
                 //check if the path is valid
                 if (Directory.Exists(textureFolderPath) == false)
                 {
                     //notify the user and this loop will run again
-                    Utilities.SetConsoleColor(ConsoleColor.Red, ConsoleColor.White); //just a display thing, not needed
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Red, ConsoleColor.White); 
                     Console.WriteLine("Incorrect Texture Path, try again.");
                 }
                 else
@@ -71,7 +79,7 @@ namespace D3DTX_TextureConverter
             }
 
             //-----------------GET RESULT FOLDER PATH-----------------
-            Utilities.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White); 
             Console.WriteLine("Enter the resulting path where converted DDS textures will be stored.");
 
             //result folder path (will contain the converted textures)
@@ -82,14 +90,14 @@ namespace D3DTX_TextureConverter
             while (inResultPathLoop)
             {
                 //get path from user
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
                 resultFolderPath = Console.ReadLine();
 
                 //check if the path is valid
                 if (Directory.Exists(resultFolderPath) == false)
                 {
                     //notify the user and this loop will run again
-                    Utilities.SetConsoleColor(ConsoleColor.Red, ConsoleColor.White); //just a display thing, not needed
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Red, ConsoleColor.White); 
                     Console.WriteLine("Incorrect Result Path, try again.");
                 }
                 else
@@ -102,7 +110,7 @@ namespace D3DTX_TextureConverter
             //-----------------START CONVERSION-----------------
 
             //notify the user we are starting
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
             Console.WriteLine("Conversion Starting...");
 
             //we got our paths, so lets begin
@@ -110,7 +118,7 @@ namespace D3DTX_TextureConverter
 
             //once the process is finished, it will come back here and we will notify the user that we are done
 
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
             Console.WriteLine("Conversion Finished.");
             Console.ResetColor();
         }
@@ -122,28 +130,28 @@ namespace D3DTX_TextureConverter
         /// <param name="resultPath"></param>
         public static void Convert_D3DTX_Bulk(string texPath, string resultPath)
         {
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
             Console.WriteLine("Collecting Files..."); //notify the user we are collecting files
 
             //gather the files from the texture folder path into an array
             List<string> textures = new List<string>(Directory.GetFiles(texPath));
 
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
             Console.WriteLine("Filtering Textures..."); //notify the user we are filtering the array
 
             //filter the array so we only get .d3dtx files
-            textures = Utilities.FilterFiles(textures, D3DTX_File.d3dtxExtension);
+            textures = IOManagement.FilterFiles(textures, D3DTX_File.d3dtxExtension);
 
             //if no d3dtx files were found, abort the program from going on any further (we don't have any files to convert!)
             if (textures.Count < 1)
             {
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red); 
                 Console.WriteLine("No .d3dtx files were found, aborting."); //notify the user we found x amount of d3dtx files in the array
                 Console.ResetColor();
                 return;
             }
 
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
             Console.WriteLine("Found {0} Textures.", textures.Count.ToString()); //notify the user we found x amount of d3dtx files in the array
             Console.WriteLine("Starting...");//notify the user we are starting
 
@@ -155,18 +163,18 @@ namespace D3DTX_TextureConverter
                 string textureFileNameOnly = Path.GetFileNameWithoutExtension(texture);
                 string textureResultPath = resultPath + "/" + textureFileNameOnly + DDS_File.ddsExtension; //add the file name to the resulting folder path, this is where our converted file will be placed
 
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
                 Console.WriteLine("||||||||||||||||||||||||||||||||");
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Blue); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Blue); 
                 Console.WriteLine("Converting '{0}'...", textureFileName); //notify the user are converting 'x' file.
                 Console.ResetColor();
 
                 //runs the main method for converting the texture
                 ConvertTexture_FromD3DTX_ToDDS(textureFileName, texture, textureResultPath);
 
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
                 Console.WriteLine("Finished converting '{0}'...", textureFileName); //notify the user we finished converting 'x' file.
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             }
         }
 
@@ -223,22 +231,22 @@ namespace D3DTX_TextureConverter
             }
 
             //get our dds file object ready and assign our parsed values from the d3dtx to new dds file
-            DDS_File dds_file = new DDS_File();
-            dds_file.dwWidth = (uint)d3dtx_file.mWidth;
-            dds_file.dwHeight = (uint)d3dtx_file.mHeight;
+            //DDS_File dds_file = new DDS_File();
+            //dds_file.dwWidth = (uint)d3dtx_file.mWidth;
+            //dds_file.dwHeight = (uint)d3dtx_file.mHeight;
             //dds_file.dwFlags = (uint)parsed_dwFlags;
-            dds_file.dwMipMapCount = (uint)d3dtx_file.mNumMipLevels;
-            dds_file.ddspf_dwFourCC = d3dtx_file.mSurfaceFormat_converted;
+            //dds_file.dwMipMapCount = (uint)d3dtx_file.mNumMipLevels;
+            //dds_file.ddspf_dwFourCC = d3dtx_file.mSurfaceFormat_converted;
 
             //build the header and store it in a byte array
-            byte[] ddsHeader = dds_file.Build_DDSHeader_ByteArray();
+            //byte[] ddsHeader = dds_file.Build_DDSHeader_ByteArray();
 
             //--------------------------EXTRACTING TEXTURE DATA FROM D3DTX--------------------------
             //estimate how many total bytes are in the largest texture mip level (main one)
-            int mainTextureByteSize_Estimation = Utilities.CalculateDDS_ByteSize(d3dtx_file.mWidth, d3dtx_file.mHeight, d3dtx_file.mSurfaceFormat_dxtTypeBoolSize);
+            int mainTextureByteSize_Estimation = DDS_Functions.CalculateDDS_ByteSize(d3dtx_file.mWidth, d3dtx_file.mHeight, d3dtx_file.mSurfaceFormat_dxtTypeBoolSize);
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("Estimated Largest Mip Level Byte Size = {0}", mainTextureByteSize_Estimation.ToString());
 
             //initalize our start offset, this is used to offset the array copy
@@ -253,7 +261,7 @@ namespace D3DTX_TextureConverter
                 //offset the byte pointer position just past the header
                 startOffset = d3dtx_file.headerLength;
 
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
                 Console.WriteLine("Estimation was off, extracting whole thing.");
 
                 //allocate byte array with the parsed length of the total texture byte data from the header
@@ -270,13 +278,13 @@ namespace D3DTX_TextureConverter
 
                 if (mainTextureByteSize_Estimation < 0)
                 {
-                    Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red); //just a display thing, not needed
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red); 
                     Console.WriteLine("ERROR, ESTIMATION WAS WRONG '{0}'", mainTextureByteSize_Estimation);
 
                     return;
                 }
 
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
                 Console.WriteLine("Estimation is accurate, '{0}'", mainTextureByteSize_Estimation);
 
                 //calculate main texture level
@@ -285,8 +293,8 @@ namespace D3DTX_TextureConverter
 
             //copy all the bytes from the source byte file after the header length, and copy that data to the texture data byte array
             Array.Copy(d3dtx_file.sourceByteFile, startOffset, textureData, 0, textureData.Length);
-
-            byte[] finalDDS_textureData = Utilities.Combine(ddsHeader, textureData);
+            /*
+            //byte[] finalDDS_textureData = ByteFunctions.Combine(ddsHeader, textureData);
 
             //if there are no mip maps, build the texture file because we are done
             if (d3dtx_file.mNumMipLevels <= 1)
@@ -299,7 +307,7 @@ namespace D3DTX_TextureConverter
             }
 
             //--------------------------MIP MAP EXTRACTION AND BUILDING--------------------------
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
             Console.WriteLine("Calculating Mip Tables..."); //notify the user we are calculating the mip table
 
             //offset for getting mip maps, we are working backwards since d3dtx has their mip maps stored backwards
@@ -316,7 +324,7 @@ namespace D3DTX_TextureConverter
             for (int i = 1; i < d3dtx_file.mNumMipLevels; i++)
             {
                 //write the result to the console for viewing
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
                 Console.WriteLine("Mip Level = {0}", i.ToString());
 
                 //divide the dimensions by 2 when stepping down on each mip level
@@ -324,11 +332,11 @@ namespace D3DTX_TextureConverter
                 mipImageHeight /= 2;
 
                 //write the result to the console for viewing
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
                 Console.WriteLine("Mip Resolution = {0}x{1}", mipImageWidth.ToString(), mipImageHeight.ToString());
 
                 //estimate how many total bytes are in the largest texture mip level (main one)
-                int byteSize_estimation = Utilities.CalculateDDS_ByteSize(mipImageWidth, mipImageHeight, d3dtx_file.mSurfaceFormat_dxtTypeBoolSize);
+                int byteSize_estimation = DDS_Functions.CalculateDDS_ByteSize(mipImageWidth, mipImageHeight, d3dtx_file.mSurfaceFormat_dxtTypeBoolSize);
                 //offset our variable so we can get to the next mip (we are working backwards from the end of the file)
                 leftoverOffset -= byteSize_estimation;
 
@@ -336,12 +344,12 @@ namespace D3DTX_TextureConverter
                 totalMipByteSize += byteSize_estimation;
 
                 //write the result to the console for viewing
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
                 Console.WriteLine("Mip Level Byte Size = {0}", byteSize_estimation.ToString());
 
                 if (byteSize_estimation < 0)
                 {
-                    Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red); //just a display thing, not needed
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red); 
                     Console.WriteLine("Mip Level Byte Size is wrong! {0}", byteSize_estimation);
 
                     break;
@@ -357,23 +365,24 @@ namespace D3DTX_TextureConverter
                     Array.Copy(d3dtx_file.sourceByteFile, leftoverOffset, mipTexData, 0, mipTexData.Length);
 
                     //combine the new mip byte data to the existing texture data byte array
-                    finalDDS_textureData = Utilities.Combine(finalDDS_textureData, mipTexData);
+                    finalDDS_textureData = ByteFunctions.Combine(finalDDS_textureData, mipTexData);
                 }
             }
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("Total Mips Byte Size = {0}", totalMipByteSize.ToString());
 
             //not required, but just viewing to see if our estimated sizes match up with the parsed texture byte size
             int totalTexByteSize = totalMipByteSize + mainTextureByteSize_Estimation;
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("Total Byte Size = {0}", totalTexByteSize.ToString());
 
             //write the data to the file, combine the generted DDS header and our new texture byte data
             File.WriteAllBytes(destinationFile, finalDDS_textureData);
+            */
         }
 
         //-----------------------------------------------DDS TO D3DTX-----------------------------------------------
@@ -386,13 +395,13 @@ namespace D3DTX_TextureConverter
         public static void App_Convert_DDS_Mode()
         {
             //introduction
-            Utilities.SetConsoleColor(ConsoleColor.Blue, ConsoleColor.White); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Blue, ConsoleColor.White); 
             Console.WriteLine("DDS to D3DTX Texture Converter");
 
             //-----------------GET TEXTURE FOLDER PATH-----------------
-            Utilities.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White); 
             Console.WriteLine("Enter the folder path with the textures.");
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
             Console.WriteLine("NOTE: Make sure each DDS is accompanied with a .header file");
 
             //texture folder path (containing the path to the textures to be converted)
@@ -403,14 +412,14 @@ namespace D3DTX_TextureConverter
             while (inTexturePathLoop)
             {
                 //get path from user
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
                 textureFolderPath = Console.ReadLine();
 
                 //check if the path is valid
                 if (Directory.Exists(textureFolderPath) == false)
                 {
                     //notify the user and this loop will run again
-                    Utilities.SetConsoleColor(ConsoleColor.Red, ConsoleColor.White); //just a display thing, not needed
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Red, ConsoleColor.White); 
                     Console.WriteLine("Incorrect Texture Path, try again.");
                 }
                 else
@@ -421,7 +430,7 @@ namespace D3DTX_TextureConverter
             }
 
             //-----------------GET RESULT FOLDER PATH-----------------
-            Utilities.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White); 
             Console.WriteLine("Enter the resulting path where converted textures will be stored.");
 
             //result folder path (will contain the converted textures)
@@ -432,14 +441,14 @@ namespace D3DTX_TextureConverter
             while (inResultPathLoop)
             {
                 //get path from user
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
                 resultFolderPath = Console.ReadLine();
 
                 //check if the path is valid
                 if (Directory.Exists(resultFolderPath) == false)
                 {
                     //notify the user and this loop will run again
-                    Utilities.SetConsoleColor(ConsoleColor.Red, ConsoleColor.White); //just a display thing, not needed
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Red, ConsoleColor.White); 
                     Console.WriteLine("Incorrect Result Path, try again.");
                 }
                 else
@@ -452,14 +461,14 @@ namespace D3DTX_TextureConverter
             //-----------------START CONVERSION-----------------
 
             //notify the user we are starting
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
             Console.WriteLine("Conversion Starting...");
 
             //we got our paths, so lets begin
             Convert_DDS_Bulk(textureFolderPath, resultFolderPath);
 
             //once BeginProcess is finished, it will come back here and we will notify the user that we are done
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
             Console.WriteLine("Conversion Finished.");
             Console.ResetColor();
         }
@@ -471,7 +480,7 @@ namespace D3DTX_TextureConverter
         /// <param name="resultPath"></param>
         public static void Convert_DDS_Bulk(string texPath, string resultPath)
         {
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
             Console.WriteLine("Collecting Files..."); //notify the user we are collecting files
 
             //gather the files from the texture folder path into an array
@@ -483,26 +492,26 @@ namespace D3DTX_TextureConverter
             //where our header file paths will be stored
             List<string> headerFiles;
 
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
             Console.WriteLine("Filtering Files..."); //notify the user we are filtering the array
 
             //filter the array so we only get .dds files
-            ddsFiles = Utilities.FilterFiles(files, DDS_File.ddsExtension);
+            ddsFiles = IOManagement.FilterFiles(files, DDS_File.ddsExtension);
 
             //filter the array so we only get .header files
-            headerFiles = Utilities.FilterFiles(files, D3DTX_File.headerExtension);
+            headerFiles = IOManagement.FilterFiles(files, D3DTX_File.headerExtension);
 
             //if none of the arrays have any files that were found, abort the program from going on any further (we don't have any files to convert!)
             if (ddsFiles.Count < 1)
             {
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red); 
                 Console.WriteLine("No .d3dtx files were found, aborting.");
                 Console.ResetColor();
                 return;
             }
             else if (headerFiles.Count < 1)
             {
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red); 
                 Console.WriteLine("No .header files were found.");
                 Console.WriteLine(".header are required and must be generated when converting a .d3dtx to a .dds");
                 Console.WriteLine("aborting...");
@@ -510,7 +519,7 @@ namespace D3DTX_TextureConverter
                 return;
             }
 
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
             Console.WriteLine("Found {0} Textures.", ddsFiles.Count.ToString()); //notify the user we found x amount of dds files in the array
             Console.WriteLine("Found {0} Headers.", headerFiles.Count.ToString()); //notify the user we found x amount of header files in the array
             Console.WriteLine("Starting...");//notify the user we are starting
@@ -547,9 +556,9 @@ namespace D3DTX_TextureConverter
                 if (!string.IsNullOrEmpty(textureHeaderFile) || !string.IsNullOrWhiteSpace(textureHeaderFile))
                 {
                     //notify the user are converting 'x' file.
-                    Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
                     Console.WriteLine("||||||||||||||||||||||||||||||||");
-                    Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Blue); //just a display thing, not needed
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Blue); 
                     Console.WriteLine("Merging '{0}'...", textureFileName); //notify the user are converting 'x' file.
                     Console.WriteLine("Merging '{0}'...", Path.GetFileName(textureHeaderFile)); //notify the user are converting 'x' file.
                     Console.ResetColor();
@@ -557,14 +566,14 @@ namespace D3DTX_TextureConverter
                     //runs the main method for merging both files into a single .d3dtx
                     ConvertTexture_FromDDS_ToD3DTX(textureFileName, ddsFile, textureHeaderFile, textureResultPath, textureFileNameWithD3DTX);
 
-                    Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); //just a display thing, not needed
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
                     Console.WriteLine("Finished merging '{0}'...", textureFileNameOnly); //notify the user we finished converting 'x' file.
-                    Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
                 }
                 else
                 {
                     //notify the user that we can't convert this file, so we have to skip
-                    Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red); //just a display thing, not needed
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red); 
                     Console.WriteLine("Can't find the matching header file for '{0}'! Skipping this one.", textureFileName);
                 }
             }
@@ -607,7 +616,7 @@ namespace D3DTX_TextureConverter
                 d3dtx_file.Apply_DDS_Data_To_D3DTX_Data(dds_file, true);
 
                 //write the data to the file, combine the generted DDS header and the dds file data
-                File.WriteAllBytes(destinationFile, Utilities.Combine(d3dtx_file.headerData, dds_file.sourceFileData));
+                File.WriteAllBytes(destinationFile, ByteFunctions.Combine(d3dtx_file.headerData, dds_file.sourceFileData));
 
                 return;
             }
@@ -619,13 +628,13 @@ namespace D3DTX_TextureConverter
 
             //apply the dds property data to the d3dtx header
             d3dtx_file.Apply_DDS_Data_To_D3DTX_Data(dds_file, true);
-
+            /*
             //--------------------------COMBINE DDS TEXTURE DATA WITH D3DTX HEADER--------------------------
             //if there are no mip maps, go ahead and just build the texture
             if (dds_file.dwMipMapCount <= 1)
             {
                 //write the data to the file, combine the generted DDS header and our new texture byte data
-                File.WriteAllBytes(destinationFile, Utilities.Combine(d3dtx_file.headerData, dds_file.ddsTextureData));
+                File.WriteAllBytes(destinationFile, ByteFunctions.Combine(d3dtx_file.headerData, dds_file.ddsTextureData));
 
                 //stop the function as there is no need to continue any further
                 return;
@@ -640,7 +649,7 @@ namespace D3DTX_TextureConverter
 
             //add the d3dtx header
             //note to self - modify the header before adding it
-            final_d3dtxData = Utilities.Combine(d3dtx_file.headerData, final_d3dtxData);
+            final_d3dtxData = ByteFunctions.Combine(d3dtx_file.headerData, final_d3dtxData);
 
             //quick fix for textures not being read properly (they are not the exact same size)
             //note to self - try to modify the d3dtx header so the texture byte size in the header matches the texture byte size we are inputing
@@ -681,7 +690,7 @@ namespace D3DTX_TextureConverter
                 int height = mipImageResolutions[i, 1];
 
                 //estimate how many total bytes are in the largest texture mip level (main one)
-                int byteSize_estimation = Utilities.CalculateDDS_ByteSize(width, height, dds_file.DDS_CompressionBool());
+                int byteSize_estimation = DDS_Functions.CalculateDDS_ByteSize(width, height, dds_file.DDS_CompressionBool());
 
                 //offset our variable so we can get to the next mip (we are working backwards from the end of the file)
                 leftoverOffset -= byteSize_estimation;
@@ -699,11 +708,11 @@ namespace D3DTX_TextureConverter
                     Array.Copy(dds_file.ddsTextureData, leftoverOffset, mipTexData, 0, mipTexData.Length);
 
                     //combine the new mip byte data to the existing texture data byte array
-                    final_d3dtxData = Utilities.Combine(final_d3dtxData, mipTexData);
+                    final_d3dtxData = ByteFunctions.Combine(final_d3dtxData, mipTexData);
                 }
 
                 //write results to the console for viewing
-                Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); //just a display thing, not needed
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
                 Console.WriteLine("Leftover Offset = {0}", leftoverOffset.ToString());
                 Console.WriteLine("Mip Level = {0}", mipLevel.ToString());
                 Console.WriteLine("Mip Resolution = {0}x{1}", width.ToString(), height.ToString());
@@ -712,12 +721,13 @@ namespace D3DTX_TextureConverter
             }
 
             //write results to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); //just a display thing, not needed
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
             Console.WriteLine("D3DTX Header Byte Size = {0}", d3dtx_file.headerData.Length.ToString());
             Console.WriteLine("D3DTX Total Estimated Byte Size = {0}", totalMipByteSize.ToString());
 
             //write the data to the file, combine the generted DDS header and our new texture byte data
             File.WriteAllBytes(destinationFile, final_d3dtxData);
+            */
         }
     }
 }

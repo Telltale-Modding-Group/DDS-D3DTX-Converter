@@ -13,6 +13,7 @@ namespace D3DTX_TextureConverter
         //telltale d3dtx texture file extension
         public static string d3dtxExtension = ".d3dtx";
 
+        /*
         /// <summary>
         /// Gets the DWORD value from the source file
         /// </summary>
@@ -28,7 +29,7 @@ namespace D3DTX_TextureConverter
             string parsed_dword = Encoding.ASCII.GetString(source_dword);
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("D3DTX DWORD = {0}", parsed_dword);
 
             return parsed_dword;
@@ -50,7 +51,7 @@ namespace D3DTX_TextureConverter
             int parsed_fileVersion = BitConverter.ToInt32(source_fileVersion);
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("D3DTX File Version = {0}", parsed_fileVersion.ToString());
 
             return parsed_fileVersion;
@@ -72,7 +73,7 @@ namespace D3DTX_TextureConverter
             int parsed_textureDataByteSize = BitConverter.ToInt32(source_fileSize);
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("D3DTX Texture Byte Size = {0}", parsed_textureDataByteSize.ToString());
 
             return parsed_textureDataByteSize;
@@ -91,7 +92,7 @@ namespace D3DTX_TextureConverter
             int headerLength = sourceByteFileSize - parsed_textureDataByteSize;
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("D3DTX Header Byte Size = {0}", headerLength.ToString());
 
             return headerLength;
@@ -137,7 +138,7 @@ namespace D3DTX_TextureConverter
             int parsed_textureByteSize2 = BitConverter.ToInt32(source_textureByteSize2);
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("D3DTX Parsed Texture Byte Size = {0}", parsed_textureByteSize2.ToString());
 
             return parsed_textureByteSize2;
@@ -159,7 +160,7 @@ namespace D3DTX_TextureConverter
             int parsed_fileNameHeaderLength = BitConverter.ToInt32(source_fileNameLength);
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("D3DTX File Name Header Length = {0}", parsed_fileNameHeaderLength.ToString());
 
             return parsed_fileNameHeaderLength;
@@ -180,7 +181,7 @@ namespace D3DTX_TextureConverter
             string parsed_fileNameFromHeader = Encoding.ASCII.GetString(parsedName);
 
             //show it to the user
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("D3DTX File Name in Header = '{0}'", parsed_fileNameFromHeader);
 
             return parsed_fileNameFromHeader;
@@ -196,7 +197,7 @@ namespace D3DTX_TextureConverter
             int parsed_imageMipMapCount_decremented = parsed_imageMipMapCount - 1;
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("D3DTX Mip Map Count = {0} ({1})", parsed_imageMipMapCount.ToString(), parsed_imageMipMapCount_decremented.ToString());
 
             return parsed_imageMipMapCount;
@@ -211,7 +212,7 @@ namespace D3DTX_TextureConverter
             int parsed_imageWidth = BitConverter.ToInt32(source_imageWidth);
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("D3DTX Image Width = {0}", parsed_imageWidth.ToString());
 
             return parsed_imageWidth;
@@ -226,7 +227,7 @@ namespace D3DTX_TextureConverter
             int parsed_imageHeight = BitConverter.ToInt32(source_imageHeight);
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("D3DTX Image Height = {0}", parsed_imageHeight.ToString());
 
             return parsed_imageHeight;
@@ -241,11 +242,12 @@ namespace D3DTX_TextureConverter
             int parsed_dxtType = BitConverter.ToInt32(source_dxtType);
 
             //write the result to the console for viewing
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); //just a display thing, not needed
+            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
             Console.WriteLine("D3DTX DXT TYPE = {0}", parsed_dxtType.ToString());
 
             return parsed_dxtType;
         }
+        */
 
         public static string D3DTX_GetDXTType_ForDDS(string parsed_dword, int parsed_dxtType)
         {
@@ -302,12 +304,13 @@ namespace D3DTX_TextureConverter
                 result = "BC5S";
             }
 
-            Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); //just a display thing, not needed
-            Console.WriteLine("Selecting '{0}' DDS Compression.", result);
+            //Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
+            //Console.WriteLine("Selecting '{0}' DDS Compression.", result);
 
             return result;
         }
 
+        /*
         public static int DDS_GetHeaderLength(byte[] sourceByteFile, int bytePointerPosition)
         {
             //allocate 4 byte array (int32)
@@ -377,5 +380,6 @@ namespace D3DTX_TextureConverter
 
             return texture_parsed_compressionType;
         }
+        */
     }
 }

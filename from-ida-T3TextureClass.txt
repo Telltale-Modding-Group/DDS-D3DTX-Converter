@@ -1,0 +1,74 @@
+personal notes:
+class - T3Texture
+class - T3Texture_DX11
+
+
+from IDA
+
+void __fastcall T3Texture::T3Texture(T3Texture *this)
+{
+  //Initalize T3Texture object and assign it
+  T3Texture *v1; // rdi@1
+  v1 = this;
+
+  T3Texture_DX11::T3Texture_DX11(&this->vfptr);
+
+
+  v1->vfptr = &T3Texture::`vftable';
+  v1->mpHOI.mpData = 0i64;
+
+  CallbacksBase::CallbacksBase(&v1->mDeletedCallbacks.mpLast);
+
+  v1->mbLocked = 0;
+  v1->mVersion = 0;
+  v1->mImportName._Mypair._Myval2._Mysize = 0i64;
+  v1->mImportName._Mypair._Myval2._Myres = 15i64;
+  v1->mImportName._Mypair._Myval2._Bx._Buf[0] = 0;
+  LODWORD(v1->mImportScale) = 1065353216;
+  ToolProps::ToolProps(&v1->mToolProps);
+  v1->mPlatform.mVal = 2;
+  v1->mType = 15;
+  LODWORD(v1->mSpecularGlossExponent) = 1090519040;
+  v1->mSwizzle = 50462976;
+  *&v1->mAlphaMode = -1i64;
+  LODWORD(v1->mHDRLightmapScale) = 1086324736;
+  LODWORD(v1->mToonGradientCutoff) = -1082130432;
+  v1->mUVOffset = 0i64;
+  LODWORD(v1->mUVScale.x) = 1065353216;
+  LODWORD(v1->mUVScale.y) = 1065353216;
+  ContainerInterface::ContainerInterface(&v1->mToonRegions.vfptr);
+  v1->mToonRegions.vfptr = &DCArray<T3ToonGradientRegion>::`vftable';
+  *&v1->mToonRegions.mSize = 0i64;
+  v1->mToonRegions.mpStorage = 0i64;
+  ContainerInterface::ContainerInterface(&v1->mArrayFrameNames.vfptr);
+  v1->mArrayFrameNames.vfptr = &DCArray<Symbol>::`vftable';
+  *&v1->mArrayFrameNames.mSize = 0i64;
+  v1->mArrayFrameNames.mpStorage = 0i64;
+  v1->mAuxiliaryData.mCount = 0;
+  v1->mAuxiliaryData.mHead = 0i64;
+  v1->mAuxiliaryData.mTail = 0i64;
+  ContainerInterface::ContainerInterface(&v1->mRegionHeaders.vfptr);
+  v1->mRegionHeaders.vfptr = &DCArray<T3Texture::RegionStreamHeader>::`vftable';
+  *&v1->mRegionHeaders.mSize = 0i64;
+  v1->mRegionHeaders.mpStorage = 0i64;
+  *&v1->mNumRegionsLoaded = 0i64;
+  v1->mAsyncReadLock.mpTempAllocator = 0i64;
+  v1->mAsyncReadLock.mpBits = 0i64;
+  *&v1->mAsyncReadLock.mPitch = 0i64;
+  v1->mAsyncReadLock.mSlicePitch = 0;
+  *&v1->mAsyncReadLock.mLockFormat = -1i64;
+  *&v1->mAsyncReadLock.mFace = 0i64;
+  *&v1->mAsyncReadLock.mWidth = 0i64;
+  *&v1->mAsyncReadLock.mDepth = 1i64;
+  *&v1->mAsyncReadLock.mbRead = 0;
+  v1->mAsyncReadLock.mbTexToTexCopy = 0;
+  v1->mAsyncReadLock.mpPlatformData = 0i64;
+  v1->mFrameUsedForRendering = -1;
+  v1->mAsyncStreamPos = 0i64;
+  v1->mpAsyncStream.mpData = 0i64;
+  v1->mhAsyncRequest.mpWaitable = 0i64;
+  v1->mhTextureReadRequest.mData.mPointerAndData = 1i64;
+  *&v1->mAbsTimeNeeded = 0i64;
+  v1->mStreamingRefCount = 0;
+  v1->mpAsyncData = 0i64;
+}

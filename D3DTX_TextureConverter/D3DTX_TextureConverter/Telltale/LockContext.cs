@@ -16,7 +16,7 @@ namespace D3DTX_TextureConverter.Telltale
         public int mFace;
         public int mWidth;
         public int mDepth;
-        public bool mbRead;
+        //public bool mbRead;
         //public bool mbTexToTexCopy;
         //public int mpPlatformData;
     }

@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace D3DTX_TextureConverter.Telltale
 {
-    public struct Vector2
+    public struct T3SamplerStateBlock
     {
-        public int x;
-        public int y;
+        public uint mData;
     }
 }

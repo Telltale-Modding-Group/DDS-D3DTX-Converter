@@ -1,0 +1,704 @@
+MetaClassDescription *__fastcall T3Texture::InternalGetMetaClassDescription(MetaClassDescription *pClassDescription)
+{
+  MetaClassDescription *v1; // rbx@1
+  int v2; // eax@1
+  signed int i; // edi@2
+  int v4; // eax@9
+  signed int j; // edi@10
+  MetaClassDescription *v6; // rax@17
+  int v7; // eax@17
+  signed int k; // edi@18
+  MetaClassDescription *v9; // rax@25
+  MetaClassDescription *v10; // rax@25
+  MetaClassDescription *v11; // rax@25
+  MetaClassDescription *v12; // rax@25
+  MetaClassDescription *result; // rax@25
+
+  pClassDescription->mFlags |= 0x200000u;
+  pClassDescription->mpVTable = `MetaClassDescription_Typed<T3Texture>::GetVTable'::`2'::sVTable;
+  v1 = pClassDescription;
+  pClassDescription->mpExt = "d3dtx";
+  
+  `T3Texture::InternalGetMetaClassDescription'::`4'::operation_obj.mpOpFn = T3Texture::MetaOperation_SetObjectName;
+  `T3Texture::InternalGetMetaClassDescription'::`4'::operation_obj.id = 22;
+  MetaClassDescription::InstallSpecializedMetaOperation(pClassDescription,&`T3Texture::InternalGetMetaClassDescription'::`4'::operation_obj);
+  
+  `T3Texture::InternalGetMetaClassDescription'::`5'::operation_obj.id = 11;
+  `T3Texture::InternalGetMetaClassDescription'::`5'::operation_obj.mpOpFn = T3Texture::MetaOperation_GetLength;
+  MetaClassDescription::InstallSpecializedMetaOperation(v1, &`T3Texture::InternalGetMetaClassDescription'::`5'::operation_obj);
+  
+  `T3Texture::InternalGetMetaClassDescription'::`6'::operation_obj.id = 3;
+  `T3Texture::InternalGetMetaClassDescription'::`6'::operation_obj.mpOpFn = T3Texture::MetaOperation_AddToChoreInst;
+  MetaClassDescription::InstallSpecializedMetaOperation(v1, &`T3Texture::InternalGetMetaClassDescription'::`6'::operation_obj);
+  
+  `T3Texture::InternalGetMetaClassDescription'::`7'::operation_obj.id = 72;
+  `T3Texture::InternalGetMetaClassDescription'::`7'::operation_obj.mpOpFn = T3Texture::MetaOperation_AddToCache;
+  MetaClassDescription::InstallSpecializedMetaOperation(v1, &`T3Texture::InternalGetMetaClassDescription'::`7'::operation_obj);
+  
+  `T3Texture::InternalGetMetaClassDescription'::`8'::operation_obj.id = 13;
+  `T3Texture::InternalGetMetaClassDescription'::`8'::operation_obj.mpOpFn = T3Texture::MetaOperation_LoadDependantResources;
+  MetaClassDescription::InstallSpecializedMetaOperation(v1, &`T3Texture::InternalGetMetaClassDescription'::`8'::operation_obj);
+  
+  `T3Texture::InternalGetMetaClassDescription'::`9'::operation_obj.id = 74;
+  `T3Texture::InternalGetMetaClassDescription'::`9'::operation_obj.mpOpFn = T3Texture::MetaOperation_SerializeAsync;
+  MetaClassDescription::InstallSpecializedMetaOperation(v1, &`T3Texture::InternalGetMetaClassDescription'::`9'::operation_obj);
+  
+  `T3Texture::InternalGetMetaClassDescription'::`10'::operation_obj.id = 75;
+  `T3Texture::InternalGetMetaClassDescription'::`10'::operation_obj.mpOpFn = T3Texture::MetaOperation_SerializeMain;
+  MetaClassDescription::InstallSpecializedMetaOperation(v1, &`T3Texture::InternalGetMetaClassDescription'::`10'::operation_obj);
+  
+  `T3Texture::InternalGetMetaClassDescription'::`11'::operation_obj.id = 76;
+  `T3Texture::InternalGetMetaClassDescription'::`11'::operation_obj.mpOpFn = T3Texture::MetaOperation_Destroy;
+  MetaClassDescription::InstallSpecializedMetaOperation(v1, &`T3Texture::InternalGetMetaClassDescription'::`11'::operation_obj);
+  
+  `T3Texture::InternalGetMetaClassDescription'::`12'::operation_obj.id = 77;
+  `T3Texture::InternalGetMetaClassDescription'::`12'::operation_obj.mpOpFn = T3Texture::MetaOperation_GetEstimatedVramUsage;
+  MetaClassDescription::InstallSpecializedMetaOperation(v1, &`T3Texture::InternalGetMetaClassDescription'::`12'::operation_obj);
+  
+  qword_140FB03C8 = MetaHelpers::GetMetaClassDescription<long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`13'::metaMemberDescriptionMemory = "mVersion";
+  
+  qword_140FB03A0 = 356i64;
+  qword_140FB03B0 = v1;
+  
+  v1->mpFirstMember = `T3Texture::InternalGetMetaClassDescription'::`13'::metaMemberDescriptionMemory;
+  
+  dword_140FB03A8 |= 0x20u;
+  
+  v2 = `MetaClassDescription_Typed<T3SamplerStateBlock>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags;
+  
+  if ( !_bittest(&v2, 0x1Du) )
+  {
+	  
+    for ( i = 0; _InterlockedExchange(&`MetaClassDescription_Typed<T3SamplerStateBlock>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock, 1) == 1; ++i )
+    {
+      if ( i > 1000 )
+        Thread_Sleep(1);
+    }
+	
+    if ( !(`MetaClassDescription_Typed<T3SamplerStateBlock>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags & 0x20000000) )
+    {
+      MetaClassDescription::Initialize(&`MetaClassDescription_Typed<T3SamplerStateBlock>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory, &T3SamplerStateBlock `RTTI Type Descriptor');
+	  
+      `MetaClassDescription_Typed<T3SamplerStateBlock>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mClassSize = 4;
+      `MetaClassDescription_Typed<T3SamplerStateBlock>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mpVTable = `MetaClassDescription_Typed<T3SamplerStateBlock>::GetVTable'::`2'::sVTable;
+	  
+      qword_140FADE68 = GetMetaClassDescription<unsigned long>();
+      qword_140FADE40 = 0i64;
+	  
+      `T3SamplerStateBlock::InternalGetMetaClassDescription'::`4'::metaMemberDescriptionMemory = "mData";
+	  
+      `MetaClassDescription_Typed<T3SamplerStateBlock>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mpFirstMember = &`T3SamplerStateBlock::InternalGetMetaClassDescription'::`4'::metaMemberDescriptionMemory;
+	  
+      qword_140FADE50 = &`MetaClassDescription_Typed<T3SamplerStateBlock>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+	  
+      MetaClassDescription::Insert(&`MetaClassDescription_Typed<T3SamplerStateBlock>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory);
+    }
+	
+    `MetaClassDescription_Typed<T3SamplerStateBlock>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock.mValue = 0;
+	
+  }
+  
+  qword_140FB0400 = &`MetaClassDescription_Typed<T3SamplerStateBlock>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+  
+  *`T3Texture::InternalGetMetaClassDescription'::`14'::metaMemberDescriptionMemory = "mSamplerState";
+  
+  qword_140FB03B8 = `T3Texture::InternalGetMetaClassDescription'::`14'::metaMemberDescriptionMemory;
+  
+  v4 = `MetaClassDescription_Typed<EnumPlatformType>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags;
+  
+  qword_140FB03D8 = 140i64;
+  qword_140FB03E8 = v1;
+  
+  if ( !_bittest(&v4, 0x1Du) )
+  {
+	  
+    for ( j = 0; _InterlockedExchange(&`MetaClassDescription_Typed<EnumPlatformType>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock, 1) == 1; ++j )
+    {
+      if ( j > 1000 )
+        Thread_Sleep(1);
+    }
+	
+    if ( !(`MetaClassDescription_Typed<EnumPlatformType>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags & 0x20000000) )
+    {
+      MetaClassDescription::Initialize(&`MetaClassDescription_Typed<EnumPlatformType>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory, &EnumPlatformType `RTTI Type Descriptor');
+	  
+      `MetaClassDescription_Typed<EnumPlatformType>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mClassSize = 4;
+	  
+      EnumPlatformType::InternalGetMetaClassDescription(&`MetaClassDescription_Typed<EnumPlatformType>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory);
+	  
+      MetaClassDescription::Insert(&`MetaClassDescription_Typed<EnumPlatformType>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory);
+	  
+    }
+	
+    `MetaClassDescription_Typed<EnumPlatformType>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock.mValue = 0;
+	
+  }
+  
+  qword_140FB0438 = &`MetaClassDescription_Typed<EnumPlatformType>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`15'::metaMemberDescriptionMemory = "mPlatform";
+  qword_140FB0410 = 408i64;
+  qword_140FB03F0 = `T3Texture::InternalGetMetaClassDescription'::`15'::metaMemberDescriptionMemory;
+  qword_140FB0420 = v1;
+  qword_140FB0470 = MetaHelpers::GetMetaClassDescription<String>();
+  qword_140FB0448 = 40i64;
+  *`T3Texture::InternalGetMetaClassDescription'::`16'::metaMemberDescriptionMemory = "mName";
+  qword_140FB0428 = `T3Texture::InternalGetMetaClassDescription'::`16'::metaMemberDescriptionMemory;
+  qword_140FB0458 = v1;
+  qword_140FB04A8 = MetaHelpers::GetMetaClassDescription<String>();
+  *`T3Texture::InternalGetMetaClassDescription'::`17'::metaMemberDescriptionMemory = "mImportName";
+  qword_140FB0460 = `T3Texture::InternalGetMetaClassDescription'::`17'::metaMemberDescriptionMemory;
+  qword_140FB0480 = 360i64;
+  qword_140FB0490 = v1;
+  qword_140FB04E0 = MetaClassDescription_Typed<float>::GetMetaClassDescription();
+  qword_140FB04B8 = 400i64;
+  *`T3Texture::InternalGetMetaClassDescription'::`18'::metaMemberDescriptionMemory = "mImportScale";
+  qword_140FB0498 = `T3Texture::InternalGetMetaClassDescription'::`18'::metaMemberDescriptionMemory;
+  qword_140FB04C8 = v1;
+  v6 = MetaHelpers::GetMetaClassDescription<ToolProps>(0x195);
+  dword_140FB04F8 |= 0x20u;
+  qword_140FB0518 = v6;
+  *`T3Texture::InternalGetMetaClassDescription'::`19'::metaMemberDescriptionMemory = "mToolProps";
+  qword_140FB04D0 = `T3Texture::InternalGetMetaClassDescription'::`19'::metaMemberDescriptionMemory;
+  qword_140FB04F0 = 404i64;
+  qword_140FB0500 = v1;
+  qword_140FB0550 = GetMetaClassDescription<unsigned long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`20'::metaMemberDescriptionMemory = "mNumMipLevels";
+  qword_140FB0508 = `T3Texture::InternalGetMetaClassDescription'::`20'::metaMemberDescriptionMemory;
+  qword_140FB0528 = 96i64;
+  qword_140FB0538 = v1;
+  qword_140FB0588 = GetMetaClassDescription<unsigned long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`21'::metaMemberDescriptionMemory = "mWidth";
+  qword_140FB0540 = `T3Texture::InternalGetMetaClassDescription'::`21'::metaMemberDescriptionMemory;
+  qword_140FB0560 = 80i64;
+  qword_140FB0570 = v1;
+  qword_140FB05C0 = GetMetaClassDescription<unsigned long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`22'::metaMemberDescriptionMemory = "mHeight";
+  qword_140FB0578 = `T3Texture::InternalGetMetaClassDescription'::`22'::metaMemberDescriptionMemory;
+  qword_140FB0598 = 84i64;
+  qword_140FB05A8 = v1;
+  qword_140FB05F8 = GetMetaClassDescription<unsigned long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`23'::metaMemberDescriptionMemory = "mDepth";
+  qword_140FB05B0 = `T3Texture::InternalGetMetaClassDescription'::`23'::metaMemberDescriptionMemory;
+  qword_140FB05D0 = 88i64;
+  qword_140FB05E0 = v1;
+  qword_140FB0630 = GetMetaClassDescription<unsigned long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`24'::metaMemberDescriptionMemory = "mArraySize";
+  qword_140FB0608 = 92i64;
+  qword_140FB0618 = v1;
+  qword_140FB05E8 = `T3Texture::InternalGetMetaClassDescription'::`24'::metaMemberDescriptionMemory;
+  qword_140FB0668 = MetaHelpers::GetMetaClassDescription<long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`25'::metaMemberDescriptionMemory = "mSurfaceFormat";
+  qword_140FB0620 = `T3Texture::InternalGetMetaClassDescription'::`25'::metaMemberDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`28'::enumDescriptionMemory = "eSurface_Unknown";
+  qword_140FB0680 = qword_140FB0660;
+  *`T3Texture::InternalGetMetaClassDescription'::`29'::enumDescriptionMemory = "eSurface_ARGB8";
+  qword_140FB0698 = `T3Texture::InternalGetMetaClassDescription'::`28'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`30'::enumDescriptionMemory = "eSurface_RGBA8";
+  qword_140FB06B0 = `T3Texture::InternalGetMetaClassDescription'::`29'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`31'::enumDescriptionMemory = "eSurface_ARGB16";
+  qword_140FB06C8 = `T3Texture::InternalGetMetaClassDescription'::`30'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`32'::enumDescriptionMemory = "eSurface_RGB565";
+  qword_140FB06E0 = `T3Texture::InternalGetMetaClassDescription'::`31'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`33'::enumDescriptionMemory = "eSurface_ARGB1555";
+  qword_140FB06F8 = `T3Texture::InternalGetMetaClassDescription'::`32'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`34'::enumDescriptionMemory = "eSurface_ARGB4";
+  qword_140FB0710 = `T3Texture::InternalGetMetaClassDescription'::`33'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`35'::enumDescriptionMemory = "eSurface_ARGB2101010";
+  qword_140FB0728 = `T3Texture::InternalGetMetaClassDescription'::`34'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`36'::enumDescriptionMemory = "eSurface_A8";
+  qword_140FB0740 = `T3Texture::InternalGetMetaClassDescription'::`35'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`37'::enumDescriptionMemory = "eSurface_L8";
+  qword_140FB0758 = `T3Texture::InternalGetMetaClassDescription'::`36'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`38'::enumDescriptionMemory = "eSurface_AL8";
+  qword_140FB0770 = `T3Texture::InternalGetMetaClassDescription'::`37'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`39'::enumDescriptionMemory = "eSurface_L16";
+  qword_140FB0788 = `T3Texture::InternalGetMetaClassDescription'::`38'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`40'::enumDescriptionMemory = "eSurface_R16";
+  qword_140FB07A0 = `T3Texture::InternalGetMetaClassDescription'::`39'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`41'::enumDescriptionMemory = "eSurface_RG16";
+  qword_140FB07B8 = `T3Texture::InternalGetMetaClassDescription'::`40'::enumDescriptionMemory;
+  qword_140FB0640 = 104i64;
+  dword_140FB0648 = 64;
+  qword_140FB0650 = v1;
+  dword_140FB067C = -1; //eSurface_Unknown
+  dword_140FB0694 = 0; //eSurface_ARGB8
+  dword_140FB06AC = 10; //eSurface_RGBA8
+  dword_140FB06C4 = 1; //eSurface_ARGB16
+  dword_140FB06DC = 2; //eSurface_RGB565
+  dword_140FB06F4 = 3; //eSurface_ARGB1555
+  dword_140FB070C = 4; //eSurface_ARGB4
+  dword_140FB0724 = 5; //eSurface_ARGB2101010
+  dword_140FB073C = 16; //eSurface_A8
+  dword_140FB0754 = 17; //eSurface_L8
+  dword_140FB076C = 18; //eSurface_AL8
+  dword_140FB0784 = 19; //eSurface_L16
+  dword_140FB079C = 6; //eSurface_R16
+  dword_140FB07B4 = 7; //eSurface_RG16
+  dword_140FB07CC = 8; //eSurface_RGBA16
+  *`T3Texture::InternalGetMetaClassDescription'::`42'::enumDescriptionMemory = "eSurface_RGBA16";
+  qword_140FB07D0 = `T3Texture::InternalGetMetaClassDescription'::`41'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`43'::enumDescriptionMemory = "eSurface_RG8";
+  qword_140FB07E8 = `T3Texture::InternalGetMetaClassDescription'::`42'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`44'::enumDescriptionMemory = "eSurface_R16F";
+  qword_140FB0800 = `T3Texture::InternalGetMetaClassDescription'::`43'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`45'::enumDescriptionMemory = "eSurface_RG16F";
+  qword_140FB0818 = `T3Texture::InternalGetMetaClassDescription'::`44'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`46'::enumDescriptionMemory = "eSurface_RGBA16F";
+  qword_140FB0830 = `T3Texture::InternalGetMetaClassDescription'::`45'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`47'::enumDescriptionMemory = "eSurface_R32F";
+  qword_140FB0848 = `T3Texture::InternalGetMetaClassDescription'::`46'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`48'::enumDescriptionMemory = "eSurface_RG32F";
+  qword_140FB0860 = `T3Texture::InternalGetMetaClassDescription'::`47'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`49'::enumDescriptionMemory = "eSurface_RGBA32F";
+  qword_140FB0878 = `T3Texture::InternalGetMetaClassDescription'::`48'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`50'::enumDescriptionMemory = "eSurface_DepthPCF16";
+  qword_140FB0890 = `T3Texture::InternalGetMetaClassDescription'::`49'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`51'::enumDescriptionMemory = "eSurface_DepthPCF24";
+  qword_140FB08A8 = `T3Texture::InternalGetMetaClassDescription'::`50'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`52'::enumDescriptionMemory = "eSurface_Depth16";
+  qword_140FB08C0 = `T3Texture::InternalGetMetaClassDescription'::`51'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`53'::enumDescriptionMemory = "eSurface_Depth24";
+  qword_140FB08D8 = `T3Texture::InternalGetMetaClassDescription'::`52'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`54'::enumDescriptionMemory = "eSurface_DepthStencil32";
+  qword_140FB0948 = `T3Texture::InternalGetMetaClassDescription'::`53'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`55'::enumDescriptionMemory = "eSurface_Depth32F";
+  qword_140FB0998 = `T3Texture::InternalGetMetaClassDescription'::`54'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`56'::enumDescriptionMemory = "eSurface_Depth32F_Stencil8";
+  qword_140FB0A00 = `T3Texture::InternalGetMetaClassDescription'::`55'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`57'::enumDescriptionMemory = "eSurface_DXT1";
+  qword_140FB0A30 = `T3Texture::InternalGetMetaClassDescription'::`56'::enumDescriptionMemory;
+  dword_140FB07E4 = 9; //eSurface_RG8
+  dword_140FB07FC = 32; //eSurface_R16F
+  dword_140FB0814 = 33; //eSurface_RG16F
+  dword_140FB082C = 34; //eSurface_RGBA16F
+  dword_140FB0844 = 35; //eSurface_R32F
+  dword_140FB085C = 36; //eSurface_RG32F
+  dword_140FB0874 = 37; //eSurface_RGBA32F
+  dword_140FB088C = 48; //eSurface_DepthPCF16
+  dword_140FB08A4 = 49; //eSurface_DepthPCF24
+  dword_140FB08BC = 50; //eSurface_Depth16
+  dword_140FB08D4 = 51; //eSurface_Depth24
+  dword_140FB0944 = 52; //eSurface_DepthStencil32
+  dword_140FB0994 = 53; //eSurface_Depth32F
+  dword_140FB09FC = 54; //eSurface_Depth32F_Stencil8
+  dword_140FB0A2C = 64; //eSurface_DXT1
+  *`T3Texture::InternalGetMetaClassDescription'::`58'::enumDescriptionMemory = "eSurface_DXT3";
+  qword_140FB0A60 = `T3Texture::InternalGetMetaClassDescription'::`57'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`59'::enumDescriptionMemory = "eSurface_DXT5";
+  qword_140FB0A90 = `T3Texture::InternalGetMetaClassDescription'::`58'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`60'::enumDescriptionMemory = "eSurface_DXT5A";
+  qword_140FB0B30 = `T3Texture::InternalGetMetaClassDescription'::`59'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`61'::enumDescriptionMemory = "eSurface_DXN";
+  qword_140FB0B60 = `T3Texture::InternalGetMetaClassDescription'::`60'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`62'::enumDescriptionMemory = "eSurface_CTX1";
+  qword_140FB0BB0 = `T3Texture::InternalGetMetaClassDescription'::`61'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`63'::enumDescriptionMemory = "eSurface_BC6";
+  qword_140FB0C00 = `T3Texture::InternalGetMetaClassDescription'::`62'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`64'::enumDescriptionMemory = "eSurface_BC7";
+  qword_140FB0C18 = `T3Texture::InternalGetMetaClassDescription'::`63'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`65'::enumDescriptionMemory = "eSurface_PVRTC2";
+  qword_140FB0C30 = `T3Texture::InternalGetMetaClassDescription'::`64'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`66'::enumDescriptionMemory = "eSurface_PVRTC4";
+  qword_140FB0CD8 = `T3Texture::InternalGetMetaClassDescription'::`65'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`67'::enumDescriptionMemory = "eSurface_PVRTC2a";
+  qword_140FB0D08 = `T3Texture::InternalGetMetaClassDescription'::`66'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`68'::enumDescriptionMemory = "eSurface_PVRTC4a";
+  qword_140FB0D38 = `T3Texture::InternalGetMetaClassDescription'::`67'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`69'::enumDescriptionMemory = "eSurface_ATC_RGB";
+  qword_140FB0D68 = `T3Texture::InternalGetMetaClassDescription'::`68'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`70'::enumDescriptionMemory = "eSurface_ATC_RGB1A";
+  qword_140FB0D98 = `T3Texture::InternalGetMetaClassDescription'::`69'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`71'::enumDescriptionMemory = "eSurface_ATC_RGBA";
+  qword_140FB0DC8 = `T3Texture::InternalGetMetaClassDescription'::`70'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`72'::enumDescriptionMemory = "eSurface_ETC1_RGB";
+  qword_140FB0E28 = `T3Texture::InternalGetMetaClassDescription'::`71'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`73'::enumDescriptionMemory = "eSurface_ETC2_RGB";
+  qword_140FB0EB0 = `T3Texture::InternalGetMetaClassDescription'::`72'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`74'::enumDescriptionMemory = "eSurface_ETC2_RGB1A";
+  dword_140FB0A5C = 65; //eSurface_DXT3
+  dword_140FB0A8C = 66; //eSurface_DXT5
+  dword_140FB0B2C = 67; //eSurface_DXT5A
+  dword_140FB0B5C = 68; //eSurface_DXN
+  dword_140FB0BAC = 69; //eSurface_CTX1
+  dword_140FB0BFC = 70; //eSurface_BC6
+  dword_140FB0C14 = 71; //eSurface_BC7
+  dword_140FB0C2C = 80; //eSurface_PVRTC2
+  dword_140FB0CD4 = 81; //eSurface_PVRTC4
+  dword_140FB0D04 = 82; //eSurface_PVRTC2a
+  dword_140FB0D34 = 83; //eSurface_PVRTC4a
+  dword_140FB0D64 = 96; //eSurface_ATC_RGB
+  dword_140FB0D94 = 97; //eSurface_ATC_RGB1A
+  dword_140FB0DC4 = 98; //eSurface_ATC_RGBA
+  dword_140FB0E24 = 112; //eSurface_ETC1_RGB
+  dword_140FB0EAC = 113; //eSurface_ETC2_RGB
+  dword_140FB0EFC = 114; //eSurface_ETC2_RGB1A
+  qword_140FB0F00 = `T3Texture::InternalGetMetaClassDescription'::`73'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`75'::enumDescriptionMemory = "eSurface_ETC2_RGBA";
+  qword_140FB0F18 = `T3Texture::InternalGetMetaClassDescription'::`74'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`76'::enumDescriptionMemory = "eSurface_ETC2_R";
+  qword_140FB0F30 = `T3Texture::InternalGetMetaClassDescription'::`75'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`77'::enumDescriptionMemory = "eSurface_ETC2_RG";
+  qword_140FB0F48 = `T3Texture::InternalGetMetaClassDescription'::`76'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`78'::enumDescriptionMemory = "eSurface_ATSC_RGBA_4x4";
+  qword_140FB0F60 = `T3Texture::InternalGetMetaClassDescription'::`77'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`79'::enumDescriptionMemory = "eSurface_R8";
+  qword_140FB0F78 = `T3Texture::InternalGetMetaClassDescription'::`78'::enumDescriptionMemory;
+  qword_140FB0660 = `T3Texture::InternalGetMetaClassDescription'::`79'::enumDescriptionMemory;
+  dword_140FB0F14 = 115; //eSurface_ETC2_RGBA
+  dword_140FB0F2C = 116; //eSurface_ETC2_R
+  dword_140FB0F44 = 117; //eSurface_ETC2_RG
+  dword_140FB0F5C = 128; //eSurface_ATSC_RGBA_4x4
+  dword_140FB0F74 = 14; //eSurface_R8
+  qword_140FB0FB0 = MetaHelpers::GetMetaClassDescription<long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`80'::metaMemberDescriptionMemory = "mTextureLayout";
+  qword_140FB0658 = `T3Texture::InternalGetMetaClassDescription'::`80'::metaMemberDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`83'::enumDescriptionMemory = "eTextureLayout_Unknown";
+  qword_140FB0FC8 = qword_140FB0FA8;
+  *`T3Texture::InternalGetMetaClassDescription'::`84'::enumDescriptionMemory = "eTextureLayout_2D";
+  qword_140FB0FE0 = `T3Texture::InternalGetMetaClassDescription'::`83'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`85'::enumDescriptionMemory = "eTextureLayout_Cube";
+  qword_140FB0FF8 = `T3Texture::InternalGetMetaClassDescription'::`84'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`86'::enumDescriptionMemory = "eTextureLayout_3D";
+  qword_140FB1010 = `T3Texture::InternalGetMetaClassDescription'::`85'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`87'::enumDescriptionMemory = "eTextureLayout_2DArray";
+  qword_140FB1028 = `T3Texture::InternalGetMetaClassDescription'::`86'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`88'::enumDescriptionMemory = "eTextureLayout_CubeArray";
+  qword_140FB1098 = `T3Texture::InternalGetMetaClassDescription'::`87'::enumDescriptionMemory;
+  qword_140FB0FA8 = `T3Texture::InternalGetMetaClassDescription'::`88'::enumDescriptionMemory;
+  qword_140FB0F88 = 100i64;
+  dword_140FB0F90 = 64;
+  qword_140FB0F98 = v1;
+  dword_140FB0FC4 = -1; //eTextureLayout_Unknown
+  dword_140FB0FDC = 0; //eTextureLayout_2D
+  dword_140FB0FF4 = 1; //eTextureLayout_Cube
+  dword_140FB100C = 2; //eTextureLayout_3D
+  dword_140FB1024 = 3; //eTextureLayout_2DArray
+  dword_140FB1094 = 4; //eTextureLayout_CubeArray
+  qword_140FB10D0 = MetaHelpers::GetMetaClassDescription<long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`89'::metaMemberDescriptionMemory = "mSurfaceGamma";
+  qword_140FB0FA0 = `T3Texture::InternalGetMetaClassDescription'::`89'::metaMemberDescriptionMemory;
+  qword_140FB10A8 = 112i64;
+  dword_140FB10B0 = 64;
+  qword_140FB10B8 = v1;
+  *`T3Texture::InternalGetMetaClassDescription'::`92'::enumDescriptionMemory = "eSurfaceGamma_Unknown";
+  qword_140FB10E8 = qword_140FB10C8;
+  *`T3Texture::InternalGetMetaClassDescription'::`93'::enumDescriptionMemory = "eSurfaceGamma_Linear";
+  qword_140FB1100 = `T3Texture::InternalGetMetaClassDescription'::`92'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`94'::enumDescriptionMemory = "eSurfaceGamma_sRGB";
+  qword_140FB1118 = `T3Texture::InternalGetMetaClassDescription'::`93'::enumDescriptionMemory;
+  qword_140FB10C8 = `T3Texture::InternalGetMetaClassDescription'::`94'::enumDescriptionMemory;
+  dword_140FB10E4 = -1; //eSurfaceGamma_Unknown
+  dword_140FB10FC = 0; //eSurfaceGamma_Linear
+  dword_140FB1114 = 1; //eSurfaceGamma_sRGB
+  qword_140FB1150 = MetaHelpers::GetMetaClassDescription<long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`95'::metaMemberDescriptionMemory = "mSurfaceMultisample";
+  qword_140FB10C0 = `T3Texture::InternalGetMetaClassDescription'::`95'::metaMemberDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`98'::enumDescriptionMemory = "eSurfaceMultisample_None";
+  qword_140FB1168 = qword_140FB1148;
+  *`T3Texture::InternalGetMetaClassDescription'::`99'::enumDescriptionMemory = "eSurfaceMultisample_2x";
+  qword_140FB1180 = `T3Texture::InternalGetMetaClassDescription'::`98'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`100'::enumDescriptionMemory = "eSurfaceMultisample_4x";
+  qword_140FB1198 = `T3Texture::InternalGetMetaClassDescription'::`99'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`101'::enumDescriptionMemory = "eSurfaceMultisample_8x";
+  qword_140FB11B0 = `T3Texture::InternalGetMetaClassDescription'::`100'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`102'::enumDescriptionMemory = "eSurfaceMultisample_16x";
+  qword_140FB11C8 = `T3Texture::InternalGetMetaClassDescription'::`101'::enumDescriptionMemory;
+  qword_140FB1148 = `T3Texture::InternalGetMetaClassDescription'::`102'::enumDescriptionMemory;
+  qword_140FB1128 = 108i64;
+  dword_140FB1130 = 64;
+  qword_140FB1138 = v1;
+  dword_140FB1164 = 0; //eSurfaceMultisample_None
+  dword_140FB117C = 1; //eSurfaceMultisample_2x
+  dword_140FB1194 = 2; //eSurfaceMultisample_4x
+  dword_140FB11AC = 3; //eSurfaceMultisample_8x
+  dword_140FB11C4 = 4; //eSurfaceMultisample_16x
+  qword_140FB1258 = MetaHelpers::GetMetaClassDescription<long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`103'::metaMemberDescriptionMemory = "mResourceUsage";
+  qword_140FB1140 = `T3Texture::InternalGetMetaClassDescription'::`103'::metaMemberDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`106'::enumDescriptionMemory = "eResourceUsage_Static";
+  qword_140FB1270 = qword_140FB1250;
+  *`T3Texture::InternalGetMetaClassDescription'::`107'::enumDescriptionMemory = "eResourceUsage_Dynamic";
+  qword_140FB1288 = `T3Texture::InternalGetMetaClassDescription'::`106'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`108'::enumDescriptionMemory = "eResourceUsage_System";
+  qword_140FB12A0 = `T3Texture::InternalGetMetaClassDescription'::`107'::enumDescriptionMemory;
+  qword_140FB1250 = `T3Texture::InternalGetMetaClassDescription'::`108'::enumDescriptionMemory;
+  qword_140FB1230 = 120i64;
+  dword_140FB1238 = 64;
+  qword_140FB1240 = v1;
+  dword_140FB126C = 0; //eResourceUsage_Static
+  dword_140FB1284 = 1; //eResourceUsage_Dynamic
+  dword_140FB129C = 2; //eResourceUsage_System
+  qword_140FB12D8 = MetaHelpers::GetMetaClassDescription<long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`109'::metaMemberDescriptionMemory = "mType";
+  qword_140FB1248 = `T3Texture::InternalGetMetaClassDescription'::`109'::metaMemberDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`112'::enumDescriptionMemory = "eTxUnknown";
+  qword_140FB1348 = qword_140FB12D0;
+  *`T3Texture::InternalGetMetaClassDescription'::`113'::enumDescriptionMemory = "eTxStandard";
+  qword_140FB1360 = `T3Texture::InternalGetMetaClassDescription'::`112'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`114'::enumDescriptionMemory = "eTxLightmap_V0";
+  qword_140FB1378 = `T3Texture::InternalGetMetaClassDescription'::`113'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`115'::enumDescriptionMemory = "eTxBumpmap";
+  qword_140FB1390 = `T3Texture::InternalGetMetaClassDescription'::`114'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`116'::enumDescriptionMemory = "eTxNormalMap";
+  qword_140FB13A8 = `T3Texture::InternalGetMetaClassDescription'::`115'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`117'::enumDescriptionMemory = "eTxSubsurfaceScatteringMap_V0";
+  qword_140FB13C0 = `T3Texture::InternalGetMetaClassDescription'::`116'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`118'::enumDescriptionMemory = "eTxSubsurfaceScatteringMap";
+  qword_140FB1430 = `T3Texture::InternalGetMetaClassDescription'::`117'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`119'::enumDescriptionMemory = "eTxDetailMap";
+  qword_140FB1448 = `T3Texture::InternalGetMetaClassDescription'::`118'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`120'::enumDescriptionMemory = "eTxStaticShadowMap";
+  qword_140FB1460 = `T3Texture::InternalGetMetaClassDescription'::`119'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`121'::enumDescriptionMemory = "eTxLightmapHDR";
+  qword_140FB1478 = `T3Texture::InternalGetMetaClassDescription'::`120'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`122'::enumDescriptionMemory = "eTxLightmapHDRScaled";
+  qword_140FB1490 = `T3Texture::InternalGetMetaClassDescription'::`121'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`123'::enumDescriptionMemory = "eTxSDFDetailMap";
+  qword_140FB14A8 = `T3Texture::InternalGetMetaClassDescription'::`122'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`124'::enumDescriptionMemory = "eTxEnvMap";
+  qword_140FB14C0 = `T3Texture::InternalGetMetaClassDescription'::`123'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`125'::enumDescriptionMemory = "eTxSpecularColor";
+  qword_140FB14D8 = `T3Texture::InternalGetMetaClassDescription'::`124'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`126'::enumDescriptionMemory = "eTxToonLookup";
+  qword_140FB14F0 = `T3Texture::InternalGetMetaClassDescription'::`125'::enumDescriptionMemory;
+  qword_140FB12B0 = 412i64;
+  dword_140FB12B8 = 64;
+  qword_140FB12C0 = v1;
+  dword_140FB1344 = 0; //eTxUnknown
+  dword_140FB135C = 15; //eTxStandard
+  dword_140FB1374 = 1; //eTxLightmap_V0
+  dword_140FB138C = 2; //eTxBumpmap
+  dword_140FB13A4 = 3; //eTxNormalMap
+  dword_140FB13BC = 6; //eTxSubsurfaceScatteringMap_V0
+  dword_140FB142C = 7; //eTxSubsurfaceScatteringMap
+  dword_140FB1444 = 8; //eTxDetailMap
+  dword_140FB145C = 9; //eTxStaticShadowMap
+  dword_140FB1474 = 10; //eTxLightmapHDR
+  dword_140FB148C = 17; //eTxLightmapHDRScaled
+  dword_140FB14A4 = 11; //eTxSDFDetailMap
+  dword_140FB14BC = 12; //eTxEnvMap
+  dword_140FB14D4 = 13; //eTxSpecularColor
+  dword_140FB14EC = 14; //eTxToonLookup
+  dword_140FB1504 = 16; //eTxOutlineDiscontinuity
+  *`T3Texture::InternalGetMetaClassDescription'::`127'::enumDescriptionMemory = "eTxOutlineDiscontinuity";
+  qword_140FB1508 = `T3Texture::InternalGetMetaClassDescription'::`126'::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::A]::enumDescriptionMemory = "eTxEmissiveMap";
+  qword_140FB1520 = `T3Texture::InternalGetMetaClassDescription'::`127'::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::B]::enumDescriptionMemory = "eTxParticleProperties";
+  qword_140FB1538 = &`T3Texture::InternalGetMetaClassDescription'[::A]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::C]::enumDescriptionMemory = "eTxNormalGlossMap";
+  qword_140FB1550 = &`T3Texture::InternalGetMetaClassDescription'[::B]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::D]::enumDescriptionMemory = "eTxLookup";
+  qword_140FB1568 = &`T3Texture::InternalGetMetaClassDescription'[::C]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::E]::enumDescriptionMemory = "eTxAmbientOcclusion";
+  qword_140FB1580 = &`T3Texture::InternalGetMetaClassDescription'[::D]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::F]::enumDescriptionMemory = "eTxPrefilteredEnvCubeMapHDR";
+  qword_140FB1598 = &`T3Texture::InternalGetMetaClassDescription'[::E]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::G]::enumDescriptionMemory = "eTxBrushLookupMap";
+  qword_140FB15B0 = &`T3Texture::InternalGetMetaClassDescription'[::F]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::H]::enumDescriptionMemory = "eTxVector2Map";
+  qword_140FB15C8 = &`T3Texture::InternalGetMetaClassDescription'[::G]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::I]::enumDescriptionMemory = "eTxNormalDxDyMap";
+  qword_140FB15E0 = &`T3Texture::InternalGetMetaClassDescription'[::H]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::J]::enumDescriptionMemory = "eTxPackedSDFDetailMap";
+  qword_140FB15F8 = &`T3Texture::InternalGetMetaClassDescription'[::I]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::K]::enumDescriptionMemory = "eTxSingleChannelSDFDetailMap";
+  qword_140FB1610 = &`T3Texture::InternalGetMetaClassDescription'[::J]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::L]::enumDescriptionMemory = "eTxLightmapDirection";
+  qword_140FB1628 = &`T3Texture::InternalGetMetaClassDescription'[::K]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::M]::enumDescriptionMemory = "eTxLightmapStaticShadows";
+  qword_140FB1678 = &`T3Texture::InternalGetMetaClassDescription'[::L]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::N]::enumDescriptionMemory = "eTxLightStaticShadowMapAtlas";
+  qword_140FB16A8 = &`T3Texture::InternalGetMetaClassDescription'[::M]::enumDescriptionMemory;
+  `T3Texture::InternalGetMetaClassDescription'[::O]::enumDescriptionMemory = "eTxLightStaticShadowMap";
+  qword_140FB16D8 = &`T3Texture::InternalGetMetaClassDescription'[::N]::enumDescriptionMemory;
+  dword_140FB151C = 18; //eTxEmissiveMap
+  dword_140FB1534 = 19; //eTxParticleProperties
+  dword_140FB154C = 22; //eTxNormalGlossMap
+  dword_140FB1564 = 23; //eTxLookup
+  dword_140FB157C = 24; //eTxAmbientOcclusion
+  dword_140FB1594 = 25; //eTxPrefilteredEnvCubeMapHDR
+  dword_140FB15AC = 26; //eTxBrushLookupMap
+  dword_140FB15C4 = 27; //eTxVector2Map
+  dword_140FB15DC = 28; //eTxNormalDxDyMap
+  dword_140FB15F4 = 29; //eTxPackedSDFDetailMap
+  dword_140FB160C = 30; //eTxSingleChannelSDFDetailMap
+  dword_140FB1624 = 31; //eTxLightmapDirection
+  dword_140FB1674 = 32; //eTxLightmapStaticShadows
+  dword_140FB16A4 = 33; //eTxLightStaticShadowMapAtlas
+  dword_140FB16D4 = 34; //eTxLightStaticShadowMap
+  `T3Texture::InternalGetMetaClassDescription'[::P]::enumDescriptionMemory = "eTxPrefilteredEnvCubeMapHDRScaled";
+  qword_140FB1708 = &`T3Texture::InternalGetMetaClassDescription'[::O]::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`144'::enumDescriptionMemory = "eTxLightStaticShadowVolume";
+  qword_140FB1738 = &`T3Texture::InternalGetMetaClassDescription'[::P]::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`145'::enumDescriptionMemory = "eTxLightmapAtlas";
+  qword_140FB1750 = `T3Texture::InternalGetMetaClassDescription'::`144'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`146'::enumDescriptionMemory = "eTxNormalXYMap";
+  qword_140FB1768 = `T3Texture::InternalGetMetaClassDescription'::`145'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`147'::enumDescriptionMemory = "eTxLightmapFlatAtlas";
+  qword_140FB17B8 = `T3Texture::InternalGetMetaClassDescription'::`146'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`148'::enumDescriptionMemory = "eTxLookupXY";
+  qword_140FB17E8 = `T3Texture::InternalGetMetaClassDescription'::`147'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`149'::enumDescriptionMemory = "eTxObjectNormalMap";
+  qword_140FB1830 = `T3Texture::InternalGetMetaClassDescription'::`148'::enumDescriptionMemory;
+  qword_140FB12D0 = `T3Texture::InternalGetMetaClassDescription'::`149'::enumDescriptionMemory;
+  v7 = `MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags;
+  dword_140FB1704 = 35; //eTxPrefilteredEnvCubeMapHDRScaled
+  dword_140FB1734 = 36; //eTxLightStaticShadowVolume
+  dword_140FB174C = 37; //eTxLightmapAtlas
+  dword_140FB1764 = 38; //eTxNormalXYMap
+  dword_140FB17B4 = 39; //eTxLightmapFlatAtlas
+  dword_140FB17E4 = 40; //eTxLookupXY
+  dword_140FB182C = 41; //eTxObjectNormalMap
+  
+  if ( !_bittest(&v7, 0x1Du) )
+  {
+    for ( k = 0; _InterlockedExchange(&`MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock, 1) == 1; ++k )
+    {
+      if ( k > 1000 )
+        Thread_Sleep(1);
+    }
+    if ( !(`MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags & 0x20000000) )
+    {
+      MetaClassDescription::Initialize(&`MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory, &RenderSwizzleParams `RTTI Type Descriptor');
+      `MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mClassSize = 4;
+      `MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mpVTable = `MetaClassDescription_Typed<RenderSwizzleParams>::GetVTable'::`2'::sVTable;
+      qword_140FAEAC8 = MetaHelpers::GetMetaClassDescription<unsigned char>(1);
+      qword_140FAEAA0 = 0i64;
+      `RenderSwizzleParams::InternalGetMetaClassDescription'::`4'::metaMemberDescriptionMemory = "mSwizzle[0]";
+      `MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mpFirstMember = &`RenderSwizzleParams::InternalGetMetaClassDescription'::`4'::metaMemberDescriptionMemory;
+      qword_140FAEAB0 = &`MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      qword_140FAEB38 = MetaHelpers::GetMetaClassDescription<unsigned char>(2);
+      qword_140FAEB10 = 1i64;
+      `RenderSwizzleParams::InternalGetMetaClassDescription'::`5'::metaMemberDescriptionMemory = "mSwizzle[1]";
+      qword_140FAEAB8 = &`RenderSwizzleParams::InternalGetMetaClassDescription'::`5'::metaMemberDescriptionMemory;
+      qword_140FAEB20 = &`MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      qword_140FAEBA8 = MetaHelpers::GetMetaClassDescription<unsigned char>(3);
+      qword_140FAEB80 = 2i64;
+      `RenderSwizzleParams::InternalGetMetaClassDescription'::`6'::metaMemberDescriptionMemory = "mSwizzle[2]";
+      qword_140FAEB28 = &`RenderSwizzleParams::InternalGetMetaClassDescription'::`6'::metaMemberDescriptionMemory;
+      qword_140FAEB90 = &`MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      qword_140FAEC18 = MetaHelpers::GetMetaClassDescription<unsigned char>(4);
+      qword_140FAEBF0 = 3i64;
+      `RenderSwizzleParams::InternalGetMetaClassDescription'::`7'::metaMemberDescriptionMemory = "mSwizzle[3]";
+      qword_140FAEB98 = &`RenderSwizzleParams::InternalGetMetaClassDescription'::`7'::metaMemberDescriptionMemory;
+      qword_140FAEC00 = &`MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      MetaClassDescription::Insert(&`MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory);
+    }
+    `MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock.mValue = 0;
+  }
+  
+  qword_140FB1880 = &`MetaClassDescription_Typed<RenderSwizzleParams>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`150'::metaMemberDescriptionMemory = "mSwizzle";
+  qword_140FB12C8 = `T3Texture::InternalGetMetaClassDescription'::`150'::metaMemberDescriptionMemory;
+  qword_140FB1858 = 420i64;
+  qword_140FB1868 = v1;
+  qword_140FB18E8 = MetaClassDescription_Typed<float>::GetMetaClassDescription();
+  *`T3Texture::InternalGetMetaClassDescription'::`151'::metaMemberDescriptionMemory = "mSpecularGlossExponent";
+  qword_140FB1870 = `T3Texture::InternalGetMetaClassDescription'::`151'::metaMemberDescriptionMemory;
+  qword_140FB18C0 = 416i64;
+  qword_140FB18D0 = v1;
+  qword_140FB1938 = MetaClassDescription_Typed<float>::GetMetaClassDescription();
+  *`T3Texture::InternalGetMetaClassDescription'::`152'::metaMemberDescriptionMemory = "mHDRLightmapScale";
+  qword_140FB18D8 = `T3Texture::InternalGetMetaClassDescription'::`152'::metaMemberDescriptionMemory;
+  qword_140FB1910 = 432i64;
+  qword_140FB1920 = v1;
+  qword_140FB19A8 = MetaClassDescription_Typed<float>::GetMetaClassDescription();
+  *`T3Texture::InternalGetMetaClassDescription'::`153'::metaMemberDescriptionMemory = "mToonGradientCutoff";
+  qword_140FB1928 = `T3Texture::InternalGetMetaClassDescription'::`153'::metaMemberDescriptionMemory;
+  qword_140FB1980 = 436i64;
+  qword_140FB1990 = v1;
+  qword_140FB1A18 = MetaHelpers::GetMetaClassDescription<long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`154'::metaMemberDescriptionMemory = "mAlphaMode";
+  qword_140FB1998 = `T3Texture::InternalGetMetaClassDescription'::`154'::metaMemberDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`157'::enumDescriptionMemory = "eTxAlphaUnkown";
+  qword_140FB1A30 = qword_140FB1A10;
+  *`T3Texture::InternalGetMetaClassDescription'::`158'::enumDescriptionMemory = "eTxNoAlpha";
+  qword_140FB1A48 = `T3Texture::InternalGetMetaClassDescription'::`157'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`159'::enumDescriptionMemory = "eTxAlphaTest";
+  qword_140FB1A60 = `T3Texture::InternalGetMetaClassDescription'::`158'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`160'::enumDescriptionMemory = "eTxAlphaBlend";
+  qword_140FB1A78 = `T3Texture::InternalGetMetaClassDescription'::`159'::enumDescriptionMemory;
+  qword_140FB1A10 = `T3Texture::InternalGetMetaClassDescription'::`160'::enumDescriptionMemory;
+  qword_140FB19F0 = 424i64;
+  dword_140FB19F8 = 64;
+  qword_140FB1A00 = v1;
+  dword_140FB1A2C = -1; //eTxAlphaUnkown
+  dword_140FB1A44 = 0; //eTxNoAlpha
+  dword_140FB1A5C = 1; //eTxAlphaTest
+  dword_140FB1A74 = 2; //eTxAlphaBlend
+  qword_140FB1AB0 = MetaHelpers::GetMetaClassDescription<long>();
+  *`T3Texture::InternalGetMetaClassDescription'::`161'::metaMemberDescriptionMemory = "mColorMode";
+  qword_140FB1A08 = `T3Texture::InternalGetMetaClassDescription'::`161'::metaMemberDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`164'::enumDescriptionMemory = "eTxColorUnknown";
+  qword_140FB1AC8 = qword_140FB1AA8;
+  *`T3Texture::InternalGetMetaClassDescription'::`165'::enumDescriptionMemory = "eTxColorFull";
+  qword_140FB1AE0 = `T3Texture::InternalGetMetaClassDescription'::`164'::enumDescriptionMemory;
+  qword_140FB1A88 = 428i64;
+  dword_140FB1A90 = 64;
+  qword_140FB1A98 = v1;
+  dword_140FB1AC4 = -1; //eTxColorUnknown
+  dword_140FB1ADC = 0; //eTxColorFull
+  dword_140FB1B64 = 1; //eTxColorBlack
+  *`T3Texture::InternalGetMetaClassDescription'::`166'::enumDescriptionMemory = "eTxColorBlack";
+  qword_140FB1B68 = `T3Texture::InternalGetMetaClassDescription'::`165'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`167'::enumDescriptionMemory = "eTxColorGrayscale";
+  qword_140FB1BB0 = `T3Texture::InternalGetMetaClassDescription'::`166'::enumDescriptionMemory;
+  *`T3Texture::InternalGetMetaClassDescription'::`168'::enumDescriptionMemory = "eTxColorGrayscaleAlpha";
+  qword_140FB1BE0 = `T3Texture::InternalGetMetaClassDescription'::`167'::enumDescriptionMemory;
+  qword_140FB1AA8 = `T3Texture::InternalGetMetaClassDescription'::`168'::enumDescriptionMemory;
+  dword_140FB1BAC = 2; //eTxColorGrayscale
+  dword_140FB1BDC = 3; //eTxColorGrayscaleAlpha
+  qword_140FB1C50 = MetaClassDescription_Typed<Vector2>::GetMetaClassDescription();
+  *`T3Texture::InternalGetMetaClassDescription'::`169'::metaMemberDescriptionMemory = "mUVOffset";
+  qword_140FB1AA0 = `T3Texture::InternalGetMetaClassDescription'::`169'::metaMemberDescriptionMemory;
+  qword_140FB1C28 = 440i64;
+  qword_140FB1C38 = v1;
+  qword_140FB1CF8 = MetaClassDescription_Typed<Vector2>::GetMetaClassDescription();
+  *`T3Texture::InternalGetMetaClassDescription'::`170'::metaMemberDescriptionMemory = "mUVScale";
+  qword_140FB1C40 = `T3Texture::InternalGetMetaClassDescription'::`170'::metaMemberDescriptionMemory;
+  qword_140FB1CD0 = 448i64;
+  qword_140FB1CE0 = v1;
+  v9 = GetMetaClassDescription<unsigned long>();
+  dword_140FB1D80 |= 1u;
+  qword_140FB1DA0 = v9;
+  *`T3Texture::InternalGetMetaClassDescription'::`171'::metaMemberDescriptionMemory = "mNumMipLevelsAllocated";
+  qword_140FB1CE8 = `T3Texture::InternalGetMetaClassDescription'::`171'::metaMemberDescriptionMemory;
+  qword_140FB1D78 = 124i64;
+  qword_140FB1D88 = v1;
+  v10 = GetMetaClassDescription<unsigned long>();
+  dword_140FB1DD0 |= 1u;
+  qword_140FB1DF0 = v10;
+  *`T3Texture::InternalGetMetaClassDescription'::`172'::metaMemberDescriptionMemory = "mNumSurfacesRequested";
+  qword_140FB1D90 = `T3Texture::InternalGetMetaClassDescription'::`172'::metaMemberDescriptionMemory;
+  qword_140FB1DC8 = 128i64;
+  qword_140FB1DD8 = v1;
+  v11 = GetMetaClassDescription<unsigned long>();
+  dword_140FB1E78 |= 1u;
+  qword_140FB1E98 = v11;
+  *`T3Texture::InternalGetMetaClassDescription'::`173'::metaMemberDescriptionMemory = "mNumSurfacesRequired";
+  qword_140FB1DE0 = `T3Texture::InternalGetMetaClassDescription'::`173'::metaMemberDescriptionMemory;
+  qword_140FB1E70 = 132i64;
+  qword_140FB1E80 = v1;
+  v12 = GetMetaClassDescription<unsigned long>();
+  dword_140FB1EE0 |= 1u;
+  qword_140FB1F00 = v12;
+  *`T3Texture::InternalGetMetaClassDescription'::`174'::metaMemberDescriptionMemory = "mNumSurfacesLoaded";
+  qword_140FB1E88 = `T3Texture::InternalGetMetaClassDescription'::`174'::metaMemberDescriptionMemory;
+  qword_140FB1ED8 = 136i64;
+  qword_140FB1EE8 = v1;
+  qword_140FB1F50 = MetaClassDescription_Typed<DCArray<Symbol>>::GetMetaClassDescription();
+  *`T3Texture::InternalGetMetaClassDescription'::`175'::metaMemberDescriptionMemory = "mArrayFrameNames";
+  qword_140FB1EF0 = `T3Texture::InternalGetMetaClassDescription'::`175'::metaMemberDescriptionMemory;
+  qword_140FB1F28 = 496i64;
+  qword_140FB1F38 = v1;
+  qword_140FB2010 = MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription();
+  *`T3Texture::InternalGetMetaClassDescription'::`176'::metaMemberDescriptionMemory = "mToonRegions";
+  dword_140FB1FF0 |= 0x20u;
+  qword_140FB1F40 = `T3Texture::InternalGetMetaClassDescription'::`176'::metaMemberDescriptionMemory;
+  result = v1;
+  qword_140FB1FF8 = v1;
+  qword_140FB1FE8 = 456i64;
+  return result;
+}

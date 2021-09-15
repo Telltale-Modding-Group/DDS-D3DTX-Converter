@@ -27,6 +27,13 @@ namespace D3DTX_TextureConverter
 
         public DDS_HEADER header;
 
+        public DDS_File(D3DTX_File d3dtx)
+        {
+            header.dwWidth = (uint)d3dtx.T3TextureBase.mWidth;
+            header.dwHeight = (uint)d3dtx.T3TextureBase.mHeight;
+            header.dwMipMapCount = (uint)d3dtx.T3TextureBase.mNumMipLevelsAllocated;
+        }
+
         /// <summary>
         /// Manually builds a byte array of a dds header
         /// </summary>

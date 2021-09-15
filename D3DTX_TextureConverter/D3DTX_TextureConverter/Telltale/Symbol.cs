@@ -8,6 +8,6 @@ namespace D3DTX_TextureConverter.Telltale
 {
     public class Symbol
     {
-
+        public long mCrc64;
     }
 }

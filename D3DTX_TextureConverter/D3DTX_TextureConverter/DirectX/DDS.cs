@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DirectXTexNet;
 
 namespace D3DTX_TextureConverter.DirectX
 {
@@ -12,6 +13,9 @@ namespace D3DTX_TextureConverter.DirectX
     //Texutre Block Compression in D3D11 - https://docs.microsoft.com/en-us/windows/win32/direct3d11/texture-block-compression-in-direct3d-11
     //DDS Programming Guide - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide
 
+    /// <summary>
+    /// DDS file header
+    /// </summary>
     public struct DDS_HEADER
     {
         public uint dwSize; //Size of structure. This member must be set to 124. [4 bytes]
@@ -40,6 +44,9 @@ namespace D3DTX_TextureConverter.DirectX
         public uint dwReserved12; //unused according to DDS docs [4 bytes]
     }
 
+    /// <summary>
+    /// Surface pixel format.
+    /// </summary>
     public struct DDS_PIXELFORMAT
     {
         public uint dwSize; //Structure size; set to 32 (bytes). [4 bytes]
@@ -51,4 +58,40 @@ namespace D3DTX_TextureConverter.DirectX
         public uint dwBBitMask; //Blue (or V) mask for reading color data. [4 bytes]
         public uint dwABitMask; //Alpha mask for reading alpha data. [4 bytes]
     }
+
+    /// <summary>
+    /// DDS header extension to handle resource arrays, DXGI pixel formats that don't map to the legacy Microsoft DirectDraw pixel format structures, and additional metadata.
+    /// </summary>
+    public struct DDS_HEADER_DXT10
+    {
+        public DXGI_FORMAT dxgiFormat;
+        public D3D10_RESOURCE_DIMENSION resourceDimension;
+        public uint miscFlag;
+        public uint arraySize;
+        public uint miscFlags2;
+    }
+
+    /// <summary>
+    /// Identifies the type of resource being used.
+    /// </summary>
+    public enum D3D10_RESOURCE_DIMENSION
+    {
+        D3D10_RESOURCE_DIMENSION_UNKNOWN,
+        D3D10_RESOURCE_DIMENSION_BUFFER,
+        D3D10_RESOURCE_DIMENSION_TEXTURE1D,
+        D3D10_RESOURCE_DIMENSION_TEXTURE2D,
+        D3D10_RESOURCE_DIMENSION_TEXTURE3D
+    };
+
+    /// <summary>
+    /// Identifies the type of resource being used.
+    /// </summary>
+    public enum D3D11_RESOURCE_DIMENSION
+    {
+        D3D11_RESOURCE_DIMENSION_UNKNOWN,
+        D3D11_RESOURCE_DIMENSION_BUFFER,
+        D3D11_RESOURCE_DIMENSION_TEXTURE1D,
+        D3D11_RESOURCE_DIMENSION_TEXTURE2D,
+        D3D11_RESOURCE_DIMENSION_TEXTURE3D
+    };
 }

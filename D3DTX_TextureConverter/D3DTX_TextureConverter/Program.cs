@@ -10,7 +10,7 @@ namespace D3DTX_TextureConverter
     class Program
     {
         //----------------------CONVERSION OPTIONS----------------------
-        public static bool d3dtxMode = false; //false = in d3dtx to dds mode, true = dds to d3dtx mode
+        public static bool d3dtxMode = true; //true = in d3dtx to dds mode, false = dds to d3dtx mode
         public static bool generateHeader = true; //for D3DTX Mode, IMPORTANT if you want to convert the dds back to a d3dtx
 
         //attempts to change the resolution IF the NEW DDS file resolution is DIFFERENT than the original D3DTX (ONLY ON FILES WITH 0 MIP MAPS)
@@ -192,15 +192,17 @@ namespace D3DTX_TextureConverter
             {
                 d3dtx_file.Read_D3DTX_File_6VSM(sourceFileName, sourceFile, false);
             }
+
+            /*
             else if(file_dword.Equals("5VSM"))
             {
-                d3dtx_file.Read_D3DTX_File_5VSM(sourceFileName, sourceFile, false);
+                //d3dtx_file.Read_D3DTX_File_5VSM(sourceFileName, sourceFile, false);
             }
             else if(file_dword.Equals("ERTM"))
             {
                 byte[] ddsFileData = null;
 
-                d3dtx_file.Read_D3DTX_File_ERTM(sourceFileName, sourceFile, false, out ddsFileData);
+                //d3dtx_file.Read_D3DTX_File_ERTM(sourceFileName, sourceFile, false, out ddsFileData);
 
                 //generates a .header file that will accompany the .dds on conversion, this .header file will contain the original .d3dtx header for converting the .dds back later
                 if (generateHeader)
@@ -222,7 +224,9 @@ namespace D3DTX_TextureConverter
                     return;
                 }
             }
+            */
 
+            /*
             //generates a .header file that will accompany the .dds on conversion, this .header file will contain the original .d3dtx header for converting the .dds back later
             if (generateHeader)
             {
@@ -231,7 +235,7 @@ namespace D3DTX_TextureConverter
             }
 
             //get our dds file object ready and assign our parsed values from the d3dtx to new dds file
-            //DDS_File dds_file = new DDS_File();
+            DDS_File dds_file = new DDS_File(d3dtx_file);
             //dds_file.dwWidth = (uint)d3dtx_file.mWidth;
             //dds_file.dwHeight = (uint)d3dtx_file.mHeight;
             //dds_file.dwFlags = (uint)parsed_dwFlags;
@@ -293,7 +297,7 @@ namespace D3DTX_TextureConverter
 
             //copy all the bytes from the source byte file after the header length, and copy that data to the texture data byte array
             Array.Copy(d3dtx_file.sourceByteFile, startOffset, textureData, 0, textureData.Length);
-            /*
+
             //byte[] finalDDS_textureData = ByteFunctions.Combine(ddsHeader, textureData);
 
             //if there are no mip maps, build the texture file because we are done
@@ -593,7 +597,6 @@ namespace D3DTX_TextureConverter
             */
 
             D3DTX_File d3dtx_file = new D3DTX_File();
-            DDS_File dds_file = new DDS_File();
 
             string file_dword = D3DTX_File.Read_D3DTX_File_DWORD_Only(sourceHeaderFile);
 
@@ -601,15 +604,19 @@ namespace D3DTX_TextureConverter
             {
                 d3dtx_file.Read_D3DTX_File_6VSM(sourceFileName, sourceHeaderFile, true);
             }
+
+            DDS_File dds_file = new DDS_File(d3dtx_file);
+
+            /*
             else if (file_dword.Equals("5VSM"))
             {
-                d3dtx_file.Read_D3DTX_File_5VSM(sourceFileName, sourceHeaderFile, true);
+                //d3dtx_file.Read_D3DTX_File_5VSM(sourceFileName, sourceHeaderFile, true);
             }
             else if (file_dword.Equals("ERTM"))
             {
                 byte[] ddsFileData = null; //because we are reading just a .header version of the .d3dtx, this won't have the data
 
-                d3dtx_file.Read_D3DTX_File_ERTM(sourceFileName, sourceHeaderFile, true, out ddsFileData);
+                //d3dtx_file.Read_D3DTX_File_ERTM(sourceFileName, sourceHeaderFile, true, out ddsFileData);
                 dds_file.Read_DDS_File(sourceTexFile, sourceFileName, false);
 
                 //apply the dds property data to the d3dtx header

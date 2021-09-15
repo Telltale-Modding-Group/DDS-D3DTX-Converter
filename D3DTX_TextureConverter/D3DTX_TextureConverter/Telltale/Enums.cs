@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace D3DTX_TextureConverter.Telltale
 {
+    //note: can't find original name, so just using the prefix eTxAlpha
     public enum eTxAlpha
     {
         eTxAlphaUnkown = 0,
@@ -14,6 +15,7 @@ namespace D3DTX_TextureConverter.Telltale
         eTxAlphaBlend = 3,
     }
 
+    //note: can't find original name, so just using the prefix eTxColor
     public enum eTxColor
     {
         eTxColorUnknown = 0,
@@ -78,6 +80,56 @@ namespace D3DTX_TextureConverter.Telltale
         eTextureLayout_CubeArray = 4,
         eTextureLayout_Count = 5,
         eTextureLayout_Unknown = 6, //0FFFFFFFFh
+    }
+
+    public enum T3SurfaceAccess
+    {
+        eSurface_ReadOnly,
+        eSurface_ReadWrite,
+        eSurface_WriteOnly
+    }
+
+    //this name is not original, can't find the original name but the enum names are correct
+    public enum T3TextureType
+    {
+        eTxUnknown,
+        eTxStandard,
+        eTxLightmap_V0,
+        eTxBumpmap,
+        eTxNormalMap,
+        eTxSubsurfaceScatteringMap_V0,
+        eTxSubsurfaceScatteringMap,
+        eTxDetailMap,
+        eTxStaticShadowMap,
+        eTxLightmapHDR,
+        eTxLightmapHDRScaled,
+        eTxSDFDetailMap,
+        eTxEnvMap,
+        eTxSpecularColor,
+        eTxToonLookup,
+        eTxOutlineDiscontinuity,
+        eTxEmissiveMap,
+        eTxParticleProperties,
+        eTxNormalGlossMap,
+        eTxLookup,
+        eTxAmbientOcclusion,
+        eTxPrefilteredEnvCubeMapHDR,
+        eTxBrushLookupMap,
+        eTxVector2Map,
+        eTxNormalDxDyMap,
+        eTxPackedSDFDetailMap,
+        eTxSingleChannelSDFDetailMap,
+        eTxLightmapDirection,
+        eTxLightmapStaticShadows,
+        eTxLightStaticShadowMapAtlas,
+        eTxLightStaticShadowMap,
+        eTxPrefilteredEnvCubeMapHDRScaled,
+        eTxLightStaticShadowVolume,
+        eTxLightmapAtlas,
+        eTxNormalXYMap,
+        eTxLightmapFlatAtlas,
+        eTxLookupXY,
+        eTxObjectNormalMap,
     }
 
     public enum T3SurfaceFormat

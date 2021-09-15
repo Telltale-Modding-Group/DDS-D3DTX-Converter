@@ -1,0 +1,88 @@
+MetaClassDescription *__cdecl MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription()
+{
+  int v0; // eax@1
+  MetaClassDescription *result; // rax@2
+  signed int i; // ebx@3
+
+  v0 = `MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags;
+  if ( _bittest(&v0, 0x1Du) )
+  {
+    result = &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+  }
+  else
+  {
+    for ( i = 0;
+          _InterlockedExchange(
+            &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock,
+            1) == 1;
+          ++i )
+    {
+      if ( i > 1000 )
+        Thread_Sleep(1);
+    }
+    if ( !(`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags & 0x20000000) )
+    {
+      MetaClassDescription::Initialize(
+        &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+        &DCArray<T3ToonGradientRegion> `RTTI Type Descriptor');
+      `MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags |= 0x100u;
+      `MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mpVTable = `MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetVTable'::`2'::sVTable;
+      `MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mClassSize = 40;
+      qword_140FAE400 = MetaClassDescription_Typed<ContainerInterface>::GetMetaClassDescription();
+      qword_140FAE3D8 = 0i64;
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`4'::metaMemberDescriptionMemory = "Baseclass_ContainerInterface";
+      dword_140FAE3E0 = 16;
+      `MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mpFirstMember = &`DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`4'::metaMemberDescriptionMemory;
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`5'::operation_obj.mpOpFn = DCArray<T3ToonGradientRegion>::MetaOperation_SerializeAsync;
+      qword_140FAE3E8 = &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`5'::operation_obj.id = 74;
+      MetaClassDescription::InstallSpecializedMetaOperation(
+        &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+        &`DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`5'::operation_obj);
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`6'::operation_obj.id = 75;
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`6'::operation_obj.mpOpFn = DCArray<T3ToonGradientRegion>::MetaOperation_SerializeMain;
+      MetaClassDescription::InstallSpecializedMetaOperation(
+        &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+        &`DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`6'::operation_obj);
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`7'::operation_obj.id = 15;
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`7'::operation_obj.mpOpFn = DCArray<T3ToonGradientRegion>::MetaOperation_ObjectState;
+      MetaClassDescription::InstallSpecializedMetaOperation(
+        &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+        &`DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`7'::operation_obj);
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`8'::operation_obj.id = 9;
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`8'::operation_obj.mpOpFn = DCArray<T3ToonGradientRegion>::MetaOperation_Equivalence;
+      MetaClassDescription::InstallSpecializedMetaOperation(
+        &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+        &`DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`8'::operation_obj);
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`9'::operation_obj.id = 10;
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`9'::operation_obj.mpOpFn = DCArray<EnlightenProbeData>::MetaOperation_FromString;
+      MetaClassDescription::InstallSpecializedMetaOperation(
+        &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+        &`DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`9'::operation_obj);
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`10'::operation_obj.id = 23;
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`10'::operation_obj.mpOpFn = DCArray<ParticleKillPlaneParams>::MetaOperation_ToString;
+      MetaClassDescription::InstallSpecializedMetaOperation(
+        &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+        &`DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`10'::operation_obj);
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`11'::operation_obj.id = 54;
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`11'::operation_obj.mpOpFn = DCArray<T3ToonGradientRegion>::MetaOperation_PreloadDependantResources;
+      MetaClassDescription::InstallSpecializedMetaOperation(
+        &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+        &`DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`11'::operation_obj);
+      qword_140FAE4E0 = MetaHelpers::GetMetaClassDescription<long>();
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`12'::metaMemberDescriptionMemory = "mSize";
+      qword_140FAE3F0 = &`DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`12'::metaMemberDescriptionMemory;
+      qword_140FAE4B8 = 24i64;
+      qword_140FAE4C8 = &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      qword_140FAE518 = MetaHelpers::GetMetaClassDescription<long>();
+      qword_140FAE4F0 = 28i64;
+      `DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`13'::metaMemberDescriptionMemory = "mCapacity";
+      qword_140FAE4D0 = &`DCArray<T3ToonGradientRegion>::InternalGetMetaClassDescription'::`13'::metaMemberDescriptionMemory;
+      qword_140FAE500 = &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      MetaClassDescription::Insert(&`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory);
+    }
+    `MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock.mValue = 0;
+    result = &`MetaClassDescription_Typed<DCArray<T3ToonGradientRegion>>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+  }
+  return result;
+}

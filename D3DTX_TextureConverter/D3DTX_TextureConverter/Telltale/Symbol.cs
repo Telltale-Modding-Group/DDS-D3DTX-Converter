@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace D3DTX_TextureConverter.Telltale
 {
-    public class Symbol
+    public struct Symbol
     {
         public long mCrc64;
     }

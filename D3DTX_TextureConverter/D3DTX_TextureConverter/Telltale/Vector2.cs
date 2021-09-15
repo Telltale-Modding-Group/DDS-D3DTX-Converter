@@ -8,7 +8,7 @@ namespace D3DTX_TextureConverter.Telltale
 {
     public struct Vector2
     {
-        public int x;
-        public int y;
+        public float x;
+        public float y;
     }
 }

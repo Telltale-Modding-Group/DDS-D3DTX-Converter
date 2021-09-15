@@ -1,0 +1,95 @@
+MetaClassDescription *__fastcall EnumPlatformType::InternalGetMetaClassDescription(MetaClassDescription *pClassDescription)
+{
+  MetaClassDescription *v1; // rbx@1
+  MetaClassDescription *result; // rax@1
+
+  pClassDescription->mFlags |= 0x8008u;
+  pClassDescription->mpVTable = `MetaClassDescription_Typed<EnumPlatformType>::GetVTable'::`2'::sVTable;
+  `EnumPlatformType::InternalGetMetaClassDescription'::`4'::operation_obj.id = 6;
+  `EnumPlatformType::InternalGetMetaClassDescription'::`4'::operation_obj.mpOpFn = EnumLightCellBlendMode::MetaOperation_ConvertFrom;
+  v1 = pClassDescription;
+  MetaClassDescription::InstallSpecializedMetaOperation(
+    pClassDescription,
+    &`EnumPlatformType::InternalGetMetaClassDescription'::`4'::operation_obj);
+  `EnumPlatformType::InternalGetMetaClassDescription'::`5'::operation_obj.id = 10;
+  `EnumPlatformType::InternalGetMetaClassDescription'::`5'::operation_obj.mpOpFn = EnlightenModule::EnumeAgentUsage::MetaOperation_FromString;
+  MetaClassDescription::InstallSpecializedMetaOperation(
+    v1,
+    &`EnumPlatformType::InternalGetMetaClassDescription'::`5'::operation_obj);
+  `EnumPlatformType::InternalGetMetaClassDescription'::`6'::operation_obj.id = 23;
+  `EnumPlatformType::InternalGetMetaClassDescription'::`6'::operation_obj.mpOpFn = EnumT3LightEnvBakeOnStatic::MetaOperation_ToString;
+  MetaClassDescription::InstallSpecializedMetaOperation(
+    v1,
+    &`EnumPlatformType::InternalGetMetaClassDescription'::`6'::operation_obj);
+  `EnumPlatformType::InternalGetMetaClassDescription'::`7'::operation_obj.id = 9;
+  `EnumPlatformType::InternalGetMetaClassDescription'::`7'::operation_obj.mpOpFn = EnlightenModule::EnumeProbeSampleMethod::MetaOperation_Equivalence;
+  MetaClassDescription::InstallSpecializedMetaOperation(
+    v1,
+    &`EnumPlatformType::InternalGetMetaClassDescription'::`7'::operation_obj);
+  qword_140FB1C18 = MetaHelpers::GetMetaClassDescription<long>();
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`8'::metaMemberDescriptionMemory = "mVal";
+  qword_140FB1BF0 = 0i64;
+  dword_140FB1BF8 = 64;
+  qword_140FB1C00 = v1;
+  v1->mpFirstMember = `EnumPlatformType::InternalGetMetaClassDescription'::`8'::metaMemberDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`11'::enumDescriptionMemory = "ePlatform_None";
+  qword_140FB1CC0 = qword_140FB1C10;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`12'::enumDescriptionMemory = "ePlatform_All";
+  qword_140FB1D10 = `EnumPlatformType::InternalGetMetaClassDescription'::`11'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`13'::enumDescriptionMemory = "ePlatform_PC";
+  qword_140FB1DB8 = `EnumPlatformType::InternalGetMetaClassDescription'::`12'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`14'::enumDescriptionMemory = "ePlatform_Wii";
+  qword_140FB1E08 = `EnumPlatformType::InternalGetMetaClassDescription'::`13'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`15'::enumDescriptionMemory = "ePlatform_Xbox";
+  qword_140FB1EB0 = `EnumPlatformType::InternalGetMetaClassDescription'::`14'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`16'::enumDescriptionMemory = "ePlatform_PS3";
+  qword_140FB1EC8 = `EnumPlatformType::InternalGetMetaClassDescription'::`15'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`17'::enumDescriptionMemory = "ePlatform_Mac";
+  qword_140FB1F18 = `EnumPlatformType::InternalGetMetaClassDescription'::`16'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`18'::enumDescriptionMemory = "ePlatform_iPhone";
+  qword_140FB1F68 = `EnumPlatformType::InternalGetMetaClassDescription'::`17'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`19'::enumDescriptionMemory = "ePlatform_Android";
+  qword_140FB1FD8 = `EnumPlatformType::InternalGetMetaClassDescription'::`18'::enumDescriptionMemory;
+  dword_140FB1CBC = 0; //ePlatform_None
+  dword_140FB1D0C = 1; //ePlatform_All
+  dword_140FB1DB4 = 2; //ePlatform_PC
+  dword_140FB1E04 = 3; //ePlatform_Wii
+  dword_140FB1EAC = 4; //ePlatform_Xbox
+  dword_140FB1EC4 = 5; //ePlatform_PS3
+  dword_140FB1F14 = 6; //ePlatform_Mac
+  dword_140FB1F64 = 7; //ePlatform_iPhone
+  dword_140FB1FD4 = 8; //ePlatform_Android
+  dword_140FB2024 = 9; //ePlatform_Vita
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`20'::enumDescriptionMemory = "ePlatform_Vita";
+  dword_140FB203C = 10; //ePlatform_Linux
+  qword_140FB2028 = `EnumPlatformType::InternalGetMetaClassDescription'::`19'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`21'::enumDescriptionMemory = "ePlatform_Linux";
+  qword_140FB2040 = `EnumPlatformType::InternalGetMetaClassDescription'::`20'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`22'::enumDescriptionMemory = "ePlatform_PS4";
+  qword_140FB2058 = `EnumPlatformType::InternalGetMetaClassDescription'::`21'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`23'::enumDescriptionMemory = "ePlatform_XBOne";
+  qword_140FB2070 = `EnumPlatformType::InternalGetMetaClassDescription'::`22'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`24'::enumDescriptionMemory = "ePlatform_WiiU";
+  qword_140FB20E0 = `EnumPlatformType::InternalGetMetaClassDescription'::`23'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`25'::enumDescriptionMemory = "ePlatform_Win10";
+  qword_140FB20F8 = `EnumPlatformType::InternalGetMetaClassDescription'::`24'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`26'::enumDescriptionMemory = "ePlatform_NX";
+  qword_140FB2110 = `EnumPlatformType::InternalGetMetaClassDescription'::`25'::enumDescriptionMemory;
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`27'::enumDescriptionMemory = "ePlatform_Count";
+  qword_140FB2160 = `EnumPlatformType::InternalGetMetaClassDescription'::`26'::enumDescriptionMemory;
+  qword_140FB1C10 = `EnumPlatformType::InternalGetMetaClassDescription'::`27'::enumDescriptionMemory;
+  dword_140FB2054 = 11; //ePlatform_PS4
+  dword_140FB206C = 12; //ePlatform_XBOne
+  dword_140FB20DC = 13; //ePlatform_WiiU
+  dword_140FB20F4 = 14; //ePlatform_Win10
+  dword_140FB210C = 15; //ePlatform_NX
+  dword_140FB215C = 16; //ePlatform_Count
+  qword_140FB2220 = MetaHelpers::GetMetaClassDescription<EnumBase>(1);
+  *`EnumPlatformType::InternalGetMetaClassDescription'::`28'::metaMemberDescriptionMemory = "Baseclass_EnumBase";
+  qword_140FB1C08 = `EnumPlatformType::InternalGetMetaClassDescription'::`28'::metaMemberDescriptionMemory;
+  result = v1;
+  qword_140FB21F8 = 0i64;
+  dword_140FB2200 = 16;
+  qword_140FB2208 = v1;
+  return result;
+}

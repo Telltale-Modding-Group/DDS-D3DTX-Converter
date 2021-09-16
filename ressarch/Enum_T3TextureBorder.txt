@@ -1,0 +1,4 @@
+enum T3TextureBorder, copyof_233
+FFFFFFFF eTextureBorder_Black  = 0
+FFFFFFFF eTextureBorder_White  = 1
+FFFFFFFF eTextureBorder_Count  = 2

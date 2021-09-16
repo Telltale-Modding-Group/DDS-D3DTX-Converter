@@ -1,0 +1,23 @@
+T3TextureBase::CreateParams struc ; (sizeof=0x38, align=0x8, copyof_5612)
+00000000                                         ; XREF: ?CreateTexture@T3Texture@@QEAA_NAEBUCreateParams@T3TextureBase@@@Z/r
+00000000                                         ; ?CreateRenderTarget@T3Texture@@QEAA_NIIW4T3SurfaceFormat@@_N1@Z/r ...
+00000000 mAllocationType dd ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+24D/w ; enum GFXPlatformAllocationType
+00000004 mLayout         dd ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+28B/w ; enum T3TextureLayout
+00000008 mFormat         dd ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+2C8/w ; enum T3SurfaceFormat
+0000000C mGamma          dd ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+2DB/w ; enum T3SurfaceGamma
+00000010 mMultisample    dd ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+292/w ; enum T3SurfaceMultisample
+00000014 mUsage          dd ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+257/w ; enum T3ResourceUsage
+00000018 mAccess         dd ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+299/w ; enum T3SurfaceAccess
+0000001C mWidth          dw ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+25F/w
+0000001E mHeight         dw ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+268/w
+00000020 mDepth          dw ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+271/w
+00000022 mArraySize      dw ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+27A/w
+00000024 mNumMipLevels   dw ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+283/w
+00000026 mbPrimaryDisplaySurface dw ?            ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+2C1/w
+00000028 mbVideoTexture  db ?
+00000029 mbCPUAccessible db ?
+0000002A                 db ? ; undefined
+0000002B                 db ? ; undefined
+0000002C mFastMemHeap    dd ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+2A0/w ; enum GFXPlatformFastMemHeap
+00000030 mTag            Symbol ?                ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+242/w
+00000038 T3TextureBase::CreateParams end

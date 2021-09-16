@@ -1,0 +1,11 @@
+T3RenderTarget  struc ; (sizeof=0x28, align=0x8, copyof_3289)
+00000000 baseclass_0     ListNode<T3RenderTarget,0> ?
+00000010 mpTexture       Ptr<T3Texture> ?
+00000018 mUsage          dd ?                    ; enum T3RenderTargetUsage
+0000001C mLayout         dd ?                    ; enum T3TextureLayout
+00000020 mMultisample    dd ?                    ; enum T3SurfaceMultisample
+00000024 mbLocked        db ?
+00000025                 db ? ; undefined
+00000026                 db ? ; undefined
+00000027                 db ? ; undefined
+00000028 T3RenderTarget  ends

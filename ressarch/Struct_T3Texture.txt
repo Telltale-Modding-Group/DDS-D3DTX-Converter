@@ -1,0 +1,52 @@
+T3Texture       struc ; (sizeof=0x2E8, align=0x8, copyof_3264)
+00000000                                         ; XREF: ?DoSetElement@?$DCArray@VT3Texture@@@@UEAAXHPEBXPEAXPEBVMetaClassDescription@@@Z/r
+00000000                                         ; ?ConvertToFormat@T3Texture@@QEAA_NW4T3SurfaceFormat@@@Z/r
+00000000 baseclass_0     T3Texture_DX11 ?
+00000150 mpHOI           Ptr<HandleObjectInfo> ?
+00000158 mDeletedCallbacks Callbacks<T3Texture> ?
+00000160 mbLocked        db ?
+00000161                 db ? ; undefined
+00000162                 db ? ; undefined
+00000163                 db ? ; undefined
+00000164 mVersion        dd ?
+00000168 mImportName     String ?
+00000190 mImportScale    dd ?
+00000194 mToolProps      ToolProps ?
+00000195                 db ? ; undefined
+00000196                 db ? ; undefined
+00000197                 db ? ; undefined
+00000198 mPlatform       EnumPlatformType ?
+0000019C mType           dd ?
+000001A0 mSpecularGlossExponent dd ?
+000001A4 mSwizzle        RenderSwizzleParams ?
+000001A8 mAlphaMode      dd ?
+000001AC mColorMode      dd ?
+000001B0 mHDRLightmapScale dd ?
+000001B4 mToonGradientCutoff dd ?
+000001B8 mUVOffset       Vector2 ?
+000001C0 mUVScale        Vector2 ?
+000001C8 mToonRegions    DCArray<T3ToonGradientRegion> ?
+000001F0 mArrayFrameNames DCArray<Symbol> ?
+00000218 mAuxiliaryData  LinkedList<T3Texture::AuxiliaryData,0> ?
+00000230 mRegionHeaders  DCArray<T3Texture::RegionStreamHeader> ?
+00000258 mNumRegionsLoaded dd ?
+0000025C mNumRegionsLoadPending dd ?
+00000260 mAsyncReadLock  T3TextureBase::LockContext ?
+000002A8 mFrameUsedForRendering dd ?
+000002AC                 db ? ; undefined
+000002AD                 db ? ; undefined
+000002AE                 db ? ; undefined
+000002AF                 db ? ; undefined
+000002B0 mAsyncStreamPos dq ?
+000002B8 mpAsyncStream   Ptr<DataStream> ?
+000002C0 mhAsyncRequest  JobCallbacks::Handle<DataStreamOp> ?
+000002C8 mhTextureReadRequest JobHandle<void *> ?
+000002D0 mAbsTimeNeeded  dd ?
+000002D4 mLoadPendingRefCount dd ?
+000002D8 mStreamingRefCount dd ?
+000002DC                 db ? ; undefined
+000002DD                 db ? ; undefined
+000002DE                 db ? ; undefined
+000002DF                 db ? ; undefined
+000002E0 mpAsyncData     dq ?                    ; offset
+000002E8 T3Texture       ends

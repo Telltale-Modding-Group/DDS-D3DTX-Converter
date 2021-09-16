@@ -1,0 +1,66 @@
+int __fastcall PerformMetaSerializeAsync<T3Texture::StreamHeader>(MetaStream *pStream, T3Texture::StreamHeader *pObj)
+{
+  int v2; // eax@1
+  T3Texture::StreamHeader *v3; // rsi@1
+  MetaStream *v4; // rdi@1
+  signed int i; // ebx@2
+  MetaOpResult (__cdecl *v6)(void *, MetaClassDescription *, MetaMemberDescription *, void *); // rax@9
+  int result; // eax@10
+
+  v2 = `MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags;
+  v3 = pObj;
+  v4 = pStream;
+  if ( !_bittest(&v2, 0x1Du) )
+  {
+    for ( i = 0;
+          _InterlockedExchange(
+            &`MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock,
+            1) == 1;
+          ++i )
+    {
+      if ( i > 1000 )
+        Thread_Sleep(1);
+    }
+    if ( !(`MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags & 0x20000000) )
+    {
+      MetaClassDescription::Initialize(
+        &`MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+        &T3Texture::StreamHeader `RTTI Type Descriptor');
+      `MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mClassSize = 12;
+      `MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mpVTable = `MetaClassDescription_Typed<T3Texture::StreamHeader>::GetVTable'::`2'::sVTable;
+      qword_140FB5E18 = MetaHelpers::GetMetaClassDescription<long>();
+      `T3Texture::StreamHeader::InternalGetMetaClassDescription'::`4'::metaMemberDescriptionMemory = "mRegionCount";
+      `MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mpFirstMember = &`T3Texture::StreamHeader::InternalGetMetaClassDescription'::`4'::metaMemberDescriptionMemory;
+      qword_140FB5DF0 = 0i64;
+      qword_140FB5E00 = &`MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      qword_140FB5E50 = MetaHelpers::GetMetaClassDescription<long>();
+      `T3Texture::StreamHeader::InternalGetMetaClassDescription'::`5'::metaMemberDescriptionMemory = "mAuxDataCount";
+      qword_140FB5E08 = &`T3Texture::StreamHeader::InternalGetMetaClassDescription'::`5'::metaMemberDescriptionMemory;
+      qword_140FB5E28 = 4i64;
+      qword_140FB5E38 = &`MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      qword_140FB5E88 = MetaHelpers::GetMetaClassDescription<long>();
+      qword_140FB5E60 = 8i64;
+      `T3Texture::StreamHeader::InternalGetMetaClassDescription'::`6'::metaMemberDescriptionMemory = "mTotalDataSize";
+      qword_140FB5E40 = &`T3Texture::StreamHeader::InternalGetMetaClassDescription'::`6'::metaMemberDescriptionMemory;
+      qword_140FB5E70 = &`MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      MetaClassDescription::Insert(&`MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory);
+    }
+    `MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock.mValue = 0;
+  }
+  v6 = MetaClassDescription::GetOperationSpecialization(
+         &`MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+         74);
+  if ( v6 )
+    result = (v6)(
+               v3,
+               &`MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+               0i64,
+               v4);
+  else
+    result = Meta::MetaOperation_SerializeAsync(
+               v3,
+               &`MetaClassDescription_Typed<T3Texture::StreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+               0i64,
+               v4);
+  return result;
+}

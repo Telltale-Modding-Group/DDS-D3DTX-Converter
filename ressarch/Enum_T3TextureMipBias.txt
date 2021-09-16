@@ -1,0 +1,10 @@
+enum T3TextureMipBias, copyof_478
+FFFFFFFF eTextureMipBias_None  = 0
+FFFFFFFF eTextureMipBias_Sharp1  = 1
+FFFFFFFF eTextureMipBias_Sharp2  = 2
+FFFFFFFF eTextureMipBias_Sharp3  = 3
+FFFFFFFF eTextureMipBias_Sharp4  = 4
+FFFFFFFF eTextureMipBias_Sharp5  = 5
+FFFFFFFF eTextureMipBias_Sharp6  = 6
+FFFFFFFF eTextureMipBias_Sharp7  = 7
+FFFFFFFF eTextureMipBias_Count  = 8

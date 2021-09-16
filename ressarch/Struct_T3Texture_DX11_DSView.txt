@@ -1,0 +1,5 @@
+T3Texture_DX11::DSView struc ; (sizeof=0x10, align=0x8, copyof_3244)
+00000000 mD3DView        TTComPtr<ID3D11DepthStencilView> ?
+00000008 mMipIndex       dd ?
+0000000C mSliceIndex     dd ?
+00000010 T3Texture_DX11::DSView ends

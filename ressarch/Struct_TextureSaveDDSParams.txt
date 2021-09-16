@@ -1,0 +1,8 @@
+TextureSaveDDSParams struc ; (sizeof=0xC, align=0x4, copyof_9008)
+00000000 mFormat         dd ?                    ; enum T3SurfaceFormat
+00000004 mLayout         dd ?                    ; enum T3TextureLayout
+00000008 mbUseNVTT       db ?
+00000009                 db ? ; undefined
+0000000A                 db ? ; undefined
+0000000B                 db ? ; undefined
+0000000C TextureSaveDDSParams ends

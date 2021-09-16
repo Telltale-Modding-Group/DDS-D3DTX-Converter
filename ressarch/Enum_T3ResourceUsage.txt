@@ -1,0 +1,6 @@
+enum T3ResourceUsage, copyof_202
+FFFFFFFF eResourceUsage_Static  = 0
+FFFFFFFF eResourceUsage_Dynamic  = 1
+FFFFFFFF eResourceUsage_System  = 2
+FFFFFFFF eResourceUsage_RenderTarget  = 3
+FFFFFFFF eResourceUsage_ShaderWrite  = 4

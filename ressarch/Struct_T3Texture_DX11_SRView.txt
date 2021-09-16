@@ -1,0 +1,9 @@
+T3Texture_DX11::SRView struc ; (sizeof=0x18, align=0x8, copyof_3232)
+00000000 mD3DView        TTComPtr<ID3D11ShaderResourceView> ?
+00000008 mView           GFXPlatformTextureView ?
+00000010 mFlags          dd ?
+00000014                 db ? ; undefined
+00000015                 db ? ; undefined
+00000016                 db ? ; undefined
+00000017                 db ? ; undefined
+00000018 T3Texture_DX11::SRView ends

@@ -1,0 +1,6 @@
+enum T3Texture::ColorMode, copyof_366
+FFFFFFFF eTxColorFull     = 0
+FFFFFFFF eTxColorBlack    = 1
+FFFFFFFF eTxColorGrayscale  = 2
+FFFFFFFF eTxColorGrayscaleAlpha  = 3
+FFFFFFFF eTxColorUnknown  = 0FFFFFFFFh

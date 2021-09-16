@@ -1,0 +1,9 @@
+T3RenderResource struc ; (sizeof=0x28, align=0x8, copyof_3218)
+00000000                                         ; XREF: T3TextureBase/r
+00000000 vfptr           dq ?                    ; offset
+00000008 baseclass_8     ListNode<T3RenderResource,0> ?
+00000018 mFrameUsed      Atomic<unsigned int> ?
+0000001C mCurrentList    dd ?                    ; enum T3RenderResource::RenderResourceList
+00000020 mFlags          Flags ?
+00000024 mLastUsedGFXFrame dd ?
+00000028 T3RenderResource ends

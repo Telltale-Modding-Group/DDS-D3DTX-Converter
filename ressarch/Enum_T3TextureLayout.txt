@@ -1,0 +1,8 @@
+enum T3TextureLayout, copyof_158
+FFFFFFFF eTextureLayout_2D  = 0
+FFFFFFFF eTextureLayout_Cube  = 1
+FFFFFFFF eTextureLayout_3D  = 2
+FFFFFFFF eTextureLayout_2DArray  = 3
+FFFFFFFF eTextureLayout_CubeArray  = 4
+FFFFFFFF eTextureLayout_Count  = 5
+FFFFFFFF eTextureLayout_Unknown  = 0FFFFFFFFh

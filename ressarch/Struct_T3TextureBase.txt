@@ -1,0 +1,22 @@
+T3TextureBase   struc ; (sizeof=0xA0, align=0x8, copyof_3222)
+00000000                                         ; XREF: T3Texture_DX11/r
+00000000 baseclass_0     T3RenderResource ?
+00000028 mName           String ?
+00000050 mWidth          dd ?
+00000054 mHeight         dd ?
+00000058 mDepth          dd ?
+0000005C mArraySize      dd ?
+00000060 mNumMipLevels   dd ?
+00000064 mTextureLayout  dd ?
+00000068 mSurfaceFormat  dd ?
+0000006C mSurfaceMultisample dd ?
+00000070 mSurfaceGamma   dd ?
+00000074 mSurfaceAccess  dd ?
+00000078 mResourceUsage  dd ?
+0000007C mNumMipLevelsAllocated dd ?
+00000080 mNumSurfacesRequested dd ?
+00000084 mNumSurfacesRequired dd ?
+00000088 mNumSurfacesLoaded dd ?
+0000008C mSamplerState   T3SamplerStateBlock ?
+00000090 mGFXMemoryOwner GFXPlatformMemoryOwner ?
+000000A0 T3TextureBase   ends

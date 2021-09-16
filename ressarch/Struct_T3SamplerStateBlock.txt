@@ -1,0 +1,5 @@
+T3SamplerStateBlock struc ; (sizeof=0x4, align=0x4, copyof_3221)
+00000000                                         ; XREF: .data:T3SamplerStateBlock T3SamplerStateBlock::kDefault/r
+00000000                                         ; _anonymous_namespace_::BindTexture/r ...
+00000000 mData           dd ?                    ; XREF: T3RenderTargetManager::InitializeExternalTarget(T3Texture *,T3RenderTargetParams const &,String const &)+50/r
+00000004 T3SamplerStateBlock ends

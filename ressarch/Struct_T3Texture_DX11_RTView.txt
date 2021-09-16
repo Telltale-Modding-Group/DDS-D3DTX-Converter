@@ -1,0 +1,10 @@
+T3Texture_DX11::RTView struc ; (sizeof=0x18, align=0x8, copyof_3240)
+00000000 mD3DView        TTComPtr<ID3D11RenderTargetView> ?
+00000008 mMipIndex       dd ?
+0000000C mSliceIndex     dd ?
+00000010 mFlags          dd ?
+00000014                 db ? ; undefined
+00000015                 db ? ; undefined
+00000016                 db ? ; undefined
+00000017                 db ? ; undefined
+00000018 T3Texture_DX11::RTView ends

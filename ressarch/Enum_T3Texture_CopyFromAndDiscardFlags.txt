@@ -1,0 +1,3 @@
+enum T3Texture::CopyFromAndDiscardFlags, copyof_369
+FFFFFFFF eCopyFromAndDiscard_None  = 0
+FFFFFFFF eCopyFromAndDiscard_CopyAuxData  = 1

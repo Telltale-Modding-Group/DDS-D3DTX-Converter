@@ -1,0 +1,4 @@
+enum T3SurfaceAccess, copyof_203
+FFFFFFFF eSurface_ReadOnly  = 0
+FFFFFFFF eSurface_ReadWrite  = 1
+FFFFFFFF eSurface_WriteOnly  = 2

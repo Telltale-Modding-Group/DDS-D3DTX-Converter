@@ -1,0 +1,5 @@
+T3Texture::AuxiliaryData struc ; (sizeof=0x28, align=0x8, copyof_3255)
+00000000 baseclass_0     ListNode<T3Texture::AuxiliaryData,0> ?
+00000010 mType           Symbol ?
+00000018 mData           BinaryBuffer ?
+00000028 T3Texture::AuxiliaryData ends

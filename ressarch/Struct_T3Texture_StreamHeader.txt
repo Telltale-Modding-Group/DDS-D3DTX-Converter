@@ -1,0 +1,7 @@
+T3Texture::StreamHeader struc ; (sizeof=0xC, align=0x4, copyof_5619)
+00000000                                         ; XREF: ?MetaOperation_SerializeAsync@T3Texture@@KA?AW4MetaOpResult@@PEAXPEBVMetaClassDescription@@PEBVMetaMemberDescription@@0@Z/r
+00000000                                         ; ?MetaOperation_SerializeAsync@T3Texture@@KA?AW4MetaOpResult@@PEAXPEBVMetaClassDescription@@PEBVMetaMemberDescription@@0@Z/r
+00000000 mRegionCount    dd ?
+00000004 mAuxDataCount   dd ?
+00000008 mTotalDataSize  dd ?
+0000000C T3Texture::StreamHeader ends

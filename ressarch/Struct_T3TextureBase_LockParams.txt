@@ -1,0 +1,12 @@
+T3TextureBase::LockParams struc ; (sizeof=0x18, align=0x8, copyof_5613)
+00000000                                         ; XREF: ?CreateSolidTexture@T3Texture@@QEAAXAEBVColor@@W4T3TextureLayout@@@Z/r
+00000000                                         ; ?CreateHorizontalGradientTexture@T3Texture@@QEAAXAEBVColor@@0H@Z/r ...
+00000000 mpTempAllocator dq ?                    ; offset
+00000008 mLockFormat     dd ?                    ; enum T3SurfaceFormat
+0000000C mMipLevel       dd ?
+00000010 mFace           dd ?
+00000014 mbRead          db ?
+00000015 mbWrite         db ?
+00000016 mbTexToTexCopy  db ?
+00000017 mbPad0          db ?
+00000018 T3TextureBase::LockParams ends

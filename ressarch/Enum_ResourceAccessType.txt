@@ -1,0 +1,5 @@
+enum ResourceAccessType, copyof_51
+FFFFFFFF eResourceAccess_None  = 0
+FFFFFFFF eResourceAccess_Read  = 1
+FFFFFFFF eResourceAccess_Write  = 2
+FFFFFFFF eResourceAccess_ReadWrite  = 3

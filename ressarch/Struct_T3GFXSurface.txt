@@ -1,0 +1,12 @@
+T3GFXSurface    struc ; (sizeof=0x28, align=0x8, copyof_3269)
+00000000                                         ; XREF: T3GFXDynamicTextureResult/r
+00000000 mpData          dq ?                    ; offset
+00000008 mLayout         dd ?                    ; enum T3TextureLayout
+0000000C mFormat         dd ?                    ; enum T3SurfaceFormat
+00000010 mWidthInBlocks  dd ?
+00000014 mHeightInBlocks dd ?
+00000018 mDepth          dd ?
+0000001C mArraySize      dd ?
+00000020 mPitch          dd ?
+00000024 mSlicePitch     dd ?
+00000028 T3GFXSurface    ends 

@@ -1,0 +1,4 @@
+enum T3SurfaceGamma, copyof_204
+FFFFFFFF eSurfaceGamma_Linear  = 0
+FFFFFFFF eSurfaceGamma_sRGB  = 1
+FFFFFFFF eSurfaceGamma_Unknown  = 0FFFFFFFFh

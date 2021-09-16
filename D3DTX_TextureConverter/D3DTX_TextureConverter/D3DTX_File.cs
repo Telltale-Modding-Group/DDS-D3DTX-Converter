@@ -130,6 +130,10 @@ namespace D3DTX_TextureConverter
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mVersion = {0}", mVersion);
 
+            //----------------------------------------------------
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+            Console.WriteLine("D3DTX Unknown 1 = {0}", ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
+
             //--------------------------mDataSize?--------------------------
             //offset byte pointer location to get the TEXTURE BYTE SIZE
             bytePointerPosition = 12;
@@ -386,7 +390,8 @@ namespace D3DTX_TextureConverter
 
 
             //--------------------------mArrayFrameNames DCArray Capacity--------------------------
-            int mArrayFrameNames_ArrayCapacity = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
+            uint bytePointerPostion_before_mArrayFrameNames = bytePointerPosition;
+            uint mArrayFrameNames_ArrayCapacity = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mArrayFrameNames_ArrayCapacity = {0}", mArrayFrameNames_ArrayCapacity);
 
@@ -411,27 +416,11 @@ namespace D3DTX_TextureConverter
                 T3Texture.mArrayFrameNames.Add(newSymbol);
             }
 
-            //not necessary, but to check if we are where we should be at
-            uint estimatedOffPoint = bytePointerPosition_before_mArrayFrameNames_ArrayLength + ((uint)mArrayFrameNames_ArrayCapacity - 4);
-            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
-            Console.WriteLine("(Array Check) Estimated to be at = {0}", estimatedOffPoint);
-
-            if(bytePointerPosition != estimatedOffPoint)
-            {
-                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
-                Console.WriteLine("(Array Check) Left off at = {0}", bytePointerPosition);
-                Console.WriteLine("(Array Check) Skipping by using the estimated position...", bytePointerPosition);
-            }
-            else
-            {
-                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
-                Console.WriteLine("(Array Check) Left off at = {0}", bytePointerPosition);
-            }
-            //not necessary, but to check if we are where we should be at (END)
-
+            ArrayCheckAdjustment(bytePointerPostion_before_mArrayFrameNames, mArrayFrameNames_ArrayCapacity, ref bytePointerPosition);
 
             //--------------------------mToonRegions DCArray Capacity--------------------------
-            int mToonRegions_ArrayCapacity = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
+            uint bytePointerPostion_before_mToonRegions = bytePointerPosition;
+            uint mToonRegions_ArrayCapacity = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mToonRegions_ArrayCapacity = {0}", mToonRegions_ArrayCapacity);
 
@@ -463,8 +452,42 @@ namespace D3DTX_TextureConverter
                 T3Texture.mToonRegions.Add(toonGradientRegion);
             }
 
-            Console.WriteLine("(Array Check) Left off at = {0}", bytePointerPosition);
+            ArrayCheckAdjustment(bytePointerPostion_before_mToonRegions, mToonRegions_ArrayCapacity, ref bytePointerPosition);
 
+            //--------------------------mRegionHeaders Length-------------------------- (NEED ASSISTANCE HERE)
+            int mRegionHeaders_Length = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+            Console.WriteLine("D3DTX mRegionHeaders_Length = {0}", mRegionHeaders_Length);
+
+            T3Texture.mRegionHeaders = new List<RegionStreamHeader>();
+
+            for(int i = 0; i < mRegionHeaders_Length; i++)
+            {
+                RegionStreamHeader mRegionHeader = new RegionStreamHeader()
+                {
+                    mFaceIndex = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition),
+                    mDataSize = (uint)ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition),
+                    mMipIndex = (int)ByteFunctions.ReadLong(sourceByteFile, ref bytePointerPosition),
+                    mMipCount = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition),
+                    mPitch = (int)ByteFunctions.ReadLong(sourceByteFile, ref bytePointerPosition),
+                    mSlicePitch = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition)
+                };
+
+                //Console.WriteLine("D3DTX mRegionHeader {0}", i);
+                Console.WriteLine("D3DTX mFaceIndex 1 = {0}", mRegionHeader.mFaceIndex);
+                //Console.WriteLine("D3DTX mMipIndex = {0}", mRegionHeader.mMipIndex);
+                //Console.WriteLine("D3DTX mMipCount = {0}", mRegionHeader.mMipCount);
+                Console.WriteLine("D3DTX mDataSize 2 = {0}", mRegionHeader.mDataSize);
+                //Console.WriteLine("D3DTX mPitch = {0}", mRegionHeader.mPitch);
+                //Console.WriteLine("D3DTX mSlicePitch = {0}", mRegionHeader.mSlicePitch);
+
+                T3Texture.mRegionHeaders.Add(mRegionHeader);
+            }
+
+            ReachedEndOfFile(bytePointerPosition, (uint)sourceByteFile.Length);
+
+            //Console.WriteLine("value at {0} = {1}", bytePointerPosition, ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
+            //Console.WriteLine("value at {0} = {1}", bytePointerPosition, ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
 
             //--------------------------GETTING D3DTX HEADER DATA--------------------------
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
@@ -484,6 +507,49 @@ namespace D3DTX_TextureConverter
             //copy all the bytes from the source byte file after the header length, and copy that data to the texture data byte array
             Array.Copy(sourceByteFile, 0, headerData, 0, headerData.Length);
         }
+
+        public static void ArrayCheckAdjustment(uint pointerPositionBeforeCapacity, uint arrayCapacity, ref uint bytePointerPosition)
+        {
+            uint estimatedOffPoint = pointerPositionBeforeCapacity + ((uint)arrayCapacity);
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
+            Console.WriteLine("(Array Check) Estimated to be at = {0}", estimatedOffPoint);
+
+            if (bytePointerPosition != estimatedOffPoint)
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
+                Console.WriteLine("(Array Check) Left off at = {0}", bytePointerPosition);
+                Console.WriteLine("(Array Check) Skipping by using the estimated position...", bytePointerPosition);
+                bytePointerPosition = estimatedOffPoint;
+            }
+            else
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
+                Console.WriteLine("(Array Check) Left off at = {0}", bytePointerPosition);
+            }
+
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+        }
+
+        public static void ReachedEndOfFile(uint bytePointerPosition, uint fileSize)
+        {
+            if (bytePointerPosition != fileSize)
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
+                Console.WriteLine("Didn't reach the end of the file!");
+                Console.WriteLine("Left off at = {0}", bytePointerPosition);
+                Console.WriteLine("File Size = {0}", fileSize);
+            }
+            else
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
+                Console.WriteLine("Reached end of file!");
+                Console.WriteLine("Left off at = {0}", bytePointerPosition);
+                Console.WriteLine("File Size = {0}", fileSize);
+            }
+
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+        }
+
         /*
         public void Read_D3DTX_File_5VSM(string sourceFileName, string sourceFile, bool readHeaderOnly)
         {
@@ -992,94 +1058,94 @@ namespace D3DTX_TextureConverter
             Array.Copy(sourceByteFile, headerLength, dds_data, 0, ddsDataLength);
         }
         */
-/*
- * DXT1 - DXGI_FORMAT_BC1_UNORM / D3DFMT_DXT1
- * DXT2 - D3DFMT_DXT2
- * DXT3 - DXGI_FORMAT_BC2_UNORM / D3DFMT_DXT3
- * DXT4 - D3DFMT_DXT4
- * DXT5 - DXGI_FORMAT_BC3_UNORM / D3DFMT_DXT5
- * ATI1
- * ATI2 - DXGI_FORMAT_BC5_UNORM
- * BC5U - 
- * BC5S - DXGI_FORMAT_BC5_SNORM
- * BC4U - DXGI_FORMAT_BC4_UNORM
- * BC4S - DXGI_FORMAT_BC4_SNORM
- * RGBG - DXGI_FORMAT_R8G8_B8G8_UNORM / D3DFMT_R8G8_B8G8
- * GRGB - DXGI_FORMAT_G8R8_G8B8_UNORM / D3DFMT_G8R8_G8B8
- * UYVY - D3DFMT_UYVY
- * YUY2 - D3DFMT_YUY2
- * DX10 - Any DXGI format
- * 36 - DXGI_FORMAT_R16G16B16A16_UNORM / D3DFMT_A16B16G16R16
- * 110 - DXGI_FORMAT_R16G16B16A16_SNORM / D3DFMT_Q16W16V16U16
- * 111 - DXGI_FORMAT_R16_FLOAT / D3DFMT_R16F
- * 112 - DXGI_FORMAT_R16G16_FLOAT / D3DFMT_G16R16F
- * 113 - DXGI_FORMAT_R16G16B16A16_FLOAT / D3DFMT_A16B16G16R16F
- * 114 - DXGI_FORMAT_R32_FLOAT / D3DFMT_R32F
- * 115 - DXGI_FORMAT_R32G32_FLOAT / D3DFMT_G32R32F
- * 116 - DXGI_FORMAT_R32G32B32A32_FLOAT / D3DFMT_A32B32G32R32F
- * 117 - D3DFMT_CxV8U8
-*/
-/*
-        public static string D3DTX_GetDXTType_ForDDS(string parsed_dword, int parsed_dxtType)
-        {
-            string result = "DXT1";
+        /*
+         * DXT1 - DXGI_FORMAT_BC1_UNORM / D3DFMT_DXT1
+         * DXT2 - D3DFMT_DXT2
+         * DXT3 - DXGI_FORMAT_BC2_UNORM / D3DFMT_DXT3
+         * DXT4 - D3DFMT_DXT4
+         * DXT5 - DXGI_FORMAT_BC3_UNORM / D3DFMT_DXT5
+         * ATI1
+         * ATI2 - DXGI_FORMAT_BC5_UNORM
+         * BC5U - 
+         * BC5S - DXGI_FORMAT_BC5_SNORM
+         * BC4U - DXGI_FORMAT_BC4_UNORM
+         * BC4S - DXGI_FORMAT_BC4_SNORM
+         * RGBG - DXGI_FORMAT_R8G8_B8G8_UNORM / D3DFMT_R8G8_B8G8
+         * GRGB - DXGI_FORMAT_G8R8_G8B8_UNORM / D3DFMT_G8R8_G8B8
+         * UYVY - D3DFMT_UYVY
+         * YUY2 - D3DFMT_YUY2
+         * DX10 - Any DXGI format
+         * 36 - DXGI_FORMAT_R16G16B16A16_UNORM / D3DFMT_A16B16G16R16
+         * 110 - DXGI_FORMAT_R16G16B16A16_SNORM / D3DFMT_Q16W16V16U16
+         * 111 - DXGI_FORMAT_R16_FLOAT / D3DFMT_R16F
+         * 112 - DXGI_FORMAT_R16G16_FLOAT / D3DFMT_G16R16F
+         * 113 - DXGI_FORMAT_R16G16B16A16_FLOAT / D3DFMT_A16B16G16R16F
+         * 114 - DXGI_FORMAT_R32_FLOAT / D3DFMT_R32F
+         * 115 - DXGI_FORMAT_R32G32_FLOAT / D3DFMT_G32R32F
+         * 116 - DXGI_FORMAT_R32G32B32A32_FLOAT / D3DFMT_A32B32G32R32F
+         * 117 - D3DFMT_CxV8U8
+        */
+        /*
+                public static string D3DTX_GetDXTType_ForDDS(string parsed_dword, int parsed_dxtType)
+                {
+                    string result = "DXT1";
 
-            //this section needs some reworking, still can't track down exactly what the compression types are, parsed_compressionType and parsed_dxtType are close
-            //SET DDS COMPRESSION TYPES
-            if (parsed_dxtType == 66)
-            {
-                //DXT5 COMPRESSION
-                result = "DXT5";
-            }
-            else if (parsed_dxtType == 68)
-            {
-                //DDSPF_BC5_UNORM COMPRESSION
-                result = "BC5U";
-            }
-            else if (parsed_dxtType == 69)
-            {
-                //DDSPF_BC4_UNORM COMPRESSION
-                result = "BC4U";
-            }
-            else if (parsed_dxtType == 646)
-            {
-                //DDSPF_BC4_UNORM COMPRESSION
-                result = "BC5S";
-            }
+                    //this section needs some reworking, still can't track down exactly what the compression types are, parsed_compressionType and parsed_dxtType are close
+                    //SET DDS COMPRESSION TYPES
+                    if (parsed_dxtType == 66)
+                    {
+                        //DXT5 COMPRESSION
+                        result = "DXT5";
+                    }
+                    else if (parsed_dxtType == 68)
+                    {
+                        //DDSPF_BC5_UNORM COMPRESSION
+                        result = "BC5U";
+                    }
+                    else if (parsed_dxtType == 69)
+                    {
+                        //DDSPF_BC4_UNORM COMPRESSION
+                        result = "BC4U";
+                    }
+                    else if (parsed_dxtType == 646)
+                    {
+                        //DDSPF_BC4_UNORM COMPRESSION
+                        result = "BC5S";
+                    }
 
-            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
-            Console.WriteLine("Selecting '{0}' DDS Compression.", result);
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
+                    Console.WriteLine("Selecting '{0}' DDS Compression.", result);
 
-            return result;
-        }
+                    return result;
+                }
 
-        public static int D3DTX_GetDXTType_ForD3DTX(string parsed_dword, string parsed_dxtType)
-        {
-            int result = 64; //DXT1
+                public static int D3DTX_GetDXTType_ForD3DTX(string parsed_dword, string parsed_dxtType)
+                {
+                    int result = 64; //DXT1
 
-            //this section needs some reworking, still can't track down exactly what the compression types are, parsed_compressionType and parsed_dxtType are close
-            //SET DDS COMPRESSION TYPES
-            if (parsed_dxtType.Equals("DXT5"))
-            {
-                //DXT5 COMPRESSION
-                result = 66;
-            }
-            else if (parsed_dxtType.Equals("BC5U"))
-            {
-                //DDSPF_BC5_UNORM COMPRESSION
-                result = 68;
-            }
-            else if (parsed_dxtType.Equals("BC4U"))
-            {
-                //DDSPF_BC4_UNORM COMPRESSION
-                result = 69;
-            }
+                    //this section needs some reworking, still can't track down exactly what the compression types are, parsed_compressionType and parsed_dxtType are close
+                    //SET DDS COMPRESSION TYPES
+                    if (parsed_dxtType.Equals("DXT5"))
+                    {
+                        //DXT5 COMPRESSION
+                        result = 66;
+                    }
+                    else if (parsed_dxtType.Equals("BC5U"))
+                    {
+                        //DDSPF_BC5_UNORM COMPRESSION
+                        result = 68;
+                    }
+                    else if (parsed_dxtType.Equals("BC4U"))
+                    {
+                        //DDSPF_BC4_UNORM COMPRESSION
+                        result = 69;
+                    }
 
-            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
-            Console.WriteLine("Selecting '{0}' for D3DTX Compression.", result.ToString());
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
+                    Console.WriteLine("Selecting '{0}' for D3DTX Compression.", result.ToString());
 
-            return result;
-        }
-*/
+                    return result;
+                }
+        */
     }
 }

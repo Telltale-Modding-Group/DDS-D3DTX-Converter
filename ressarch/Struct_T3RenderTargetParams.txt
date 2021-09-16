@@ -1,0 +1,17 @@
+T3RenderTargetParams struc ; (sizeof=0x48, align=0x4, copyof_3294)
+00000000                                         ; XREF: ?AllocateShadowMap@ShadowMapCacheUtil@@YA?BUShadowMapCacheRef@@AEAUT3RenderTargetContext@@HHW4T3RenderTargetUsage@@IPEBD@Z/r
+00000000                                         ; _anonymous_namespace_::AllocatePage/r ...
+00000000 mAllocationType dd ?                    ; enum GFXPlatformAllocationType
+00000004 mWidth          dd ?
+00000008 mHeight         dd ?
+0000000C mDepth          dd ?
+00000010 mArraySize      dd ?
+00000014 mNumMipLevels   dd ?
+00000018 mUsage          dd ?                    ; enum T3RenderTargetUsage
+0000001C mAccess         dd ?                    ; enum T3SurfaceAccess
+00000020 mLayout         dd ?                    ; enum T3TextureLayout
+00000024 mMultisample    dd ?                    ; enum T3SurfaceMultisample
+00000028 mClear          T3RenderTargetClear ?
+00000040 mResourceUsage  dd ?                    ; enum T3ResourceUsage
+00000044 mFastMemHeap    dd ?                    ; enum GFXPlatformFastMemHeap
+00000048 T3RenderTargetParams ends

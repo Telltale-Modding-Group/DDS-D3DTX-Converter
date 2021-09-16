@@ -1,0 +1,6 @@
+enum T3SurfaceMultisample, copyof_159
+FFFFFFFF eSurfaceMultisample_None  = 0
+FFFFFFFF eSurfaceMultisample_2x  = 1
+FFFFFFFF eSurfaceMultisample_4x  = 2
+FFFFFFFF eSurfaceMultisample_8x  = 3
+FFFFFFFF eSurfaceMultisample_16x  = 4

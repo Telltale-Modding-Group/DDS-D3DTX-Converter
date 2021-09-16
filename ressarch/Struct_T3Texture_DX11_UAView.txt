@@ -1,0 +1,4 @@
+T3Texture_DX11::UAView struc ; (sizeof=0x10, align=0x8, copyof_3236)
+00000000 mD3DView        TTComPtr<ID3D11UnorderedAccessView> ?
+00000008 mView           GFXPlatformTextureView ?
+00000010 T3Texture_DX11::UAView ends

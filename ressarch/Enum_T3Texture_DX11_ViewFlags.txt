@@ -1,0 +1,2 @@
+enum T3Texture_DX11::ViewFlags, copyof_488, bitfield
+00000001 eViewFlag_SRGB   = 1

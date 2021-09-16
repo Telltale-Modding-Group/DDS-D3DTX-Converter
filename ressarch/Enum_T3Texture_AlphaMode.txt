@@ -1,0 +1,5 @@
+enum T3Texture::AlphaMode, copyof_364
+FFFFFFFF eTxNoAlpha       = 0
+FFFFFFFF eTxAlphaTest     = 1
+FFFFFFFF eTxAlphaBlend    = 2
+FFFFFFFF eTxAlphaUnkown   = 0FFFFFFFFh

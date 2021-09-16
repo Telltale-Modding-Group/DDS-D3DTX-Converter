@@ -11,6 +11,7 @@ namespace D3DTX_TextureConverter.Telltale
         public int mFaceIndex;
         public int mMipIndex;
         public int mMipCount;
+        public uint mDataSize;
         public int mPitch;
         public int mSlicePitch;
     }

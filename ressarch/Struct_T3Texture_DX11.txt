@@ -1,0 +1,11 @@
+T3Texture_DX11  struc ; (sizeof=0x150, align=0x8, copyof_3246)
+00000000                                         ; XREF: T3Texture/r
+00000000 baseclass_0     T3TextureBase ?
+000000A0 mD3DTexture     TTComPtr<ID3D11Resource> ?
+000000A8 mShaderResourceViews DCArray<T3Texture_DX11::SRView> ?
+000000D0 mUnorderedAccessViews DCArray<T3Texture_DX11::UAView> ?
+000000F8 mRenderTargetViews DCArray<T3Texture_DX11::RTView> ?
+00000120 mDepthStencilViews DCArray<T3Texture_DX11::DSView> ?
+00000148 mD3DBindFlags   dd ?
+0000014C mFastMemHeap    dd ?                    ; enum GFXPlatformFastMemHeap
+00000150 T3Texture_DX11  ends

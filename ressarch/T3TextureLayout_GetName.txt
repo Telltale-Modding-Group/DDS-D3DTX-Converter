@@ -1,0 +1,44 @@
+const char *__fastcall T3TextureLayout_GetName(T3TextureLayout v)
+{
+  unsigned __int32 v1; // ecx@2
+  int v2; // ecx@3
+  int v3; // ecx@4
+  const char *result; // rax@6
+
+  if ( v )
+  {
+    v1 = v - 1;
+    if ( v1 )
+    {
+      v2 = v1 - 1;
+      if ( v2 )
+      {
+        v3 = v2 - 1;
+        if ( v3 )
+        {
+          if ( v3 == 1 )
+            result = "CubeArray";
+          else
+            result = "Unknown";
+        }
+        else
+        {
+          result = "2DArray";
+        }
+      }
+      else
+      {
+        result = "3D";
+      }
+    }
+    else
+    {
+      result = "Cube";
+    }
+  }
+  else
+  {
+    result = "2D";
+  }
+  return result;
+}

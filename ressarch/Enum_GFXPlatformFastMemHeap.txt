@@ -1,0 +1,5 @@
+enum GFXPlatformFastMemHeap, copyof_216
+FFFFFFFF eGFXPlatformFastMemHeap_ShadowMap  = 0
+FFFFFFFF eGFXPlatformFastMemHeap_Other  = 1
+FFFFFFFF eGFXPlatformFastMemHeap_Count  = 2
+FFFFFFFF eGFXPlatformFastMemHeap_None  = 0FFFFFFFFh

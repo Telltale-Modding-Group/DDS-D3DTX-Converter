@@ -1,0 +1,66 @@
+MetaClassDescription *__cdecl MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription()
+{
+  int v0; // eax@1
+  MetaClassDescription *result; // rax@2
+  signed int i; // ebx@3
+
+  v0 = `MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags;
+  if ( _bittest(&v0, 0x1Du) )
+  {
+    result = &`MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+  }
+  else
+  {
+    for ( i = 0;
+          _InterlockedExchange(
+            &`MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock,
+            1) == 1;
+          ++i )
+    {
+      if ( i > 1000 )
+        Thread_Sleep(1);
+    }
+    if ( !(`MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags & 0x20000000) )
+    {
+      MetaClassDescription::Initialize(
+        &`MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory,
+        &T3Texture::RegionStreamHeader `RTTI Type Descriptor');
+      `MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mClassSize = 24;
+      `MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mpVTable = `MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetVTable'::`2'::sVTable;
+      qword_140FB5EC0 = MetaHelpers::GetMetaClassDescription<long>();
+      `T3Texture::RegionStreamHeader::InternalGetMetaClassDescription'::`4'::metaMemberDescriptionMemory = "mFaceIndex";
+      `MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mpFirstMember = &`T3Texture::RegionStreamHeader::InternalGetMetaClassDescription'::`4'::metaMemberDescriptionMemory;
+      qword_140FB5E98 = 0i64;
+      qword_140FB5EA8 = &`MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      qword_140FB5EF8 = MetaHelpers::GetMetaClassDescription<long>();
+      `T3Texture::RegionStreamHeader::InternalGetMetaClassDescription'::`5'::metaMemberDescriptionMemory = "mMipIndex";
+      qword_140FB5EB0 = &`T3Texture::RegionStreamHeader::InternalGetMetaClassDescription'::`5'::metaMemberDescriptionMemory;
+      qword_140FB5ED0 = 4i64;
+      qword_140FB5EE0 = &`MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      qword_140FB5F30 = MetaHelpers::GetMetaClassDescription<long>();
+      `T3Texture::RegionStreamHeader::InternalGetMetaClassDescription'::`6'::metaMemberDescriptionMemory = "mMipCount";
+      qword_140FB5EE8 = &`T3Texture::RegionStreamHeader::InternalGetMetaClassDescription'::`6'::metaMemberDescriptionMemory;
+      qword_140FB5F08 = 8i64;
+      qword_140FB5F18 = &`MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      qword_140FB5F68 = MetaHelpers::GetMetaClassDescription<long>();
+      `T3Texture::RegionStreamHeader::InternalGetMetaClassDescription'::`7'::metaMemberDescriptionMemory = "mDataSize";
+      qword_140FB5F20 = &`T3Texture::RegionStreamHeader::InternalGetMetaClassDescription'::`7'::metaMemberDescriptionMemory;
+      qword_140FB5F40 = 12i64;
+      qword_140FB5F50 = &`MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      qword_140FB5FA0 = MetaHelpers::GetMetaClassDescription<long>();
+      `T3Texture::RegionStreamHeader::InternalGetMetaClassDescription'::`8'::metaMemberDescriptionMemory = "mPitch";
+      qword_140FB5F58 = &`T3Texture::RegionStreamHeader::InternalGetMetaClassDescription'::`8'::metaMemberDescriptionMemory;
+      qword_140FB5F78 = 16i64;
+      qword_140FB5F88 = &`MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      qword_140FB5FD8 = MetaHelpers::GetMetaClassDescription<long>();
+      qword_140FB5FB0 = 20i64;
+      `T3Texture::RegionStreamHeader::InternalGetMetaClassDescription'::`9'::metaMemberDescriptionMemory = "mSlicePitch";
+      qword_140FB5F90 = &`T3Texture::RegionStreamHeader::InternalGetMetaClassDescription'::`9'::metaMemberDescriptionMemory;
+      qword_140FB5FC0 = &`MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+      MetaClassDescription::Insert(&`MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory);
+    }
+    `MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock.mValue = 0;
+    result = &`MetaClassDescription_Typed<T3Texture::RegionStreamHeader>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+  }
+  return result;
+}

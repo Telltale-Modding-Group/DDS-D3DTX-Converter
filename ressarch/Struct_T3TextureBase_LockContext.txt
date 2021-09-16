@@ -1,0 +1,22 @@
+T3TextureBase::LockContext struc ; (sizeof=0x48, align=0x8, copyof_3261)
+00000000                                         ; XREF: ?CreateHorizontalGradientTexture@T3Texture@@QEAAXAEBVColor@@0H@Z/r
+00000000                                         ; ?MetaOperation_SerializeAsync@T3Texture@@KA?AW4MetaOpResult@@PEAXPEBVMetaClassDescription@@PEBVMetaMemberDescription@@0@Z/r ...
+00000000 mpTempAllocator dq ?                    ; offset
+00000008 mpBits          dq ?                    ; offset
+00000010 mPitch          dd ?
+00000014 mPlatformPitch  dd ?
+00000018 mSlicePitch     dd ?
+0000001C mLockFormat     dd ?                    ; enum T3SurfaceFormat
+00000020 mMipLevel       dd ?
+00000024 mFace           dd ?
+00000028 mNumMipLevels   dd ?
+0000002C mWidth          dd ?
+00000030 mHeight         dd ?
+00000034 mDepth          dd ?
+00000038 mBitsPerBlock   dd ?
+0000003C mbRead          db ?
+0000003D mbWrite         db ?
+0000003E mbTexToTexCopy  db ?
+0000003F                 db ? ; undefined
+00000040 mpPlatformData  dq ?                    ; offset
+00000048 T3TextureBase::LockContext ends

@@ -1,0 +1,8 @@
+T3Texture::RegionStreamHeader struc ; (sizeof=0x18, align=0x4, copyof_3259)
+00000000 mFaceIndex      dd ?
+00000004 mMipIndex       dd ?
+00000008 mMipCount       dd ?
+0000000C mDataSize       dd ?
+00000010 mPitch          dd ?
+00000014 mSlicePitch     dd ?
+00000018 T3Texture::RegionStreamHeader ends

@@ -1,0 +1,5 @@
+enum T3TextureWrap, copyof_221
+FFFFFFFF eTextureWrap_Clamp  = 0
+FFFFFFFF eTextureWrap_Repeat  = 1
+FFFFFFFF eTextureWrap_ClampToBorder  = 2
+FFFFFFFF eTextureWrap_Count  = 3

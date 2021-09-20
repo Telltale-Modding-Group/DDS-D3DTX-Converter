@@ -213,5 +213,112 @@
                     return T3SurfaceFormat.eSurface_R8;
             }
         }
+
+        public static long D3D9Format_FromSurfaceFormat(T3SurfaceFormat format)
+        {
+            long result = 0;
+
+            switch (format)
+            {
+                case 0u:
+                case (T3SurfaceFormat)0xAu:
+                    result = 21;
+                    break;
+                case (T3SurfaceFormat)5u:
+                    result = 35;
+                    break;
+                case (T3SurfaceFormat)2u:
+                    result = 23;
+                    break;
+                case (T3SurfaceFormat)3u:
+                    result = 25;
+                    break;
+                case (T3SurfaceFormat)4u:
+                    result = 26;
+                    break;
+                case (T3SurfaceFormat)0x10u:
+                    result = 28;
+                    break;
+                case (T3SurfaceFormat)0x11u:
+                    result = 50;
+                    break;
+                case (T3SurfaceFormat)9u:
+                case (T3SurfaceFormat)0x12u:
+                    result = 51;
+                    break;
+                case (T3SurfaceFormat)0xBu:
+                    result = 42;
+                    break;
+                case (T3SurfaceFormat)0xCu:
+                    result = 17;
+                    break;
+                case (T3SurfaceFormat)0xDu:
+                    result = 3;
+                    break;
+                case (T3SurfaceFormat)6u:
+                case (T3SurfaceFormat)0x13u:
+                    result = 81;
+                    break;
+                case (T3SurfaceFormat)7u:
+                    result = 34;
+                    break;
+                case (T3SurfaceFormat)1u:
+                case (T3SurfaceFormat)8u:
+                    result = 36;
+                    break;
+                case (T3SurfaceFormat)0x22u:
+                    result = 113;
+                    break;
+                case (T3SurfaceFormat)0x20u:
+                    result = 111;
+                    break;
+                case (T3SurfaceFormat)0x23u:
+                    result = 114;
+                    break;
+                case (T3SurfaceFormat)0x21u:
+                    result = 112;
+                    break;
+                case (T3SurfaceFormat)0x24u:
+                    result = 115;
+                    break;
+                case (T3SurfaceFormat)0x25u:
+                    result = 116;
+                    break;
+                case (T3SurfaceFormat)0x30u:
+                case (T3SurfaceFormat)0x32u:
+                    result = 80;
+                    break;
+                case (T3SurfaceFormat)0x31u:
+                case (T3SurfaceFormat)0x33u:
+                    result = 77;
+                    break;
+                case (T3SurfaceFormat)0x34u:
+                    result = 75;
+                    break;
+                case (T3SurfaceFormat)0x40u:
+                    result = 827611204;
+                    break;
+                case (T3SurfaceFormat)0x41u:
+                    result = 861165636;
+                    break;
+                case (T3SurfaceFormat)0x42u:
+                    result = 894720068;
+                    break;
+                case (T3SurfaceFormat)0x90u:
+                    result = 22;
+                    break;
+                case (T3SurfaceFormat)0x43u:
+                    result = 826889281;
+                    break;
+                case (T3SurfaceFormat)0x44u:
+                    result = 843666497;
+                    break;
+                default:
+                    result = 0;
+                    break;
+            }
+
+            return result;
+        }
     }
 }

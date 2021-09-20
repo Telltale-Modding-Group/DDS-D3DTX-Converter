@@ -1,0 +1,105 @@
+signed __int64 __fastcall D3D9Format_FromSurfaceFormat(T3SurfaceFormat format)
+{
+  signed __int64 result; // rax@2
+
+  switch ( format )
+  {
+    case 0u:
+    case 0xAu:
+      result = 21i64;
+      break;
+    case 5u:
+      result = 35i64;
+      break;
+    case 2u:
+      result = 23i64;
+      break;
+    case 3u:
+      result = 25i64;
+      break;
+    case 4u:
+      result = 26i64;
+      break;
+    case 0x10u:
+      result = 28i64;
+      break;
+    case 0x11u:
+      result = 50i64;
+      break;
+    case 9u:
+    case 0x12u:
+      result = 51i64;
+      break;
+    case 0xBu:
+      result = 42i64;
+      break;
+    case 0xCu:
+      result = 17i64;
+      break;
+    case 0xDu:
+      result = 3i64;
+      break;
+    case 6u:
+    case 0x13u:
+      result = 81i64;
+      break;
+    case 7u:
+      result = 34i64;
+      break;
+    case 1u:
+    case 8u:
+      result = 36i64;
+      break;
+    case 0x22u:
+      result = 113i64;
+      break;
+    case 0x20u:
+      result = 111i64;
+      break;
+    case 0x23u:
+      result = 114i64;
+      break;
+    case 0x21u:
+      result = 112i64;
+      break;
+    case 0x24u:
+      result = 115i64;
+      break;
+    case 0x25u:
+      result = 116i64;
+      break;
+    case 0x30u:
+    case 0x32u:
+      result = 80i64;
+      break;
+    case 0x31u:
+    case 0x33u:
+      result = 77i64;
+      break;
+    case 0x34u:
+      result = 75i64;
+      break;
+    case 0x40u:
+      result = 827611204i64;
+      break;
+    case 0x41u:
+      result = 861165636i64;
+      break;
+    case 0x42u:
+      result = 894720068i64;
+      break;
+    case 0x90u:
+      result = 22i64;
+      break;
+    case 0x43u:
+      result = 826889281i64;
+      break;
+    case 0x44u:
+      result = 843666497i64;
+      break;
+    default:
+      result = 0i64;
+      break;
+  }
+  return result;
+}

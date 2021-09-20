@@ -98,14 +98,18 @@ MetaOpResult __fastcall T3Texture::MetaOperation_SerializeAsync(void *pObj, Meta
   {
     T3Texture::LoadFullTexture(pObj);
     *(v7 + 89) = 9;
+	
     if ( *(v7 + 31) < *(v7 + 24) )
       return 2;
   }
+  
   result = Meta::MetaOperation_SerializeAsync(v7, v6, v5, v4);
+  
   if ( result == 1 )
   {
     v9 = *(v7 + 25);
-    if ( v9 == 4 )
+    
+	if ( v9 == 4 )
     {
       v10 = 6 * *(v7 + 23);
     }
@@ -119,15 +123,18 @@ MetaOpResult __fastcall T3Texture::MetaOperation_SerializeAsync(void *pObj, Meta
       if ( v9 == 1 )
         v10 = 6;
     }
-    v79 = v10;
+    
+	v79 = v10;
     v11 = v10 * *(v7 + 24);
-    if ( *(v4 + 12) == 1 )
+    
+	if ( *(v4 + 12) == 1 )
     {
       *&pObja.mRegionCount = 0i64;
       pObja.mTotalDataSize = 0;
       PerformMetaSerializeAsync<T3Texture::StreamHeader>(v4, &pObja);
       *(v7 + 180) = *(v4 + 46);
-      switch ( *(v7 + 103) )
+      
+	  switch ( *(v7 + 103) )
       {
         case 0xF:
           T3TextureBase::SetGFXAllocationType(v7, eGFXPlatformAllocation_DiffuseTexture);
@@ -169,20 +176,24 @@ MetaOpResult __fastcall T3Texture::MetaOperation_SerializeAsync(void *pObj, Meta
             GFXUtility::SetAllocationType(&v12->mMemoryStats, v7 + 9, eGFXPlatformAllocation_MiscTexture);
           break;
       }
-      v13 = pObja.mRegionCount;
+      
+	  v13 = pObja.mRegionCount;
       v14 = pObja.mRegionCount;
-      if ( pObja.mRegionCount >= *(v7 + 146) )
+      
+	  if ( pObja.mRegionCount >= *(v7 + 146) )
       {
         if ( pObja.mRegionCount > *(v7 + 146) )
         {
           v15 = *(v7 + 147);
-          if ( v15 < pObja.mRegionCount )
+          
+		  if ( v15 < pObja.mRegionCount )
           {
             if ( !DCArray<KeyframedValue<Vector2>::Sample>::Resize(v7 + 14, pObja.mRegionCount - v15) )
               return 3;
             v13 = pObja.mRegionCount;
           }
-          v16 = v14 - *(v7 + 146);
+          
+		  v16 = v14 - *(v7 + 146);
           if ( v14 - *(v7 + 146) > 0 )
           {
             v17 = 0i64;
@@ -198,15 +209,18 @@ MetaOpResult __fastcall T3Texture::MetaOperation_SerializeAsync(void *pObj, Meta
             while ( v17 < v16 );
             v13 = pObja.mRegionCount;
           }
-          *(v7 + 146) = v14;
+          
+		  *(v7 + 146) = v14;
         }
       }
       else
       {
         *(v7 + 146) = pObja.mRegionCount;
       }
-      v20 = 0;
-      if ( v13 > 0 )
+      
+	  v20 = 0;
+      
+	  if ( v13 > 0 )
       {
         v21 = 0i64;
         do
@@ -222,7 +236,8 @@ MetaOpResult __fastcall T3Texture::MetaOperation_SerializeAsync(void *pObj, Meta
         }
         while ( v20 < pObja.mRegionCount );
       }
-      if ( pObja.mAuxDataCount > 0 )
+      
+	  if ( pObja.mAuxDataCount > 0 )
       {
         (*(*v4 + 184i64))(v4);
         v23 = 0;
@@ -312,9 +327,11 @@ MetaOpResult __fastcall T3Texture::MetaOperation_SerializeAsync(void *pObj, Meta
         }
         (*(*v4 + 192i64))(v4);
       }
-      v31 = (*(*v4 + 104i64))(v4);
+      
+	  v31 = (*(*v4 + 104i64))(v4);
       *(v7 + 86) = 0i64;
-      if ( pObja.mTotalDataSize > 0 )
+      
+	  if ( pObja.mTotalDataSize > 0 )
       {
         LODWORD(v32) = (*(*v4 + 96i64))(v4, &v81, pObja.mTotalDataSize);
         v33 = *v32;
@@ -329,7 +346,8 @@ MetaOpResult __fastcall T3Texture::MetaOperation_SerializeAsync(void *pObj, Meta
         if ( v35 )
           PtrModifyRefCount(v35, -1);
       }
-      if ( v31 )
+      
+	  if ( v31 )
         (*(*v4 + 112i64))(v4);
     }
     else
@@ -642,7 +660,8 @@ MetaOpResult __fastcall T3Texture::MetaOperation_SerializeAsync(void *pObj, Meta
           Memory::SetTempBufferMarker(*&params.mbRead);
       }
     }
-    result = 1;
+    
+	result = 1;
   }
   return result;
 }

@@ -1,0 +1,23 @@
+signed __int64 __fastcall T3Texture::MetaOperation_SerializeMain(void *pObj, MetaClassDescription *pObjDescription, MetaMemberDescription *pContextDescription, void *pUserData)
+{
+  _DWORD *v4; // rbx@1
+  T3Texture *v5; // rdi@1
+  Symbol *v6; // rax@6
+  RenderFrameUpdateList *v7; // rax@6
+
+  v4 = pUserData;
+  v5 = pObj;
+  Meta::MetaOperation_SerializeMain(pObj, pObjDescription, pContextDescription, pUserData);
+  if ( v4[12] == 1
+    && v5->mVersion
+    && v5->mpAsyncStream.mpData
+    && v5->mRegionHeaders.mSize
+    && v5->mNumSurfacesLoaded != T3Texture::_GetNumSurfacesToLoad(v5) )
+  {
+    v6 = RenderUtility::MemoryScope::Top();
+    Symbol::operator=(&v5->mGFXMemoryOwner.mOrigin, v6);
+    v7 = RenderThread::GetCurrentResourceUpdateList();
+    RenderFrameUpdateList::UpdateTextureStreaming(v7, v5, 0, v5->mNumMipLevels);
+  }
+  return 1i64;
+}

@@ -36,7 +36,7 @@
             switch (value)
             {
                 default:
-                    return T3ResourceUsage.eResourceUsage_Static;
+                    return (T3ResourceUsage)value;
                 case 0:
                     return T3ResourceUsage.eResourceUsage_Static;
                 case 1:
@@ -51,7 +51,7 @@
             switch (value)
             {
                 default:
-                    return T3SurfaceGamma.eSurfaceGamma_sRGB;
+                    return (T3SurfaceGamma)value;
                 case -1:
                     return T3SurfaceGamma.eSurfaceGamma_Unknown;
                 case 0:
@@ -66,7 +66,7 @@
             switch (value)
             {
                 default:
-                    return T3SurfaceMultisample.eSurfaceMultisample_None;
+                    return (T3SurfaceMultisample)value;
                 case 0:
                     return T3SurfaceMultisample.eSurfaceMultisample_None;
                 case 1:
@@ -85,7 +85,7 @@
             switch (value)
             {
                 default:
-                    return T3TextureLayout.eTextureLayout_2D;
+                    return (T3TextureLayout)value;
                 case -1:
                     return T3TextureLayout.eTextureLayout_Unknown;
                 case 0:
@@ -106,7 +106,7 @@
             switch(value)
             {
                 default:
-                    return T3SurfaceFormat.eSurface_DXT1;
+                    return (T3SurfaceFormat)value;
                 case -1:
                     return T3SurfaceFormat.eSurface_Unknown;
                 case 0:

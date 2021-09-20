@@ -339,5 +339,84 @@ namespace D3DTX_TextureConverter.Utilities
             //return the result
             return destinationBytes;
         }
+
+
+        /// <summary>
+        /// Checks if the pointer position is at the DCArray capacity, if's not then it moves the pointer past where it should be after reading the DCArray.
+        /// </summary>
+        /// <param name="pointerPositionBeforeCapacity"></param>
+        /// <param name="arrayCapacity"></param>
+        /// <param name="bytePointerPosition"></param>
+        public static void DCArrayCheckAdjustment(uint pointerPositionBeforeCapacity, uint arrayCapacity, ref uint bytePointerPosition)
+        {
+            uint estimatedOffPoint = pointerPositionBeforeCapacity + ((uint)arrayCapacity);
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
+            Console.WriteLine("(DCArray Check) Estimated to be at = {0}", estimatedOffPoint);
+
+            if (bytePointerPosition != estimatedOffPoint)
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
+                Console.WriteLine("(DCArray Check) Left off at = {0}", bytePointerPosition);
+                Console.WriteLine("(DCArray Check) Skipping by using the estimated position...", bytePointerPosition);
+                bytePointerPosition = estimatedOffPoint;
+            }
+            else
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
+                Console.WriteLine("(DCArray Check) Left off at = {0}", bytePointerPosition);
+            }
+
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+        }
+
+        /// <summary>
+        /// Checks if we have reached the end of the file.
+        /// </summary>
+        /// <param name="bytePointerPosition"></param>
+        /// <param name="fileSize"></param>
+        public static void ReachedEndOfFile(uint bytePointerPosition, uint fileSize)
+        {
+            if (bytePointerPosition != fileSize)
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
+                Console.WriteLine("(End Of File Check) Didn't reach the end of the file!");
+                Console.WriteLine("(End Of File Check) Left off at = {0}", bytePointerPosition);
+                Console.WriteLine("(End Of File Check) File Size = {0}", fileSize);
+            }
+            else
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
+                Console.WriteLine("(End Of File Check) Reached end of file!");
+                Console.WriteLine("(End Of File Check) Left off at = {0}", bytePointerPosition);
+                Console.WriteLine("(End Of File Check) File Size = {0}", fileSize);
+            }
+
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+        }
+
+        /// <summary>
+        /// Checks if we have reached a specific offset in the file.
+        /// </summary>
+        /// <param name="bytePointerPosition"></param>
+        /// <param name="offsetPoint"></param>
+        public static void ReachedOffset(uint bytePointerPosition, uint offsetPoint)
+        {
+            if (bytePointerPosition != offsetPoint)
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
+                Console.WriteLine("(Offset Check) Didn't reach the offset!");
+                Console.WriteLine("(Offset Check) Left off at = {0}", bytePointerPosition);
+                Console.WriteLine("(Offset Check) Offset = {0}", offsetPoint);
+            }
+            else
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
+                Console.WriteLine("(Offset Check) Reached the offset!");
+                Console.WriteLine("(Offset Check) Left off at = {0}", bytePointerPosition);
+                Console.WriteLine("(Offset Check) Offset = {0}", offsetPoint);
+            }
+
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+        }
     }
 }

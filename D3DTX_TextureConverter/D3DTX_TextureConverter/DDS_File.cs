@@ -58,37 +58,36 @@ namespace D3DTX_TextureConverter
         public DDS_File(D3DTX_File d3dtx)
         {
             header = DDS_Functions.GetPresetHeader();
-            header.dwWidth = (uint)d3dtx.T3TextureBase.mWidth;
-            header.dwHeight = (uint)d3dtx.T3TextureBase.mHeight;
-            header.dwMipMapCount = (uint)d3dtx.T3TextureBase.mNumMipLevelsAllocated;
-            header.dwDepth = (uint)d3dtx.T3TextureBase.mDepth;
-            
-            switch(d3dtx.T3TextureBase.mSurfaceFormat)
+
+            //6VSM
+            if (d3dtx.D3DTX_6VSM != null)
             {
-                default:
-                    header.ddspf.dwFourCC = uint.Parse("DXT1");
-                    break;
-                case Telltale.T3SurfaceFormat.eSurface_DXT1:
-                    header.ddspf.dwFourCC = uint.Parse("DXT1");
-                    break;
-                case Telltale.T3SurfaceFormat.eSurface_DXT3:
-                    header.ddspf.dwFourCC = uint.Parse("DXT3");
-                    break;
-                case Telltale.T3SurfaceFormat.eSurface_DXT5:
-                    header.ddspf.dwFourCC = uint.Parse("DXT5");
-                    break;
-                case Telltale.T3SurfaceFormat.eSurface_BC5:
-                    header.ddspf.dwFourCC = uint.Parse("BC5U");
-                    break;
-                case Telltale.T3SurfaceFormat.eSurface_BC4:
-                    header.ddspf.dwFourCC = uint.Parse("BC4U");
-                    break;
-                case Telltale.T3SurfaceFormat.eSurface_RGBA16:
-                    header.ddspf.dwFourCC = uint.Parse("36");
-                    break;
-                case Telltale.T3SurfaceFormat.eSurface_RGBA16F:
-                    header.ddspf.dwFourCC = uint.Parse("110");
-                    break;
+                header.dwWidth = (uint)d3dtx.D3DTX_6VSM.mWidth;
+                header.dwHeight = (uint)d3dtx.D3DTX_6VSM.mHeight;
+                header.dwMipMapCount = (uint)d3dtx.D3DTX_6VSM.mNumMipLevels;
+                header.dwDepth = (uint)d3dtx.D3DTX_6VSM.mDepth;
+
+                switch (d3dtx.D3DTX_6VSM.mSurfaceFormat)
+                {
+                    default:
+                        header.ddspf.dwFourCC = uint.Parse("DXT1");
+                        break;
+                    case Telltale.T3SurfaceFormat.eSurface_DXT1:
+                        header.ddspf.dwFourCC = uint.Parse("DXT1");
+                        break;
+                    case Telltale.T3SurfaceFormat.eSurface_DXT3:
+                        header.ddspf.dwFourCC = uint.Parse("DXT3");
+                        break;
+                    case Telltale.T3SurfaceFormat.eSurface_DXT5:
+                        header.ddspf.dwFourCC = uint.Parse("DXT5");
+                        break;
+                    case Telltale.T3SurfaceFormat.eSurface_BC5:
+                        header.ddspf.dwFourCC = uint.Parse("BC5U");
+                        break;
+                    case Telltale.T3SurfaceFormat.eSurface_BC4:
+                        header.ddspf.dwFourCC = uint.Parse("BC4U");
+                        break;
+                }
             }
         }
 

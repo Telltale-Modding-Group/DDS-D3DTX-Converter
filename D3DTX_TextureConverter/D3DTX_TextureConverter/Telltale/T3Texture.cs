@@ -84,7 +84,7 @@ namespace D3DTX_TextureConverter.Telltale
             switch (value)
             {
                 default:
-                    return T3TextureType.eTxStandard;
+                    return (T3TextureType)value;
                 case 0:
                     return T3TextureType.eTxUnknown;
                 case 15:
@@ -169,9 +169,9 @@ namespace D3DTX_TextureConverter.Telltale
             switch (value)
             {
                 default:
-                    return eTxAlpha.eTxNoAlpha;
+                    return (eTxAlpha)value;
                 case -1:
-                    return eTxAlpha.eTxAlphaUnkown;
+                    return eTxAlpha.eTxAlphaUnknown;
                 case 0:
                     return eTxAlpha.eTxNoAlpha;
                 case 1:
@@ -186,7 +186,7 @@ namespace D3DTX_TextureConverter.Telltale
             switch (value)
             {
                 default:
-                    return eTxColor.eTxColorFull;
+                    return (eTxColor)value;
                 case -1:
                     return eTxColor.eTxColorUnknown;
                 case 0:

@@ -185,12 +185,16 @@ namespace D3DTX_TextureConverter
         /// <param name="destinationFile"></param>
         public static void ConvertTexture_FromD3DTX_ToDDS(string sourceFileName, string sourceFile, string destinationFile)
         {
-            string file_dword = D3DTX_File.Read_D3DTX_File_DWORD_Only(sourceFile);
+            string file_dword = D3DTX_File.Read_D3DTX_File_MetaVersionOnly(sourceFile);
             D3DTX_File d3dtx_file = new D3DTX_File();
 
             if (file_dword.Equals("6VSM"))
             {
-                d3dtx_file.Read_D3DTX_File_6VSM(sourceFileName, sourceFile, false);
+                d3dtx_file.D3DTX_6VSM = new D3DTX_6VSM(sourceFile, false);
+            }
+            else if (file_dword.Equals("5VSM"))
+            {
+                d3dtx_file.D3DTX_5VSM = new D3DTX_5VSM(sourceFile, false);
             }
 
             /*
@@ -598,11 +602,15 @@ namespace D3DTX_TextureConverter
 
             D3DTX_File d3dtx_file = new D3DTX_File();
 
-            string file_dword = D3DTX_File.Read_D3DTX_File_DWORD_Only(sourceHeaderFile);
+            string file_dword = D3DTX_File.Read_D3DTX_File_MetaVersionOnly(sourceHeaderFile);
 
             if (file_dword.Equals("6VSM"))
             {
-                d3dtx_file.Read_D3DTX_File_6VSM(sourceFileName, sourceHeaderFile, true);
+                d3dtx_file.D3DTX_6VSM = new D3DTX_6VSM(sourceHeaderFile, true);
+            }
+            else if (file_dword.Equals("5VSM"))
+            {
+                d3dtx_file.D3DTX_5VSM = new D3DTX_5VSM(sourceHeaderFile, true);
             }
 
             DDS_File dds_file = new DDS_File(d3dtx_file);

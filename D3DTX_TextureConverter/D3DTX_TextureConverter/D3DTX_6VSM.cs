@@ -24,7 +24,7 @@ namespace D3DTX_TextureConverter
 
         //d3dtx header
         public int mVersion; //[4 bytes]
-        public int mSamplerState_BlockSize; //[4 bytes] SAMPLER STATE BLOCK SIZE
+        public int mSamplerState_BlockSize; //[4 bytes]
         public T3SamplerStateBlock mSamplerState; //[4 bytes]
         public int mPlatform_BlockSize; //[4 bytes]
         public PlatformType mPlatform; //[4 bytes]
@@ -160,12 +160,12 @@ namespace D3DTX_TextureConverter
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
             Console.WriteLine("||||||||||| D3DTX Header |||||||||||");
 
-            //--------------------------mVersion-------------------------- [4 bytes] (THIS IS mVersion ACCORDING TO LUCAS)
+            //--------------------------mVersion-------------------------- [4 bytes]
             mVersion = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mVersion = {0}", mVersion);
 
-            //--------------------------mSamplerState Block Size-------------------------- [4 bytes] (SAMPLER STATE BLOCK SIZE)
+            //--------------------------mSamplerState Block Size-------------------------- [4 bytes]
             mSamplerState_BlockSize = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mSamplerState_BlockSize = {0}", mSamplerState_BlockSize);
@@ -236,67 +236,56 @@ namespace D3DTX_TextureConverter
             Console.WriteLine("D3DTX mToolProps = {0}", mToolProps);
 
             //--------------------------mNumMipLevels-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is an unsigned long
             mNumMipLevels = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mNumMipLevels = {0}", mNumMipLevels);
 
             //--------------------------mWidth-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is an unsigned long
             mWidth = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mWidth = {0}", mWidth);
 
             //--------------------------mHeight-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is an unsigned long
             mHeight = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mHeight = {0}", mHeight);
 
             //--------------------------mDepth-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is an unsigned long
             mDepth = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mDepth = {0}", mDepth);
 
             //--------------------------mArraySize-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is an unsigned long
             mArraySize = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mArraySize = {0}", mArraySize);
 
             //--------------------------mSurfaceFormat-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is a long
             mSurfaceFormat = T3TextureBase_Functions.GetSurfaceFormat(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mSurfaceFormat = {0} ({1})", Enum.GetName(typeof(T3SurfaceFormat), mSurfaceFormat), (int)mSurfaceFormat);
 
             //--------------------------mTextureLayout-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is a long
             mTextureLayout = T3TextureBase_Functions.GetTextureLayout(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mTextureLayout = {0} ({1})", Enum.GetName(typeof(T3TextureLayout), mTextureLayout), (int)mTextureLayout);
 
             //--------------------------mSurfaceGamma-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is a long
             mSurfaceGamma = T3TextureBase_Functions.GetSurfaceGamma(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mSurfaceGamma = {0} ({1})", Enum.GetName(typeof(T3SurfaceGamma), mSurfaceGamma), (int)mSurfaceGamma);
 
             //--------------------------mSurfaceMultisample-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is a long
             mSurfaceMultisample = T3TextureBase_Functions.GetSurfaceMultisample(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mSurfaceMultisample = {0} ({1})", Enum.GetName(typeof(T3SurfaceMultisample), mSurfaceMultisample), (int)mSurfaceMultisample);
 
             //--------------------------mResourceUsage-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is a long
             mResourceUsage = T3TextureBase_Functions.GetResourceUsage(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mResourceUsage = {0} ({1})", Enum.GetName(typeof(T3ResourceUsage), mResourceUsage), (int)mResourceUsage);
 
             //--------------------------mType-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is a long
             mType = T3Texture_Functions.GetTextureType(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mType = {0} ({1})", Enum.GetName(typeof(T3TextureType), mType), (int)mType);
@@ -335,13 +324,11 @@ namespace D3DTX_TextureConverter
             Console.WriteLine("D3DTX mToonGradientCutoff = {0}", mToonGradientCutoff);
 
             //--------------------------mAlphaMode-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is a long
             mAlphaMode = T3Texture_Functions.GetAlphaMode(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mAlphaMode = {0} ({1})", Enum.GetName(typeof(eTxAlpha), mAlphaMode), (int)mAlphaMode);
 
             //--------------------------mColorMode-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is a long
             mColorMode = T3Texture_Functions.GetColorMode(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mColorMode = {0} ({1})", Enum.GetName(typeof(eTxColor), mColorMode), (int)mColorMode);
@@ -424,7 +411,8 @@ namespace D3DTX_TextureConverter
                     {
                         r = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition), //[4 bytes]
                         g = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition), //[4 bytes]
-                        b = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition) //[4 bytes]
+                        b = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition), //[4 bytes]
+                        a = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition) //[4 bytes]
                     },
 
                     mSize = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition) //[4 bytes]

@@ -12,6 +12,9 @@ using System.IO;
 
 namespace D3DTX_TextureConverter
 {
+    /// <summary>
+    /// This is a plug-in-play class that converts a DDS into common image formats, and also can convert a common image format into a DDS
+    /// </summary>
     public static class GenericImageFormats
     {
         public static void ConvertDDS_To_JPEG(string path, bool removeOriginalFile = false)
@@ -44,6 +47,11 @@ namespace D3DTX_TextureConverter
             ConvertFromDDS_Master(path, ".bmp", ImageFormat.BMP, removeOriginalFile);
         }
 
+        /// <summary>
+        /// Converts a common image format into a DDS file.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="removeOriginalFile"></param>
         public static void ConvertImage_To_DDS(string path, bool removeOriginalFile = false)
         {
             string newExtension = ".dds";

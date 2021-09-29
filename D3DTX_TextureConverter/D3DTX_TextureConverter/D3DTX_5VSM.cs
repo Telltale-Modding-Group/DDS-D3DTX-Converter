@@ -14,28 +14,27 @@ namespace D3DTX_TextureConverter
     /// </summary>
     public class D3DTX_5VSM
     {
-        public string MetaStreamVersion; //[4 bytes]
-        public uint mHeaderBlockSize; //[4 bytes]
-        public uint Unknown1; //[4 bytes]
-        public uint mDataSize; //[4 bytes]
+        //meta header
+        public string mMetaStreamVersion; //[4 bytes]
+        public uint mDefaultSectionChunkSize; //[4 bytes]
+        public uint mDebugSectionChunkSize; //[4 bytes]
+        public uint mAsyncSectionChunkSize; //[4 bytes]
         public uint mClassNamesLength; //[4 bytes]
         public ClassNames[] mClassNames;//[12 bytes for each element]
+
+        //d3dtx header
         public int mVersion; //[4 bytes]
-
-        public int mSamplerState_BlockSize; //[4 bytes] SAMPLER STATE BLOCK SIZE
+        public int mSamplerState_BlockSize; //[4 bytes]
         public T3SamplerStateBlock mSamplerState; //[4 bytes]
-
         public int mPlatform_BlockSize; //[4 bytes]
         public PlatformType mPlatform; //[4 bytes]
-
+        public int mName_BlockSize; //[4 bytes]
+        public uint mName_StringLength; //[4 bytes]
+        public string mName; //[mName_StringLength bytes]
         public int mImportName_BlockSize; //[4 bytes]
         public uint mImportName_StringLength; //[4 bytes]
-        public string mName;
         public string mImportName; //[mImportName_StringLength bytes]
         public float mImportScale; //[4 bytes]
-
-        //skipped 8 bytes (NOTE TO SELF: FIGURE OUT WHAT IS HERE)
-
         public ToolProps mToolProps; //[1 byte]
         public uint mNumMipLevels; //[4 bytes]
         public uint mWidth; //[4 bytes]
@@ -65,7 +64,7 @@ namespace D3DTX_TextureConverter
             //read the source file into a byte array
             byte[] sourceByteFile = File.ReadAllBytes(sourceFilePath);
             byte[] headerData = new byte[0];
-            int headerLength = 0;
+            int calculated_HeaderLength = 0;
 
             Data_OriginalBytes = sourceByteFile;
 
@@ -75,27 +74,33 @@ namespace D3DTX_TextureConverter
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
             Console.WriteLine("D3DTX Total File Size = {0}", sourceByteFile.Length);
 
-            //--------------------------Meta Stream Version-------------------------- [4 bytes]
-            MetaStreamVersion = ByteFunctions.ReadFixedString(sourceByteFile, 4, ref bytePointerPosition);
+            //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
+            //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
+            //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
+            Console.WriteLine("||||||||||| Meta Header |||||||||||");
+            //--------------------------Meta Stream Keyword-------------------------- [4 bytes]
+            mMetaStreamVersion = ByteFunctions.ReadFixedString(sourceByteFile, 4, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-            Console.WriteLine("D3DTX Meta Stream Version = {0}", MetaStreamVersion);
+            Console.WriteLine("D3DTX Meta Stream Keyword = {0}", mMetaStreamVersion);
 
-            //--------------------------Header Block Size-------------------------- [4 bytes] //header block size
-            mHeaderBlockSize = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
+            //--------------------------Default Section Chunk Size-------------------------- [4 bytes] //default section chunk size (THIS IS THE SIZE OF THE FULL D3DTX HEADER MINUS THIS META STREAM HEADER)
+            mDefaultSectionChunkSize = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-            Console.WriteLine("D3DTX Header Block Size = {0}", mHeaderBlockSize);
+            Console.WriteLine("D3DTX Default Section Chunk Size = {0}", mDefaultSectionChunkSize);
 
-            //--------------------------Unknown 2-------------------------- [4 bytes]
-            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
-            Console.WriteLine("D3DTX Unknown 1 = {0}", ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
-
-            //--------------------------mDataSize-------------------------- [4 bytes]
-            mDataSize = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
+            //-------------------------Debug Section Chunk Size-------------------------- [4 bytes] //debug section chunk size (always zero)
+            mDebugSectionChunkSize = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-            Console.WriteLine("D3DTX mDataSize = {0}", mDataSize);
+            Console.WriteLine("D3DTX Debug Section Chunk Size = {0}", mDebugSectionChunkSize);
+
+            //--------------------------Async Section Chunk Size-------------------------- [4 bytes] //async section chunk size (size of the bytes after the file header)
+            mAsyncSectionChunkSize = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+            Console.WriteLine("D3DTX Async Section Chunk Size = {0}", mAsyncSectionChunkSize);
 
             //if the 'parsed' texture byte size in the file is actually supposedly bigger than the file itself
-            if (mDataSize > sourceByteFile.Length && !readHeaderOnly)
+            if (mAsyncSectionChunkSize > sourceByteFile.Length && !readHeaderOnly)
             {
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
                 Console.WriteLine("Can't continue reading the file because the values we are reading are incorrect! This can be due to the byte data being shifted in the file or non-existant, and this is likley because the file version has changed.");
@@ -105,18 +110,15 @@ namespace D3DTX_TextureConverter
 
             //--------------------------CALCULATING HEADER LENGTH--------------------------
             if (readHeaderOnly)
-            {
-                headerLength = sourceByteFile.Length;
-            }
+                calculated_HeaderLength = sourceByteFile.Length;
             else
-            {
-                //calculating header length, parsed texture byte size - source byte size
-                headerLength = sourceByteFile.Length - (int)mDataSize;
-            }
+                calculated_HeaderLength = sourceByteFile.Length - (int)mAsyncSectionChunkSize;
 
             //write the result to the console for viewing
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
-            Console.WriteLine("D3DTX (Calculated) Header Size = {0}", headerLength);
+            Console.WriteLine("D3DTX (Calculated) FULL Header Size = {0}", calculated_HeaderLength);
+            Console.WriteLine("D3DTX Meta Header Size = {0}", calculated_HeaderLength - mDefaultSectionChunkSize);
+            Console.WriteLine("D3DTX D3DTX Header Size = {0}", mDefaultSectionChunkSize);
 
             //--------------------------mClassNamesLength-------------------------- [4 bytes]
             mClassNamesLength = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
@@ -141,15 +143,21 @@ namespace D3DTX_TextureConverter
                 Console.WriteLine("D3DTX mClassName {0} = {1}", i, mClassNames[i]);
             }
 
+            //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
+            //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
+            //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
+            Console.WriteLine("||||||||||| D3DTX Header |||||||||||");
+
             //--------------------------mVersion-------------------------- [4 bytes]
             mVersion = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mVersion = {0}", mVersion);
 
-            //--------------------------mSamplerState_BlockSize-------------------------- [4 bytes]
+            //--------------------------mSamplerState Block Size-------------------------- [4 bytes]
             mSamplerState_BlockSize = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-            Console.WriteLine("D3DTX mSamplerState Block Size = {0}", mSamplerState_BlockSize);
+            Console.WriteLine("D3DTX mSamplerState_BlockSize = {0}", mSamplerState_BlockSize);
 
             //--------------------------mSamplerState-------------------------- [4 bytes]
             mSamplerState = new T3SamplerStateBlock()
@@ -170,7 +178,22 @@ namespace D3DTX_TextureConverter
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mPlatform = {0} ({1})", Enum.GetName(typeof(PlatformType), (int)mPlatform), mPlatform);
 
-            //--------------------------mImportName Block Size-------------------------- [4 bytes] //importname block size (size + string len)
+            //--------------------------mName Block Size-------------------------- [4 bytes] //mName block size (size + string len)
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+            mName_BlockSize = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
+            Console.WriteLine("D3DTX mName Block Size = {0}", mName_BlockSize);
+
+            //--------------------------mName String Length-------------------------- [4 bytes]
+            mName_StringLength = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+            Console.WriteLine("D3DTX mName String Length = {0}", mName_StringLength);
+
+            //--------------------------mName-------------------------- [mName_StringLength bytes]
+            mName = ByteFunctions.ReadFixedString(sourceByteFile, mName_StringLength, ref bytePointerPosition);
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+            Console.WriteLine("D3DTX mName = {0}", mName);
+
+            //--------------------------mImportName Block Size-------------------------- [4 bytes] //mImportName block size (size + string len)
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             mImportName_BlockSize = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
             Console.WriteLine("D3DTX mImportName Block Size = {0}", mImportName_BlockSize);
@@ -180,72 +203,53 @@ namespace D3DTX_TextureConverter
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mImportName String Length = {0}", mImportName_StringLength);
 
-            //--------------------------mImportName-------------------------- [mImportName_length bytes]
+            //--------------------------mImportName String Length-------------------------- [mImportName_StringLength bytes] (this is always 0)
             mImportName = ByteFunctions.ReadFixedString(sourceByteFile, mImportName_StringLength, ref bytePointerPosition);
-            mName = mImportName;
-
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-            Console.WriteLine("D3DTX mImportName = '{0}'", mImportName);
+            Console.WriteLine("D3DTX mImportName = {0}", mImportName);
 
-            //skip 4 bytes
-            ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
-
-            //skip 4 bytes
-            ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
-
-            //--------------------------mImportScale-------------------------- [4 bytes]
+            //--------------------------mImportName String Length-------------------------- [4 bytes]
             mImportScale = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mImportScale = {0}", mImportScale);
 
             //--------------------------mToolProps-------------------------- (NEEDS WORK) [1 byte]
-            //skip 4 bytes
-            //ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
-
-            Console.WriteLine("at = '{0}'", bytePointerPosition);
-
             //get tool props
             ToolProps toolProps = new ToolProps()
             {
-                mbHasProps = ByteFunctions.ReadBool(sourceByteFile, ref bytePointerPosition)
+                mbHasProps = ByteFunctions.GetBool(ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition) - 48)
             };
 
             mToolProps = toolProps;
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-            Console.WriteLine("D3DTX mbHasProps = {0}", mToolProps.mbHasProps);
+            Console.WriteLine("D3DTX mToolProps = {0}", mToolProps);
 
             //--------------------------mNumMipLevels-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is an unsigned long
             mNumMipLevels = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mNumMipLevels = {0}", mNumMipLevels);
 
             //--------------------------mWidth-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is an unsigned long
             mWidth = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mWidth = {0}", mWidth);
 
             //--------------------------mHeight-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is an unsigned long
             mHeight = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mHeight = {0}", mHeight);
 
             //--------------------------mSurfaceFormat-------------------------- [4 bytes] 
-            //NOTE: According to meta function, this is a long
             mSurfaceFormat = T3TextureBase_Functions.GetSurfaceFormat(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mSurfaceFormat = {0} ({1})", Enum.GetName(typeof(T3SurfaceFormat), mSurfaceFormat), (int)mSurfaceFormat);
 
             //--------------------------mResourceUsage-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is a long
             mResourceUsage = T3TextureBase_Functions.GetResourceUsage(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mResourceUsage = {0} ({1})", Enum.GetName(typeof(T3ResourceUsage), mResourceUsage), (int)mResourceUsage);
 
             //--------------------------mType-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is a long
             mType = T3Texture_Functions.GetTextureType(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mType = {0} ({1})", Enum.GetName(typeof(T3TextureType), mType), (int)mType);
@@ -266,13 +270,11 @@ namespace D3DTX_TextureConverter
             Console.WriteLine("D3DTX mToonGradientCutoff = {0}", mToonGradientCutoff);
 
             //--------------------------mAlphaMode-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is a long
             mAlphaMode = T3Texture_Functions.GetAlphaMode(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mAlphaMode = {0} ({1})", Enum.GetName(typeof(eTxAlpha), mAlphaMode), (int)mAlphaMode);
 
             //--------------------------mColorMode-------------------------- [4 bytes]
-            //NOTE: According to meta function, this is a long
             mColorMode = T3Texture_Functions.GetColorMode(ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition));
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mColorMode = {0} ({1})", Enum.GetName(typeof(eTxColor), mColorMode), (int)mColorMode);
@@ -315,7 +317,7 @@ namespace D3DTX_TextureConverter
 
             //--------------------------mToonRegions DCArray--------------------------
             mToonRegions = new List<T3ToonGradientRegion>();
-            
+
             for (int i = 0; i < mToonRegions_ArrayLength; i++)
             {
                 T3ToonGradientRegion toonGradientRegion = new T3ToonGradientRegion()
@@ -324,7 +326,8 @@ namespace D3DTX_TextureConverter
                     {
                         r = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition), //[4 bytes]
                         g = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition), //[4 bytes]
-                        b = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition) //[4 bytes]
+                        b = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition), //[4 bytes]
+                        a = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition) //[4 bytes]
                     },
 
                     mSize = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition) //[4 bytes]
@@ -355,7 +358,7 @@ namespace D3DTX_TextureConverter
             mRegionHeaders = new List<RegionStreamHeader>();
             for (int i = 0; i < StreamHeader.mRegionCount; i++)
             {
-                if (bytePointerPosition > headerLength)
+                if (bytePointerPosition > calculated_HeaderLength)
                 {
                     ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
                     Console.WriteLine("Pointer position is beyond the header length!");
@@ -363,7 +366,7 @@ namespace D3DTX_TextureConverter
                     break;
                 }
 
-                RegionStreamHeader mRegionHeader = new RegionStreamHeader() //no mFaceIndex or mSlicePitch
+                RegionStreamHeader mRegionHeader = new RegionStreamHeader() //no mFaceIndex or mSlicePitch compared to 6VSM
                 {
                     mMipIndex = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition), //[4 bytes] 
                     mMipCount = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition), //[4 bytes]
@@ -382,23 +385,23 @@ namespace D3DTX_TextureConverter
                 mRegionHeaders.Add(mRegionHeader);
             }
 
-            //do a quick check to see if we reached the end of the D3DTX header
-            ByteFunctions.ReachedOffset(bytePointerPosition, (uint)headerLength);
+            //do a quick check to see if we reached the end of the file header
+            ByteFunctions.ReachedOffset(bytePointerPosition, (uint)calculated_HeaderLength);
 
             //--------------------------STORING D3DTX HEADER DATA--------------------------
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Blue);
             Console.WriteLine("Storing the .d3dtx header data...");
 
-            if (headerLength < 0)
+            if (calculated_HeaderLength < 0)
             {
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
-                Console.WriteLine("ERROR, we were off with calculating header length! {0}", headerLength);
+                Console.WriteLine("ERROR, we were off with calculating header length! {0}", calculated_HeaderLength);
 
                 return;
             }
 
             //allocate a byte array to contain the header data
-            headerData = new byte[headerLength];
+            headerData = new byte[calculated_HeaderLength];
 
             //copy all the bytes from the source byte file after the header length, and copy that data to the texture data byte array
             Array.Copy(sourceByteFile, 0, headerData, 0, headerData.Length);

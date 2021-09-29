@@ -42,6 +42,16 @@ namespace D3DTX_TextureConverter.DirectX
         public uint dwCaps3; //unused according to DDS docs [4 bytes]
         public uint dwCaps4; //unused according to DDS docs [4 bytes]
         public uint dwReserved12; //unused according to DDS docs [4 bytes]
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
+        public string ToString2()
+        {
+            return string.Format("[DDS_HEADER] x: {0} y: {1}");
+        }
     }
 
     /// <summary>

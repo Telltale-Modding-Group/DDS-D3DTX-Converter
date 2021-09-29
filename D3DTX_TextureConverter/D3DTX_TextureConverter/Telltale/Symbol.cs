@@ -8,6 +8,11 @@ namespace D3DTX_TextureConverter.Telltale
 {
     public struct Symbol
     {
-        public long mCrc64;
+        public ulong mCrc64;
+
+        public override string ToString()
+        {
+            return string.Format("[Symbol] mCrc64: {0}", mCrc64);
+        }
     }
 }

@@ -9,6 +9,53 @@ namespace D3DTX_TextureConverter.Utilities
 {
     public static class ByteFunctions
     {
+        public static bool GetBool(uint value)
+        {
+            return value == 0 ? false : true;
+        }
+
+        public static byte[] GetBytes(string stringValue)
+        {
+            //create byte array of the length of the string
+            byte[] stringBytes = new byte[stringValue.Length];
+
+            //for the length of the string, get each byte value
+            for (int i = 0; i < stringBytes.Length; i++)
+            {
+                stringBytes[i] = Convert.ToByte(stringValue[i]);
+            }
+
+            //return it
+            return stringBytes;
+        }
+
+        public static uint Convert_String_To_UInt32(string sValue)
+        {
+            //convert the bytes into a value
+            uint parsedValue = BitConverter.ToUInt32(GetBytes(sValue), 0);
+
+            //return it
+            return parsedValue;
+        }
+
+        public static int Convert_String_To_Int32(string sValue)
+        {
+            //create byte array of the length of the string
+            byte[] stringBytes = new byte[sValue.Length];
+
+            //for the length of the string, get each byte value
+            for (int i = 0; i < stringBytes.Length; i++)
+            {
+                stringBytes[i] = Convert.ToByte(sValue[i]);
+            }
+
+            //convert the bytes into a value
+            int parsedValue = BitConverter.ToInt32(stringBytes, 0);
+
+            //return it
+            return parsedValue;
+        }
+
         /// <summary>
         /// Gets a single byte and parsed the value into an unsigned integer. Increments the byte pointer position by 1.
         /// </summary>
@@ -151,6 +198,27 @@ namespace D3DTX_TextureConverter.Utilities
 
             //increment the pointer position
             bytePointerLocation += 4;
+
+            //return the parsed value
+            return parsedValue;
+        }
+
+        /// <summary>
+        /// Gets 8 bytes and parses the value into an unsigned long. Increments the byte pointer position by 8.
+        /// </summary>
+        /// <param name="fileBytes"></param>
+        /// <param name="bytePointerLocation"></param>
+        /// <returns></returns>
+        public static ulong ReadUnsignedLong(byte[] bytes, ref uint bytePointerLocation)
+        {
+            //allocate the bytes from the main byte array
+            byte[] raw_bytes = AllocateBytes(8, bytes, bytePointerLocation);
+
+            //convert the bytes into a value
+            ulong parsedValue = BitConverter.ToUInt64(raw_bytes, 0);
+
+            //increment the pointer position
+            bytePointerLocation += 8;
 
             //return the parsed value
             return parsedValue;

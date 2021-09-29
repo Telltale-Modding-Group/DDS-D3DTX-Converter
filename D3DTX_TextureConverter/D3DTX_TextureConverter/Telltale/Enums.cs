@@ -33,6 +33,31 @@ namespace D3DTX_TextureConverter.Telltale
         eTextureWrap_Count
     }
 
+    public enum T3SamplerStateValue
+    {
+        eSamplerState_WrapU_Value,
+        eSamplerState_WrapV_Value,
+        eSamplerState_Filtered_Value,
+        eSamplerState_BorderColor_Value,
+        eSamplerState_GammaCorrect_Value,
+        eSamplerState_MipBias_Value,
+        eSamplerState_Count
+    }
+
+    public enum T3EffectSamplerFilterType
+    {
+        eEffectSamplerFilter_Unknown = -1,
+        eEffectSamplerFilter_Linear = 0,
+        eEffectSamplerFilter_Anisotropic = 1
+    }
+
+    public enum WiiTextureFormat
+    {
+        eTxWiiFormatDefault,
+        eTxWiiFormatAlphaOnly,
+        eTxWiiFormatRGBA24
+    }
+
     public enum T3TextureMipBias
     {
         eTextureMipBias_None,

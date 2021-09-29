@@ -12,5 +12,10 @@ namespace D3DTX_TextureConverter.Telltale
         public char mSwizzle2;
         public char mSwizzle3;
         public char mSwizzle4;
+
+        public override string ToString()
+        {
+            return string.Format("[RenderSwizzleParams]: {0} {1} {2} {3}", (int)mSwizzle1, (int)mSwizzle2, (int)mSwizzle3, (int)mSwizzle4);
+        }
     }
 }

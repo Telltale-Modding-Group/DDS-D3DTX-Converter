@@ -4,11 +4,48 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using D3DTX_TextureConverter.Utilities;
 
 namespace D3DTX_TextureConverter.DirectX
 {
     public static class DDS_Functions
     {
+        public static uint[,] DDS_CalculateMipResolutions(uint mipCount, uint width, uint height)
+        {
+            //because I suck at math, we will generate our mip map resolutions using the same method we did in d3dtx to dds (can't figure out how to calculate them in reverse properly)
+            uint[,] mipResolutions = new uint[mipCount + 1, 2];
+
+            //get our mip image dimensions (have to multiply by 2 as the mip calculations will be off by half)
+            uint mipImageWidth = width * 2;
+            uint mipImageHeight = height * 2;
+
+            //add the resolutions in reverse
+            for (uint i = mipCount; i > 0; i--)
+            {
+                //divide the resolutions by 2
+                mipImageWidth /= 2;
+                mipImageHeight /= 2;
+
+                //assign the resolutions
+                mipResolutions[i, 0] = mipImageWidth;
+                mipResolutions[i, 1] = mipImageHeight;
+            }
+
+            return mipResolutions;
+        }
+
+        public static uint[] DDS_GetImageByteSizes(uint[,] mipResolutions, bool isDXT1)
+        {
+            uint[] byteSizes = new uint[mipResolutions.Length];
+
+            for(int i = 0; i < byteSizes.Length; i++)
+            {
+                byteSizes[i] = (uint)CalculateDDS_ByteSize((int)mipResolutions[i, 0], (int)mipResolutions[i, 1], isDXT1);
+            }
+
+            return new uint[0];
+        }
+
         /// <summary>
         /// The block-size is 8 bytes for DXT1, BC1, and BC4 formats, and 16 bytes for other block-compressed formats.
         /// </summary>
@@ -101,7 +138,7 @@ namespace D3DTX_TextureConverter.DirectX
                 ddspf = new DDS_PIXELFORMAT()
                 {
                     dwSize = 32,
-                    dwFourCC = uint.Parse("DXT1"),
+                    dwFourCC = ByteFunctions.Convert_String_To_UInt32("DXT1"),
                 },
             };
         }
@@ -121,7 +158,7 @@ namespace D3DTX_TextureConverter.DirectX
                 {
                     dwSize = 32,
                     dwFlags = 4,
-                    dwFourCC = uint.Parse("DXT1"),
+                    dwFourCC = ByteFunctions.Convert_String_To_UInt32("DXT1"),
                     dwRGBBitCount = 0,
                 },
                 dwCaps = 4096,

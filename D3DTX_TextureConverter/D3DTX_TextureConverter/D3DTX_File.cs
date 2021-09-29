@@ -21,6 +21,9 @@ namespace D3DTX_TextureConverter
         //5VSM version of a .d3dtx
         public D3DTX_5VSM D3DTX_5VSM;
 
+        //ERTM version of a .d3dtx
+        public D3DTX_ERTM D3DTX_ERTM;
+
         public void Write_D3DTX_Header(string destinationFile)
         {
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
@@ -38,6 +41,10 @@ namespace D3DTX_TextureConverter
             {
                 File.WriteAllBytes(headerFilePath, D3DTX_5VSM.Data_OriginalHeader);
             }
+            else if (D3DTX_ERTM != null)
+            {
+                File.WriteAllBytes(headerFilePath, D3DTX_ERTM.Data_OriginalHeader);
+            }
 
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
             Console.WriteLine(".d3dtx data stored in {0}", headerFilePath);
@@ -45,23 +52,7 @@ namespace D3DTX_TextureConverter
 
         public void Apply_DDS_Data_To_D3DTX_Data(DDS_File ddsFile, bool applyToHeader)
         {
-            //Utilities.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow); 
-            //Console.WriteLine("Experimental Resolution Changed enabled, changing values on the original D3DTX header...");
 
-            //byte[] mainData = applyToHeader ? headerData : sourceByteFile;
-
-            //--------------------------3 = mDataSize--------------------------
-            //modify the bytes in the header
-            //mainData = ByteFunctions.ModifyBytes(mainData, ddsFile.ddsTextureData.Length, byteLocation_mDataSize);
-            //--------------------------9 = mWidth--------------------------
-            //modify the bytes in the header
-            //mainData = ByteFunctions.ModifyBytes(mainData, mWidth, byteLocation_mWidth);
-            //--------------------------10 = mHeight--------------------------
-            //modify the bytes in the header
-            //mainData = ByteFunctions.ModifyBytes(mainData, mHeight, byteLocation_mHeight);
-            //--------------------------12 = mTotalDataSize--------------------------
-            //modify the bytes in the header
-            //mainData = ByteFunctions.ModifyBytes(mainData, ddsFile.ddsTextureData.Length, byteLocation_mTotalDataSize);
         }
 
         public static string Read_D3DTX_File_MetaVersionOnly(string sourceFile)

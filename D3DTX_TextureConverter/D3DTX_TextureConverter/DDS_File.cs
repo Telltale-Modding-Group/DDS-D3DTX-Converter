@@ -5,6 +5,7 @@ using System.Text;
 using DirectXTexNet;
 using D3DTX_TextureConverter.Utilities;
 using D3DTX_TextureConverter.DirectX;
+using D3DTX_TextureConverter.Telltale;
 
 /*
  * DXT1 - DXGI_FORMAT_BC1_UNORM / D3DFMT_DXT1
@@ -50,45 +51,230 @@ namespace D3DTX_TextureConverter
         public string sourceFileName; //file name + extension
         public string sourceFile; //file path
         public byte[] sourceFileData; //file data
-        public uint[,] mipImageResolutions; //calculated mip resolutions [Pixel Value, Width or Height (0 or 1)]
-        public byte[] ddsTextureData;
+        public List<byte[]> textureData;
 
         public DDS_HEADER header;
+
+        private void GetData(byte[] fileData, bool headerOnly)
+        {
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+            Console.WriteLine("Total Source Texture Byte Size = {0}", fileData.Length);
+
+            //which byte offset we are on for the source texture (will be changed as we go through the file)
+            uint bytePointerPosition = 4; //skip past the 'DDS '
+            byte[] headerBytes = ByteFunctions.AllocateBytes(124, fileData, bytePointerPosition);
+
+            //this will automatically read all of the byte data in the header
+            header = DDS_Functions.GetHeaderFromBytes(headerBytes);
+
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+            Console.WriteLine("DDS Height = {0}", header.dwHeight);
+            Console.WriteLine("DDS Width = {0}", header.dwWidth);
+            Console.WriteLine("DDS Mip Map Count = {0}", header.dwMipMapCount);
+            Console.WriteLine("DDS Compression = {0}", header.ddspf.dwFourCC);
+
+            if (headerOnly)
+                return;
+
+            //--------------------------EXTRACT DDS TEXTURE DATA--------------------------
+            //calculate dds header length (we add 4 because we skipped the 4 bytes which contain the ddsPrefix, it isn't necessary to parse this data)
+            uint ddsHeaderLength = 4 + header.dwSize;
+
+            //calculate the length of just the dds texture data
+            uint ddsTextureDataLength = (uint)sourceFileData.Length - ddsHeaderLength;
+
+            //allocate a byte array of dds texture length
+            byte[] ddsTextureData = new byte[ddsTextureDataLength];
+
+            //copy the data from the source byte array past the header (so we are only getting texture data)
+            Array.Copy(sourceFileData, ddsHeaderLength, ddsTextureData, 0, ddsTextureData.Length);
+
+            //if there are no mip maps
+            if(header.dwMipMapCount <= 0)
+            {
+                textureData = new List<byte[]>();
+                textureData.Add(ddsTextureData);
+            }
+            else //if there are mip maps
+            {
+                //get mip resolutions
+                //calculated mip resolutions [Pixel Value, Width or Height (0 or 1)]
+                uint[,] mipImageResolutions = DDS_Functions.DDS_CalculateMipResolutions(header.dwMipMapCount, header.dwWidth, header.dwHeight);
+
+                //get byte sizes
+                uint[] byteSizes = DDS_Functions.DDS_GetImageByteSizes(mipImageResolutions, DDS_Functions.DDS_CompressionBool(header));
+
+                textureData = new List<byte[]>();
+                int offset = 0;
+
+                for (int i = 0; i < byteSizes.Length; i++)
+                {
+                    byte[] temp = new byte[byteSizes[i]];
+
+                    Array.Copy(ddsTextureData, offset, temp, 0, temp.Length);
+
+                    offset += temp.Length;
+
+                    textureData.Add(temp);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reads a DDS file from disk. (Can also read just the header only)
+        /// </summary>
+        /// <param name="ddsFilePath"></param>
+        /// <param name="headerOnly"></param>
+        public DDS_File(string ddsFilePath, bool headerOnly)
+        {
+            //read the source texture file into a byte array
+            sourceFileData = File.ReadAllBytes(ddsFilePath);
+            sourceFileName = Path.GetFileName(ddsFilePath);
+            sourceFile = ddsFilePath;
+
+            //read the DDS file
+            GetData(sourceFileData, headerOnly);
+        }
+
+        /// <summary>
+        /// Reads a DDS file from a byte array. (Can also just read the header only)
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="headerOnly"></param>
+        public DDS_File(byte[] data, bool headerOnly)
+        {
+            //get the byte data
+            sourceFileData = data;
+
+            //read the DDS file
+            GetData(sourceFileData, headerOnly);
+        }
+
+        public DDS_File Match_DDS_With_D3DTX(string ddsPath, D3DTX_File d3dtx)
+        {
+            ScratchImage scratchImage = TexHelper.Instance.LoadFromDDSFile(ddsPath, DDS_FLAGS.NONE);
+            TexMetadata texMetadata = TexHelper.Instance.GetMetadataFromDDSFile(ddsPath, DDS_FLAGS.NONE);
+
+            //6VSM
+            if(d3dtx.D3DTX_6VSM != null)
+            {
+                //change the compression if needed
+                //if (d3dtx.D3DTX_6VSM.mSurfaceFormat != texMetadata.Format)
+                //{
+                //  scratchImage.Convert((int)d3dtx.D3DTX_6VSM.mWidth, (int)d3dtx.D3DTX_6VSM.mHeight, TEX_FILTER_FLAGS.CUBIC);
+                //}
+
+                //rescale the image to match if needed
+                if (d3dtx.D3DTX_6VSM.mHeight != texMetadata.Height || d3dtx.D3DTX_6VSM.mWidth != texMetadata.Width)
+                {
+                    scratchImage.Resize((int)d3dtx.D3DTX_6VSM.mWidth, (int)d3dtx.D3DTX_6VSM.mHeight, TEX_FILTER_FLAGS.CUBIC);
+                }
+
+                //if there are mip maps
+                if (d3dtx.D3DTX_6VSM.mNumMipLevels > 1)
+                {
+                    //generate mip maps
+                    scratchImage.GenerateMipMaps(0, TEX_FILTER_FLAGS.CUBIC, 0, false);
+                }
+
+                //resave the newly modified DDS
+                scratchImage.SaveToDDSFile(DDS_FLAGS.NONE, ddsPath);
+            }
+
+
+            return null;
+        }
+
+        public uint Get_FourCC_FromTellale(T3SurfaceFormat format)
+        {
+            switch (format)
+            {
+                default:
+                    return ByteFunctions.Convert_String_To_UInt32("DXT1");
+                case Telltale.T3SurfaceFormat.eSurface_DXT1:
+                    return ByteFunctions.Convert_String_To_UInt32("DXT1");
+                case Telltale.T3SurfaceFormat.eSurface_DXT3:
+                    return ByteFunctions.Convert_String_To_UInt32("DXT3");
+                case Telltale.T3SurfaceFormat.eSurface_DXT5:
+                    return ByteFunctions.Convert_String_To_UInt32("DXT5");
+                case Telltale.T3SurfaceFormat.eSurface_DXN:
+                    return ByteFunctions.Convert_String_To_UInt32("ATI2");
+                case Telltale.T3SurfaceFormat.eSurface_DXT5A:
+                    return ByteFunctions.Convert_String_To_UInt32("ATI1");
+                case Telltale.T3SurfaceFormat.eSurface_A8:
+                    return 0;
+            }
+        }
 
         public DDS_File(D3DTX_File d3dtx)
         {
             header = DDS_Functions.GetPresetHeader();
 
-            //6VSM
-            if (d3dtx.D3DTX_6VSM != null)
+            if (d3dtx.D3DTX_6VSM != null) //6VSM
             {
                 header.dwWidth = (uint)d3dtx.D3DTX_6VSM.mWidth;
                 header.dwHeight = (uint)d3dtx.D3DTX_6VSM.mHeight;
                 header.dwMipMapCount = (uint)d3dtx.D3DTX_6VSM.mNumMipLevels;
                 header.dwDepth = (uint)d3dtx.D3DTX_6VSM.mDepth;
+                header.ddspf.dwFourCC = Get_FourCC_FromTellale(d3dtx.D3DTX_6VSM.mSurfaceFormat);
+            }
+            else if (d3dtx.D3DTX_5VSM != null) //5VSM
+            {
+                header.dwWidth = (uint)d3dtx.D3DTX_5VSM.mWidth;
+                header.dwHeight = (uint)d3dtx.D3DTX_5VSM.mHeight;
+                header.dwMipMapCount = (uint)d3dtx.D3DTX_5VSM.mNumMipLevels;
+                header.ddspf.dwFourCC = Get_FourCC_FromTellale(d3dtx.D3DTX_5VSM.mSurfaceFormat);
 
-                switch (d3dtx.D3DTX_6VSM.mSurfaceFormat)
+                switch (d3dtx.D3DTX_5VSM.mSurfaceFormat)
                 {
-                    default:
-                        header.ddspf.dwFourCC = uint.Parse("DXT1");
-                        break;
-                    case Telltale.T3SurfaceFormat.eSurface_DXT1:
-                        header.ddspf.dwFourCC = uint.Parse("DXT1");
-                        break;
-                    case Telltale.T3SurfaceFormat.eSurface_DXT3:
-                        header.ddspf.dwFourCC = uint.Parse("DXT3");
-                        break;
-                    case Telltale.T3SurfaceFormat.eSurface_DXT5:
-                        header.ddspf.dwFourCC = uint.Parse("DXT5");
-                        break;
-                    case Telltale.T3SurfaceFormat.eSurface_BC5:
-                        header.ddspf.dwFourCC = uint.Parse("BC5U");
-                        break;
-                    case Telltale.T3SurfaceFormat.eSurface_BC4:
-                        header.ddspf.dwFourCC = uint.Parse("BC4U");
+                    case Telltale.T3SurfaceFormat.eSurface_A8:
+                        header.ddspf.dwABitMask = 255;
+                        header.dwCaps = 4198408; //DDSCAPS_COMPLEX | DDSCAPS_TEXTURE | DDSCAPS_MIPMAP
                         break;
                 }
             }
+        }
+
+        public void Write_D3DTX_AsDDS(D3DTX_File d3dtx, string destinationPath)
+        {
+            byte[] finalData = new byte[0];
+
+            //turn our header data into bytes to be written into a file
+            byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS_Functions.GetHeaderBytes(header));
+
+            //copy the dds header to the file
+            finalData = ByteFunctions.Combine(finalData, dds_header);
+
+            //6VSM
+            if (d3dtx.D3DTX_6VSM != null)
+            {
+                //copy the images
+                for(int i = d3dtx.D3DTX_6VSM.T3Texture_Data.Count - 1; i >= 0; i--)
+                {
+                    finalData = ByteFunctions.Combine(finalData, d3dtx.D3DTX_6VSM.T3Texture_Data[i]);
+                }
+            }
+            //5VSM
+            else if (d3dtx.D3DTX_5VSM != null)
+            {
+                //copy the images
+                for (int i = d3dtx.D3DTX_5VSM.T3Texture_Data.Count - 1; i >= 0; i--)
+                {
+                    finalData = ByteFunctions.Combine(finalData, d3dtx.D3DTX_5VSM.T3Texture_Data[i]);
+                }
+            }
+            //ERTM
+            else if (d3dtx.D3DTX_ERTM != null)
+            {
+                //copy the images
+                //for (int i = d3dtx.D3DTX_ERTM.T3Texture_Data.Count - 1; i >= 0; i--)
+                //{
+                //    finalData = ByteFunctions.Combine(finalData, d3dtx.D3DTX_ERTM.T3Texture_Data[i]);
+                //}
+            }
+
+            //write the file
+            File.WriteAllBytes(destinationPath, finalData);
         }
 
         /// <summary>
@@ -102,72 +288,6 @@ namespace D3DTX_TextureConverter
 
             //return the result
             return ddsHeader;
-        }
-
-        public void Read_DDS_File(string sourceFile, string sourceFileName, bool readHeaderOnly)
-        {
-            /*
-             * NOTE TO SELF
-             * DDS --> D3DTX EXTRACTION, THE BYTES ARE NOT FULLY 1:1 WHEN THERE IS A CONVERSION (off by 8 bytes)
-             * MABYE TRY TO CHANGE THE TEXTURE DATA BYTE SIZE IN THE D3DTX HEADER AND SEE IF THAT CHANGES ANYTHING?
-            */
-
-            //read the source texture file into a byte array
-            sourceFileData = File.ReadAllBytes(sourceFile);
-            this.sourceFileName = sourceFileName;
-            this.sourceFile = sourceFile;
-
-            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
-            Console.WriteLine("Total Source Texture Byte Size = {0}", sourceFileData.Length);
-
-            //which byte offset we are on for the source texture (will be changed as we go through the file)
-            uint bytePointerPosition = 4; //skip past the 'DDS '
-            byte[] headerBytes = ByteFunctions.AllocateBytes(124, sourceFileData, bytePointerPosition);
-
-            //this will automatically read all of the byte data in the header
-            header = DDS_Functions.GetHeaderFromBytes(headerBytes);
-
-            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-            Console.WriteLine("DDS Height = {0}", header.dwHeight);
-            Console.WriteLine("DDS Width = {0}", header.dwWidth);
-            Console.WriteLine("DDS Compression = {0}", header.ddspf.dwFourCC);
-
-            //if we are not reading
-            if(!readHeaderOnly)
-            {
-                //--------------------------EXTRACT DDS TEXTURE DATA--------------------------
-                //calculate dds header length (we add 4 because we skipped the 4 bytes which contain the ddsPrefix, it isn't necessary to parse this data)
-                uint ddsHeaderLength = 4 + header.dwSize;
-
-                //calculate the length of just the dds texture data
-                uint ddsTextureDataLength = (uint)sourceFileData.Length - ddsHeaderLength;
-
-                //allocate a byte array of dds texture length
-                ddsTextureData = new byte[ddsTextureDataLength];
-
-                //copy the data from the source byte array past the header (so we are only getting texture data)
-                Array.Copy(sourceFileData, ddsHeaderLength, ddsTextureData, 0, ddsTextureData.Length);
-
-                //--------------------------CALCULATE MIP MAP RESOLUTIONS--------------------------
-                //because I suck at math, we will generate our mip map resolutions using the same method we did in d3dtx to dds (can't figure out how to calculate them in reverse properly)
-                mipImageResolutions = new uint[header.dwMipMapCount + 1, 2];
-
-                //get our mip image dimensions (have to multiply by 2 as the mip calculations will be off by half)
-                uint mipImageWidth = header.dwWidth * 2;
-                uint mipImageHeight = header.dwHeight * 2;
-
-                //add the resolutions in reverse
-                for (uint i = header.dwMipMapCount; i > 0; i--)
-                {
-                    //divide the resolutions by 2
-                    mipImageWidth /= 2;
-                    mipImageHeight /= 2;
-
-                    //assign the resolutions
-                    mipImageResolutions[i, 0] = mipImageWidth;
-                    mipImageResolutions[i, 1] = mipImageHeight;
-                }
-            }
         }
     }
 }

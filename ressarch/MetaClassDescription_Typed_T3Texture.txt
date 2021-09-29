@@ -1,0 +1,37 @@
+MetaClassDescription *__cdecl MetaClassDescription_Typed<T3Texture>::GetMetaClassDescription()
+{
+  int v0; // eax@1
+  signed int i; // ebx@2
+
+  v0 = `MetaClassDescription_Typed<T3Texture>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags;
+  
+  if ( !_bittest(&v0, 0x1Du) )
+  {
+	  
+    for ( i = 0; _InterlockedExchange( &`MetaClassDescription_Typed<T3Texture>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock, 1) == 1; ++i )
+    {
+		
+      if ( i > 1000 )
+        Thread_Sleep(1);
+	
+    }
+	
+    if ( !(`MetaClassDescription_Typed<T3Texture>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mFlags & 0x20000000) )
+    {
+      MetaClassDescription::Initialize(&`MetaClassDescription_Typed<T3Texture>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory, &T3Texture `RTTI Type Descriptor');
+	  
+      `MetaClassDescription_Typed<T3Texture>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mClassSize = 744;
+	  
+      T3Texture::InternalGetMetaClassDescription(&`MetaClassDescription_Typed<T3Texture>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory);
+	  
+      MetaClassDescription::Insert(&`MetaClassDescription_Typed<T3Texture>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory);
+	  
+    }
+	
+    `MetaClassDescription_Typed<T3Texture>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory.mLock.mValue = 0;
+	
+  }
+  
+  return &`MetaClassDescription_Typed<T3Texture>::GetMetaClassDescription'::`2'::metaClassDescriptionMemory;
+  
+}

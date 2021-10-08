@@ -7,10 +7,9 @@ using System.Windows;
 using TeximpNet;
 using TeximpNet.DDS;
 using TeximpNet.Compression;
-using D3DTX_TextureConverter.Utilities;
 using System.IO;
 
-namespace D3DTX_TextureConverter
+namespace D3DTX_TextureConverter.Utilities
 {
     /// <summary>
     /// This is a plug-in-play class that converts a DDS into common image formats, and also can convert a common image format into a DDS

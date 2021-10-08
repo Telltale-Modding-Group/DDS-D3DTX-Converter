@@ -8,11 +8,11 @@ namespace D3DTX_TextureConverter.Telltale
 {
     public class RegionStreamHeader
     {
-        public int mFaceIndex;
-        public int mMipIndex;
-        public int mMipCount;
-        public uint mDataSize;
-        public int mPitch;
-        public int mSlicePitch;
+        public int mFaceIndex { get; set; }
+        public int mMipIndex { get; set; }
+        public int mMipCount { get; set; }
+        public uint mDataSize { get; set; }
+        public int mPitch { get; set; }
+        public int mSlicePitch { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 using System.ComponentModel;
+using D3DTX_TextureConverter.Utilities;
 
 namespace TextureMod_GUI
 {
@@ -15,7 +16,7 @@ namespace TextureMod_GUI
         //note to self - move the converter script and functionality to a background worker to do 'work' on a different thread so we don't freeze the UI thread
 
         //app version
-        public readonly string appVersion = "v1.0.0";
+        public readonly string appVersion = "v2.0.0";
 
         //web link for getting help with the application
         public readonly string appHelp_link = "https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki";
@@ -23,22 +24,17 @@ namespace TextureMod_GUI
         //our private objects
         private Converter converter;
         private WorkingDirectory workingDirectory;
-        private IOManagement ioManagement;
         private MainWindow mainWindow;
+        private ConsoleWriter consoleWriter;
 
-        //used for console output
-        private List<string> consoleOutput;
-
-        public MainManager(MainWindow mainWindow)
+        public MainManager(MainWindow mainWindow, ConsoleWriter consoleWriter)
         {
             //get our main window ui
             this.mainWindow = mainWindow;
 
             //create the rest of our objects
-            converter = new Converter(this);
             workingDirectory = new WorkingDirectory();
-            ioManagement = new IOManagement();
-            consoleOutput = new List<string>();
+            converter = new Converter(workingDirectory, consoleWriter);
         }
 
         /// <summary>
@@ -47,12 +43,12 @@ namespace TextureMod_GUI
         public void ConvertToDDS()
         {
             //call the main function
-            converter.App_Convert_D3DTX_Mode(workingDirectory.workingDirectoryPath, workingDirectory.workingDirectoryPath);
+            converter.App_Convert_D3DTX_Mode();
 
             //after we finish converting, delete the original .d3dtx files
-            foreach (string path in ioManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".d3dtx"))
+            foreach (string path in IOManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".d3dtx"))
             {
-                ioManagement.DeleteFile(path);
+                IOManagement.DeleteFile(path);
             }
 
             //refresh the directory
@@ -68,22 +64,22 @@ namespace TextureMod_GUI
         public void ConvertToD3DTX()
         {
             //create a temp variable for our user selected path
-            string path = "";
+            //string path = "";
 
             //open a folder browser dialog
-            ioManagement.GetFolderPath(ref path, "Select a folder where the converted d3dtx will be stored.");
+            //IOManagement.GetFolderPath(ref path, "Select a folder where the converted d3dtx will be stored.");
 
             //if the user didn't select anything, the path will be null and therefore they have cancled the action, so don't continue
-            if (string.IsNullOrEmpty(path))
-                return;
+            //if (string.IsNullOrEmpty(path))
+            //    return;
 
             //if they selected a folder, call the main function for converting the textures
-            converter.App_Convert_DDS_Mode(workingDirectory.workingDirectoryPath, path + "/");
+            converter.App_Convert_DDS_Mode();
 
             //after conversion
             //create a windows explorer processinfo and we will open the final path where the fianl converted textures are.
             ProcessStartInfo processStartInfo = new ProcessStartInfo();
-            processStartInfo.FileName = path;
+            processStartInfo.FileName = workingDirectory.workingDirectoryPath;
             processStartInfo.UseShellExecute = true;
             processStartInfo.Verb = "open";
 
@@ -97,29 +93,11 @@ namespace TextureMod_GUI
             mainWindow.UpdateUI();
         }
 
-        /// <summary>
-        /// Creates an console output
-        /// </summary>
-        /// <param name="line"></param>
-        public void Console_Output(string line)
-        {
-            consoleOutput.Add(line);
-
-            string mainOutput = "";
-
-            foreach(string outputLine in consoleOutput)
-            {
-                mainOutput += outputLine;
-            }
-
-            mainWindow.UpdateConsoleOutput(mainOutput);
-        }
-
         public void Set_WorkingDirectory_Path()
         {
             string path = "";
 
-            ioManagement.GetFolderPath(ref path, "Locate your folder containg your extracted .d3dtx textures.");
+            IOManagement.GetFolderPath(ref path, "Locate your folder containg your extracted .d3dtx textures.");
 
             if (string.IsNullOrEmpty(path))
                 return;
@@ -170,12 +148,12 @@ namespace TextureMod_GUI
 
         public bool CanConvertTo_DDS()
         {
-            return ioManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".d3dtx").Count > 0;
+            return IOManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".d3dtx").Count > 0;
         }
 
         public bool CanConvertTo_D3DTX()
         {
-            return ioManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".dds").Count > 0 && ioManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".header").Count > 0;
+            return IOManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".dds").Count > 0 && IOManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".header").Count > 0;
         }
 
         public string Get_WorkingDirectory_Path()

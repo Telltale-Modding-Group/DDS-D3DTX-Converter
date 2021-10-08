@@ -5,7 +5,7 @@ using System.Text;
 using D3DTX_TextureConverter.Utilities;
 using D3DTX_TextureConverter.Telltale;
 
-namespace D3DTX_TextureConverter
+namespace D3DTX_TextureConverter.Main
 {
     public class D3DTX_File
     {

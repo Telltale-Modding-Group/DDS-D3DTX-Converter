@@ -7,22 +7,64 @@ using System.IO;
 using System.Windows.Forms;
 using Ookii.Dialogs.Wpf;
 
-namespace TextureMod_GUI
+namespace D3DTX_TextureConverter.Utilities
 {
     /// <summary>
     /// This class contains common System.IO functions but 'enhanced' with safety checks, warnings, and error messages.
     /// <para>It also contains other additional custom System.IO functions</para>
     /// <para>We recomend you use this class's functions in-place of the traditional System.IO functions</para>
     /// </summary>
-    public class IOManagement
+    public static class IOManagement
     {
+        /// <summary>
+        /// Filters an array of files by ".d3dtx" so only files with said extension will be in the array.
+        /// </summary>
+        /// <param name="files"></param>
+        /// <returns></returns>
+        public static List<string> FilterFiles(List<string> files, string filterExtension)
+        {
+            //the new filtered list
+            List<string> filteredFiles = new List<string>();
+
+            //run a loop through the existing 'files'
+            foreach (string file in files)
+            {
+                //get the extension of a file
+                string extension = Path.GetExtension(file);
+
+                //if the file's extension matches our filter, add it to the list (naturally anything that doesn't have said filter will be ignored)
+                if (extension.Equals(filterExtension))
+                {
+                    //add the matched extension to the list
+                    filteredFiles.Add(file);
+                }
+            }
+
+            //return the new filtered list
+            return filteredFiles;
+        }
+
+        /// <summary>
+        /// Duplicate/Copy a file and replace it with the original file
+        /// </summary>
+        /// <param name="originalFilePath"></param>
+        /// <param name="newFilePath"></param>
+        public static void ReplaceFile(string originalFilePath, string newFilePath)
+        {
+            string duplicatedArchive = "";
+
+            DuplicateFile(newFilePath, out duplicatedArchive);
+            DeleteFile(originalFilePath);
+            MoveFile(duplicatedArchive, originalFilePath);
+        }
+
         /// <summary>
         /// Duplicate/Copy a file, this will output the copied file path
         /// </summary>
         /// <param name="originalFilePath"></param>
         /// <param name="copiedFilePath"></param>
         /// <param name="copiedSuffix"></param>
-        public void DuplicateFile(string originalFilePath, out string copiedFilePath, string copiedSuffix = "_duplicated")
+        public static void DuplicateFile(string originalFilePath, out string copiedFilePath, string copiedSuffix = "_duplicated")
         {
             copiedFilePath = "null";
 
@@ -38,7 +80,7 @@ namespace TextureMod_GUI
                     message = originalFilePath + " - given file does not exist! Can't duplicate this file!";
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
 
                 //dont continue
                 return;
@@ -62,7 +104,7 @@ namespace TextureMod_GUI
                 string message = string.Format("Can't Copy the file! Exception: {0}. Exception Message: {1}", e, e.Message);
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
             }
         }
 
@@ -72,7 +114,7 @@ namespace TextureMod_GUI
         /// <param name="originalFilePath"></param>
         /// <param name="outputDirectory"></param>
         /// <param name="sameNameAsOriginal"></param>
-        public void DuplicateFileToDirectory(string originalFilePath, string outputDirectory, bool sameNameAsOriginal = true)
+        public static void DuplicateFileToDirectory(string originalFilePath, string outputDirectory, bool sameNameAsOriginal = true)
         {
             string duplicatedFilePath = "";
             string newFileName = "";
@@ -94,20 +136,6 @@ namespace TextureMod_GUI
         }
 
         /// <summary>
-        /// Duplicate/Copy a file and replace it with the original file
-        /// </summary>
-        /// <param name="originalFilePath"></param>
-        /// <param name="newFilePath"></param>
-        public void ReplaceFile(string originalFilePath, string newFilePath)
-        {
-            string duplicatedArchive = "";
-
-            DuplicateFile(newFilePath, out duplicatedArchive);
-            DeleteFile(originalFilePath);
-            MoveFile(duplicatedArchive, originalFilePath);
-        }
-
-        /// <summary>
         /// Move a given file to a new location.
         /// This can also be used to re-name files.
         /// <para>Note: the new file path must contain the filename and extension.</para>
@@ -116,7 +144,7 @@ namespace TextureMod_GUI
         /// <param name="originalFilePath"></param>
         /// <param name="newFilePath"></param>
         /// <param name="giveWarning"></param>
-        public void MoveFile(string originalFilePath, string newFilePath, bool giveWarning = false)
+        public static void MoveFile(string originalFilePath, string newFilePath, bool giveWarning = false)
         {
             //check if the file exists as a safety measure, if not then stop
             if (File.Exists(originalFilePath) == false)
@@ -130,7 +158,7 @@ namespace TextureMod_GUI
                     message = originalFilePath + " - given file does not exist! Can't move this file!";
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
 
                 //dont continue with the rest of the function
                 return;
@@ -141,10 +169,7 @@ namespace TextureMod_GUI
                 //get our message
                 string message = "Are you sure you want to move the following file? " + originalFilePath;
 
-                //warn the user about the action
-                DialogResult dialogResult = MessageBox.Show(message, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                if (dialogResult == DialogResult.No)
+                if (MessageBoxes.Warning_Confirm(message, "Warning") == false)
                 {
                     //dont continue with the rest of the function
                     return;
@@ -162,7 +187,7 @@ namespace TextureMod_GUI
                 string message = string.Format("Can't Move the file! Exception: {0}. Exception Message: {1}", e, e.Message);
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
             }
         }
 
@@ -171,7 +196,7 @@ namespace TextureMod_GUI
         /// </summary>
         /// <param name="newDirectoryPath"></param>
         /// <param name="giveWarning"></param>
-        public void CreateDirectory(string newDirectoryPath, bool giveWarning = false)
+        public static void CreateDirectory(string newDirectoryPath, bool giveWarning = false)
         {
             //check if the directory exists as a safety measure, if not then stop
             if (string.IsNullOrEmpty(newDirectoryPath) || string.IsNullOrWhiteSpace(newDirectoryPath))
@@ -180,7 +205,7 @@ namespace TextureMod_GUI
                 string message = "No given directory path to create!";
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
 
                 //dont continue with the rest of the function
                 return;
@@ -192,9 +217,7 @@ namespace TextureMod_GUI
                 string message = "Are you sure you want to create the following directory? " + newDirectoryPath;
 
                 //warn the user about the action
-                DialogResult dialogResult = MessageBox.Show(message, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                if (dialogResult == DialogResult.No)
+                if (MessageBoxes.Warning_Confirm(message, "Warning") == false)
                 {
                     //dont continue with the rest of the function
                     return;
@@ -212,7 +235,7 @@ namespace TextureMod_GUI
                 string message = string.Format("Can't create the directory! Exception: {0}. Exception Message: {1}", e, e.Message);
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
             }
         }
 
@@ -222,7 +245,7 @@ namespace TextureMod_GUI
         /// <param name="oldDirectoryPath"></param>
         /// <param name="newDirectoryPath"></param>
         /// <param name="giveWarning"></param>
-        public void MoveDirectory(string oldDirectoryPath, string newDirectoryPath, bool giveWarning = false)
+        public static void MoveDirectory(string oldDirectoryPath, string newDirectoryPath, bool giveWarning = false)
         {
             //check if the irectory exists as a safety measure, if not then stop
             if (Directory.Exists(oldDirectoryPath) == false)
@@ -236,7 +259,7 @@ namespace TextureMod_GUI
                     message = oldDirectoryPath + " - given create does not exist! Can't delete this directory!";
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
 
                 //dont continue with the rest of the function
                 return;
@@ -248,9 +271,7 @@ namespace TextureMod_GUI
                 string message = "Are you sure you want to move the following directory? " + newDirectoryPath;
 
                 //warn the user about the action
-                DialogResult dialogResult = MessageBox.Show(message, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                if (dialogResult == DialogResult.No)
+                if (MessageBoxes.Warning_Confirm(message, "Warning") == false)
                 {
                     //dont continue with the rest of the function
                     return;
@@ -268,7 +289,7 @@ namespace TextureMod_GUI
                 string message = string.Format("Can't move the directory! Exception: {0}. Exception Message: {1}", e, e.Message);
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
             }
         }
 
@@ -277,7 +298,7 @@ namespace TextureMod_GUI
         /// </summary>
         /// <param name="originalDirectoryPath"></param>
         /// <param name="giveWarning"></param>
-        public void DeleteDirectory(string originalDirectoryPath, bool giveWarning = false, bool recursiveDelete = false)
+        public static void DeleteDirectory(string originalDirectoryPath, bool giveWarning = false, bool recursiveDelete = false)
         {
             //check if the file exists as a safety measure, if not then stop
             if (Directory.Exists(originalDirectoryPath) == false)
@@ -291,7 +312,7 @@ namespace TextureMod_GUI
                     message = originalDirectoryPath + " - given directory does not exist! Can't delete this directory!";
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
 
                 //dont continue with the rest of the function
                 return;
@@ -303,9 +324,7 @@ namespace TextureMod_GUI
                 string message = "Are you sure you want to delete the following directory? " + originalDirectoryPath;
 
                 //warn the user about the action
-                DialogResult dialogResult = MessageBox.Show(message, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                if (dialogResult == DialogResult.No)
+                if (MessageBoxes.Warning_Confirm(message, "Warning") == false)
                 {
                     //dont continue with the rest of the function
                     return;
@@ -323,7 +342,7 @@ namespace TextureMod_GUI
                 string message = string.Format("Can't Delete the directory! Exception: {0}. Exception Message: {1}", e, e.Message);
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
             }
         }
 
@@ -333,7 +352,7 @@ namespace TextureMod_GUI
         /// <param name="directoryPath"></param>
         /// <param name="giveWarning"></param>
         /// <param name="recursiveDelete"></param>
-        public void DeleteDirectoryContents(string directoryPath, bool giveWarning = false, bool recursiveDelete = false)
+        public static void DeleteDirectoryContents(string directoryPath, bool giveWarning = false, bool recursiveDelete = false)
         {
             //check if the file exists as a safety measure, if not then stop
             if (Directory.Exists(directoryPath) == false)
@@ -347,7 +366,7 @@ namespace TextureMod_GUI
                     message = directoryPath + " - given directory does not exist! Can't delete this directory!";
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
 
                 //dont continue with the rest of the function
                 return;
@@ -359,9 +378,7 @@ namespace TextureMod_GUI
                 string message = "Are you sure you want to delete the contents in the following directory? " + directoryPath;
 
                 //warn the user about the action
-                DialogResult dialogResult = MessageBox.Show(message, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                if (dialogResult == DialogResult.No)
+                if (MessageBoxes.Warning_Confirm(message, "Warning") == false)
                 {
                     //dont continue with the rest of the function
                     return;
@@ -382,7 +399,7 @@ namespace TextureMod_GUI
                 string message = string.Format("Can't delete the directory contents! Exception: {0}. Exception Message: {1}", e, e.Message);
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
             }
         }
 
@@ -391,7 +408,7 @@ namespace TextureMod_GUI
         /// </summary>
         /// <param name="originalFilePath"></param>
         /// <param name="giveWarning"></param>
-        public void DeleteFile(string originalFilePath, bool giveWarning = false)
+        public static void DeleteFile(string originalFilePath, bool giveWarning = false)
         {
             //check if the file exists as a safety measure, if not then stop
             if (File.Exists(originalFilePath) == false)
@@ -405,7 +422,7 @@ namespace TextureMod_GUI
                     message = originalFilePath + " - given file does not exist! Can't delete this file!";
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
 
                 //dont continue with the rest of the function
                 return;
@@ -417,9 +434,7 @@ namespace TextureMod_GUI
                 string message = "Are you sure you want to delete the following file? " + originalFilePath;
 
                 //warn the user about the action
-                DialogResult dialogResult = MessageBox.Show(message, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                if (dialogResult == DialogResult.No)
+                if (MessageBoxes.Warning_Confirm(message, "Warning") == false)
                 {
                     //dont continue with the rest of the function
                     return;
@@ -437,7 +452,7 @@ namespace TextureMod_GUI
                 string message = string.Format("Can't Delete the file! Exception: {0}. Exception Message: {1}", e, e.Message);
 
                 //notify the user that this action is not possible
-                MessageBox.Show(message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxes.Error(message, "ERROR");
             }
         }
 
@@ -447,7 +462,7 @@ namespace TextureMod_GUI
         /// <param name="givenDirectory"></param>
         /// <param name="fileExtension"></param>
         /// <returns></returns>
-        public int GetNumberOfFilesByExtension(string givenDirectory, string fileExtension)
+        public static int GetNumberOfFilesByExtension(string givenDirectory, string fileExtension)
         {
             //the return value
             int numberOfFiles = 0;
@@ -474,7 +489,7 @@ namespace TextureMod_GUI
         /// <param name="givenDirectory"></param>
         /// <param name="fileExtension"></param>
         /// <returns></returns>
-        public List<string> GetFilesPathsByExtension(string givenDirectory, string fileExtension)
+        public static List<string> GetFilesPathsByExtension(string givenDirectory, string fileExtension)
         {
             //the list we will be returning
             List<string> filesPaths = new List<string>();
@@ -505,11 +520,11 @@ namespace TextureMod_GUI
         /// <param name="warning"></param>
         /// <param name="promptDescription"></param>
         /// <param name="promptTitle"></param>
-        public void DeleteFilesInDirectory(string directory, bool warning = false, string promptDescription = "", string promptTitle = "")
+        public static void DeleteFilesInDirectory(string directory, bool warning = false, string promptDescription = "", string promptTitle = "")
         {
             if (warning)
             {
-                if (MessageBox_Confirmation(promptDescription, promptTitle) == false)
+                if (MessageBoxes.Warning_Confirm(promptDescription, promptTitle) == false)
                     return;
             }
 
@@ -526,11 +541,11 @@ namespace TextureMod_GUI
         /// <param name="warning"></param>
         /// <param name="promptDescription"></param>
         /// <param name="promptTitle"></param>
-        public void DeleteDirectoriesInDirectory(string mainDir, bool warning = false, string promptDescription = "", string promptTitle = "")
+        public static void DeleteDirectoriesInDirectory(string mainDir, bool warning = false, string promptDescription = "", string promptTitle = "")
         {
             if (warning)
             {
-                if (MessageBox_Confirmation(promptDescription, promptTitle) == false)
+                if (MessageBoxes.Warning_Confirm(promptDescription, promptTitle) == false)
                     return;
             }
 
@@ -549,7 +564,7 @@ namespace TextureMod_GUI
         /// </summary>
         /// <param name="newFolderPath"></param>
         /// <param name="dialogTitle"></param>
-        public void GetFolderPath(ref string newFolderPath, string dialogTitle = "Select a Folder Path")
+        public static void GetFolderPath(ref string newFolderPath, string dialogTitle = "Select a Folder Path")
         {
             //open a folder dialog
             VistaFolderBrowserDialog folderBrowserDialog = new VistaFolderBrowserDialog();
@@ -570,7 +585,7 @@ namespace TextureMod_GUI
         /// </summary>
         /// <param name="newFilePath"></param>
         /// <param name="dialogTitle"></param>
-        public void GetFilePath(ref string newFilePath, string dialogTitle = "Select a File Path")
+        public static void GetFilePath(ref string newFilePath, string dialogTitle = "Select a File Path")
         {
             //open a file dialog
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -596,7 +611,7 @@ namespace TextureMod_GUI
         /// <param name="newFilePath"></param>
         /// <param name="extensionFilter"></param>
         /// <param name="dialogTitle"></param>
-        public void GetFilePath(ref string newFilePath, string extensionFilter, string dialogTitle = "Select a File Path")
+        public static void GetFilePath(ref string newFilePath, string extensionFilter, string dialogTitle = "Select a File Path")
         {
             //open a file dialog
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -615,30 +630,6 @@ namespace TextureMod_GUI
                 {
                     newFilePath = openFileDialog.FileName;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Opens a MessageBox that prompts the user if they want to proceed with said action.
-        /// <para>DialogResult.Yes - returns true</para>
-        /// <para>DialogResult.No - returns false</para>
-        /// </summary>
-        /// <param name="description"></param>
-        /// <param name="title"></param>
-        /// <param name="icon"></param>
-        /// <returns></returns>
-        public bool MessageBox_Confirmation(string description, string title, MessageBoxIcon icon = MessageBoxIcon.Warning)
-        {
-            //get our message box
-            DialogResult messageBox = MessageBox.Show(description, title, MessageBoxButtons.YesNo, icon);
-
-            if (messageBox == DialogResult.Yes)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
             }
         }
     }

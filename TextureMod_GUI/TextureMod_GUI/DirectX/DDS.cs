@@ -47,6 +47,11 @@ namespace D3DTX_TextureConverter.DirectX
         {
             return base.ToString();
         }
+
+        public string ToString2()
+        {
+            return string.Format("[DDS_HEADER] x: {0} y: {1}");
+        }
     }
 
     /// <summary>

@@ -8,7 +8,7 @@ using D3DTX_TextureConverter.Telltale;
 using D3DTX_TextureConverter.Utilities;
 using D3DTX_TextureConverter.DirectX;
 
-namespace D3DTX_TextureConverter
+namespace D3DTX_TextureConverter.Main
 {
     /// <summary>
     /// This is a custom class that actually matches what is inside a D3DTX [ERTM] file (this exact struct doesn't exist within telltale).

@@ -13,6 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO;
+using D3DTX_TextureConverter.Telltale;
+using D3DTX_TextureConverter.Main;
+using TextureMod_GUI.UI;
 
 namespace TextureMod_GUI
 {
@@ -21,9 +24,9 @@ namespace TextureMod_GUI
     /// </summary>
     public partial class MainWindow
     {
-        //main app object
+        //main app objects
         private MainManager mainManager;
-        private Read_DDS read_DDS;
+        private ConsoleWriter consoleWriter;
 
         //XAML INITALIZATION
         public MainWindow()
@@ -40,17 +43,12 @@ namespace TextureMod_GUI
         /// </summary>
         public void InitalizeApplication()
         {
-            mainManager = new MainManager(this);
-            read_DDS = new Read_DDS();
-        }
+            mainManager = new MainManager(this, consoleWriter);
+            consoleWriter = new ConsoleWriter(ui_console_textbox);
+            Console.SetOut(consoleWriter);
 
-        /// <summary>
-        /// Updates the console output UI with the output string
-        /// </summary>
-        /// <param name="output"></param>
-        public void UpdateConsoleOutput(string output)
-        {
-            ui_console_textbox.Text = output;
+            Console.WriteLine("[Welcome to the D3DTX Texture converter!]");
+            Console.WriteLine("To begin, open a directory that contains d3dtx files.");
         }
 
         /// <summary>
@@ -67,6 +65,11 @@ namespace TextureMod_GUI
             ui_textureDirectory_convertD3DTX_button.IsEnabled = mainManager.CanConvertTo_D3DTX();
             ui_textureDirectory_convertDDS_button.IsEnabled = mainManager.CanConvertTo_DDS();
             ui_textureDirectory_refreshdirectory_button.IsEnabled = mainManager.WorkingDirectory_Path_Exists();
+
+            List<UI_D3DTX_6VSM> test = new List<UI_D3DTX_6VSM>();
+            test.Add(new UI_D3DTX_6VSM());
+
+            ui_imageproperties_propertyGrid.CurrentObject = new UI_D3DTX_6VSM();
         }
 
         /// <summary>
@@ -110,12 +113,12 @@ namespace TextureMod_GUI
                 ui_imagepreview_imageName_label.Content = workingDirectory_file.FileName;
 
                 //display the image properties
-                ui_imageproperties_infobox_textblock.Text = GetImageProperties_Text(bitmap, workingDirectory_file.FileName, workingDirectory_file.FilePath);
+                //ui_imageproperties_infobox_textblock.Text = GetImageProperties_Text(bitmap, workingDirectory_file.FileName, workingDirectory_file.FilePath);
             }
             catch (Exception e)
             {
                 //if it fails to decode the dds image and display it, notify the user and write a message.
-                ui_imageproperties_infobox_textblock.Text = "Can't Decode DDS Image.";
+                //ui_imageproperties_infobox_textblock.Text = "Can't Decode DDS Image.";
 
                 //don't continue
                 return;
@@ -132,6 +135,7 @@ namespace TextureMod_GUI
         {
             string final = "";
 
+            /*
             final += string.Format("Image Name : {0}", name);
             final += Environment.NewLine;
 
@@ -149,6 +153,7 @@ namespace TextureMod_GUI
 
             final += string.Format("Mip Map Count : {0}", read_DDS.MipMapCount(path).ToString());
             final += Environment.NewLine;
+            */
 
             return final;
         }

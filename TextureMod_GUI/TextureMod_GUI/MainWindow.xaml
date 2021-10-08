@@ -5,11 +5,12 @@
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:pt="http://propertytools.org/wpf"
         xmlns:local="clr-namespace:TextureMod_GUI"
         mc:Ignorable="d"
         GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
         ResizeMode="CanResizeWithGrip"
-        Title="Texture Mod Tool" Height="534" Width="753" MinWidth="503" MinHeight="400">
+        Title="Texture Mod Tool" Height="699" Width="773" MinWidth="503" MinHeight="400">
 
     <mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
@@ -83,7 +84,7 @@
                 <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
 
                 <Grid Grid.Row="2">
-                    <TextBox Name="ui_console_textbox" TextWrapping="NoWrap" IsReadOnly="True" Text="Output" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" Margin="10,10,10,32" ScrollViewer.CanContentScroll="True" UseLayoutRounding="False"/>
+                    <TextBox Name="ui_console_textbox" TextWrapping="NoWrap" IsReadOnly="True" Text="" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" Margin="10,10,10,32" ScrollViewer.CanContentScroll="True" UseLayoutRounding="False"/>
                     <ProgressBar Name="ui_console_progressbar" Height="17" Margin="10,0,10,10" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom"/>
                 </Grid>
 
@@ -101,9 +102,8 @@
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0">
-                    <Label Name="ui_imagepreview_title_label" Content="DDS Image Preview" Margin="10,10,10,0" VerticalAlignment="Top" Height="26"/>
-                    <Label Name="ui_imagepreview_imageName_label" Content="Image Name" Margin="10,41,10,0" VerticalAlignment="Top" Height="26"/>
-                    <Border Name="ui_imagepreview_imageBorder_border" BorderBrush="Black" BorderThickness="1" Margin="10,72,10,10">
+                    <Label Name="ui_imagepreview_imageName_label" Content="Image Name" Margin="10,10,10,0" VerticalAlignment="Top" Height="26"/>
+                    <Border Name="ui_imagepreview_imageBorder_border" BorderBrush="Black" BorderThickness="1" Margin="10,41,10,10">
                         <Image Name="ui_imagepreview_image" Stretch="Uniform"/>
                     </Border>
                 </Grid>
@@ -111,8 +111,9 @@
                 <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
 
                 <Grid Grid.Row="2">
-                    <Label Name="ui_imageproperties_title_label" Content="Image Properties" Margin="9,9,8,0" VerticalAlignment="Top" Height="25"/>
-                    <TextBlock Name="ui_imageproperties_infobox_textblock" Margin="10,39,10,10" Text="" TextWrapping="Wrap" Width="354"/>
+                    <Label Name="ui_imageproperties_title_label" Content="File Properties" Margin="9,9,8,0" VerticalAlignment="Top" Height="25"/>
+                    <pt:PropertyGrid 
+                        x:Name="ui_imageproperties_propertyGrid" Margin="10,39,10,10" DescriptionIconAlignment="Left" EnumAsRadioButtonsLimit="0"/>
                 </Grid>
             </Grid>
         </Grid>

@@ -7,7 +7,7 @@ using System.IO;
 using D3DTX_TextureConverter.Telltale;
 using D3DTX_TextureConverter.Utilities;
 
-namespace D3DTX_TextureConverter
+namespace D3DTX_TextureConverter.Main
 {
     /// <summary>
     /// This is a custom class that actually matches what is inside a D3DTX [5VSM] file (this exact struct doesn't exist within telltale).
@@ -15,45 +15,45 @@ namespace D3DTX_TextureConverter
     public class D3DTX_5VSM
     {
         //meta header
-        public string mMetaStreamVersion; //[4 bytes]
-        public uint mDefaultSectionChunkSize; //[4 bytes]
-        public uint mDebugSectionChunkSize; //[4 bytes]
-        public uint mAsyncSectionChunkSize; //[4 bytes]
+        public string mMetaStreamVersion { get; set; } //[4 bytes]
+        public uint mDefaultSectionChunkSize { get; set; } //[4 bytes]
+        public uint mDebugSectionChunkSize { get; set; } //[4 bytes]
+        public uint mAsyncSectionChunkSize { get; set; } //[4 bytes]
         public uint mClassNamesLength; //[4 bytes]
-        public ClassNames[] mClassNames;//[12 bytes for each element]
+        public ClassNames[] mClassNames { get; set; }//[12 bytes for each element]
 
         //d3dtx header
-        public int mVersion; //[4 bytes]
+        public int mVersion { get; set; } //[4 bytes]
         public int mSamplerState_BlockSize; //[4 bytes]
-        public T3SamplerStateBlock mSamplerState; //[4 bytes]
+        public T3SamplerStateBlock mSamplerState { get; set; } //[4 bytes]
         public int mPlatform_BlockSize; //[4 bytes]
-        public PlatformType mPlatform; //[4 bytes]
+        public PlatformType mPlatform { get; set; } //[4 bytes]
         public int mName_BlockSize; //[4 bytes]
         public uint mName_StringLength; //[4 bytes]
-        public string mName; //[mName_StringLength bytes]
+        public string mName { get; set; } //[mName_StringLength bytes]
         public int mImportName_BlockSize; //[4 bytes]
         public uint mImportName_StringLength; //[4 bytes]
         public string mImportName; //[mImportName_StringLength bytes]
-        public float mImportScale; //[4 bytes]
-        public ToolProps mToolProps; //[1 byte]
-        public uint mNumMipLevels; //[4 bytes]
-        public uint mWidth; //[4 bytes]
-        public uint mHeight; //[4 bytes]
-        public T3SurfaceFormat mSurfaceFormat; //[4 bytes]
-        public T3ResourceUsage mResourceUsage; //[4 bytes]
-        public T3TextureType mType; //[4 bytes]
-        public int mNormalMapFormat; //[4 bytes]
-        public float mHDRLightmapScale; //[4 bytes]
-        public float mToonGradientCutoff; //[4 bytes]
-        public eTxAlpha mAlphaMode; //[4 bytes]
-        public eTxColor mColorMode; //[4 bytes]
-        public Vector2 mUVOffset; //[8 bytes]
-        public Vector2 mUVScale; //[8 bytes]
+        public float mImportScale { get; set; } //[4 bytes]
+        public ToolProps mToolProps { get; set; } //[1 byte]
+        public uint mNumMipLevels { get; set; } //[4 bytes]
+        public uint mWidth { get; set; } //[4 bytes]
+        public uint mHeight { get; set; } //[4 bytes]
+        public T3SurfaceFormat mSurfaceFormat { get; set; } //[4 bytes]
+        public T3ResourceUsage mResourceUsage { get; set; } //[4 bytes]
+        public T3TextureType mType { get; set; } //[4 bytes]
+        public int mNormalMapFormat { get; set; } //[4 bytes]
+        public float mHDRLightmapScale { get; set; } //[4 bytes]
+        public float mToonGradientCutoff { get; set; } //[4 bytes]
+        public eTxAlpha mAlphaMode { get; set; } //[4 bytes]
+        public eTxColor mColorMode { get; set; } //[4 bytes]
+        public Vector2 mUVOffset { get; set; } //[8 bytes]
+        public Vector2 mUVScale { get; set; } //[8 bytes]
         public uint mToonRegions_ArrayCapacity; //[4 bytes]
         public int mToonRegions_ArrayLength; //[4 bytes]
-        public List<T3ToonGradientRegion> mToonRegions; //(varies, each element is 16 bytes long)
-        public StreamHeader StreamHeader; // [12 bytes]
-        public List<RegionStreamHeader> mRegionHeaders; //(varies, each element is 24 bytes long)
+        public List<T3ToonGradientRegion> mToonRegions { get; set; } //(varies, each element is 16 bytes long)
+        public StreamHeader StreamHeader { get; set; } // [12 bytes]
+        public List<RegionStreamHeader> mRegionHeaders { get; set; } //(varies, each element is 24 bytes long)
         public List<byte[]> T3Texture_Data; //each image data, starts from smallest mip map to largest mip map
 
         public byte[] Data_OriginalBytes;
@@ -306,12 +306,12 @@ namespace D3DTX_TextureConverter
             Console.WriteLine("----------- mToonRegions -----------");
             //--------------------------mToonRegions DCArray Capacity-------------------------- [4 bytes]
             uint bytePointerPostion_before_mToonRegions = bytePointerPosition;
-            uint mToonRegions_ArrayCapacity = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
+            mToonRegions_ArrayCapacity = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mToonRegions_ArrayCapacity = {0}", mToonRegions_ArrayCapacity);
 
             //--------------------------mToonRegions DCArray Length-------------------------- [4 bytes]
-            int mToonRegions_ArrayLength = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
+            mToonRegions_ArrayLength = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mToonRegions_ArrayLength = {0}", mToonRegions_ArrayLength);
 
@@ -434,16 +434,158 @@ namespace D3DTX_TextureConverter
 
         public byte[] Get_Modified_D3DTX(DDS_File DDS_File, bool headerOnly)
         {
-            byte[] Copied_Data = null;
+            byte[] NewData = null;
+
+            //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
+            //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
+            //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
+            //--------------------------Meta Stream Keyword-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, ByteFunctions.GetBytes(mMetaStreamVersion));
+
+            //--------------------------Default Section Chunk Size-------------------------- [4 bytes] //default section chunk size (THIS IS THE SIZE OF THE FULL D3DTX HEADER MINUS THIS META STREAM HEADER)
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mDefaultSectionChunkSize));
+
+            //-------------------------Debug Section Chunk Size-------------------------- [4 bytes] //debug section chunk size (always zero)
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mDebugSectionChunkSize));
+
+            //--------------------------Async Section Chunk Size-------------------------- [4 bytes] //async section chunk size (size of the bytes after the file header)
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mAsyncSectionChunkSize));
+
+            //--------------------------mClassNamesLength-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mClassNamesLength));
+
+            //--------------------------mClassNames--------------------------
+            for (int i = 0; i < mClassNames.Length; i++)
+            {
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mClassNames[i].mTypeNameCRC.mCrc64));
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mClassNames[i].mVersionCRC));
+            }
+
+            //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
+            //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
+            //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
+            //--------------------------mVersion-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mVersion));
+
+            //--------------------------mSamplerState Block Size-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSamplerState_BlockSize));
+
+            //--------------------------mSamplerState-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSamplerState.mData));
+
+            //--------------------------mPlatform Block Size-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mPlatform_BlockSize));
+
+            //--------------------------mPlatform-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mPlatform));
+
+            //--------------------------mName Block Size-------------------------- [4 bytes] //mName block size (size + string len)
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mName_BlockSize));
+
+            //--------------------------mName String Length-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mName_StringLength));
+
+            //--------------------------mName-------------------------- [mName_StringLength bytes]
+            NewData = ByteFunctions.Combine(NewData, ByteFunctions.GetBytes(mName));
+
+            //--------------------------mImportName Block Size-------------------------- [4 bytes] //mImportName block size (size + string len)
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mImportName_BlockSize));
+
+            //--------------------------mImportName String Length-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mImportName_StringLength));
+
+            //--------------------------mImportName-------------------------- [mImportName_StringLength bytes] (this is always 0)
+            NewData = ByteFunctions.Combine(NewData, ByteFunctions.GetBytes(mImportName));
+
+            //--------------------------mImportScale-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mImportScale));
+
+            //--------------------------mToolProps-------------------------- (NEEDS WORK) [1 byte]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToolProps.mbHasProps));
+
+            //--------------------------mNumMipLevels-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mNumMipLevels));
+
+            //--------------------------mWidth-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mWidth));
+
+            //--------------------------mHeight-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mHeight));
+
+            //--------------------------mSurfaceFormat-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mSurfaceFormat));
+
+            //--------------------------mResourceUsage-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mResourceUsage));
+
+            //--------------------------mType-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mType));
+
+            //--------------------------mNormalMapFormat-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mNormalMapFormat));
+
+            //--------------------------mHDRLightmapScale-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mHDRLightmapScale));
+
+            //--------------------------mToonGradientCutoff-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonGradientCutoff));
+
+            //--------------------------mAlphaMode-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mAlphaMode));
+
+            //--------------------------mColorMode-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mColorMode));
+
+            //--------------------------mUVOffset-------------------------- [8 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mUVOffset.x));
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mUVOffset.y));
+
+            //--------------------------mUVScale-------------------------- [8 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mUVScale.x));
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mUVScale.y));
+
+            //--------------------------mToonRegions--------------------------
+            //--------------------------mToonRegions DCArray Capacity-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions_ArrayCapacity));
+
+            //--------------------------mToonRegions DCArray Length-------------------------- [4 bytes]
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions_ArrayLength));
+
+            //--------------------------mToonRegions DCArray--------------------------
+            for (int i = 0; i < mToonRegions_ArrayLength; i++)
+            {
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mColor.r));
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mColor.g));
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mColor.b));
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mColor.a));
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mSize));
+            }
+
+            //--------------------------StreamHeader--------------------------
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(StreamHeader.mRegionCount));
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(StreamHeader.mAuxDataCount));
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(StreamHeader.mTotalDataSize));
+
+            //--------------------------mRegionHeaders--------------------------
+            for (int i = 0; i < StreamHeader.mRegionCount; i++)
+            {
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mFaceIndex));
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mMipIndex));
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mMipCount));
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mDataSize));
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mPitch));
+                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mSlicePitch));
+            }
 
             if (headerOnly)
-                Copied_Data = Data_OriginalHeader;
-            else
-                Copied_Data = Data_OriginalBytes;
+                return NewData;
 
+            for (int i = DDS_File.textureData.Count - 1; i >= 0; i--)
+            {
+                NewData = ByteFunctions.Combine(NewData, DDS_File.textureData[i]);
+            }
 
-
-            return Copied_Data;
+            return NewData;
         }
     }
 }

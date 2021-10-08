@@ -35,7 +35,7 @@ using D3DTX_TextureConverter.Telltale;
  * 117 - D3DFMT_CxV8U8
 */
 
-namespace D3DTX_TextureConverter
+namespace D3DTX_TextureConverter.Main
 {
     /// <summary>
     /// Main class for generating a dds byte header

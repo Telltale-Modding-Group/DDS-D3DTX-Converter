@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Text;
 using D3DTX_TextureConverter.Utilities;
 using D3DTX_TextureConverter.DirectX;
+using D3DTX_TextureConverter.Main;
+using Newtonsoft.Json;
 
 namespace D3DTX_TextureConverter
 {
@@ -12,10 +16,7 @@ namespace D3DTX_TextureConverter
         //----------------------CONVERSION OPTIONS----------------------
         public static bool d3dtxMode = true; //true = in d3dtx to dds mode, false = dds to d3dtx mode
         public static bool generateHeader = true; //for D3DTX Mode, IMPORTANT if you want to convert the dds back to a d3dtx
-
-        //attempts to change the resolution IF the NEW DDS file resolution is DIFFERENT than the original D3DTX (ONLY ON FILES WITH 0 MIP MAPS)
-        //this can be prone to conversion errors and artifacts
-        public static bool enableExperimentalResolutionChange = true;
+        public static bool generateJSON = true; //generate JSON
         //----------------------CONVERSION OPTIONS END----------------------
 
         /// <summary>
@@ -104,7 +105,6 @@ namespace D3DTX_TextureConverter
             }
 
             //-----------------START CONVERSION-----------------
-
             //notify the user we are starting
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
             Console.WriteLine("Conversion Starting...");
@@ -113,7 +113,6 @@ namespace D3DTX_TextureConverter
             Convert_D3DTX_Bulk(textureFolderPath, resultFolderPath);
 
             //once the process is finished, it will come back here and we will notify the user that we are done
-
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
             Console.WriteLine("Conversion Finished.");
             Console.ResetColor();
@@ -151,6 +150,9 @@ namespace D3DTX_TextureConverter
             Console.WriteLine("Found {0} Textures.", textures.Count.ToString()); //notify the user we found x amount of d3dtx files in the array
             Console.WriteLine("Starting...");//notify the user we are starting
 
+            Thread[] threads = new Thread[textures.Count];
+
+            int index = 0;
             //run a loop through each of the found textures and convert each one
             foreach (string texture in textures)
             {
@@ -165,12 +167,18 @@ namespace D3DTX_TextureConverter
                 Console.WriteLine("Converting '{0}'...", textureFileName); //notify the user are converting 'x' file.
                 Console.ResetColor();
 
+                //var thre = new Thread(() => ConvertTexture_FromD3DTX_ToDDS(textureFileName, texture, textureResultPath));
+                //thre.IsBackground = true;
+                //thre.
+                //thre.Start();
+
                 //runs the main method for converting the texture
                 ConvertTexture_FromD3DTX_ToDDS(textureFileName, texture, textureResultPath);
 
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green); 
                 Console.WriteLine("Finished converting '{0}'...", textureFileName); //notify the user we finished converting 'x' file.
-                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+                index++;
             }
         }
 
@@ -206,10 +214,10 @@ namespace D3DTX_TextureConverter
             DDS_File ddsFile = new DDS_File(d3dtx_file);
 
             //write the dds file to disk
-            //ddsFile.Write_D3DTX_AsDDS(d3dtx_file, destinationFile);
+            ddsFile.Write_D3DTX_AsDDS(d3dtx_file, destinationFile);
 
             //write the d3dtx header to disk
-            //d3dtx_file.Write_D3DTX_Header(destinationFile);
+            d3dtx_file.Write_D3DTX_Header(destinationFile);
 
             //GenericImageFormats.ConvertDDS_To_PSD(destinationFile);
         }
@@ -417,20 +425,82 @@ namespace D3DTX_TextureConverter
              * MABYE TRY TO CHANGE THE TEXTURE DATA BYTE SIZE IN THE D3DTX HEADER AND SEE IF THAT CHANGES ANYTHING?
             */
 
-            D3DTX_File d3dtx_file = new D3DTX_File();
 
+            //D3DTX_File d3dtx_file = new D3DTX_File();
+            //DDS_File dds_file = new DDS_File(sourceTexFile, false);
+
+            GenericImageFormats.ConvertDDS_To_PNG(sourceTexFile, false);
+
+            /*
             string file_dword = D3DTX_File.Read_D3DTX_File_MetaVersionOnly(sourceHeaderFile);
 
             if (file_dword.Equals("6VSM"))
             {
                 d3dtx_file.D3DTX_6VSM = new D3DTX_6VSM(sourceHeaderFile, true);
+                dds_file = new DDS_File(d3dtx_file);
+
+                File.WriteAllBytes(destinationFile, d3dtx_file.D3DTX_6VSM.Get_Modified_D3DTX(dds_file, false));
+
+                return;
             }
             else if (file_dword.Equals("5VSM"))
             {
                 d3dtx_file.D3DTX_5VSM = new D3DTX_5VSM(sourceHeaderFile, true);
-            }
+                dds_file = new DDS_File(d3dtx_file);
 
-            DDS_File dds_file = new DDS_File(d3dtx_file);
+                File.WriteAllBytes(destinationFile, d3dtx_file.D3DTX_5VSM.Get_Modified_D3DTX(dds_file, false));
+
+                return;
+            }
+            else if(file_dword.Equals("ERTM"))
+            {
+                //notify the user that we can't convert this file back because we don't have support for doing that
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
+                Console.WriteLine("Converting DDS back to D3DTX (ERTM) is not supported yet! Skipping '{0}'!", sourceFileName);
+
+                return;
+            }
+            */
+        }
+
+        public static void Write_D3DTX_Json(D3DTX_File file)
+        {
+            string fileExt = Path.GetExtension(filePath);
+            string jsonPath = filePath.Remove(filePath.Length - fileExt.Length, fileExt.Length) + ".json";
+
+            if (File.Exists(jsonPath))
+                File.Delete(jsonPath);
+
+            //open a stream writer to create the text file and write to it
+            using (StreamWriter file = File.CreateText(jsonPath))
+            {
+                //get our json seralizer
+                JsonSerializer serializer = new JsonSerializer();
+
+                //seralize the data and write it to the configruation file
+                serializer.Formatting = Formatting.Indented;
+                serializer.Serialize(file, walkBoxes.Get_WBOX_Object());
+            }
+        }
+
+        public static void WriteJSON(string originalFilePath, WalkBoxes_File walkBoxes)
+        {
+            string fileExt = Path.GetExtension(originalFilePath);
+            string jsonPath = originalFilePath.Remove(originalFilePath.Length - fileExt.Length, fileExt.Length) + ".json";
+
+            if (File.Exists(jsonPath))
+                File.Delete(jsonPath);
+
+            //open a stream writer to create the text file and write to it
+            using (StreamWriter file = File.CreateText(jsonPath))
+            {
+                //get our json seralizer
+                JsonSerializer serializer = new JsonSerializer();
+
+                //seralize the data and write it to the configruation file
+                serializer.Formatting = Formatting.Indented;
+                serializer.Serialize(file, walkBoxes);
+            }
         }
     }
 }

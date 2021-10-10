@@ -27,6 +27,22 @@ This is currently being developed and tested only with ***"The Walking Dead Tell
 2. Can't upscale or downscale the texture resolution *(for the time being)*
 3. Not all textures are supported, textures like **'specular maps'** *(some of them)*, **'ink maps'**, **'normal maps'** *(some of them)* may not be converted by the tool properly. *(for the time being)* **However the majority of the regular color/diffuse/albedo and even alpha textures should be supported.**
 
+**NOTE: (NOT CURRENTLY, BUT FOR VERSION 2)**
+- The Wolf Among Us *(5VSM)*
+- The Walking Dead: Season Two *(5VSM)*
+- Tales from the Borderlands *(5VSM)*
+- Game of Thrones *(5VSM)*
+- Minecraft: Story Mode *(5VSM)*
+- The Walking Dead: Michonne *(5VSM)*
+- Batman: The Telltale Series *(6VSM)*
+- The Walking Dead: A New Frontier *(6VSM)*
+- Guardians of the Galaxy: The Telltale Series *(6VSM)*
+- Minecraft: Story Mode – Season Two *(6VSM)*
+- Batman: The Enemy Within *(6VSM)*
+- The Walking Dead Collection? (not sure) *(6VSM)*
+- The Walking Dead: The Final Season *(6VSM)*
+- The Walking Dead: The Telltale Definitive Series *(6VSM)*
+
 ## How to use?
 
 **[This guides you on the interface of the application. (It's easy)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BHelp%5D-Application-Guide)**

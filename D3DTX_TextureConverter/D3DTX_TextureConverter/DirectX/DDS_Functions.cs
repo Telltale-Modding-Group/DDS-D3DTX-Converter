@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using D3DTX_TextureConverter.Utilities;
+using D3DTX_TextureConverter.Telltale;
 
 namespace D3DTX_TextureConverter.DirectX
 {
@@ -36,14 +37,14 @@ namespace D3DTX_TextureConverter.DirectX
 
         public static uint[] DDS_GetImageByteSizes(uint[,] mipResolutions, bool isDXT1)
         {
-            uint[] byteSizes = new uint[mipResolutions.Length];
+            uint[] byteSizes = new uint[mipResolutions.GetLength(0)];
 
             for(int i = 0; i < byteSizes.Length; i++)
             {
                 byteSizes[i] = (uint)CalculateDDS_ByteSize((int)mipResolutions[i, 0], (int)mipResolutions[i, 1], isDXT1);
             }
 
-            return new uint[0];
+            return byteSizes;
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ using D3DTX_TextureConverter.DirectX;
 namespace D3DTX_TextureConverter.Main
 {
     /// <summary>
-    /// This is a custom class that actually matches what is inside a D3DTX [6VSM] file (this exact struct doesn't exist within telltale).
+    /// This is a custom class that matches what is serialized in a D3DTX [6VSM] file.
     /// </summary>
     public class D3DTX_6VSM
     {
@@ -20,21 +20,21 @@ namespace D3DTX_TextureConverter.Main
         public uint mDefaultSectionChunkSize { get; set; } //[4 bytes] size of the d3dtx header after the meta header
         public uint mDebugSectionChunkSize { get; set; } //[4 bytes] (always 0)
         public uint mAsyncSectionChunkSize { get; set; } //[4 bytes] size of texture data itself (not the header)
-        public uint mClassNamesLength; //[4 bytes]
+        public uint mClassNamesLength { get; set; } //[4 bytes]
         public ClassNames[] mClassNames { get; set; } //[12 bytes for each element]
 
         //d3dtx header
         public int mVersion { get; set; } //[4 bytes]
-        public int mSamplerState_BlockSize; //[4 bytes] (always 8)
+        public int mSamplerState_BlockSize { get; set; } //[4 bytes] (always 8)
         public T3SamplerStateBlock mSamplerState { get; set; } //[4 bytes]
-        public int mPlatform_BlockSize; //[4 bytes] (always 8)
+        public int mPlatform_BlockSize { get; set; } //[4 bytes] (always 8)
         public PlatformType mPlatform { get; set; } //[4 bytes]
-        public int mName_BlockSize; //[4 bytes]
-        public uint mName_StringLength; //[4 bytes]
+        public int mName_BlockSize { get; set; } //[4 bytes]
+        public uint mName_StringLength { get; set; } //[4 bytes]
         public string mName { get; set; } //[mName_StringLength bytes]
-        public int mImportName_BlockSize; //[4 bytes]
-        public uint mImportName_StringLength; //[4 bytes]
-        public string mImportName; //[mImportName_StringLength bytes]
+        public int mImportName_BlockSize { get; set; } //[4 bytes]
+        public uint mImportName_StringLength { get; set; } //[4 bytes]
+        public string mImportName { get; set; } //[mImportName_StringLength bytes]
         public float mImportScale { get; set; } //[4 bytes]
         public ToolProps mToolProps { get; set; } //[1 byte]
         public uint mNumMipLevels { get; set; } //[4 bytes]
@@ -48,7 +48,7 @@ namespace D3DTX_TextureConverter.Main
         public T3SurfaceMultisample mSurfaceMultisample { get; set; } //[4 bytes]
         public T3ResourceUsage mResourceUsage { get; set; } //[4 bytes]
         public T3TextureType mType { get; set; } //[4 bytes]
-        public int mSwizzleSize; //[4 bytes]
+        public int mSwizzleSize { get; set; } //[4 bytes]
         public RenderSwizzleParams mSwizzle { get; set; } //[4 bytes]
         public float mSpecularGlossExponent { get; set; } //[4 bytes]
         public float mHDRLightmapScale { get; set; } //[4 bytes]
@@ -57,28 +57,28 @@ namespace D3DTX_TextureConverter.Main
         public eTxColor mColorMode { get; set; } //[4 bytes]
         public Vector2 mUVOffset { get; set; } //[8 bytes]
         public Vector2 mUVScale { get; set; } //[8 bytes]
-        public uint mArrayFrameNames_ArrayCapacity; //[4 bytes]
-        public int mArrayFrameNames_ArrayLength; //[4 bytes]
+        public uint mArrayFrameNames_ArrayCapacity { get; set; } //[4 bytes]
+        public int mArrayFrameNames_ArrayLength { get; set; } //[4 bytes]
         public List<Symbol> mArrayFrameNames { get; set; } //(varies, each element is 8 bytes long)
-        public uint mToonRegions_ArrayCapacity; //[4 bytes]
-        public int mToonRegions_ArrayLength; //[4 bytes]
+        public uint mToonRegions_ArrayCapacity { get; set; } //[4 bytes]
+        public int mToonRegions_ArrayLength { get; set; } //[4 bytes]
         public T3ToonGradientRegion[] mToonRegions { get; set; } //(varies, each element is 16 bytes long)
         public StreamHeader mStreamHeader { get; set; } // [12 bytes]
         public RegionStreamHeader[] mRegionHeaders { get; set; } //(varies, each element is 24 bytes long)
 
         //d3dtx byte data
-        public List<byte[]> T3Texture_Data; //each image data, starts from smallest mip map to largest mip map
-        public byte[] Data_OriginalBytes; //full byte array of the original file
-        public byte[] Data_OriginalHeader; //byte array of the full header (including the meta stream and d3dtx)
+        public List<byte[]> T3Texture_Data { get; set; } //each image data, starts from smallest mip map to largest mip map
 
-        public D3DTX_6VSM(string sourceFilePath, bool readHeaderOnly)
+        public D3DTX_6VSM()
+        {
+
+        }
+
+        public D3DTX_6VSM(string sourceFilePath)
         {
             //read the source file into a byte array
             byte[] sourceByteFile = File.ReadAllBytes(sourceFilePath);
-            byte[] headerData = new byte[0];
             int calculated_HeaderLength = 0;
-
-            Data_OriginalBytes = sourceByteFile;
 
             //which byte offset we are on (will be changed as we go through the file)
             uint bytePointerPosition = 0;
@@ -109,7 +109,7 @@ namespace D3DTX_TextureConverter.Main
             Console.WriteLine("D3DTX Async Section Chunk Size = {0}", mAsyncSectionChunkSize);
 
             //if the 'parsed' texture byte size in the file is actually supposedly bigger than the file itself
-            if (mAsyncSectionChunkSize > sourceByteFile.Length && !readHeaderOnly)
+            if (mAsyncSectionChunkSize > sourceByteFile.Length)
             {
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
                 Console.WriteLine("Can't continue reading the file because the values we are reading are incorrect! This can be due to the byte data being shifted in the file or non-existant, and this is likley because the file version has changed.");
@@ -118,10 +118,7 @@ namespace D3DTX_TextureConverter.Main
             }
 
             //--------------------------CALCULATING HEADER LENGTH--------------------------
-            if (readHeaderOnly)
-                calculated_HeaderLength = sourceByteFile.Length;
-            else
-                calculated_HeaderLength = sourceByteFile.Length - (int)mAsyncSectionChunkSize;
+            calculated_HeaderLength = sourceByteFile.Length - (int)mAsyncSectionChunkSize;
 
             //write the result to the console for viewing
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
@@ -450,19 +447,7 @@ namespace D3DTX_TextureConverter.Main
                 return;
             }
 
-            //allocate a byte array to contain the header data
-            headerData = new byte[calculated_HeaderLength];
-
-            //copy all the bytes from the source byte file after the header length, and copy that data to the texture data byte array
-            Array.Copy(sourceByteFile, 0, headerData, 0, headerData.Length);
-
-            Data_OriginalHeader = headerData;
-
             //--------------------------STORING D3DTX IMAGE DATA--------------------------
-            //if we are reading the header only, dont continue past this point
-            if (readHeaderOnly)
-                return;
-
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Blue);
             Console.WriteLine("Storing the .d3dtx image data...");
 
@@ -482,9 +467,9 @@ namespace D3DTX_TextureConverter.Main
             ByteFunctions.ReachedEndOfFile(bytePointerPosition, (uint)sourceByteFile.Length);
         }
 
-        public void Write_D3DTX(string destinationPath)
+        public void WriteD3DTX(string destinationPath)
         {
-            byte[] NewData = null;
+            byte[] NewData = new byte[0];
 
             //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
             //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
@@ -773,13 +758,11 @@ namespace D3DTX_TextureConverter.Main
             //--------------------------mHeight-------------------------- [4 bytes]
             mHeight = dds.header.dwHeight;
             //--------------------------mDepth-------------------------- [4 bytes]
-            mDepth = dds.header.dwDepth;
+            mDepth = 1 + dds.header.dwDepth; //DOUBLE CHECK but even on regular texture this seems to be 1
             //--------------------------mArraySize-------------------------- [4 bytes]
             mArraySize = 1;
             //--------------------------mSurfaceFormat-------------------------- [4 bytes] 
-
-            //NEEDS WORK HERE
-
+            mSurfaceFormat = DDS_File.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC);
             //--------------------------mTextureLayout-------------------------- [4 bytes]
 
             //NEEDS WORK HERE
@@ -803,7 +786,7 @@ namespace D3DTX_TextureConverter.Main
             //--------------------------mToonRegions DCArray Capacity-------------------------- [4 bytes]
             //--------------------------mToonRegions DCArray Length-------------------------- [4 bytes]
             //--------------------------mToonRegions DCArray--------------------------
-
+            //--------------------------StreamHeader--------------------------
             mStreamHeader = new StreamHeader()
             {
                 mRegionCount = (int)dds.header.dwMipMapCount + 1, //[4 bytes]
@@ -821,16 +804,17 @@ namespace D3DTX_TextureConverter.Main
                 mRegionHeaders[i] = new RegionStreamHeader()
                 {
                     mDataSize = (uint)dds.textureData[reverseIndex].Length,
-                    mFaceIndex = i,
-                    mMipCount = i,
-                    mMipIndex = i,
+                    mFaceIndex = 0, //seems to be zero most of the time
+                    mMipCount = 1, //seems to be 1 most of the time
+                    mMipIndex = (mRegionHeaders.Length - 1) - i, 
                     mPitch = DDS_Functions.DDS_ComputePitchValue(dds.mipMapResolutions[reverseIndex, 0], DDS_Functions.DDS_CompressionBool(dds.header)),
-                    mSlicePitch = (int)dds.header.dwPitchOrLinearSize
+                    mSlicePitch = dds.textureData[reverseIndex].Length
                 };
             }
             //--------------------------Texture Data--------------------------
             T3Texture_Data = new List<byte[]>();
 
+            //add the DDS data in reverse
             for(int i = mRegionHeaders.Length - 1; i >= 0; i--)
             {
                 T3Texture_Data.Add(dds.textureData[i]);

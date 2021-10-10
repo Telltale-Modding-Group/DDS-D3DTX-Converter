@@ -11,7 +11,7 @@ using D3DTX_TextureConverter.DirectX;
 namespace D3DTX_TextureConverter.Main
 {
     /// <summary>
-    /// This is a custom class that actually matches what is inside a D3DTX [ERTM] file (this exact struct doesn't exist within telltale).
+    /// (UNFINISHED) This is a custom class that matches what is serialized in a D3DTX [ERTM] file.
     /// </summary>
     public class D3DTX_ERTM
     {
@@ -74,19 +74,14 @@ namespace D3DTX_TextureConverter.Main
         //public T3TextureType mType; //[4 bytes]
         //public eTxAlpha mAlphaMode; //[4 bytes]
 
-        //public List<byte[]> T3Texture_Data; //each image data, starts from smallest mip map to largest mip map
-
-        public byte[] Data_OriginalBytes;
+        public List<byte[]> T3Texture_Data; //each image data, starts from smallest mip map to largest mip map
         public byte[] Data_OriginalHeader;
 
         public D3DTX_ERTM(string sourceFilePath, bool readHeaderOnly)
         {
             //read the source file into a byte array
             byte[] sourceByteFile = File.ReadAllBytes(sourceFilePath);
-            byte[] headerData = new byte[0];
             int headerLength = 0;
-
-            Data_OriginalBytes = sourceByteFile;
 
             //which byte offset we are on (will be changed as we go through the file)
             uint bytePointerPosition = 0;
@@ -204,36 +199,19 @@ namespace D3DTX_TextureConverter.Main
             Console.WriteLine("D3DTX mHeight = {0}", mHeight);
 
 
+
+
+
+
+
             //NOTE TO SELF: THIS BIG CHUNK OF DATA NEEDS TO STAY THE SAME SIZE AS THE VALUES AFTER THIS CHUNK ARE CORRECT
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
-            /*
-            Console.WriteLine("D3DTX Unknown [mWiiForceWidth] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //mWiiForceWidth
-            Console.WriteLine("D3DTX Unknown [mWiiForceHeight] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //mWiiForceHeight
-            Console.WriteLine("D3DTX Unknown [mbWiiForceUncompressed] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition)); //mbWiiForceUncompressed
-            Console.WriteLine("D3DTX Unknown [mTextureDataFormats] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [mTplTexutreDataSize] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //mTextureDataFormats
-            Console.WriteLine("D3DTX Unknown [mTplAlphaDataSize] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //mTplTexutreDataSize
-            Console.WriteLine("D3DTX Unknown [mJPEGTextureDataSize] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //mTplAlphaDataSize
-            Console.WriteLine("D3DTX Unknown [mHDRLightmapScale] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //mJPEGTextureDataSize
-            Console.WriteLine("D3DTX Unknown [mExactAlphaMode] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //mHDRLightmapScale
-            Console.WriteLine("D3DTX Unknown [mColorMode] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //mExactAlphaMode
-            Console.WriteLine("D3DTX Unknown [mWiiTextureFormat] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //mColorMode
-            Console.WriteLine("D3DTX Unknown [mDetailMapBrightness] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //mWiiTextureFormat
-            Console.WriteLine("D3DTX Unknown [mNormalMapFmt] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //mDetailMapBrightness
-            Console.WriteLine("D3DTX Unknown [] (UInt32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //mNormalMapFmt
-            Console.WriteLine("D3DTX Unknown [mbEncrypted] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition)); //mbForcePreviewRebuild?
-            Console.WriteLine("D3DTX Unknown [mbForcePreviewRebuild] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition)); //mbForcePreviewRebuild?
-            Console.WriteLine("D3DTX Unknown [] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition)); //mbForcePreviewRebuild?
-            Console.WriteLine("D3DTX Unknown [] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition)); //mbEncrypted
-            Console.WriteLine("D3DTX Unknown [] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition)); //mbForcePreviewRebuild?
-            */
 
             Console.WriteLine("D3DTX Unknown [1] (UINT32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //6 on ui, 4 on regular/alpha/normal, 0 on lightmap
             Console.WriteLine("D3DTX Unknown [5] (UINT32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition));
             Console.WriteLine("D3DTX Unknown [9] (UINT32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition));
 
-            Console.WriteLine("D3DTX Unknown [13] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition)); //ALWAYS 48
+            Console.WriteLine("D3DTX Unknown [13] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition)); //ALWAYS 48 (THIS IS A BOOL)
 
             Console.WriteLine("D3DTX Unknown [14] (UINT32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition));
             Console.WriteLine("D3DTX mNormalMapFmt [18] (UINT32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //33 on normal map textures, 1 on regular textures
@@ -252,7 +230,7 @@ namespace D3DTX_TextureConverter.Main
             Console.WriteLine("D3DTX Unknown [46] (UINT32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition)); //(was 2 on additive textures?) (was 2 on bmap files but not normal)
             Console.WriteLine("D3DTX Unknown [50] (UINT32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition));
 
-            Console.WriteLine("D3DTX Unknown [54] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition)); //ALWAYS 48
+            Console.WriteLine("D3DTX Unknown [54] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition)); //ALWAYS 48 (THIS IS A BOOL)
 
             Console.WriteLine("D3DTX Unknown [55] (UINT32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition));
             Console.WriteLine("D3DTX Unknown [59] (UINT32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition));
@@ -325,14 +303,14 @@ namespace D3DTX_TextureConverter.Main
 
             /*
  * d3dtx
- * mSamplerState (DONE)
- * mImportName (DONE)
+ * mSamplerState [DONE]
+ * mImportName [DONE]
  * mbHasTextureData
- * mbIsMipMapped
- * mNumMipLevels (DONE)
- * mD3DFormat (DONE)
- * mWidth (DONE)
- * mHeight (DONE)
+ * mbIsMipMapped [DONE]
+ * mNumMipLevels [DONE]
+ * mD3DFormat [DONE]
+ * mWidth [DONE]
+ * mHeight [DONE]
  * mWiiForceWidth
  * mWiiForceHeight
  * mbWiiForceUncompressed
@@ -347,12 +325,12 @@ namespace D3DTX_TextureConverter.Main
  * mbEncrypted
  * mDetailMapBrightness
  * mNormalMapFmt
- * mUVOffset (DONE)
- * mUVScale (DONE)
+ * mUVOffset [DONE]
+ * mUVScale [DONE]
  * mbForcePreviewRebuild
 */
 
-            /*
+            /* - FROM EXE HEX
              * mbForcePreviewRebuild
              * ���mUVScale
              * ����mUVOffset
@@ -415,7 +393,6 @@ namespace D3DTX_TextureConverter.Main
             };
 
             this.mUVScale = mUVScale;
-            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("D3DTX mUVScale = {0} {1}", mUVScale.x, mUVScale.y);
 
             //--------------------------mDataSize-------------------------- [4 bytes]
@@ -427,28 +404,17 @@ namespace D3DTX_TextureConverter.Main
             ByteFunctions.ReachedOffset(bytePointerPosition, (uint)headerLength);
 
             //--------------------------END OF D3DTX HEADER--------------------------
+            //--------------------------STORE D3DTX HEADER DATA--------------------------
+            Data_OriginalHeader = new byte[headerLength];
+            Array.Copy(sourceByteFile, 0, Data_OriginalHeader, 0, headerLength);
             //--------------------------START OF DDS FILE (right after d3dtx header)--------------------------
             int ddsFileOffsetStart = sourceByteFile.Length - (int)mDataSize;
 
             //get the bytes of the dds file from the d3dtx
-            //byte[] DDS_Data = ByteFunctions.AllocateBytes((int)uknown, sourceByteFile, bytePointerPosition);
+            byte[] DDS_Data = ByteFunctions.AllocateBytes((int)mDataSize, sourceByteFile, bytePointerPosition);
 
             //parse the byte data into a DDS file
-            //DDS_File dds_file = new DDS_File(DDS_Data, false);
-        }
-
-        public byte[] Get_Modified_D3DTX(DDS_File DDS_File, bool headerOnly)
-        {
-            byte[] Copied_Data = null;
-
-            if (headerOnly)
-                Copied_Data = Data_OriginalHeader;
-            else
-                Copied_Data = Data_OriginalBytes;
-
-
-
-            return Copied_Data;
+            mInnerDDS = new DDS_File(DDS_Data, false);
         }
 
         /*

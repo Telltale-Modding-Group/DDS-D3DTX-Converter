@@ -52,7 +52,7 @@ namespace D3DTX_TextureConverter.Main
         public string sourceFile; //file path
         public byte[] sourceFileData; //file data
         public List<byte[]> textureData;
-        public byte[,] mipMapResolutions;
+        public uint[,] mipMapResolutions;
 
         public DDS_HEADER header;
 
@@ -100,10 +100,12 @@ namespace D3DTX_TextureConverter.Main
             {
                 //get mip resolutions
                 //calculated mip resolutions [Pixel Value, Width or Height (0 or 1)]
-                uint[,] mipImageResolutions = DDS_Functions.DDS_CalculateMipResolutions(header.dwMipMapCount, header.dwWidth, header.dwHeight);
+                uint[,] mipResolutions = DDS_Functions.DDS_CalculateMipResolutions(header.dwMipMapCount, header.dwWidth, header.dwHeight);
 
-                //get byte sizes
-                uint[] byteSizes = DDS_Functions.DDS_GetImageByteSizes(mipImageResolutions, DDS_Functions.DDS_CompressionBool(header));
+                mipMapResolutions = mipResolutions;
+
+                //get byte sizes (ISSUE HERE WITH MIP IMAGE RESOLUTIONS)
+                uint[] byteSizes = DDS_Functions.DDS_GetImageByteSizes(mipResolutions, DDS_Functions.DDS_CompressionBool(header));
 
                 textureData = new List<byte[]>();
                 int offset = 0;
@@ -151,6 +153,48 @@ namespace D3DTX_TextureConverter.Main
             GetData(sourceFileData, headerOnly);
         }
 
+        public void Write_D3DTX_AsDDS(D3DTX_File d3dtx, string destinationPath)
+        {
+            byte[] finalData = new byte[0];
+
+            //turn our header data into bytes to be written into a file
+            byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS_Functions.GetHeaderBytes(header));
+
+            //copy the dds header to the file
+            finalData = ByteFunctions.Combine(finalData, dds_header);
+
+            //6VSM
+            if (d3dtx.D3DTX_6VSM != null)
+            {
+                //copy the images
+                for (int i = d3dtx.D3DTX_6VSM.T3Texture_Data.Count - 1; i >= 0; i--)
+                {
+                    finalData = ByteFunctions.Combine(finalData, d3dtx.D3DTX_6VSM.T3Texture_Data[i]);
+                }
+            }
+            //5VSM
+            else if (d3dtx.D3DTX_5VSM != null)
+            {
+                //copy the images
+                for (int i = d3dtx.D3DTX_5VSM.T3Texture_Data.Count - 1; i >= 0; i--)
+                {
+                    finalData = ByteFunctions.Combine(finalData, d3dtx.D3DTX_5VSM.T3Texture_Data[i]);
+                }
+            }
+            //ERTM
+            else if (d3dtx.D3DTX_ERTM != null)
+            {
+                //copy the images
+                //for (int i = d3dtx.D3DTX_ERTM.T3Texture_Data.Count - 1; i >= 0; i--)
+                //{
+                //    finalData = ByteFunctions.Combine(finalData, d3dtx.D3DTX_ERTM.T3Texture_Data[i]);
+                //}
+            }
+
+            //write the file
+            File.WriteAllBytes(destinationPath, finalData);
+        }
+
         public DDS_File Match_DDS_With_D3DTX(string ddsPath, D3DTX_File d3dtx)
         {
             ScratchImage scratchImage = TexHelper.Instance.LoadFromDDSFile(ddsPath, DDS_FLAGS.NONE);
@@ -186,28 +230,7 @@ namespace D3DTX_TextureConverter.Main
             return null;
         }
 
-        public T3SurfaceFormat Get_TellaleFormat_FromFourCC(uint fourCC)
-        {
-            switch (fourCC)
-            {
-                default:
-                    return Telltale.T3SurfaceFormat.eSurface_DXT1;//ByteFunctions.Convert_String_To_UInt32("DXT1");
-                case Telltale.T3SurfaceFormat.eSurface_DXT1:
-                    return ByteFunctions.Convert_String_To_UInt32("DXT1");
-                case Telltale.T3SurfaceFormat.eSurface_DXT3:
-                    return ByteFunctions.Convert_String_To_UInt32("DXT3");
-                case Telltale.T3SurfaceFormat.eSurface_DXT5:
-                    return ByteFunctions.Convert_String_To_UInt32("DXT5");
-                case Telltale.T3SurfaceFormat.eSurface_DXN:
-                    return ByteFunctions.Convert_String_To_UInt32("ATI2");
-                case Telltale.T3SurfaceFormat.eSurface_DXT5A:
-                    return ByteFunctions.Convert_String_To_UInt32("ATI1");
-                case Telltale.T3SurfaceFormat.eSurface_A8:
-                    return 0;
-            }
-        }
-
-        public uint Get_FourCC_FromTellale(T3SurfaceFormat format)
+        public static uint Get_FourCC_FromTellale(T3SurfaceFormat format)
         {
             switch (format)
             {
@@ -228,6 +251,26 @@ namespace D3DTX_TextureConverter.Main
             }
         }
 
+        public static T3SurfaceFormat Get_T3Format_FromFourCC(uint fourCC)
+        {
+            if(fourCC == ByteFunctions.Convert_String_To_UInt32("DXT1"))
+                return Telltale.T3SurfaceFormat.eSurface_DXT1;
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("DXT3"))
+                return Telltale.T3SurfaceFormat.eSurface_DXT3;
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("DXT5"))
+                return Telltale.T3SurfaceFormat.eSurface_DXT5;
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("ATI2"))
+                return Telltale.T3SurfaceFormat.eSurface_DXN;
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("ATI1"))
+                return Telltale.T3SurfaceFormat.eSurface_DXT5A;
+            else
+                return Telltale.T3SurfaceFormat.eSurface_DXT1;
+        }
+
+        /// <summary>
+        /// Create a DDS file from a D3DTX
+        /// </summary>
+        /// <param name="d3dtx"></param>
         public DDS_File(D3DTX_File d3dtx)
         {
             header = DDS_Functions.GetPresetHeader();
@@ -255,48 +298,6 @@ namespace D3DTX_TextureConverter.Main
                         break;
                 }
             }
-        }
-
-        public void Write_D3DTX_AsDDS(D3DTX_File d3dtx, string destinationPath)
-        {
-            byte[] finalData = new byte[0];
-
-            //turn our header data into bytes to be written into a file
-            byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS_Functions.GetHeaderBytes(header));
-
-            //copy the dds header to the file
-            finalData = ByteFunctions.Combine(finalData, dds_header);
-
-            //6VSM
-            if (d3dtx.D3DTX_6VSM != null)
-            {
-                //copy the images
-                for(int i = d3dtx.D3DTX_6VSM.T3Texture_Data.Count - 1; i >= 0; i--)
-                {
-                    finalData = ByteFunctions.Combine(finalData, d3dtx.D3DTX_6VSM.T3Texture_Data[i]);
-                }
-            }
-            //5VSM
-            else if (d3dtx.D3DTX_5VSM != null)
-            {
-                //copy the images
-                for (int i = d3dtx.D3DTX_5VSM.T3Texture_Data.Count - 1; i >= 0; i--)
-                {
-                    finalData = ByteFunctions.Combine(finalData, d3dtx.D3DTX_5VSM.T3Texture_Data[i]);
-                }
-            }
-            //ERTM
-            else if (d3dtx.D3DTX_ERTM != null)
-            {
-                //copy the images
-                //for (int i = d3dtx.D3DTX_ERTM.T3Texture_Data.Count - 1; i >= 0; i--)
-                //{
-                //    finalData = ByteFunctions.Combine(finalData, d3dtx.D3DTX_ERTM.T3Texture_Data[i]);
-                //}
-            }
-
-            //write the file
-            File.WriteAllBytes(destinationPath, finalData);
         }
 
         /// <summary>

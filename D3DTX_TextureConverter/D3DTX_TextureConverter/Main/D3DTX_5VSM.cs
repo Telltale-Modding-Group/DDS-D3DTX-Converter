@@ -6,34 +6,35 @@ using System.Threading.Tasks;
 using System.IO;
 using D3DTX_TextureConverter.Telltale;
 using D3DTX_TextureConverter.Utilities;
+using D3DTX_TextureConverter.DirectX;
 
 namespace D3DTX_TextureConverter.Main
 {
     /// <summary>
-    /// This is a custom class that actually matches what is inside a D3DTX [5VSM] file (this exact struct doesn't exist within telltale).
+    /// This is a custom class that matches what is serialized in a D3DTX [5VSM] file.
     /// </summary>
     public class D3DTX_5VSM
     {
         //meta header
         public string mMetaStreamVersion { get; set; } //[4 bytes]
-        public uint mDefaultSectionChunkSize { get; set; } //[4 bytes]
-        public uint mDebugSectionChunkSize { get; set; } //[4 bytes]
-        public uint mAsyncSectionChunkSize { get; set; } //[4 bytes]
-        public uint mClassNamesLength; //[4 bytes]
-        public ClassNames[] mClassNames { get; set; }//[12 bytes for each element]
+        public uint mDefaultSectionChunkSize { get; set; } //[4 bytes] size of the d3dtx header after the meta header
+        public uint mDebugSectionChunkSize { get; set; } //[4 bytes] (always 0)
+        public uint mAsyncSectionChunkSize { get; set; } //[4 bytes] size of texture data itself (not the header)
+        public uint mClassNamesLength { get; set; } //[4 bytes]
+        public ClassNames[] mClassNames { get; set; } //[12 bytes for each element]
 
         //d3dtx header
         public int mVersion { get; set; } //[4 bytes]
-        public int mSamplerState_BlockSize; //[4 bytes]
+        public int mSamplerState_BlockSize { get; set; } //[4 bytes] (always 8)
         public T3SamplerStateBlock mSamplerState { get; set; } //[4 bytes]
-        public int mPlatform_BlockSize; //[4 bytes]
+        public int mPlatform_BlockSize { get; set; } //[4 bytes] (always 8)
         public PlatformType mPlatform { get; set; } //[4 bytes]
-        public int mName_BlockSize; //[4 bytes]
-        public uint mName_StringLength; //[4 bytes]
+        public int mName_BlockSize { get; set; } //[4 bytes]
+        public uint mName_StringLength { get; set; } //[4 bytes]
         public string mName { get; set; } //[mName_StringLength bytes]
-        public int mImportName_BlockSize; //[4 bytes]
-        public uint mImportName_StringLength; //[4 bytes]
-        public string mImportName; //[mImportName_StringLength bytes]
+        public int mImportName_BlockSize { get; set; } //[4 bytes]
+        public uint mImportName_StringLength { get; set; } //[4 bytes]
+        public string mImportName { get; set; } //[mImportName_StringLength bytes]
         public float mImportScale { get; set; } //[4 bytes]
         public ToolProps mToolProps { get; set; } //[1 byte]
         public uint mNumMipLevels { get; set; } //[4 bytes]
@@ -49,24 +50,20 @@ namespace D3DTX_TextureConverter.Main
         public eTxColor mColorMode { get; set; } //[4 bytes]
         public Vector2 mUVOffset { get; set; } //[8 bytes]
         public Vector2 mUVScale { get; set; } //[8 bytes]
-        public uint mToonRegions_ArrayCapacity; //[4 bytes]
-        public int mToonRegions_ArrayLength; //[4 bytes]
-        public List<T3ToonGradientRegion> mToonRegions { get; set; } //(varies, each element is 16 bytes long)
-        public StreamHeader StreamHeader { get; set; } // [12 bytes]
-        public List<RegionStreamHeader> mRegionHeaders { get; set; } //(varies, each element is 24 bytes long)
-        public List<byte[]> T3Texture_Data; //each image data, starts from smallest mip map to largest mip map
+        public uint mToonRegions_ArrayCapacity { get; set; } //[4 bytes]
+        public int mToonRegions_ArrayLength { get; set; } //[4 bytes]
+        public T3ToonGradientRegion[] mToonRegions { get; set; } //(varies, each element is 16 bytes long)
+        public StreamHeader mStreamHeader { get; set; } // [12 bytes]
+        public RegionStreamHeader[] mRegionHeaders { get; set; } //(varies, each element is 24 bytes long)
 
-        public byte[] Data_OriginalBytes;
-        public byte[] Data_OriginalHeader;
+        //d3dtx byte data
+        public List<byte[]> T3Texture_Data { get; set; } //each image data, starts from smallest mip map to largest mip map
 
-        public D3DTX_5VSM(string sourceFilePath, bool readHeaderOnly)
+        public D3DTX_5VSM(string sourceFilePath)
         {
             //read the source file into a byte array
             byte[] sourceByteFile = File.ReadAllBytes(sourceFilePath);
-            byte[] headerData = new byte[0];
             int calculated_HeaderLength = 0;
-
-            Data_OriginalBytes = sourceByteFile;
 
             //which byte offset we are on (will be changed as we go through the file)
             uint bytePointerPosition = 0;
@@ -100,7 +97,7 @@ namespace D3DTX_TextureConverter.Main
             Console.WriteLine("D3DTX Async Section Chunk Size = {0}", mAsyncSectionChunkSize);
 
             //if the 'parsed' texture byte size in the file is actually supposedly bigger than the file itself
-            if (mAsyncSectionChunkSize > sourceByteFile.Length && !readHeaderOnly)
+            if (mAsyncSectionChunkSize > sourceByteFile.Length)
             {
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
                 Console.WriteLine("Can't continue reading the file because the values we are reading are incorrect! This can be due to the byte data being shifted in the file or non-existant, and this is likley because the file version has changed.");
@@ -109,10 +106,7 @@ namespace D3DTX_TextureConverter.Main
             }
 
             //--------------------------CALCULATING HEADER LENGTH--------------------------
-            if (readHeaderOnly)
-                calculated_HeaderLength = sourceByteFile.Length;
-            else
-                calculated_HeaderLength = sourceByteFile.Length - (int)mAsyncSectionChunkSize;
+            calculated_HeaderLength = sourceByteFile.Length - (int)mAsyncSectionChunkSize;
 
             //write the result to the console for viewing
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
@@ -316,11 +310,11 @@ namespace D3DTX_TextureConverter.Main
             Console.WriteLine("D3DTX mToonRegions_ArrayLength = {0}", mToonRegions_ArrayLength);
 
             //--------------------------mToonRegions DCArray--------------------------
-            mToonRegions = new List<T3ToonGradientRegion>();
+            mToonRegions = new T3ToonGradientRegion[mToonRegions_ArrayLength];
 
             for (int i = 0; i < mToonRegions_ArrayLength; i++)
             {
-                T3ToonGradientRegion toonGradientRegion = new T3ToonGradientRegion()
+                mToonRegions[i] = new T3ToonGradientRegion()
                 {
                     mColor = new Color()
                     {
@@ -332,15 +326,13 @@ namespace D3DTX_TextureConverter.Main
 
                     mSize = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition) //[4 bytes]
                 };
-
-                mToonRegions.Add(toonGradientRegion);
             }
 
             //check if we are at the offset we should be after going through the array
             ByteFunctions.DCArrayCheckAdjustment(bytePointerPostion_before_mToonRegions, mToonRegions_ArrayCapacity, ref bytePointerPosition);
-            
+
             //--------------------------StreamHeader--------------------------
-            StreamHeader = new StreamHeader()
+            mStreamHeader = new StreamHeader()
             {
                 mRegionCount = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition), //[4 bytes]
                 mAuxDataCount = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition), //[4 bytes]
@@ -348,15 +340,15 @@ namespace D3DTX_TextureConverter.Main
             };
 
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-            Console.WriteLine("D3DTX mRegionCount = {0}", StreamHeader.mRegionCount);
-            Console.WriteLine("D3DTX mAuxDataCount {0}", StreamHeader.mAuxDataCount);
-            Console.WriteLine("D3DTX mTotalDataSize {0}", StreamHeader.mTotalDataSize);
+            Console.WriteLine("D3DTX mRegionCount = {0}", mStreamHeader.mRegionCount);
+            Console.WriteLine("D3DTX mAuxDataCount {0}", mStreamHeader.mAuxDataCount);
+            Console.WriteLine("D3DTX mTotalDataSize {0}", mStreamHeader.mTotalDataSize);
 
             //--------------------------mRegionHeaders--------------------------
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
             Console.WriteLine("----------- mRegionHeaders -----------");
-            mRegionHeaders = new List<RegionStreamHeader>();
-            for (int i = 0; i < StreamHeader.mRegionCount; i++)
+            mRegionHeaders = new RegionStreamHeader[mStreamHeader.mRegionCount];
+            for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 if (bytePointerPosition > calculated_HeaderLength)
                 {
@@ -366,7 +358,7 @@ namespace D3DTX_TextureConverter.Main
                     break;
                 }
 
-                RegionStreamHeader mRegionHeader = new RegionStreamHeader() //no mFaceIndex or mSlicePitch compared to 6VSM
+                mRegionHeaders[i] = new RegionStreamHeader() //no mFaceIndex or mSlicePitch compared to 6VSM
                 {
                     mMipIndex = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition), //[4 bytes] 
                     mMipCount = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition), //[4 bytes]
@@ -377,12 +369,10 @@ namespace D3DTX_TextureConverter.Main
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
                 Console.WriteLine("[mRegionHeader {0}]", i);
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-                Console.WriteLine("D3DTX mMipIndex = {0}", mRegionHeader.mMipIndex);
-                Console.WriteLine("D3DTX mMipCount = {0}", mRegionHeader.mMipCount);
-                Console.WriteLine("D3DTX mDataSize = {0}", mRegionHeader.mDataSize);
-                Console.WriteLine("D3DTX mPitch = {0}", mRegionHeader.mPitch);
-
-                mRegionHeaders.Add(mRegionHeader);
+                Console.WriteLine("D3DTX mMipIndex = {0}", mRegionHeaders[i].mMipIndex);
+                Console.WriteLine("D3DTX mMipCount = {0}", mRegionHeaders[i].mMipCount);
+                Console.WriteLine("D3DTX mDataSize = {0}", mRegionHeaders[i].mDataSize);
+                Console.WriteLine("D3DTX mPitch = {0}", mRegionHeaders[i].mPitch);
             }
 
             //do a quick check to see if we reached the end of the file header
@@ -400,25 +390,13 @@ namespace D3DTX_TextureConverter.Main
                 return;
             }
 
-            //allocate a byte array to contain the header data
-            headerData = new byte[calculated_HeaderLength];
-
-            //copy all the bytes from the source byte file after the header length, and copy that data to the texture data byte array
-            Array.Copy(sourceByteFile, 0, headerData, 0, headerData.Length);
-
-            Data_OriginalHeader = headerData;
-
             //--------------------------STORING D3DTX IMAGE DATA--------------------------
-            //if we are reading the header only, dont continue past this point
-            if (readHeaderOnly)
-                return;
-
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Blue);
             Console.WriteLine("Storing the .d3dtx image data...");
 
             T3Texture_Data = new List<byte[]>();
 
-            for (int i = 0; i < StreamHeader.mRegionCount; i++)
+            for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 int dataSize = (int)mRegionHeaders[i].mDataSize;
                 byte[] imageData = ByteFunctions.AllocateBytes(dataSize, sourceByteFile, bytePointerPosition);
@@ -432,9 +410,10 @@ namespace D3DTX_TextureConverter.Main
             ByteFunctions.ReachedEndOfFile(bytePointerPosition, (uint)sourceByteFile.Length);
         }
 
-        public byte[] Get_Modified_D3DTX(DDS_File DDS_File, bool headerOnly)
+
+        public void WriteD3DTX(string destinationPath)
         {
-            byte[] NewData = null;
+            byte[] NewData = new byte[0];
 
             //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
             //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
@@ -521,9 +500,6 @@ namespace D3DTX_TextureConverter.Main
             //--------------------------mType-------------------------- [4 bytes]
             NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mType));
 
-            //--------------------------mNormalMapFormat-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mNormalMapFormat));
-
             //--------------------------mHDRLightmapScale-------------------------- [4 bytes]
             NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mHDRLightmapScale));
 
@@ -562,30 +538,158 @@ namespace D3DTX_TextureConverter.Main
             }
 
             //--------------------------StreamHeader--------------------------
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(StreamHeader.mRegionCount));
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(StreamHeader.mAuxDataCount));
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(StreamHeader.mTotalDataSize));
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mStreamHeader.mRegionCount));
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mStreamHeader.mAuxDataCount));
+            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mStreamHeader.mTotalDataSize));
 
             //--------------------------mRegionHeaders--------------------------
-            for (int i = 0; i < StreamHeader.mRegionCount; i++)
+            for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mFaceIndex));
                 NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mMipIndex));
                 NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mMipCount));
                 NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mDataSize));
                 NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mPitch));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mSlicePitch));
             }
 
-            if (headerOnly)
-                return NewData;
-
-            for (int i = DDS_File.textureData.Count - 1; i >= 0; i--)
+            //--------------------------Texture Data--------------------------
+            for (int i = 0; i < T3Texture_Data.Count; i++)
             {
-                NewData = ByteFunctions.Combine(NewData, DDS_File.textureData[i]);
+                NewData = ByteFunctions.Combine(NewData, T3Texture_Data[i]);
             }
 
-            return NewData;
+            //write the final to disk
+            File.WriteAllBytes(destinationPath, NewData);
+        }
+
+        public void ModifyD3DTX(DDS_File dds)
+        {
+            //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
+            //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
+            //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
+            //--------------------------Default Section Chunk Size-------------------------- [4 bytes] //default section chunk size (THIS IS THE SIZE OF THE FULL D3DTX HEADER MINUS THIS META STREAM HEADER)
+            //NOTE TO SELF: I know this is inefficent as hell, and I definetly plan to simplify it but I do it just so I can keep track of the values correctly
+            mDefaultSectionChunkSize = 0;
+            mDefaultSectionChunkSize += 4; //mVersion
+            mDefaultSectionChunkSize += 4; //mSamplerState Block Size
+            mDefaultSectionChunkSize += 4; //mSamplerState
+            mDefaultSectionChunkSize += 4; //mPlatform Block Size
+            mDefaultSectionChunkSize += 4; //mPlatform
+            mDefaultSectionChunkSize += 4; //mName Block Size
+            mDefaultSectionChunkSize += 4; //mName String Length
+            mDefaultSectionChunkSize += (uint)mName.Length;
+            mDefaultSectionChunkSize += 4; //mImportName Block Size
+            mDefaultSectionChunkSize += 4; //mImportName String Length
+            mDefaultSectionChunkSize += (uint)mImportName.Length;
+            mDefaultSectionChunkSize += 4; //mImportScale
+            mDefaultSectionChunkSize += 1; //mToolProps
+            mDefaultSectionChunkSize += 4; //mNumMipLevels
+            mDefaultSectionChunkSize += 4; //mWidth
+            mDefaultSectionChunkSize += 4; //mHeight
+            mDefaultSectionChunkSize += 4; //mSurfaceFormat
+            mDefaultSectionChunkSize += 4; //mResourceUsage
+            mDefaultSectionChunkSize += 4; //mType
+            mDefaultSectionChunkSize += 4; //mHDRLightmapScale
+            mDefaultSectionChunkSize += 4; //mToonGradientCutoff
+            mDefaultSectionChunkSize += 4; //mAlphaMode
+            mDefaultSectionChunkSize += 4; //mColorMode
+            mDefaultSectionChunkSize += 8; //mUVOffset
+            mDefaultSectionChunkSize += 8; //mUVScale
+
+            mDefaultSectionChunkSize += 4; //mToonRegions DCArray Capacity
+            mDefaultSectionChunkSize += 4; //mToonRegions DCArray Length
+            mDefaultSectionChunkSize += mToonRegions_ArrayCapacity; //mToonRegions DCArray
+            mDefaultSectionChunkSize += 4; //StreamHeader mRegionCount
+            mDefaultSectionChunkSize += 4; //StreamHeader mAuxDataCount
+            mDefaultSectionChunkSize += 4; //StreamHeader mTotalDataSize
+
+            for (int i = 0; i < mStreamHeader.mRegionCount; i++)
+            {
+                mDefaultSectionChunkSize += 4; //mFaceIndex
+                mDefaultSectionChunkSize += 4; //mMipIndex
+                mDefaultSectionChunkSize += 4; //mMipCount
+                mDefaultSectionChunkSize += 4; //mDataSize
+                mDefaultSectionChunkSize += 4; //mPitch
+                mDefaultSectionChunkSize += 4; //mSlicePitch
+            }
+
+            //-------------------------Debug Section Chunk Size-------------------------- [4 bytes] //debug section chunk size (always zero)
+            mDebugSectionChunkSize = 0;
+            //--------------------------Async Section Chunk Size-------------------------- [4 bytes] //async section chunk size (size of the bytes after the file header)
+            mAsyncSectionChunkSize = 0;
+
+            foreach (byte[] dds_textureChunk in dds.textureData)
+            {
+                mAsyncSectionChunkSize += (uint)dds_textureChunk.Length;
+            }
+            //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
+            //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
+            //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
+            //--------------------------mSamplerState Block Size-------------------------- [4 bytes]
+            mSamplerState_BlockSize = 8;
+            //--------------------------mSamplerState-------------------------- [4 bytes]
+            //--------------------------mPlatform Block Size-------------------------- [4 bytes]
+            mPlatform_BlockSize = 8;
+            //--------------------------mName Block Size-------------------------- [4 bytes] //mName block size (size + string len)
+            mName_BlockSize = mName.Length + 8;
+            //--------------------------mName String Length-------------------------- [4 bytes]
+            mName_StringLength = (uint)mName.Length;
+            //--------------------------mImportName Block Size-------------------------- [4 bytes] //mImportName block size (size + string len)
+            mImportName_BlockSize = mImportName.Length + 8;
+            //--------------------------mImportName String Length-------------------------- [4 bytes]
+            mImportName_StringLength = (uint)mImportName.Length;
+            //--------------------------mImportName-------------------------- [mImportName_StringLength bytes] (this is always 0)
+            //--------------------------mImportScale-------------------------- [4 bytes]
+            //--------------------------mToolProps-------------------------- [1 byte]
+            //--------------------------mNumMipLevels-------------------------- [4 bytes]
+            mNumMipLevels = dds.header.dwMipMapCount + 1;
+            //--------------------------mWidth-------------------------- [4 bytes]
+            mWidth = dds.header.dwWidth;
+            //--------------------------mHeight-------------------------- [4 bytes]
+            mHeight = dds.header.dwHeight;
+            //--------------------------mSurfaceFormat-------------------------- [4 bytes] 
+            mSurfaceFormat = DDS_File.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC);
+            //--------------------------mResourceUsage-------------------------- [4 bytes]
+            //--------------------------mType-------------------------- [4 bytes]
+            //--------------------------mHDRLightmapScale-------------------------- [4 bytes]
+            //--------------------------mToonGradientCutoff-------------------------- [4 bytes]
+            //--------------------------mAlphaMode-------------------------- [4 bytes]
+            //--------------------------mColorMode-------------------------- [4 bytes]
+            //--------------------------mUVOffset-------------------------- [8 bytes]
+            //--------------------------mUVScale-------------------------- [8 bytes]
+            //--------------------------mToonRegions DCArray Capacity-------------------------- [4 bytes]
+            //--------------------------mToonRegions DCArray Length-------------------------- [4 bytes]
+            //--------------------------mToonRegions DCArray--------------------------
+            //--------------------------StreamHeader--------------------------
+            mStreamHeader = new StreamHeader()
+            {
+                mRegionCount = (int)dds.header.dwMipMapCount + 1, //[4 bytes]
+                mAuxDataCount = 0, //[4 bytes]
+                mTotalDataSize = (int)mAsyncSectionChunkSize //[4 bytes]
+            };
+
+            //--------------------------mRegionHeaders--------------------------
+            mRegionHeaders = new RegionStreamHeader[mStreamHeader.mRegionCount];
+
+            for (int i = 0; i < mRegionHeaders.Length; i++)
+            {
+                int reverseIndex = (mRegionHeaders.Length - 1) - i;
+
+                mRegionHeaders[i] = new RegionStreamHeader()
+                {
+                    mDataSize = (uint)dds.textureData[reverseIndex].Length,
+                    mMipCount = 1, //seems to be 1 most of the time
+                    mMipIndex = mRegionHeaders.Length - i,
+                    mPitch = DDS_Functions.DDS_ComputePitchValue(dds.mipMapResolutions[reverseIndex, 0], DDS_Functions.DDS_CompressionBool(dds.header))
+                };
+            }
+            //--------------------------Texture Data--------------------------
+            T3Texture_Data = new List<byte[]>();
+
+            //add the DDS data in reverse
+            for (int i = mRegionHeaders.Length - 1; i >= 0; i--)
+            {
+                T3Texture_Data.Add(dds.textureData[i]);
+            }
         }
     }
 }

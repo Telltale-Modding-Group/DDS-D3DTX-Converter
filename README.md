@@ -59,4 +59,4 @@ There are 2 projects in this repository, **TextureMod_GUI** being the main appli
 
 If you are new and don't want to deal with a console application and would rather have a user-friendly interface then use **TextureMod_GUI**, however if your comfortable with using a console application you can use the  **D3DTX_TextureConverter** BUT it will require you to change the code directly to set some parameters or switch to a different mode.
 
-**If you want to learn about the file format** I suggest you look in the **D3DTX_TextureConverter** and look at the **[Program.cs](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/blob/main/D3DTX_TextureConverter/D3DTX_TextureConverter/Program.cs)** script, it's is well documented and describes the .d3dtx format and .dds format well.
+**If you want to learn about the file format** I suggest you look in the **D3DTX_TextureConverter** and look at the **[D3DTX_6VSM.cs](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/blob/main/D3DTX_TextureConverter/D3DTX_TextureConverter/Main/D3DTX_6VSM.cs)** script, it's is well documented and describes the .d3dtx format and .dds format well.

@@ -14,7 +14,7 @@ namespace D3DTX_TextureConverter
     class Program
     {
         //----------------------CONVERSION OPTIONS----------------------
-        public static bool d3dtxMode = false; //true = in d3dtx to dds mode, false = dds to d3dtx mode
+        public static bool d3dtxMode = true; //true = in d3dtx to dds mode, false = dds to d3dtx mode
         //----------------------CONVERSION OPTIONS END----------------------
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace D3DTX_TextureConverter
             Console.WriteLine("Filtering Textures..."); //notify the user we are filtering the array
 
             //filter the array so we only get .d3dtx files
-            textures = IOManagement.FilterFiles(textures, D3DTX_File.d3dtxExtension);
+            textures = IOManagement.FilterFiles(textures, D3DTX_Master.d3dtxExtension);
 
             //if no d3dtx files were found, abort the program from going on any further (we don't have any files to convert!)
             if (textures.Count < 1)
@@ -121,7 +121,7 @@ namespace D3DTX_TextureConverter
                 //build the path for the resulting file
                 string textureFileName = Path.GetFileName(texturePath); //get the file name of the file + extension
                 string textureFileNameOnly = Path.GetFileNameWithoutExtension(texturePath);
-                string textureResultPath = resultPath + "/" + textureFileNameOnly + DDS_File.ddsExtension; //add the file name to the resulting folder path, this is where our converted file will be placed
+                string textureResultPath = resultPath + "/" + textureFileNameOnly + DDS_Master.ddsExtension; //add the file name to the resulting folder path, this is where our converted file will be placed
 
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White); 
                 Console.WriteLine("||||||||||||||||||||||||||||||||");
@@ -152,16 +152,16 @@ namespace D3DTX_TextureConverter
         public static void ConvertTexture_FromD3DTX_ToDDS(string sourceFile, string destinationFile)
         {
             //string file_dword = D3DTX_File.Read_D3DTX_File_MetaVersionOnly(sourceFile);
-            D3DTX_File d3dtx_file = new D3DTX_File();
+            D3DTX_Master d3dtx_file = new D3DTX_Master();
             d3dtx_file.Read_D3DTX_File(sourceFile);
 
-            DDS_File dds_file = new DDS_File(d3dtx_file);
+            DDS_Master dds_file = new DDS_Master(d3dtx_file);
 
             //write the dds file to disk
             dds_file.Write_D3DTX_AsDDS(d3dtx_file, destinationFile);
 
             //write the d3dtx data into a file (json for newer versions, .header for older versions)
-            d3dtx_file.Write_D3DTX_CompanionFile(destinationFile);
+            d3dtx_file.Write_D3DTX_JSON(destinationFile);
 
             //GenericImageFormats.ConvertDDS_To_PSD(destinationFile);
         }
@@ -225,7 +225,7 @@ namespace D3DTX_TextureConverter
             Console.WriteLine("Filtering Files..."); //notify the user we are filtering the array
 
             //filter the array so we only get .dds files
-            ddsFiles = IOManagement.FilterFiles(files, DDS_File.ddsExtension);
+            ddsFiles = IOManagement.FilterFiles(files, DDS_Master.ddsExtension);
 
             //if none of the arrays have any files that were found, abort the program from going on any further (we don't have any files to convert!)
             if (ddsFiles.Count < 1)
@@ -259,9 +259,9 @@ namespace D3DTX_TextureConverter
             string textureFileNameOnly = Path.GetFileNameWithoutExtension(sourceFilePath);
 
             //create the names of the following files
-            string textureFileNameWithD3DTX = textureFileNameOnly + D3DTX_File.d3dtxExtension;
-            string textureFileNameWithHEADER = textureFileNameOnly + D3DTX_File.headerExtension;
-            string textureFileNameWithJSON = textureFileNameOnly + D3DTX_File.jsonExtension;
+            string textureFileNameWithD3DTX = textureFileNameOnly + D3DTX_Master.d3dtxExtension;
+            string textureFileNameWithHEADER = textureFileNameOnly + D3DTX_Master.headerExtension;
+            string textureFileNameWithJSON = textureFileNameOnly + D3DTX_Master.jsonExtension;
 
             //create the path of these files. If things go well, these files (depending on the version) should exist in the same directory at the original .dds file.
             string textureFilePath_HEADER = textureFileDirectory + "/" + textureFileNameWithHEADER;
@@ -274,10 +274,10 @@ namespace D3DTX_TextureConverter
             if(File.Exists(textureFilePath_JSON))
             {
                 //read in our DDS file
-                DDS_File dds = new DDS_File(sourceFilePath, false);
+                DDS_Master dds = new DDS_Master(sourceFilePath, false);
 
                 //create our d3dtx object
-                D3DTX_File d3dtx_file = new D3DTX_File();
+                D3DTX_Master d3dtx_file = new D3DTX_Master();
 
                 //parse the .json file as a d3dtx
                 d3dtx_file.Read_D3DTX_JSON(textureFilePath_JSON);

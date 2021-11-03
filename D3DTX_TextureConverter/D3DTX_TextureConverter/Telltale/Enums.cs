@@ -33,6 +33,7 @@ namespace D3DTX_TextureConverter.Telltale
         eTextureWrap_Count
     }
 
+    [Flags]
     public enum T3SamplerStateValue
     {
         eSamplerState_WrapU_Value,

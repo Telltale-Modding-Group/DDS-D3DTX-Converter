@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using D3DTX_TextureConverter.Utilities;
 
 namespace D3DTX_TextureConverter.Telltale
 {
@@ -12,7 +13,22 @@ namespace D3DTX_TextureConverter.Telltale
 
         public override string ToString()
         {
-            return string.Format("[T3SamplerStateBlock] mData: {0}", mData);
+            T3SamplerStateValue samplerValue = (T3SamplerStateValue)mData;
+
+            string enumFlags = "";
+
+            var type = typeof(T3SamplerStateValue);
+            var names = Enum.GetNames(type);
+
+            foreach (var name in names)
+            {
+                var item = (T3SamplerStateValue)Enum.Parse(type, name);
+
+                if (samplerValue.HasFlag(item))
+                    enumFlags += name + " ";
+            }
+
+            return string.Format("[T3SamplerStateBlock] mData: ( {0})", enumFlags);
         }
     }
 

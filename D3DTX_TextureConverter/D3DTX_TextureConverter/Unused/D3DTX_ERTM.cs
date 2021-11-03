@@ -7,19 +7,25 @@ using System.IO;
 using D3DTX_TextureConverter.Telltale;
 using D3DTX_TextureConverter.Utilities;
 using D3DTX_TextureConverter.DirectX;
+using D3DTX_TextureConverter.Main;
 
-namespace D3DTX_TextureConverter.Main
+/*
+ * NOTE: This is now placed in an unused folder for archival purposes.
+ * This class is not used in the app, however it still contains some useful info and code.
+*/
+
+namespace D3DTX_TextureConverter.Unused
 {
     /// <summary>
     /// (UNFINISHED) This is a custom class that matches what is serialized in a D3DTX [ERTM] file.
     /// </summary>
     public class D3DTX_ERTM
     {
-        //----------D3DTX HEADER START----------
         public string MetaStreamVersion; //[4 bytes]
         public uint mClassNames_Length; //[4 bytes]
         public ClassNames[] mClassNames;//[12 bytes for each element]
 
+        //----------D3DTX HEADER START----------
         public int mSamplerState_BlockSize; //[4 bytes] SAMPLER STATE BLOCK SIZE
         public T3SamplerStateBlock mSamplerState; //[4 bytes]
 
@@ -62,7 +68,7 @@ namespace D3DTX_TextureConverter.Main
         //----------D3DTX HEADER END----------
 
         //DDS FILE (which is literally at the end of the d3dtx header)
-        public DDS_File mInnerDDS;
+        public DDS_Master mInnerDDS;
 
 
 
@@ -414,7 +420,7 @@ namespace D3DTX_TextureConverter.Main
             byte[] DDS_Data = ByteFunctions.AllocateBytes((int)mDataSize, sourceByteFile, bytePointerPosition);
 
             //parse the byte data into a DDS file
-            mInnerDDS = new DDS_File(DDS_Data, false);
+            mInnerDDS = new DDS_Master(DDS_Data, false);
         }
 
         /*

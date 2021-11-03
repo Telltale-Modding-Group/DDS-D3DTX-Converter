@@ -7,8 +7,14 @@ using System.IO;
 using D3DTX_TextureConverter.Telltale;
 using D3DTX_TextureConverter.Utilities;
 using D3DTX_TextureConverter.DirectX;
+using D3DTX_TextureConverter.Main;
 
-namespace D3DTX_TextureConverter.Main
+/*
+ * NOTE: This is now placed in an unused folder for archival purposes.
+ * This class is not used in the app, however it still contains some useful info and code.
+*/
+
+namespace D3DTX_TextureConverter.Unused
 {
     /// <summary>
     /// This is a custom class that matches what is serialized in a D3DTX [5VSM] file.
@@ -57,7 +63,7 @@ namespace D3DTX_TextureConverter.Main
         public RegionStreamHeader[] mRegionHeaders { get; set; } //(varies, each element is 24 bytes long)
 
         //d3dtx byte data
-        public List<byte[]> T3Texture_Data { get; set; } //each image data, starts from smallest mip map to largest mip map
+        public List<byte[]> mPixelData { get; set; } //each image data, starts from smallest mip map to largest mip map
 
         public D3DTX_5VSM(string sourceFilePath)
         {
@@ -394,7 +400,7 @@ namespace D3DTX_TextureConverter.Main
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Blue);
             Console.WriteLine("Storing the .d3dtx image data...");
 
-            T3Texture_Data = new List<byte[]>();
+            mPixelData = new List<byte[]>();
 
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
@@ -403,7 +409,7 @@ namespace D3DTX_TextureConverter.Main
 
                 bytePointerPosition += (uint)dataSize;
 
-                T3Texture_Data.Add(imageData);
+                mPixelData.Add(imageData);
             }
 
             //do a quick check to see if we reached the end of the file
@@ -552,16 +558,16 @@ namespace D3DTX_TextureConverter.Main
             }
 
             //--------------------------Texture Data--------------------------
-            for (int i = 0; i < T3Texture_Data.Count; i++)
+            for (int i = 0; i < mPixelData.Count; i++)
             {
-                NewData = ByteFunctions.Combine(NewData, T3Texture_Data[i]);
+                NewData = ByteFunctions.Combine(NewData, mPixelData[i]);
             }
 
             //write the final to disk
             File.WriteAllBytes(destinationPath, NewData);
         }
 
-        public void ModifyD3DTX(DDS_File dds)
+        public void ModifyD3DTX(DDS_Master dds)
         {
             //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
             //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
@@ -647,7 +653,7 @@ namespace D3DTX_TextureConverter.Main
             //--------------------------mHeight-------------------------- [4 bytes]
             mHeight = dds.header.dwHeight;
             //--------------------------mSurfaceFormat-------------------------- [4 bytes] 
-            mSurfaceFormat = DDS_File.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC);
+            mSurfaceFormat = DDS_Master.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC);
             //--------------------------mResourceUsage-------------------------- [4 bytes]
             //--------------------------mType-------------------------- [4 bytes]
             //--------------------------mHDRLightmapScale-------------------------- [4 bytes]
@@ -683,12 +689,12 @@ namespace D3DTX_TextureConverter.Main
                 };
             }
             //--------------------------Texture Data--------------------------
-            T3Texture_Data = new List<byte[]>();
+            mPixelData = new List<byte[]>();
 
             //add the DDS data in reverse
             for (int i = mRegionHeaders.Length - 1; i >= 0; i--)
             {
-                T3Texture_Data.Add(dds.textureData[i]);
+                mPixelData.Add(dds.textureData[i]);
             }
         }
     }

@@ -17,7 +17,7 @@ namespace TextureMod_GUI.UI
 
         //d3dtx header
         public int Version { get; }
-        //public T3SamplerStateBlock mSamplerState { get; }
+        public T3SamplerStateBlock mSamplerState { get; }
         public PlatformType Platform { get; set; }
         public string Name { get; set; }
         public uint NumMipLevels { get; set; }

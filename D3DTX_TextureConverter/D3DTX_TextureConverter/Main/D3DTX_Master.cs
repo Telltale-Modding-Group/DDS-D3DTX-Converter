@@ -51,68 +51,61 @@ namespace D3DTX_TextureConverter.Main
             //read the d3dtx version of the file
             int d3dtxVersion = Read_D3DTX_File_D3DTXVersionOnly(filePath);
 
-            //where the pointer is in the file
-            uint bytePointerPosition = 0;
-
-            //read the file into a byte array
-            byte[] fileData = File.ReadAllBytes(filePath);
-
-            //read meta header
-            switch(metaVersion)
+            using (BinaryReader reader = new BinaryReader(File.OpenRead(filePath)))
             {
-                case "6VSM":
-                    msv6 = new(fileData, ref bytePointerPosition);
-                    break;
-                case "5VSM":
-                    msv5 = new(fileData, ref bytePointerPosition);
-                    break;
-                case "ERTM":
-                    mtre = new(fileData, ref bytePointerPosition);
-                    break;
-                default:
-                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
-                    Console.WriteLine("ERROR! '{0}' meta stream version is not supported!", metaVersion);
+                //read meta header
+                switch (metaVersion)
+                {
+                    case "6VSM":
+                        msv6 = new(reader);
+                        break;
+                    case "5VSM":
+                        msv5 = new(reader);
+                        break;
+                    case "ERTM":
+                        mtre = new(reader);
+                        break;
+                    default:
+                        ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
+                        Console.WriteLine("ERROR! '{0}' meta stream version is not supported!", metaVersion);
+                        ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+                        return;
+                }
+
+                if (d3dtxVersion == 5 || d3dtxVersion == 6 || d3dtxVersion == 7 || d3dtxVersion == 8)
+                {
+                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
+                    Console.WriteLine("Warning! '{0}' version is not fully complete/tested! There may be some issues with converting.", d3dtxVersion);
                     ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-                    return;
-            }
+                }
 
-            uint headerLength = msv6 != null ? msv6.Get_MetaHeaderLength() + msv6.mDefaultSectionChunkSize : 0;
-            headerLength = msv5 != null ? msv5.Get_MetaHeaderLength() + msv5.mDefaultSectionChunkSize : 0;
-            //headerLength = mtre != null ? mtre.Get_MetaHeaderLength() : 0;
-
-            if(d3dtxVersion == 5 || d3dtxVersion == 6  || d3dtxVersion == 7 || d3dtxVersion == 8)
-            {
-                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
-                Console.WriteLine("Warning! '{0}' version is not fully complete/tested! There may be some issues with converting.", d3dtxVersion);
-                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-            }
-
-            //read d3dtx header
-            switch (d3dtxVersion)
-            {
-                case 4:
-                    d3dtx4 = new(fileData, ref bytePointerPosition, headerLength);
-                    break;
-                case 5:
-                    d3dtx5 = new(fileData, ref bytePointerPosition, headerLength);
-                    break;
-                case 6:
-                    d3dtx6 = new(fileData, ref bytePointerPosition, headerLength);
-                    break;
-                case 7:
-                    d3dtx7 = new(fileData, ref bytePointerPosition, headerLength);
-                    break;
-                case 8:
-                    d3dtx8 = new(fileData, ref bytePointerPosition, headerLength);
-                    break;
-                case 9:
-                    d3dtx9 = new(fileData, ref bytePointerPosition, headerLength);
-                    break;
-                default:
-                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
-                    Console.WriteLine("ERROR! '{0}' d3dtx version is not supported!", d3dtxVersion);
-                    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-                    break;
+                //read d3dtx header
+                switch (d3dtxVersion)
+                {
+                    case 4:
+                        d3dtx4 = new(reader);
+                        break;
+                    case 5:
+                        d3dtx5 = new(reader);
+                        break;
+                    case 6:
+                        d3dtx6 = new(reader);
+                        break;
+                    case 7:
+                        d3dtx7 = new(reader);
+                        break;
+                    case 8:
+                        d3dtx8 = new(reader);
+                        break;
+                    case 9:
+                        d3dtx9 = new(reader);
+                        break;
+                    default:
+                        ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
+                        Console.WriteLine("ERROR! '{0}' d3dtx version is not supported!", d3dtxVersion);
+                        ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+                        break;
+                }
             }
         }
 
@@ -154,27 +147,28 @@ namespace D3DTX_TextureConverter.Main
         {
             byte[] finalData = new byte[0];
 
-            if(msv6 != null)
-                finalData = ByteFunctions.Combine(finalData, msv6.GetByteData());
-            else if (msv5 != null)
-                finalData = ByteFunctions.Combine(finalData, msv5.GetByteData());
-            else if (mtre != null)
-                finalData = ByteFunctions.Combine(finalData, mtre.GetByteData());
+            using(BinaryWriter writer = new BinaryWriter(File.OpenWrite(destinationPath)))
+            {
+                if (msv6 != null)
+                    msv6.GetByteData(writer);
+                else if (msv5 != null)
+                    msv5.GetByteData(writer);
+                else if (mtre != null)
+                    mtre.GetByteData(writer);
 
-            if (d3dtx4 != null)
-                finalData = ByteFunctions.Combine(finalData, d3dtx4.GetByteData());
-            else if (d3dtx5 != null)
-                finalData = ByteFunctions.Combine(finalData, d3dtx5.GetByteData());
-            else if (d3dtx6 != null)
-                finalData = ByteFunctions.Combine(finalData, d3dtx6.GetByteData());
-            else if (d3dtx7 != null)
-                finalData = ByteFunctions.Combine(finalData, d3dtx7.GetByteData());
-            else if (d3dtx8 != null)
-                finalData = ByteFunctions.Combine(finalData, d3dtx8.GetByteData());
-            else if (d3dtx9 != null)
-                finalData = ByteFunctions.Combine(finalData, d3dtx9.GetByteData());
-
-            File.WriteAllBytes(destinationPath, finalData);
+                if (d3dtx4 != null)
+                    d3dtx4.WriteBinaryData(writer);
+                else if (d3dtx5 != null)
+                    d3dtx5.WriteBinaryData(writer);
+                else if (d3dtx6 != null)
+                    d3dtx6.WriteBinaryData(writer);
+                else if (d3dtx7 != null)
+                    d3dtx7.WriteBinaryData(writer);
+                else if (d3dtx8 != null)
+                    d3dtx8.WriteBinaryData(writer);
+                else if (d3dtx9 != null)
+                    d3dtx9.WriteBinaryData(writer);
+            }
         }
 
         /// <summary>
@@ -278,11 +272,14 @@ namespace D3DTX_TextureConverter.Main
         /// <returns></returns>
         public static string Read_D3DTX_File_MetaVersionOnly(string sourceFile)
         {
-            byte[] sourceByteFile = File.ReadAllBytes(sourceFile);
+            string metaStreamVersion = "";
 
-            uint bytePointerPosition = 0;
+            using (BinaryReader reader = new BinaryReader(File.OpenRead(sourceFile)))
+            {
+                metaStreamVersion += reader.ReadChars(4);
+            }
 
-            return ByteFunctions.ReadFixedString(sourceByteFile, 4, ref bytePointerPosition);
+            return metaStreamVersion;
         }
 
         /// <summary>
@@ -294,27 +291,28 @@ namespace D3DTX_TextureConverter.Main
         public static int Read_D3DTX_File_D3DTXVersionOnly(string sourceFile)
         {
             string metaVersion = Read_D3DTX_File_MetaVersionOnly(sourceFile);
+            int mVersion = -1;
 
-            byte[] sourceByteFile = File.ReadAllBytes(sourceFile);
-            uint bytePointerPosition = 0;
-
-            if (metaVersion.Equals("6VSM"))
+            using (BinaryReader reader = new BinaryReader(File.OpenRead(sourceFile)))
             {
-                MSV6 meta6VSM = new(sourceByteFile, ref bytePointerPosition, false);
-            }
-            else if (metaVersion.Equals("5VSM"))
-            {
-                MSV5 meta5VSM = new(sourceByteFile, ref bytePointerPosition, false);
-            }
-            else if(metaVersion.Equals("ERTM"))
-            {
-                MTRE metaERTM = new(sourceByteFile, ref bytePointerPosition, false);
+                if (metaVersion.Equals("6VSM"))
+                {
+                    MSV6 meta6VSM = new(reader, false);
+                }
+                else if (metaVersion.Equals("5VSM"))
+                {
+                    MSV5 meta5VSM = new(reader, false);
+                }
+                else if (metaVersion.Equals("ERTM"))
+                {
+                    MTRE metaERTM = new(reader, false);
 
-                return -1; //return -1 because d3dtx versions older than 4 don't have an mVersion variable (not that I know of atleast)
-            }
+                    return mVersion; //return -1 because d3dtx versions older than 4 don't have an mVersion variable (not that I know of atleast)
+                }
 
-            //read the first int (which is an mVersion d3dtx value)
-            int mVersion = ByteFunctions.ReadInt(sourceByteFile, ref bytePointerPosition);
+                //read the first int (which is an mVersion d3dtx value)
+                mVersion = reader.ReadInt32();
+            }
 
             return mVersion;
         }

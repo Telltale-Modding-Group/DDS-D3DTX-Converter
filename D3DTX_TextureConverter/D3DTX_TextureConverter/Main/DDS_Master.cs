@@ -132,7 +132,7 @@ namespace D3DTX_TextureConverter.Main
                 header.dwWidth = d3dtx.d3dtx7.mWidth;
                 header.dwHeight = d3dtx.d3dtx7.mHeight;
                 header.dwMipMapCount = d3dtx.d3dtx7.mNumMipLevels;
-                header.dwDepth = d3dtx.d3dtx7.mDepth;
+                //header.dwDepth = d3dtx.d3dtx7.mDepth;
                 surfaceFormat = d3dtx.d3dtx7.mSurfaceFormat;
             }
             else if (d3dtx.d3dtx8 != null)
@@ -181,8 +181,7 @@ namespace D3DTX_TextureConverter.Main
             Console.WriteLine("Total Source Texture Byte Size = {0}", fileData.Length);
 
             //which byte offset we are on for the source texture (will be changed as we go through the file)
-            uint bytePointerPosition = 4; //skip past the 'DDS '
-            byte[] headerBytes = ByteFunctions.AllocateBytes(124, fileData, bytePointerPosition);
+            byte[] headerBytes = ByteFunctions.AllocateBytes(124, fileData, 4); //skip past the 'DDS '
 
             //this will automatically read all of the byte data in the header
             header = DDS_Functions.GetHeaderFromBytes(headerBytes);

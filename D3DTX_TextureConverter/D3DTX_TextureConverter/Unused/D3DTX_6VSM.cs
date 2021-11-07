@@ -16,6 +16,7 @@ using D3DTX_TextureConverter.Main;
 
 namespace D3DTX_TextureConverter.Unused
 {
+    /*
     /// <summary>
     /// This is a custom class that matches what is serialized in a D3DTX [6VSM] file.
     /// </summary>
@@ -897,4 +898,5 @@ namespace D3DTX_TextureConverter.Unused
             };
         }
     }
+    */
 }

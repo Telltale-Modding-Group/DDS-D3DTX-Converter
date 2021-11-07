@@ -16,6 +16,7 @@ using D3DTX_TextureConverter.Main;
 
 namespace D3DTX_TextureConverter.Unused
 {
+    /*
     /// <summary>
     /// (UNFINISHED) This is a custom class that matches what is serialized in a D3DTX [ERTM] file.
     /// </summary>
@@ -240,385 +241,387 @@ namespace D3DTX_TextureConverter.Unused
 
             Console.WriteLine("D3DTX Unknown [55] (UINT32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition));
             Console.WriteLine("D3DTX Unknown [59] (UINT32) = {0}", ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition));
+    */
 
-            /*
-            Console.WriteLine("D3DTX Unknown [1] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [2] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [3] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [4] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [5] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [6] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [7] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [8] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [9] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [10] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [11] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [12] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [13] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [14] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [15] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [16] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [17] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [18] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [19] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [20] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [21] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [22] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [23] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [24] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [25] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [26] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [27] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [28] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [29] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [30] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [31] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [32] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [33] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [34] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [35] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [36] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [37] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [38] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [39] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [40] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [41] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [42] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [43] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [44] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [45] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [46] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [47] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [48] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [49] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [50] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [51] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [52] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [53] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [54] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [55] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [56] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [57] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [58] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [59] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [60] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [61] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            Console.WriteLine("D3DTX Unknown [62] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
-            */
+    /*
+    Console.WriteLine("D3DTX Unknown [1] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [2] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [3] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [4] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [5] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [6] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [7] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [8] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [9] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [10] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [11] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [12] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [13] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [14] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [15] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [16] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [17] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [18] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [19] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [20] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [21] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [22] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [23] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [24] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [25] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [26] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [27] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [28] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [29] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [30] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [31] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [32] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [33] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [34] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [35] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [36] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [37] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [38] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [39] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [40] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [41] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [42] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [43] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [44] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [45] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [46] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [47] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [48] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [49] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [50] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [51] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [52] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [53] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [54] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [55] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [56] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [57] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [58] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [59] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [60] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [61] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    Console.WriteLine("D3DTX Unknown [62] (Byte) = {0}", ByteFunctions.ReadByte(sourceByteFile, ref bytePointerPosition));
+    */
 
 
-            /*
- * d3dtx
- * mSamplerState [DONE]
- * mImportName [DONE]
- * mbHasTextureData
- * mbIsMipMapped [DONE]
- * mNumMipLevels [DONE]
- * mD3DFormat [DONE]
- * mWidth [DONE]
- * mHeight [DONE]
- * mWiiForceWidth
- * mWiiForceHeight
- * mbWiiForceUncompressed
- * mTextureDataFormats
- * mTplTexutreDataSize
- * mTplAlphaDataSize
- * mJPEGTextureDataSize
- * mHDRLightmapScale
- * mExactAlphaMode (enum)
- * mColorMode (enum)
- * mWiiTextureFormat (enum)
- * mbEncrypted
- * mDetailMapBrightness
- * mNormalMapFmt
- * mUVOffset [DONE]
- * mUVScale [DONE]
- * mbForcePreviewRebuild
+    /*
+* d3dtx
+* mSamplerState [DONE]
+* mImportName [DONE]
+* mbHasTextureData
+* mbIsMipMapped [DONE]
+* mNumMipLevels [DONE]
+* mD3DFormat [DONE]
+* mWidth [DONE]
+* mHeight [DONE]
+* mWiiForceWidth
+* mWiiForceHeight
+* mbWiiForceUncompressed
+* mTextureDataFormats
+* mTplTexutreDataSize
+* mTplAlphaDataSize
+* mJPEGTextureDataSize
+* mHDRLightmapScale
+* mExactAlphaMode (enum)
+* mColorMode (enum)
+* mWiiTextureFormat (enum)
+* mbEncrypted
+* mDetailMapBrightness
+* mNormalMapFmt
+* mUVOffset [DONE]
+* mUVScale [DONE]
+* mbForcePreviewRebuild
 */
 
-            /* - FROM EXE HEX
-             * mbForcePreviewRebuild
-             * ���mUVScale
-             * ����mUVOffset
-             * ���mNormalMapFmt
-             * ���mDetailMapBrightness
-             * ����mbEncrypted
-             * �eTxWiiFormatRGBA24
-             * ��eTxWiiFormatAlphaOnly
-             * ���eTxWiiFormatDefault
-             * �mWiiTextureFormat
-             * ���eTxColorGrayscaleAlpha
-             * ��eTxColorGrayscale
-             * ���eTxColorFull
-             * ����eTxColorUnknown
-             * �mColorMode
-             * ��mExactAlphaMode
-             * �eTxAlphaBlend
-             * ���eTxAlphaTest
-             * ����eTxNoAlpha
-             * ��eTxAlphaUnkown
-             * ��mHDRLightmapScale
-             * ���mJPEGTextureDataSize
-             * ����mTplAlphaDataSize
-             * ���mTplTexutreDataSize
-             * �mTextureDataFormats
-             * �mbWiiForceUncompressed
-             * ��mWiiForceHeight
-             * �mWiiForceWidth
-             * ��Generated mips
-             * ��Locked size
-             * �Low quality
-             * �mHeight
-             * �mWidth
-             * ��mD3DFormat
-             * ��mNumMipLevels
-             * ���mbIsMipMapped
-             * ���mbHasTextureData
-             * ����mImportName
-             * �mSamplerState
-             * ���d3dtx
-             */
+    /* - FROM EXE HEX
+     * mbForcePreviewRebuild
+     * ���mUVScale
+     * ����mUVOffset
+     * ���mNormalMapFmt
+     * ���mDetailMapBrightness
+     * ����mbEncrypted
+     * �eTxWiiFormatRGBA24
+     * ��eTxWiiFormatAlphaOnly
+     * ���eTxWiiFormatDefault
+     * �mWiiTextureFormat
+     * ���eTxColorGrayscaleAlpha
+     * ��eTxColorGrayscale
+     * ���eTxColorFull
+     * ����eTxColorUnknown
+     * �mColorMode
+     * ��mExactAlphaMode
+     * �eTxAlphaBlend
+     * ���eTxAlphaTest
+     * ����eTxNoAlpha
+     * ��eTxAlphaUnkown
+     * ��mHDRLightmapScale
+     * ���mJPEGTextureDataSize
+     * ����mTplAlphaDataSize
+     * ���mTplTexutreDataSize
+     * �mTextureDataFormats
+     * �mbWiiForceUncompressed
+     * ��mWiiForceHeight
+     * �mWiiForceWidth
+     * ��Generated mips
+     * ��Locked size
+     * �Low quality
+     * �mHeight
+     * �mWidth
+     * ��mD3DFormat
+     * ��mNumMipLevels
+     * ���mbIsMipMapped
+     * ���mbHasTextureData
+     * ����mImportName
+     * �mSamplerState
+     * ���d3dtx
+     */
+    /*
 
+    //--------------------------mUVOffset-------------------------- [8 bytes]
+    Vector2 mUVOffset = new Vector2()
+    {
+        x = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition), //[4 bytes]
+        y = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition) //[4 bytes]
+    };
 
-            //--------------------------mUVOffset-------------------------- [8 bytes]
-            Vector2 mUVOffset = new Vector2()
-            {
-                x = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition), //[4 bytes]
-                y = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition) //[4 bytes]
-            };
+    this.mUVOffset = mUVOffset;
+    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+    Console.WriteLine("D3DTX mUVOffset = {0} {1}", mUVOffset.x, mUVOffset.y);
 
-            this.mUVOffset = mUVOffset;
-            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-            Console.WriteLine("D3DTX mUVOffset = {0} {1}", mUVOffset.x, mUVOffset.y);
+    //--------------------------mUVScale-------------------------- [8 bytes]
+    Vector2 mUVScale = new Vector2()
+    {
+        x = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition), //[4 bytes]
+        y = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition) //[4 bytes]
+    };
 
-            //--------------------------mUVScale-------------------------- [8 bytes]
-            Vector2 mUVScale = new Vector2()
-            {
-                x = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition), //[4 bytes]
-                y = ByteFunctions.ReadFloat(sourceByteFile, ref bytePointerPosition) //[4 bytes]
-            };
+    this.mUVScale = mUVScale;
+    Console.WriteLine("D3DTX mUVScale = {0} {1}", mUVScale.x, mUVScale.y);
 
-            this.mUVScale = mUVScale;
-            Console.WriteLine("D3DTX mUVScale = {0} {1}", mUVScale.x, mUVScale.y);
+    //--------------------------mDataSize-------------------------- [4 bytes]
+    mDataSize = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
+    ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
+    Console.WriteLine("D3DTX mDataSize = {0}", mDataSize); //----------------THIS IS THE TOTAL DDS FILE SIZE
 
-            //--------------------------mDataSize-------------------------- [4 bytes]
-            mDataSize = ByteFunctions.ReadUnsignedInt(sourceByteFile, ref bytePointerPosition);
-            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
-            Console.WriteLine("D3DTX mDataSize = {0}", mDataSize); //----------------THIS IS THE TOTAL DDS FILE SIZE
+    //do a quick check to see if we reached the end of the D3DTX header
+    ByteFunctions.ReachedOffset(bytePointerPosition, (uint)headerLength);
 
-            //do a quick check to see if we reached the end of the D3DTX header
-            ByteFunctions.ReachedOffset(bytePointerPosition, (uint)headerLength);
+    //--------------------------END OF D3DTX HEADER--------------------------
+    //--------------------------STORE D3DTX HEADER DATA--------------------------
+    Data_OriginalHeader = new byte[headerLength];
+    Array.Copy(sourceByteFile, 0, Data_OriginalHeader, 0, headerLength);
+    //--------------------------START OF DDS FILE (right after d3dtx header)--------------------------
+    int ddsFileOffsetStart = sourceByteFile.Length - (int)mDataSize;
 
-            //--------------------------END OF D3DTX HEADER--------------------------
-            //--------------------------STORE D3DTX HEADER DATA--------------------------
-            Data_OriginalHeader = new byte[headerLength];
-            Array.Copy(sourceByteFile, 0, Data_OriginalHeader, 0, headerLength);
-            //--------------------------START OF DDS FILE (right after d3dtx header)--------------------------
-            int ddsFileOffsetStart = sourceByteFile.Length - (int)mDataSize;
+    //get the bytes of the dds file from the d3dtx
+    byte[] DDS_Data = ByteFunctions.AllocateBytes((int)mDataSize, sourceByteFile, bytePointerPosition);
 
-            //get the bytes of the dds file from the d3dtx
-            byte[] DDS_Data = ByteFunctions.AllocateBytes((int)mDataSize, sourceByteFile, bytePointerPosition);
+    //parse the byte data into a DDS file
+    mInnerDDS = new DDS_Master(DDS_Data, false);
+}
 
-            //parse the byte data into a DDS file
-            mInnerDDS = new DDS_Master(DDS_Data, false);
-        }
+/*
+public byte[] Get_Modified_D3DTX(DDS_File DDS_File, bool headerOnly)
+{
+    byte[] NewData = null;
 
-        /*
-        public byte[] Get_Modified_D3DTX(DDS_File DDS_File, bool headerOnly)
-        {
-            byte[] NewData = null;
+    //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
+    //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
+    //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
+    //--------------------------Meta Stream Keyword-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, ByteFunctions.GetBytes(mMetaStreamVersion));
 
-            //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
-            //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
-            //||||||||||||||||||||||||||||||||||||||||| META HEADER |||||||||||||||||||||||||||||||||||||||||
-            //--------------------------Meta Stream Keyword-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, ByteFunctions.GetBytes(mMetaStreamVersion));
+    //--------------------------Default Section Chunk Size-------------------------- [4 bytes] //default section chunk size (THIS IS THE SIZE OF THE FULL D3DTX HEADER MINUS THIS META STREAM HEADER)
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mDefaultSectionChunkSize));
 
-            //--------------------------Default Section Chunk Size-------------------------- [4 bytes] //default section chunk size (THIS IS THE SIZE OF THE FULL D3DTX HEADER MINUS THIS META STREAM HEADER)
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mDefaultSectionChunkSize));
+    //-------------------------Debug Section Chunk Size-------------------------- [4 bytes] //debug section chunk size (always zero)
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mDebugSectionChunkSize));
 
-            //-------------------------Debug Section Chunk Size-------------------------- [4 bytes] //debug section chunk size (always zero)
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mDebugSectionChunkSize));
+    //--------------------------Async Section Chunk Size-------------------------- [4 bytes] //async section chunk size (size of the bytes after the file header)
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mAsyncSectionChunkSize));
 
-            //--------------------------Async Section Chunk Size-------------------------- [4 bytes] //async section chunk size (size of the bytes after the file header)
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mAsyncSectionChunkSize));
+    //--------------------------mClassNamesLength-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mClassNamesLength));
 
-            //--------------------------mClassNamesLength-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mClassNamesLength));
-
-            //--------------------------mClassNames--------------------------
-            for (int i = 0; i < mClassNames.Length; i++)
-            {
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mClassNames[i].mTypeNameCRC.mCrc64));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mClassNames[i].mVersionCRC));
-            }
-
-            //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
-            //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
-            //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
-            //--------------------------mVersion-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mVersion));
-
-            //--------------------------mSamplerState Block Size-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSamplerState_BlockSize));
-
-            //--------------------------mSamplerState-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSamplerState.mData));
-
-            //--------------------------mPlatform Block Size-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mPlatform_BlockSize));
-
-            //--------------------------mPlatform-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mPlatform));
-
-            //--------------------------mName Block Size-------------------------- [4 bytes] //mName block size (size + string len)
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mName_BlockSize));
-
-            //--------------------------mName String Length-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mName_StringLength));
-
-            //--------------------------mName-------------------------- [mName_StringLength bytes]
-            NewData = ByteFunctions.Combine(NewData, ByteFunctions.GetBytes(mName));
-
-            //--------------------------mImportName Block Size-------------------------- [4 bytes] //mImportName block size (size + string len)
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mImportName_BlockSize));
-
-            //--------------------------mImportName String Length-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mImportName_StringLength));
-
-            //--------------------------mImportName-------------------------- [mImportName_StringLength bytes] (this is always 0)
-            NewData = ByteFunctions.Combine(NewData, ByteFunctions.GetBytes(mImportName));
-
-            //--------------------------mImportScale-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mImportScale));
-
-            //--------------------------mToolProps-------------------------- (NEEDS WORK) [1 byte]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToolProps.mbHasProps));
-
-            //--------------------------mNumMipLevels-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mNumMipLevels));
-
-            //--------------------------mWidth-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mWidth));
-
-            //--------------------------mHeight-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mHeight));
-
-            //--------------------------mDepth-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mDepth));
-
-            //--------------------------mArraySize-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mArraySize));
-
-            //--------------------------mSurfaceFormat-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mSurfaceFormat));
-
-            //--------------------------mTextureLayout-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mTextureLayout));
-
-            //--------------------------mSurfaceGamma-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mSurfaceGamma));
-
-            //--------------------------mSurfaceMultisample-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mSurfaceMultisample));
-
-            //--------------------------mResourceUsage-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mResourceUsage));
-
-            //--------------------------mType-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mType));
-
-            //--------------------------mSwizzleSize-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSwizzleSize));
-
-            //--------------------------mSwizzle-------------------------- [4 bytes]
-            for(int i = 0; i < mSwizzleSize; i++)
-            {
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSwizzle.mSwizzle1));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSwizzle.mSwizzle2));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSwizzle.mSwizzle3));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSwizzle.mSwizzle4));
-            }
-
-            //--------------------------mSpecularGlossExponent-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSpecularGlossExponent));
-
-            //--------------------------mHDRLightmapScale-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mHDRLightmapScale));
-
-            //--------------------------mToonGradientCutoff-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonGradientCutoff));
-
-            //--------------------------mAlphaMode-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mAlphaMode));
-
-            //--------------------------mColorMode-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mColorMode));
-
-            //--------------------------mUVOffset-------------------------- [8 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mUVOffset.x));
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mUVOffset.y));
-
-            //--------------------------mUVScale-------------------------- [8 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mUVScale.x));
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mUVScale.y));
-
-            //--------------------------mArrayFrameNames--------------------------
-            //--------------------------mArrayFrameNames DCArray Capacity-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mArrayFrameNames_ArrayCapacity));
-
-            //--------------------------mArrayFrameNames DCArray Length-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mArrayFrameNames_ArrayLength));
-
-            //--------------------------mArrayFrameNames DCArray--------------------------
-            for(int i = 0; i < mArrayFrameNames_ArrayLength; i++)
-            {
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mArrayFrameNames[i].mCrc64));
-            }
-
-            //--------------------------mToonRegions--------------------------
-            //--------------------------mToonRegions DCArray Capacity-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions_ArrayCapacity));
-
-            //--------------------------mToonRegions DCArray Length-------------------------- [4 bytes]
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions_ArrayLength));
-
-            //--------------------------mToonRegions DCArray--------------------------
-            for(int i = 0; i < mToonRegions_ArrayLength; i++)
-            {
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mColor.r));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mColor.g));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mColor.b));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mColor.a));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mSize));
-            }
-
-            //--------------------------StreamHeader--------------------------
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(StreamHeader.mRegionCount));
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(StreamHeader.mAuxDataCount));
-            NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(StreamHeader.mTotalDataSize));
-
-            //--------------------------mRegionHeaders--------------------------
-            for (int i = 0; i < StreamHeader.mRegionCount; i++)
-            {
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mFaceIndex));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mMipIndex));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mMipCount));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mDataSize));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mPitch));
-                NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mSlicePitch));
-            }
-
-            if(headerOnly)
-                return NewData;
-
-            for(int i = DDS_File.textureData.Count - 1; i >= 0; i--)
-            {
-                NewData = ByteFunctions.Combine(NewData, DDS_File.textureData[i]);
-            }
-
-            return NewData;
-        }
-        */
+    //--------------------------mClassNames--------------------------
+    for (int i = 0; i < mClassNames.Length; i++)
+    {
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mClassNames[i].mTypeNameCRC.mCrc64));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mClassNames[i].mVersionCRC));
     }
+
+    //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
+    //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
+    //||||||||||||||||||||||||||||||||||||||||| D3DTX HEADER |||||||||||||||||||||||||||||||||||||||||
+    //--------------------------mVersion-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mVersion));
+
+    //--------------------------mSamplerState Block Size-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSamplerState_BlockSize));
+
+    //--------------------------mSamplerState-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSamplerState.mData));
+
+    //--------------------------mPlatform Block Size-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mPlatform_BlockSize));
+
+    //--------------------------mPlatform-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mPlatform));
+
+    //--------------------------mName Block Size-------------------------- [4 bytes] //mName block size (size + string len)
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mName_BlockSize));
+
+    //--------------------------mName String Length-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mName_StringLength));
+
+    //--------------------------mName-------------------------- [mName_StringLength bytes]
+    NewData = ByteFunctions.Combine(NewData, ByteFunctions.GetBytes(mName));
+
+    //--------------------------mImportName Block Size-------------------------- [4 bytes] //mImportName block size (size + string len)
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mImportName_BlockSize));
+
+    //--------------------------mImportName String Length-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mImportName_StringLength));
+
+    //--------------------------mImportName-------------------------- [mImportName_StringLength bytes] (this is always 0)
+    NewData = ByteFunctions.Combine(NewData, ByteFunctions.GetBytes(mImportName));
+
+    //--------------------------mImportScale-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mImportScale));
+
+    //--------------------------mToolProps-------------------------- (NEEDS WORK) [1 byte]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToolProps.mbHasProps));
+
+    //--------------------------mNumMipLevels-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mNumMipLevels));
+
+    //--------------------------mWidth-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mWidth));
+
+    //--------------------------mHeight-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mHeight));
+
+    //--------------------------mDepth-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mDepth));
+
+    //--------------------------mArraySize-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mArraySize));
+
+    //--------------------------mSurfaceFormat-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mSurfaceFormat));
+
+    //--------------------------mTextureLayout-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mTextureLayout));
+
+    //--------------------------mSurfaceGamma-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mSurfaceGamma));
+
+    //--------------------------mSurfaceMultisample-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mSurfaceMultisample));
+
+    //--------------------------mResourceUsage-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mResourceUsage));
+
+    //--------------------------mType-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mType));
+
+    //--------------------------mSwizzleSize-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSwizzleSize));
+
+    //--------------------------mSwizzle-------------------------- [4 bytes]
+    for(int i = 0; i < mSwizzleSize; i++)
+    {
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSwizzle.mSwizzle1));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSwizzle.mSwizzle2));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSwizzle.mSwizzle3));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSwizzle.mSwizzle4));
+    }
+
+    //--------------------------mSpecularGlossExponent-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mSpecularGlossExponent));
+
+    //--------------------------mHDRLightmapScale-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mHDRLightmapScale));
+
+    //--------------------------mToonGradientCutoff-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonGradientCutoff));
+
+    //--------------------------mAlphaMode-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mAlphaMode));
+
+    //--------------------------mColorMode-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes((int)mColorMode));
+
+    //--------------------------mUVOffset-------------------------- [8 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mUVOffset.x));
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mUVOffset.y));
+
+    //--------------------------mUVScale-------------------------- [8 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mUVScale.x));
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mUVScale.y));
+
+    //--------------------------mArrayFrameNames--------------------------
+    //--------------------------mArrayFrameNames DCArray Capacity-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mArrayFrameNames_ArrayCapacity));
+
+    //--------------------------mArrayFrameNames DCArray Length-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mArrayFrameNames_ArrayLength));
+
+    //--------------------------mArrayFrameNames DCArray--------------------------
+    for(int i = 0; i < mArrayFrameNames_ArrayLength; i++)
+    {
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mArrayFrameNames[i].mCrc64));
+    }
+
+    //--------------------------mToonRegions--------------------------
+    //--------------------------mToonRegions DCArray Capacity-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions_ArrayCapacity));
+
+    //--------------------------mToonRegions DCArray Length-------------------------- [4 bytes]
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions_ArrayLength));
+
+    //--------------------------mToonRegions DCArray--------------------------
+    for(int i = 0; i < mToonRegions_ArrayLength; i++)
+    {
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mColor.r));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mColor.g));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mColor.b));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mColor.a));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mToonRegions[i].mSize));
+    }
+
+    //--------------------------StreamHeader--------------------------
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(StreamHeader.mRegionCount));
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(StreamHeader.mAuxDataCount));
+    NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(StreamHeader.mTotalDataSize));
+
+    //--------------------------mRegionHeaders--------------------------
+    for (int i = 0; i < StreamHeader.mRegionCount; i++)
+    {
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mFaceIndex));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mMipIndex));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mMipCount));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mDataSize));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mPitch));
+        NewData = ByteFunctions.Combine(NewData, BitConverter.GetBytes(mRegionHeaders[i].mSlicePitch));
+    }
+
+    if(headerOnly)
+        return NewData;
+
+    for(int i = DDS_File.textureData.Count - 1; i >= 0; i--)
+    {
+        NewData = ByteFunctions.Combine(NewData, DDS_File.textureData[i]);
+    }
+
+    return NewData;
+}
+
+}
+    */
 }

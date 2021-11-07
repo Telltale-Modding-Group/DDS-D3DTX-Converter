@@ -62,58 +62,13 @@ namespace D3DTX_TextureConverter.Main
         /// <param name="data"></param>
         /// <param name="bytePointerPosition"></param>
         /// <param name="showConsole"></param>
-        public MSV6(byte[] data, ref uint bytePointerPosition, bool showConsole = true)
+        public MSV6(BinaryReader reader, bool showConsole = true)
         {
-            MetaHeaderLength = 0;
-
-            if(showConsole)
-            {
-                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
-                Console.WriteLine("||||||||||| Meta Header |||||||||||");
-            }
-
-            //--------------------------Meta Stream Keyword-------------------------- [4 bytes]
-            mMetaStreamVersion = ByteFunctions.ReadFixedString(data, 4, ref bytePointerPosition);
-
-            if (showConsole)
-            {
-                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-                Console.WriteLine("D3DTX Meta Stream Keyword = {0}", mMetaStreamVersion);
-            }
-
-            MetaHeaderLength += 4;
-
-            //--------------------------Default Section Chunk Size-------------------------- [4 bytes] //default section chunk size
-            mDefaultSectionChunkSize = ByteFunctions.ReadUnsignedInt(data, ref bytePointerPosition);
-
-            if (showConsole)
-                Console.WriteLine("D3DTX Default Section Chunk Size = {0}", mDefaultSectionChunkSize);
-
-            MetaHeaderLength += 4;
-
-            //-------------------------Debug Section Chunk Size-------------------------- [4 bytes] //debug section chunk size (always zero)
-            mDebugSectionChunkSize = ByteFunctions.ReadUnsignedInt(data, ref bytePointerPosition);
-
-            if (showConsole)
-                Console.WriteLine("D3DTX Debug Section Chunk Size = {0}", mDebugSectionChunkSize);
-
-            MetaHeaderLength += 4;
-
-            //--------------------------Async Section Chunk Size-------------------------- [4 bytes] //async section chunk size (size of the bytes after the file header)
-            mAsyncSectionChunkSize = ByteFunctions.ReadUnsignedInt(data, ref bytePointerPosition);
-
-            if (showConsole)
-                Console.WriteLine("D3DTX Async Section Chunk Size = {0}", mAsyncSectionChunkSize);
-
-            MetaHeaderLength += 4;
-
-            //--------------------------mClassNamesLength-------------------------- [4 bytes]
-            mClassNamesLength = ByteFunctions.ReadUnsignedInt(data, ref bytePointerPosition);
-
-            if (showConsole)
-                Console.WriteLine("D3DTX mClassNamesLength = {0}", mClassNamesLength);
-
-            MetaHeaderLength += 4;
+            mMetaStreamVersion += reader.ReadChars(4); //Meta Stream Keyword [4 bytes]
+            mDefaultSectionChunkSize = reader.ReadUInt32(); //Default Section Chunk Size [4 bytes] //default section chunk size
+            mDebugSectionChunkSize = reader.ReadUInt32(); //Debug Section Chunk Size [4 bytes] //debug section chunk size (always zero)
+            mAsyncSectionChunkSize = reader.ReadUInt32(); //Async Section Chunk Size [4 bytes] //async section chunk size (size of the bytes after the file header)
+            mClassNamesLength = reader.ReadUInt32(); //mClassNamesLength [4 bytes]
 
             //--------------------------mClassNames--------------------------
             mClassNames = new ClassNames[mClassNamesLength];
@@ -124,15 +79,29 @@ namespace D3DTX_TextureConverter.Main
                 {
                     mTypeNameCRC = new Symbol()
                     {
-                        mCrc64 = ByteFunctions.ReadUnsignedLong(data, ref bytePointerPosition)
+                        mCrc64 = reader.ReadUInt64()
                     },
-                    mVersionCRC = ByteFunctions.ReadUnsignedInt(data, ref bytePointerPosition)
+                    mVersionCRC = reader.ReadUInt32()
                 };
+            }
 
-                MetaHeaderLength += 12;
+            MetaHeaderLength = (4 * 5) + (12 * mClassNamesLength);
 
-                if (showConsole)
-                    Console.WriteLine("D3DTX mClassName {0} = {1}", i, mClassNames[i]);
+            if (showConsole)
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
+                Console.WriteLine("||||||||||| Meta Header |||||||||||");
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+                Console.WriteLine("Meta Stream Keyword = {0}", mMetaStreamVersion);
+                Console.WriteLine("Meta Default Section Chunk Size = {0}", mDefaultSectionChunkSize);
+                Console.WriteLine("Meta Debug Section Chunk Size = {0}", mDebugSectionChunkSize);
+                Console.WriteLine("Meta Async Section Chunk Size = {0}", mAsyncSectionChunkSize);
+                Console.WriteLine("Meta mClassNamesLength = {0}", mClassNamesLength);
+
+                for(int i = 0; i < mClassNames.Length; i++)
+                {
+                    Console.WriteLine("Meta mClassName {0} = {1}", i, mClassNames[i]);
+                }
             }
         }
 
@@ -140,36 +109,25 @@ namespace D3DTX_TextureConverter.Main
         /// Converts the data of this object into a byte array.
         /// </summary>
         /// <returns></returns>
-        public byte[] GetByteData()
+        public void GetByteData(BinaryWriter writer)
         {
-            byte[] finalData = new byte[0];
-
             //--------------------------Meta Stream Keyword-------------------------- [4 bytes]
-            finalData = ByteFunctions.Combine(finalData, ByteFunctions.GetBytes(mMetaStreamVersion));
+            writer.Write(mMetaStreamVersion[0]);
+            writer.Write(mMetaStreamVersion[1]);
+            writer.Write(mMetaStreamVersion[2]);
+            writer.Write(mMetaStreamVersion[3]);
 
-            //--------------------------Default Section Chunk Size-------------------------- [4 bytes] //default section chunk size
-            finalData = ByteFunctions.Combine(finalData, BitConverter.GetBytes(mDefaultSectionChunkSize));
-
-            //-------------------------Debug Section Chunk Size-------------------------- [4 bytes] //debug section chunk size (always zero)
-            finalData = ByteFunctions.Combine(finalData, BitConverter.GetBytes(mDebugSectionChunkSize));
-
-            //--------------------------Async Section Chunk Size-------------------------- [4 bytes] //async section chunk size (size of the bytes after the file header)
-            finalData = ByteFunctions.Combine(finalData, BitConverter.GetBytes(mAsyncSectionChunkSize));
-
-            //--------------------------mClassNamesLength-------------------------- [4 bytes]
-            finalData = ByteFunctions.Combine(finalData, BitConverter.GetBytes(mClassNamesLength));
+            writer.Write(mDefaultSectionChunkSize); //Default Section Chunk Size [4 bytes] default section chunk size
+            writer.Write(mDebugSectionChunkSize); //Debug Section Chunk Size [4 bytes] debug section chunk size (always zero)
+            writer.Write(mAsyncSectionChunkSize); //Async Section Chunk Size [4 bytes] async section chunk size (size of the bytes after the file header)
+            writer.Write(mClassNamesLength); //mClassNamesLength [4 bytes]
 
             //--------------------------mClassNames--------------------------
             for (int i = 0; i < mClassNames.Length; i++)
             {
-                //symbol
-                finalData = ByteFunctions.Combine(finalData, BitConverter.GetBytes(mClassNames[i].mTypeNameCRC.mCrc64));
-
-                //version crc
-                finalData = ByteFunctions.Combine(finalData, BitConverter.GetBytes(mClassNames[i].mVersionCRC));
+                writer.Write(mClassNames[i].mTypeNameCRC.mCrc64); //symbol
+                writer.Write(mClassNames[i].mVersionCRC); //version crc
             }
-
-            return finalData;
         }
 
         public uint Get_MetaHeaderLength()

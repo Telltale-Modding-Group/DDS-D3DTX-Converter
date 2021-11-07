@@ -47,33 +47,10 @@ namespace D3DTX_TextureConverter.Main
         /// <param name="data"></param>
         /// <param name="bytePointerPosition"></param>
         /// <param name="showConsole"></param>
-        public MTRE(byte[] data, ref uint bytePointerPosition, bool showConsole = true)
+        public MTRE(BinaryReader reader, bool showConsole = true)
         {
-            MetaHeaderLength = 0;
-
-            if(showConsole)
-            {
-                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
-                Console.WriteLine("||||||||||| Meta Header |||||||||||");
-            }
-            //--------------------------Meta Stream Keyword-------------------------- [4 bytes]
-            mMetaStreamVersion = ByteFunctions.ReadFixedString(data, 4, ref bytePointerPosition);
-
-            if (showConsole)
-            {
-                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
-                Console.WriteLine("D3DTX Meta Stream Keyword = {0}", mMetaStreamVersion);
-            }
-
-            MetaHeaderLength += 4;
-
-            //--------------------------mClassNamesLength-------------------------- [4 bytes]
-            mClassNamesLength = ByteFunctions.ReadUnsignedInt(data, ref bytePointerPosition);
-
-            if (showConsole)
-                Console.WriteLine("D3DTX mClassNamesLength = {0}", mClassNamesLength);
-
-            MetaHeaderLength += 4;
+            mMetaStreamVersion += reader.ReadChars(4); //Meta Stream Keyword [4 bytes]
+            mClassNamesLength = reader.ReadUInt32(); //mClassNamesLength [4 bytes]
 
             //--------------------------mClassNames--------------------------
             mClassNames = new ClassNames[mClassNamesLength];
@@ -84,15 +61,26 @@ namespace D3DTX_TextureConverter.Main
                 {
                     mTypeNameCRC = new Symbol()
                     {
-                        mCrc64 = ByteFunctions.ReadUnsignedLong(data, ref bytePointerPosition)
+                        mCrc64 = reader.ReadUInt64()
                     },
-                    mVersionCRC = ByteFunctions.ReadUnsignedInt(data, ref bytePointerPosition)
+                    mVersionCRC = reader.ReadUInt32()
                 };
+            }
 
-                MetaHeaderLength += 12;
+            MetaHeaderLength = (4 * 5) + (12 * mClassNamesLength);
 
-                if (showConsole)
-                    Console.WriteLine("D3DTX mClassName {0} = {1}", i, mClassNames[i]);
+            if (showConsole)
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
+                Console.WriteLine("||||||||||| Meta Header |||||||||||");
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+                Console.WriteLine("Meta Stream Keyword = {0}", mMetaStreamVersion);
+                Console.WriteLine("Meta mClassNamesLength = {0}", mClassNamesLength);
+
+                for (int i = 0; i < mClassNames.Length; i++)
+                {
+                    Console.WriteLine("Meta mClassName {0} = {1}", i, mClassNames[i]);
+                }
             }
         }
 
@@ -100,27 +88,25 @@ namespace D3DTX_TextureConverter.Main
         /// Converts the data of this object into a byte array.
         /// </summary>
         /// <returns></returns>
-        public byte[] GetByteData()
+        public void GetByteData(BinaryWriter writer)
         {
-            byte[] finalData = new byte[0];
-
             //--------------------------Meta Stream Keyword-------------------------- [4 bytes]
-            finalData = ByteFunctions.Combine(finalData, ByteFunctions.GetBytes(mMetaStreamVersion));
+            writer.Write(mMetaStreamVersion[0]);
+            writer.Write(mMetaStreamVersion[1]);
+            writer.Write(mMetaStreamVersion[2]);
+            writer.Write(mMetaStreamVersion[3]);
 
-            //--------------------------mClassNamesLength-------------------------- [4 bytes]
-            finalData = ByteFunctions.Combine(finalData, BitConverter.GetBytes(mClassNamesLength));
+            writer.Write(mClassNamesLength); //mClassNamesLength [4 bytes]
 
             //--------------------------mClassNames--------------------------
             for (int i = 0; i < mClassNames.Length; i++)
             {
                 //symbol
-                finalData = ByteFunctions.Combine(finalData, BitConverter.GetBytes(mClassNames[i].mTypeNameCRC.mCrc64));
+                writer.Write(mClassNames[i].mTypeNameCRC.mCrc64);
 
                 //version crc
-                finalData = ByteFunctions.Combine(finalData, BitConverter.GetBytes(mClassNames[i].mVersionCRC));
+                writer.Write(mClassNames[i].mVersionCRC);
             }
-
-            return finalData;
         }
 
         public uint Get_MetaHeaderLength()

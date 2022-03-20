@@ -83,22 +83,22 @@ namespace D3DTX_TextureConverter.Main
                 switch (d3dtxVersion)
                 {
                     case 4:
-                        d3dtx4 = new(reader);
+                        d3dtx4 = new(reader, true);
                         break;
                     case 5:
-                        d3dtx5 = new(reader);
+                        d3dtx5 = new(reader, true);
                         break;
                     case 6:
-                        d3dtx6 = new(reader);
+                        d3dtx6 = new(reader, true);
                         break;
                     case 7:
-                        d3dtx7 = new(reader);
+                        d3dtx7 = new(reader, true);
                         break;
                     case 8:
-                        d3dtx8 = new(reader);
+                        d3dtx8 = new(reader, true);
                         break;
                     case 9:
-                        d3dtx9 = new(reader);
+                        d3dtx9 = new(reader, true);
                         break;
                     default:
                         ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
@@ -189,10 +189,9 @@ namespace D3DTX_TextureConverter.Main
             //parsed meta stream version from the json document
             string metaStreamVersion = "";
 
-            //loop through each property to get the data in the meta object
+            //loop through each property to get the value of the variable 'mMetaStreamVersion' to determine what version of the meta header to parse.
             foreach (JProperty property in metaObject.Properties())
             {
-                //get the name of the property from the json object
                 string name = property.Name;
 
                 if (name.Equals("mMetaStreamVersion"))
@@ -204,26 +203,54 @@ namespace D3DTX_TextureConverter.Main
 
             //deserialize the appropriate json object
             if (metaStreamVersion.Equals("6VSM"))
-                msv6 = JsonConvert.DeserializeObject<MSV6>(jsonText);
+                msv6 = metaObject.ToObject<MSV6>();
             else if (metaStreamVersion.Equals("5VSM"))
-                msv5 = JsonConvert.DeserializeObject<MSV5>(jsonText);
-            else if(metaStreamVersion.Equals("ERTM"))
-                mtre = JsonConvert.DeserializeObject<MTRE>(jsonText);
+                msv5 = metaObject.ToObject<MSV5>();
+            else if (metaStreamVersion.Equals("ERTM"))
+                mtre = metaObject.ToObject<MTRE>();
 
             //d3dtx object
             JObject d3dtxObject = jarray[1] as JObject;
 
-            //loop through each property to get the data in the meta object
+            //d3dtx version value
+            int d3dtxVersion = 0;
+
+            //loop through each property to get the value of the variable 'mVersion' to determine what version of the d3dtx header to parse.
             foreach (JProperty property in d3dtxObject.Properties())
             {
-                //get the name of the property from the json object
                 string name = property.Name;
 
-                if (name.Equals("mMetaStreamVersion"))
+                if (name.Equals("mVersion"))
                 {
-                    metaStreamVersion = (string)property.Value;
+                    d3dtxVersion = (int)property.Value;
                     break;
                 }
+            }
+
+            //deserialize the appropriate json object
+            switch (d3dtxVersion)
+            {
+                case 4:
+                    d3dtx4 = d3dtxObject.ToObject<D3DTX_V4>();
+                    break;
+                case 5:
+                    d3dtx5 = d3dtxObject.ToObject<D3DTX_V5>();
+                    break;
+                case 6:
+                    d3dtx6 = d3dtxObject.ToObject<D3DTX_V6>();
+                    break;
+                case 7:
+                    d3dtx7 = d3dtxObject.ToObject<D3DTX_V7>();
+                    break;
+                case 8:
+                    d3dtx8 = d3dtxObject.ToObject<D3DTX_V8>();
+                    break;
+                case 9:
+                    d3dtx9 = d3dtxObject.ToObject<D3DTX_V9>();
+                    break;
+                default:
+                    d3dtxOLD = d3dtxObject.ToObject<D3DTX_V_OLD>();
+                    break;
             }
         }
 
@@ -252,17 +279,40 @@ namespace D3DTX_TextureConverter.Main
         public void Modify_D3DTX(DDS_Master dds)
         {
             if (d3dtx4 != null)
+            {
                 d3dtx4.ModifyD3DTX(dds);
+            }
             else if (d3dtx5 != null)
+            {
                 d3dtx5.ModifyD3DTX(dds);
+            }
             else if (d3dtx6 != null)
+            {
                 d3dtx6.ModifyD3DTX(dds);
+            }
             else if (d3dtx7 != null)
+            {
                 d3dtx7.ModifyD3DTX(dds);
+            }
             else if (d3dtx8 != null)
+            {
                 d3dtx8.ModifyD3DTX(dds);
+            }
             else if (d3dtx9 != null)
+            {
                 d3dtx9.ModifyD3DTX(dds);
+
+                if (msv5 != null)
+                {
+                    msv5.mDefaultSectionChunkSize = d3dtx9.GetHeaderByteSize();
+                    msv5.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx9.mPixelData);
+                }
+                else if (msv6 != null)
+                {
+                    msv6.mDefaultSectionChunkSize = d3dtx9.GetHeaderByteSize();
+                    msv6.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx9.mPixelData);
+                }
+            }
         }
 
         /// <summary>
@@ -276,7 +326,10 @@ namespace D3DTX_TextureConverter.Main
 
             using (BinaryReader reader = new BinaryReader(File.OpenRead(sourceFile)))
             {
-                metaStreamVersion += reader.ReadChars(4);
+                for(int i = 0; i < 4; i++)
+                {
+                    metaStreamVersion += reader.ReadChar();
+                }
             }
 
             return metaStreamVersion;

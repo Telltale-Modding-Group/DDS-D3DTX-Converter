@@ -15,6 +15,7 @@ namespace D3DTX_TextureConverter.DirectX
         public static uint[,] DDS_CalculateMipResolutions(uint mipCount, uint width, uint height)
         {
             //because I suck at math, we will generate our mip map resolutions using the same method we did in d3dtx to dds (can't figure out how to calculate them in reverse properly)
+            //first [] is the "resolution" index, and the second [] always has a length of 2, and contains the width and height
             uint[,] mipResolutions = new uint[mipCount + 1, 2];
 
             //get our mip image dimensions (have to multiply by 2 as the mip calculations will be off by half)

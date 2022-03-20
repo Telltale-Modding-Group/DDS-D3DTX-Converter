@@ -49,7 +49,7 @@ namespace D3DTX_TextureConverter.Main
         /// <param name="showConsole"></param>
         public MTRE(BinaryReader reader, bool showConsole = true)
         {
-            mMetaStreamVersion += reader.ReadChars(4); //Meta Stream Keyword [4 bytes]
+            mMetaStreamVersion += ByteFunctions.ReadFixedString(reader, 4); //Meta Stream Keyword [4 bytes]
             mClassNamesLength = reader.ReadUInt32(); //mClassNamesLength [4 bytes]
 
             //--------------------------mClassNames--------------------------
@@ -85,17 +85,17 @@ namespace D3DTX_TextureConverter.Main
         }
 
         /// <summary>
+        /// Meta Header (empty constructor, only used for json deserialization)
+        /// </summary>
+        public MTRE() { }
+
+        /// <summary>
         /// Converts the data of this object into a byte array.
         /// </summary>
         /// <returns></returns>
         public void GetByteData(BinaryWriter writer)
         {
-            //--------------------------Meta Stream Keyword-------------------------- [4 bytes]
-            writer.Write(mMetaStreamVersion[0]);
-            writer.Write(mMetaStreamVersion[1]);
-            writer.Write(mMetaStreamVersion[2]);
-            writer.Write(mMetaStreamVersion[3]);
-
+            ByteFunctions.WriteFixedString(writer, mMetaStreamVersion); //Meta Stream Keyword [4 bytes]
             writer.Write(mClassNamesLength); //mClassNamesLength [4 bytes]
 
             //--------------------------mClassNames--------------------------

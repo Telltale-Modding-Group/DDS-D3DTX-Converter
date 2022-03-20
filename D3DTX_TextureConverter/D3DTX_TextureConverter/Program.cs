@@ -14,7 +14,7 @@ namespace D3DTX_TextureConverter
     class Program
     {
         //----------------------CONVERSION OPTIONS----------------------
-        public static bool d3dtxMode = true; //true = in d3dtx to dds mode, false = dds to d3dtx mode
+        public static bool d3dtxMode = false; //true = in d3dtx to dds mode, false = dds to d3dtx mode
         //----------------------CONVERSION OPTIONS END----------------------
 
         /// <summary>

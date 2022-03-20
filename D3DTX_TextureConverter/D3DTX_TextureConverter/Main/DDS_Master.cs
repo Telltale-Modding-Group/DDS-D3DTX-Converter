@@ -209,7 +209,7 @@ namespace D3DTX_TextureConverter.Main
             Array.Copy(sourceFileData, ddsHeaderLength, ddsTextureData, 0, ddsTextureData.Length);
 
             //if there are no mip maps
-            if(header.dwMipMapCount <= 0)
+            if(header.dwMipMapCount <= 1)
             {
                 textureData = new();
                 textureData.Add(ddsTextureData);
@@ -232,17 +232,14 @@ namespace D3DTX_TextureConverter.Main
                     byte[] temp = new byte[byteSizes[i]];
 
                     //issue length
-                    //Array.Copy(ddsTextureData, offset, temp, 0, temp.Length);
+                    Array.Copy(ddsTextureData, offset, temp, 0, temp.Length);
 
-                    //offset += temp.Length - 1;
+                    offset += temp.Length - 1;
 
-                    //textureData.Add(temp);
+                    textureData.Add(temp);
 
                     test -= (int)byteSizes[i];
-                    //test = test;
                 }
-
-                test = test;
             }
         }
 

@@ -69,11 +69,6 @@ namespace D3DTX_TextureConverter.Main
         public int mName_BlockSize { get; set; }
 
         /// <summary>
-        /// [4 bytes] The length of the mName string value.
-        /// </summary>
-        public uint mName_StringLength { get; set; }
-
-        /// <summary>
         /// [mName_StringLength bytes] The string mName.
         /// </summary>
         public string mName { get; set; }
@@ -82,11 +77,6 @@ namespace D3DTX_TextureConverter.Main
         /// [4 bytes] The mImportName block size in bytes.
         /// </summary>
         public int mImportName_BlockSize { get; set; }
-
-        /// <summary>
-        /// [4 bytes] The length of the mImportName string value. 
-        /// </summary>
-        public uint mImportName_StringLength { get; set; }
 
         /// <summary>
         /// [mImportName_StringLength bytes] The mImportName string.
@@ -216,7 +206,7 @@ namespace D3DTX_TextureConverter.Main
         /// <summary>
         /// [8 bytes for each element] An array containing frame names. (Usually unused)
         /// </summary>
-        public List<Symbol> mArrayFrameNames { get; set; }
+        public Symbol[] mArrayFrameNames { get; set; }
 
         /// <summary>
         /// [4 bytes] The size in bytes of the mToonRegions block.
@@ -249,6 +239,11 @@ namespace D3DTX_TextureConverter.Main
         public List<byte[]> mPixelData { get; set; }
 
         /// <summary>
+        /// D3DTX V9 Header (empty constructor, only used for json deserialization)
+        /// </summary>
+        public D3DTX_V9() { }
+
+        /// <summary>
         /// Deserializes a D3DTX Object from a byte array.
         /// </summary>
         /// <param name="data"></param>
@@ -264,9 +259,9 @@ namespace D3DTX_TextureConverter.Main
             mPlatform_BlockSize = reader.ReadInt32(); //mPlatform Block Size [4 bytes]
             mPlatform = EnumPlatformType.GetPlatformType(reader.ReadInt32()); //mPlatform [4 bytes]
             mName_BlockSize = reader.ReadInt32(); //mName Block Size [4 bytes] //mName block size (size + string len)
-            mName = reader.ReadString(); //mName [x bytes]
+            mName = ByteFunctions.ReadString(reader); //mName [x bytes]
             mImportName_BlockSize = reader.ReadInt32(); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
-            mImportName = reader.ReadString(); //mImportName [x bytes] (this is always 0)
+            mImportName = ByteFunctions.ReadString(reader); //mImportName [x bytes] (this is always 0)
             mImportScale = reader.ReadSingle(); //mImportScale [4 bytes]
             mToolProps = new ToolProps() //mToolProps [1 byte]
             {
@@ -310,15 +305,14 @@ namespace D3DTX_TextureConverter.Main
             //--------------------------mArrayFrameNames--------------------------
             mArrayFrameNames_ArrayCapacity = reader.ReadUInt32();  //mArrayFrameNames DCArray Capacity [4 bytes]
             mArrayFrameNames_ArrayLength = reader.ReadInt32(); //mArrayFrameNames DCArray Length [4 bytes] //ADD 1 BECAUSE COUNTING STARTS AT 0
-            mArrayFrameNames = new List<Symbol>();
+            mArrayFrameNames = new Symbol[mArrayFrameNames_ArrayLength];
+
             for (int i = 0; i < mArrayFrameNames_ArrayLength; i++)
             {
-                Symbol newSymbol = new Symbol()
+                mArrayFrameNames[i] = new Symbol()
                 {
                     mCrc64 = reader.ReadUInt64()
                 };
-
-                mArrayFrameNames.Add(newSymbol);
             }
 
             //--------------------------mToonRegions--------------------------
@@ -386,6 +380,40 @@ namespace D3DTX_TextureConverter.Main
             mHeight = dds.header.dwHeight;
             mSurfaceFormat = DDS_Functions.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC);
             mDepth = dds.header.dwDepth;
+            mNumMipLevels = dds.header.dwMipMapCount;
+
+            List<byte[]> ddsData = new List<byte[]>(dds.textureData);
+            ddsData.Reverse();
+
+            mPixelData = ddsData;
+
+            StreamHeader newStreamHeader = new StreamHeader()
+            {
+                mRegionCount = (int)dds.header.dwMipMapCount,
+                mAuxDataCount = mStreamHeader.mAuxDataCount,
+                mTotalDataSize = (int)ByteFunctions.Get2DByteArrayTotalSize(mPixelData)
+            };
+
+            mStreamHeader = newStreamHeader;
+
+            RegionStreamHeader[] regionStreamHeader = new RegionStreamHeader[mStreamHeader.mRegionCount];
+            uint[,] mipMapResolutions = DDS_Functions.DDS_CalculateMipResolutions(mNumMipLevels, mWidth, mHeight);
+            bool blockSizeDouble = DDS_Functions.DDS_CompressionBool(dds.header);
+
+            for (int i = 0; i < regionStreamHeader.Length; i++)
+            {
+                regionStreamHeader[i] = new RegionStreamHeader()
+                {
+                    mDataSize = (uint)mPixelData[i].Length,
+                    mFaceIndex = 0, //NOTE: for cubemap textures this will need to change
+                    mMipCount = 1, //NOTE: for cubemap textures this will need to change
+                    mMipIndex = (regionStreamHeader.Length - 1) - i, //mMipIndex = (regionStreamHeader.Length - 1) - i,
+                    mPitch = DDS_Functions.DDS_ComputePitchValue(mipMapResolutions[regionStreamHeader.Length - i, 0], blockSizeDouble),
+                    mSlicePitch = mPixelData[i].Length,
+                };
+            }
+
+            UpdateArrayCapacities();
         }
 
         public void WriteBinaryData(BinaryWriter writer)
@@ -396,11 +424,12 @@ namespace D3DTX_TextureConverter.Main
             writer.Write(mPlatform_BlockSize); //mPlatform Block Size [4 bytes]
             writer.Write((int)mPlatform); //mPlatform [4 bytes]
             writer.Write(mName_BlockSize); //mName Block Size [4 bytes] //mName block size (size + string len)
-            writer.Write(mName); //mName [x bytes]
+            ByteFunctions.WriteString(writer, mName); //mName [x bytes]
             writer.Write(mImportName_BlockSize); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
-            writer.Write(mImportName); //mImportName [x bytes] (this is always 0)
+            ByteFunctions.WriteString(writer, mImportName); //mImportName [x bytes] (this is always 0)
             writer.Write(mImportScale); //mImportScale [4 bytes]
-            writer.Write(mToolProps.mbHasProps); //mToolProps mbHasProps [1 byte]
+            //writer.Write(mToolProps.mbHasProps); //mToolProps mbHasProps [1 byte]
+            writer.Write('0');
             writer.Write(mNumMipLevels); //mNumMipLevels [4 bytes]
             writer.Write(mWidth); //mWidth [4 bytes]
             writer.Write(mHeight); //mHeight [4 bytes]
@@ -465,6 +494,93 @@ namespace D3DTX_TextureConverter.Main
             }
         }
 
+        public uint GetHeaderByteSize()
+        {
+            uint totalSize = 0;
+
+            totalSize += 4; //mVersion [4 bytes]
+            totalSize += 4; //mSamplerState Block Size [4 bytes]
+            totalSize += 4; //mSamplerState mData [4 bytes] 
+            totalSize += 4; //mPlatform Block Size [4 bytes]
+            totalSize += 4; //mPlatform [4 bytes]
+            totalSize += 4; //mName Block Size [4 bytes] //mName block size (size + string len)
+            totalSize += 4; //mName (strength length prefix) [4 bytes]
+            totalSize += (uint)mName.Length;  //mName [x bytes]
+            totalSize += 4; //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
+            totalSize += 4; //mImportName (strength length prefix) [4 bytes] (this is always 0)
+            totalSize += (uint)mImportName.Length; //mImportName [x bytes] (this is always 0)
+            totalSize += 4; //mImportScale [4 bytes]
+            totalSize += 1; //mToolProps mbHasProps [1 byte]
+            totalSize += 4; //mNumMipLevels [4 bytes]
+            totalSize += 4; //mWidth [4 bytes]
+            totalSize += 4; //mHeight [4 bytes]
+            totalSize += 4; //mDepth [4 bytes]
+            totalSize += 4; //mArraySize [4 bytes]
+            totalSize += 4; //mSurfaceFormat [4 bytes]
+            totalSize += 4; //mTextureLayout [4 bytes]
+            totalSize += 4; //mSurfaceGamma [4 bytes]
+            totalSize += 4; //mSurfaceMultisample [4 bytes]
+            totalSize += 4; //mResourceUsage [4 bytes]
+            totalSize += 4; //mType [4 bytes]
+            totalSize += 4; //mSwizzleSize [4 bytes]
+            totalSize += 1; //mSwizzle A [1 byte]
+            totalSize += 1; //mSwizzle B [1 byte]
+            totalSize += 1; //mSwizzle C [1 byte]
+            totalSize += 1; //mSwizzle D [1 byte]
+            totalSize += 4; //mSpecularGlossExponent [4 bytes]
+            totalSize += 4; //mHDRLightmapScale [4 bytes]
+            totalSize += 4; //mToonGradientCutoff [4 bytes]
+            totalSize += 4; //mAlphaMode [4 bytes]
+            totalSize += 4; //mColorMode [4 bytes]
+            totalSize += 4; //mUVOffset X [4 bytes]
+            totalSize += 4; //mUVOffset Y [4 bytes]
+            totalSize += 4; //mUVScale X [4 bytes]
+            totalSize += 4; //mUVScale Y [4 bytes]
+
+            totalSize += 4; //mArrayFrameNames DCArray Capacity [4 bytes]
+            totalSize += 4; //mArrayFrameNames DCArray Length [4 bytes] //ADD 1 BECAUSE COUNTING STARTS AT 0
+            for (int i = 0; i < mArrayFrameNames_ArrayLength; i++)
+            {
+                totalSize += 8; //Symbol [8 bytes]
+            }
+
+            totalSize += 4; //mToonRegions DCArray Capacity [4 bytes]
+            totalSize += 4; //mToonRegions DCArray Length [4 bytes]
+            for (int i = 0; i < mToonRegions_ArrayLength; i++)
+            {
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+            }
+
+            totalSize += 4; //mRegionCount [4 bytes]
+            totalSize += 4; //mAuxDataCount [4 bytes]
+            totalSize += 4; //mTotalDataSize [4 bytes]
+
+            for (int i = 0; i < mStreamHeader.mRegionCount; i++)
+            {
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+            }
+
+            return totalSize;
+        }
+
+        public void UpdateArrayCapacities()
+        {
+            mArrayFrameNames_ArrayCapacity = 8 + (uint)(8 * mArrayFrameNames.Length);
+            mArrayFrameNames_ArrayLength = mArrayFrameNames.Length;
+
+            mToonRegions_ArrayCapacity = 8 + (uint)(20 * mToonRegions.Length);
+            mToonRegions_ArrayLength = mToonRegions.Length;
+        }
+
         public void PrintConsole()
         {
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Cyan);
@@ -492,7 +608,7 @@ namespace D3DTX_TextureConverter.Main
             Console.WriteLine("D3DTX mSurfaceMultisample = {0} ({1})", Enum.GetName(typeof(T3SurfaceMultisample), mSurfaceMultisample), (int)mSurfaceMultisample);
             Console.WriteLine("D3DTX mResourceUsage = {0} ({1})", Enum.GetName(typeof(T3ResourceUsage), mResourceUsage), (int)mResourceUsage);
             Console.WriteLine("D3DTX mType = {0} ({1})", Enum.GetName(typeof(T3TextureType), mType), (int)mType);
-            Console.WriteLine("D3DTX mSwizzleSize = {0}", Enum.GetName(typeof(T3TextureType), mType), (int)mType);
+            Console.WriteLine("D3DTX mSwizzleSize = {0}", mSwizzleSize);
             Console.WriteLine("D3DTX mSwizzle = {0}", mSwizzle);
             Console.WriteLine("D3DTX mSpecularGlossExponent = {0}", mSpecularGlossExponent);
             Console.WriteLine("D3DTX mHDRLightmapScale = {0}", mHDRLightmapScale);

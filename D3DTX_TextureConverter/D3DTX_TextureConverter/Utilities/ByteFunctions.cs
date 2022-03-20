@@ -9,6 +9,76 @@ namespace D3DTX_TextureConverter.Utilities
 {
     public static class ByteFunctions
     {
+        public static uint Get2DByteArrayTotalSize(List<byte[]> array)
+        {
+            uint result = 0;
+
+            for(int i = 0; i < array.Count; i++)
+            {
+                result += (uint)array[i].Length;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Reads a string from the current stream. The string is prefixed with the length, encoded as an integer 32 bits at a time.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static string ReadString(BinaryReader reader)
+        {
+            int stringLength = reader.ReadInt32();
+            string value = "";
+
+            for (int i = 0; i < stringLength; i++)
+            {
+                value += reader.ReadChar();
+            }
+
+            return value;
+        }
+
+        public static string ReadFixedString(BinaryReader reader, int length)
+        {
+            string value = "";
+
+            for (int i = 0; i < length; i++)
+            {
+                value += reader.ReadChar();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Writes a length-prefixed string (32 bit integer).
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        public static void WriteString(BinaryWriter writer, string value)
+        {
+            writer.Write(value.Length);
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                writer.Write(value[i]);
+            }
+        }
+
+        /// <summary>
+        /// Writes a string (length specified by the string value itself).
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        public static void WriteFixedString(BinaryWriter writer, string value)
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                writer.Write(value[i]);
+            }
+        }
+
         public static byte[] GetBytes(string stringValue)
         {
             //create byte array of the length of the string

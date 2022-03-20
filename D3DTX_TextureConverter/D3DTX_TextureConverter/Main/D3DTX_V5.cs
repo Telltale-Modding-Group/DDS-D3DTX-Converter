@@ -64,11 +64,6 @@ namespace D3DTX_TextureConverter.Main
         public int mName_BlockSize { get; set; }
 
         /// <summary>
-        /// [4 bytes] The length of the mName string value.
-        /// </summary>
-        public uint mName_StringLength { get; set; }
-
-        /// <summary>
         /// [mName_StringLength bytes] The string mName.
         /// </summary>
         public string mName { get; set; }
@@ -77,11 +72,6 @@ namespace D3DTX_TextureConverter.Main
         /// [4 bytes] The mImportName block size in bytes.
         /// </summary>
         public int mImportName_BlockSize { get; set; }
-
-        /// <summary>
-        /// [4 bytes] The length of the mImportName string value. 
-        /// </summary>
-        public uint mImportName_StringLength { get; set; }
 
         /// <summary>
         /// [mImportName_StringLength bytes] The mImportName string.
@@ -214,6 +204,11 @@ namespace D3DTX_TextureConverter.Main
         public List<byte[]> mPixelData { get; set; }
 
         /// <summary>
+        /// D3DTX V5 Header (empty constructor, only used for json deserialization)
+        /// </summary>
+        public D3DTX_V5() { }
+
+        /// <summary>
         /// Deserializes a D3DTX Object from a byte array.
         /// </summary>
         /// <param name="data"></param>
@@ -229,9 +224,9 @@ namespace D3DTX_TextureConverter.Main
             mPlatform_BlockSize = reader.ReadInt32(); //mPlatform Block Size [4 bytes]
             mPlatform = EnumPlatformType.GetPlatformType(reader.ReadInt32()); //mPlatform [4 bytes]
             mName_BlockSize = reader.ReadInt32(); //mName Block Size [4 bytes] //mName block size (size + string len)
-            mName = reader.ReadString(); //mName [x bytes]
+            mName = ByteFunctions.ReadString(reader); //mName [x bytes]
             mImportName_BlockSize = reader.ReadInt32(); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
-            mImportName = reader.ReadString(); //mImportName [x bytes] (this is always 0)
+            mImportName = ByteFunctions.ReadString(reader); //mImportName [x bytes] (this is always 0)
             mImportScale = reader.ReadSingle(); //mImportScale [4 bytes]
             Unknown0 = reader.ReadInt32(); //Unknown 0 [4 bytes] always zero (tool props byte structure size?)
             mToolProps = new ToolProps() //mToolProps [1 byte]
@@ -337,9 +332,9 @@ namespace D3DTX_TextureConverter.Main
             writer.Write(mPlatform_BlockSize); //mPlatform Block Size [4 bytes]
             writer.Write((int)mPlatform); //mPlatform [4 bytes]
             writer.Write(mName_BlockSize); //mName Block Size [4 bytes] //mName block size (size + string len)
-            writer.Write(mName); //mName [x bytes]
+            ByteFunctions.WriteString(writer, mName); //mName [x bytes]
             writer.Write(mImportName_BlockSize); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
-            writer.Write(mImportName); //mImportName [x bytes] (this is always 0)
+            ByteFunctions.WriteString(writer, mImportName); //mImportName [x bytes] (this is always 0)
             writer.Write(mImportScale); //mImportScale [4 bytes]
             writer.Write(Unknown0); //Unknown0 [4 bytes]
             writer.Write(mToolProps.mbHasProps); //mToolProps mbHasProps [1 byte]

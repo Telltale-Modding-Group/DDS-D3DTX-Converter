@@ -64,7 +64,7 @@ namespace D3DTX_TextureConverter.Main
         /// <param name="showConsole"></param>
         public MSV6(BinaryReader reader, bool showConsole = true)
         {
-            mMetaStreamVersion += reader.ReadChars(4); //Meta Stream Keyword [4 bytes]
+            mMetaStreamVersion += ByteFunctions.ReadFixedString(reader, 4); //Meta Stream Keyword [4 bytes]
             mDefaultSectionChunkSize = reader.ReadUInt32(); //Default Section Chunk Size [4 bytes] //default section chunk size
             mDebugSectionChunkSize = reader.ReadUInt32(); //Debug Section Chunk Size [4 bytes] //debug section chunk size (always zero)
             mAsyncSectionChunkSize = reader.ReadUInt32(); //Async Section Chunk Size [4 bytes] //async section chunk size (size of the bytes after the file header)
@@ -106,17 +106,17 @@ namespace D3DTX_TextureConverter.Main
         }
 
         /// <summary>
+        /// Meta Stream Header version 6 (empty constructor, only used for json deserialization)
+        /// </summary>
+        public MSV6() { }
+
+        /// <summary>
         /// Converts the data of this object into a byte array.
         /// </summary>
         /// <returns></returns>
         public void GetByteData(BinaryWriter writer)
         {
-            //--------------------------Meta Stream Keyword-------------------------- [4 bytes]
-            writer.Write(mMetaStreamVersion[0]);
-            writer.Write(mMetaStreamVersion[1]);
-            writer.Write(mMetaStreamVersion[2]);
-            writer.Write(mMetaStreamVersion[3]);
-
+            ByteFunctions.WriteFixedString(writer, mMetaStreamVersion); //Meta Stream Keyword [4 bytes]
             writer.Write(mDefaultSectionChunkSize); //Default Section Chunk Size [4 bytes] default section chunk size
             writer.Write(mDebugSectionChunkSize); //Debug Section Chunk Size [4 bytes] debug section chunk size (always zero)
             writer.Write(mAsyncSectionChunkSize); //Async Section Chunk Size [4 bytes] async section chunk size (size of the bytes after the file header)

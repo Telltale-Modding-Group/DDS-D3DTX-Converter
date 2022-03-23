@@ -37,13 +37,29 @@ namespace D3DTX_TextureConverter.DirectX
             return mipResolutions;
         }
 
-        public static uint[] DDS_GetImageByteSizes(uint[,] mipResolutions, bool isDXT1)
+        public static uint[] DDS_GetImageByteSizes(uint[,] mipResolutions, uint baseLinearSize, bool isDXT1)
         {
             uint[] byteSizes = new uint[mipResolutions.GetLength(0)];
 
             for(int i = 0; i < byteSizes.Length; i++)
             {
-                byteSizes[i] = (uint)CalculateDDS_ByteSize((int)mipResolutions[i, 0], (int)mipResolutions[i, 1], isDXT1);
+                uint mipWidth = mipResolutions[i, 0];
+                uint mipHeight = mipResolutions[i, 1];
+
+                if(mipWidth == mipHeight)
+                {
+                    //computed linear size
+                    //(mipWidth * mipWidth) / 2
+
+                    byteSizes[i] = CalculateDDS_ByteSize_Square(mipWidth, mipHeight, baseLinearSize, (uint)i, (uint)byteSizes.Length, isDXT1);
+                }   
+                else
+                {
+                    byteSizes[i] = CalculateDDS_ByteSize_NonSquare(mipWidth, mipHeight, isDXT1);
+                }
+
+                //original calculation
+                //byteSizes[i] = CalculateDDS_ByteSize((int)mipResolutions[i, 0], (int)mipResolutions[i, 1], isDXT1);
             }
 
             return byteSizes;
@@ -66,21 +82,18 @@ namespace D3DTX_TextureConverter.DirectX
             return (int)MathF.Max(1, ((width + 3) / 4)) * blockSizeValue;
         }
 
-        public static bool DDS_CompressionBool(DDS_HEADER header)
-        {
-            return header.ddspf.dwFourCC.Equals("DXT1");
-        }
+        public static bool DDS_CompressionBool(DDS_HEADER header) => header.ddspf.dwFourCC.Equals("DXT1");
 
         /// <summary>
-        /// Calculates the byte size of a DDS texture
+        /// Calculates the byte size of a DDS non-square texture
         /// </summary>
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="isDXT1"></param>
         /// <returns></returns>
-        public static int CalculateDDS_ByteSize(int width, int height, bool isDXT1)
+        public static uint CalculateDDS_ByteSize_NonSquare(uint width, uint height, bool isDXT1)
         {
-            int compression = 0;
+            uint compression = 0;
 
             //according to formula, if the compression is dxt1 then the number needs to be 8
             if (isDXT1)
@@ -93,6 +106,35 @@ namespace D3DTX_TextureConverter.DirectX
 
             //do the micorosoft magic texture byte size calculation formula
             return Math.Max(1, ((width + 3) / 4)) * Math.Max(1, ((height + 3) / 4)) * compression;
+        }
+
+
+        /// <summary>
+        /// Calculates the byte size of a DDS square texture
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="isDXT1"></param>
+        /// <returns></returns>
+        public static uint CalculateDDS_ByteSize_Square(uint width, uint height, uint dwPitchOrLinearSize, uint mipLevel, uint maxMipLevel, bool isDXT1)
+        {
+            //reference - http://doc.51windows.net/directx9_sdk/graphics/reference/DDSFileReference/ddstextures.htm
+            uint compression = 0;
+
+            //according to formula, if the compression is dxt1 then the number needs to be 8
+            if (isDXT1)
+                compression = 8;
+            else
+                compression = 16;
+
+            uint finalSize = dwPitchOrLinearSize;
+
+            finalSize = (width * width) / 2;
+
+            if (finalSize < compression)
+                finalSize = compression;
+
+            return finalSize;
         }
 
         /// <summary>

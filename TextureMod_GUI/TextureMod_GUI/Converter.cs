@@ -5,6 +5,7 @@ using System.Text;
 using D3DTX_TextureConverter.Utilities;
 using D3DTX_TextureConverter.DirectX;
 using D3DTX_TextureConverter.Main;
+using D3DTX_TextureConverter;
 
 namespace TextureMod_GUI
 {
@@ -71,7 +72,7 @@ namespace TextureMod_GUI
             Console.WriteLine("Filtering Textures..."); //notify the user we are filtering the array
 
             //filter the array so we only get .d3dtx files
-            textures = IOManagement.FilterFiles(textures, D3DTX_File.d3dtxExtension);
+            textures = IOManagement.FilterFiles(textures, D3DTX_Master.d3dtxExtension);
 
             //if no d3dtx files were found, abort the program from going on any further (we don't have any files to convert!)
             if (textures.Count < 1)
@@ -92,7 +93,7 @@ namespace TextureMod_GUI
                 //build the path for the resulting file
                 string textureFileName = Path.GetFileName(texture); //get the file name of the file + extension
                 string textureFileNameOnly = Path.GetFileNameWithoutExtension(texture);
-                string textureResultPath = resultPath + "/" + textureFileNameOnly + DDS_File.ddsExtension; //add the file name to the resulting folder path, this is where our converted file will be placed
+                string textureResultPath = resultPath + "/" + textureFileNameOnly + DDS_Master.ddsExtension; //add the file name to the resulting folder path, this is where our converted file will be placed
 
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
                 Console.WriteLine("||||||||||||||||||||||||||||||||");
@@ -101,14 +102,14 @@ namespace TextureMod_GUI
                 Console.ResetColor();
 
                 //runs the main method for converting the texture
-                ConvertTexture_FromD3DTX_ToDDS(textureFileName, texture, textureResultPath);
+                //ConvertTexture_FromD3DTX_ToDDS(textureFileName, texture, textureResultPath);
 
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
                 Console.WriteLine("Finished converting '{0}'...", textureFileName); //notify the user we finished converting 'x' file.
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             }
         }
-
+        /*
         /// <summary>
         /// The main function for reading and converting said .d3dtx into a .dds file
         /// </summary>
@@ -148,7 +149,7 @@ namespace TextureMod_GUI
 
             //GenericImageFormats.ConvertDDS_To_PSD(destinationFile);
         }
-
+        */
         //-----------------------------------------------DDS TO D3DTX-----------------------------------------------
         //-----------------------------------------------DDS TO D3DTX-----------------------------------------------
         //-----------------------------------------------DDS TO D3DTX-----------------------------------------------
@@ -163,7 +164,7 @@ namespace TextureMod_GUI
             Console.WriteLine("Conversion Starting...");
 
             //we got our paths, so lets begin
-            Convert_DDS_Bulk(workingDirectory.workingDirectoryPath, workingDirectory.workingDirectoryPath);
+            //Convert_DDS_Bulk(workingDirectory.workingDirectoryPath, workingDirectory.workingDirectoryPath);
 
             //once BeginProcess is finished, it will come back here and we will notify the user that we are done
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
@@ -171,6 +172,7 @@ namespace TextureMod_GUI
             Console.ResetColor();
         }
 
+        /*
         /// <summary>
         /// Begins the conversion process. Gathers the files found in the texture folder path, filters them, and converts each one.
         /// </summary>
@@ -276,7 +278,7 @@ namespace TextureMod_GUI
                 }
             }
         }
-
+        */
         /// <summary>
         /// The main function for reading and converting said .d3dtx into a .dds file
         /// </summary>
@@ -290,6 +292,7 @@ namespace TextureMod_GUI
              * MABYE TRY TO CHANGE THE TEXTURE DATA BYTE SIZE IN THE D3DTX HEADER AND SEE IF THAT CHANGES ANYTHING?
             */
 
+            /*
             D3DTX_File d3dtx_file = new D3DTX_File();
             DDS_File dds_file;
 
@@ -321,6 +324,7 @@ namespace TextureMod_GUI
 
                 return;
             }
+            */
         }
     }
 }

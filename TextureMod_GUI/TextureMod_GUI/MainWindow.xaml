@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
         ResizeMode="CanResizeWithGrip"
-        Title="Texture Mod Tool" Height="699" Width="773" MinWidth="503" MinHeight="400">
+        Title="D3DTX Texture Tool" Height="699" Width="877" MinWidth="503" MinHeight="400">
 
     <mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
@@ -53,18 +53,14 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="350"></RowDefinition>
-                    <RowDefinition Height="5"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0" Margin="0,0,0,5" Grid.RowSpan="2">
+                <Grid Margin="0,0,0,5" Grid.RowSpan="2">
                     <Label Name="ui_textureDirectory_title_label" Content="Textures Directory" Margin="10,10,10,0" VerticalAlignment="Top"/>
-                    <TextBox Name="ui_textureDirectory_directorypath_textbox" Text="Directory Path" IsReadOnly="True" Margin="10,41,42,0" VerticalAlignment="Top"/>
-                    <Button Name="ui_textureDirectory_opendirectory_button" HorizontalAlignment="Right" Margin="0,40,10,0" VerticalAlignment="Top" Width="27" Height="27" Padding="0" ToolTip="Opens the Texture Directory" Click="ui_textureDirectory_opendirectory_button_Click" >
+                    <TextBox Name="ui_textureDirectory_directorypath_textbox" Text="Directory Path" IsReadOnly="True" Margin="10,41,74,0" VerticalAlignment="Top"/>
+                    <Button Name="ui_textureDirectory_opendirectory_button" HorizontalAlignment="Right" Margin="0,40,42,0" VerticalAlignment="Top" Width="27" Height="27" Padding="0" ToolTip="Opens the Texture Directory" Click="ui_textureDirectory_opendirectory_button_Click" >
                         <iconPacks:BootstrapIcons Height="18" Width="18" Kind="Folder"></iconPacks:BootstrapIcons>
                     </Button>
-                    <ListView Name="ui_textureDirectory_files_listview" Margin="10,72,10,38" SelectionChanged="ui_textureDirectory_files_listview_SelectionChanged">
+                    <Button Name="ui_textureDirectory_refreshdirectory_button" HorizontalAlignment="Right" Margin="0,40,10,0" Width="27" Padding="0" ToolTip="Refreshes The Texture Directory" Content="{iconPacks:BootstrapIcons ArrowClockwise, Height=18, Width=18}" Height="27" VerticalAlignment="Top" Click="ui_textureDirectory_refreshdirectory_button_Click" IsEnabled="False" />
+                    <ListView Name="ui_textureDirectory_files_listview" Margin="10,72,10,38" SelectionChanged="ui_textureDirectory_files_listview_SelectionChanged" MouseDoubleClick="ui_textureDirectory_files_listview_MouseDoubleClick">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="File Name" DisplayMemberBinding="{Binding FileName}" />
@@ -78,18 +74,9 @@
                             </ContextMenu>
                         </ListView.ContextMenu>
                     </ListView>
-                    <Button Name="ui_textureDirectory_refreshdirectory_button" HorizontalAlignment="Right" Margin="0,0,10,6" Width="27" Padding="0" ToolTip="Refreshes The Texture Directory" Content="{iconPacks:BootstrapIcons ArrowClockwise, Height=18, Width=18}" Height="27" VerticalAlignment="Bottom" Click="ui_textureDirectory_refreshdirectory_button_Click" IsEnabled="False" />
                 </Grid>
-
-                <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
-
-                <Grid Grid.Row="2">
-                    <TextBox Name="ui_console_textbox" TextWrapping="NoWrap" IsReadOnly="True" Text="" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" Margin="10,10,10,32" ScrollViewer.CanContentScroll="True" UseLayoutRounding="False"/>
-                    <ProgressBar Name="ui_console_progressbar" Height="17" Margin="10,0,10,10" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom"/>
-                </Grid>
-
-                <Button Name="ui_textureDirectory_convertDDS_button" Content="Convert To DDS" Margin="10,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="104" Click="ui_textureDirectory_convertDDS_button_Click" IsEnabled="False" ToolTip="Convert .d3dtx textures in folder to .dds"/>
-                <Button Name="ui_textureDirectory_convertD3DTX_button" Content="Convert To D3DTX" Margin="119,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="116" Click="ui_textureDirectory_convertD3DTX_button_Click" IsEnabled="False" ToolTip="Converts .dds textures and .header files to create a .d3dtx"/>
+                <ComboBox Name="ui_textureDirectory_convertType_combobox" HorizontalAlignment="Left" Margin="105,0,0,5" VerticalAlignment="Bottom" Width="155" Height="27"/>
+                <Button Name="ui_textureDirectory_convert_button" Content="Convert To" Margin="10,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="90"  IsEnabled="False" ToolTip="Convert the files in the directory to the desired format."/>
             </Grid>
 
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Width="5" ResizeDirection="Columns"/>
@@ -111,9 +98,32 @@
                 <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
 
                 <Grid Grid.Row="2">
-                    <Label Name="ui_imageproperties_title_label" Content="File Properties" Margin="9,9,8,0" VerticalAlignment="Top" Height="25"/>
-                    <pt:PropertyGrid 
-                        x:Name="ui_imageproperties_propertyGrid" Margin="10,39,10,10" DescriptionIconAlignment="Left" EnumAsRadioButtonsLimit="0"/>
+                    <Label Name="ui_imageproperties_title_label" Content="Image Properties" Margin="9,9,8,0" VerticalAlignment="Top" Height="25"/>
+
+                    <pt:PropertyGrid Name="ui_datagridtest" Margin="10,39,10,10"></pt:PropertyGrid>
+                    
+                    <!--
+                    <StackPanel Name="ui_imageproperties_stackpanel_6vsm" Margin="10,39,10,10" Orientation="Vertical">
+                        <Label Content="MSV6 Header" VerticalAlignment="Top" Height="25"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="mDefaultSectionChunkSize: " VerticalAlignment="Top" Height="25" Width="200" />
+                            <TextBox Text="0" VerticalAlignment="Top" Height="25" IsReadOnly="True" HorizontalContentAlignment="Left" Width="200"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="mDebugSectionChunkSize: " VerticalAlignment="Top" Height="25" Width="200" />
+                            <TextBox Text="0" VerticalAlignment="Top" Height="25" IsReadOnly="True" HorizontalContentAlignment="Left" Width="200"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="mAsyncSectionChunkSize: " VerticalAlignment="Top" Height="25" Width="200" />
+                            <TextBox Text="0" VerticalAlignment="Top" Height="25" IsReadOnly="True" HorizontalContentAlignment="Left" Width="200"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label VerticalAlignment="Top" Height="25" Width="200" />
+                            <TextBox Text="0" VerticalAlignment="Top" Height="25" IsReadOnly="True" HorizontalContentAlignment="Left" Width="200"/>
+                        </StackPanel>
+                    </StackPanel>
+                    -->
+
                 </Grid>
             </Grid>
         </Grid>

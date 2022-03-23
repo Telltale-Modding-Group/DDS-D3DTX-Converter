@@ -152,22 +152,26 @@ namespace D3DTX_TextureConverter.Main
                 surfaceFormat = d3dtx.d3dtx9.mSurfaceFormat;
             }
 
-            header.ddspf.dwFourCC = DDS_Functions.Get_FourCC_FromTellale(surfaceFormat);
+            DDS_PIXELFORMAT new_ddspf = new DDS_PIXELFORMAT();
+
+            new_ddspf.dwFourCC = DDS_Functions.Get_FourCC_FromTellale(surfaceFormat);
 
             switch (surfaceFormat)
             {
                 case Telltale.T3SurfaceFormat.eSurface_A8:
-                    header.ddspf.dwABitMask = 255;
+                    new_ddspf.dwABitMask = 255;
                     header.dwCaps = 4198408; //DDSCAPS_COMPLEX | DDSCAPS_TEXTURE | DDSCAPS_MIPMAP
                     break;
                 case Telltale.T3SurfaceFormat.eSurface_ARGB8:
-                    header.ddspf.dwABitMask = 255;
-                    header.ddspf.dwRBitMask = 255;
-                    header.ddspf.dwGBitMask = 255;
-                    header.ddspf.dwBBitMask = 255;
+                    new_ddspf.dwABitMask = 255;
+                    new_ddspf.dwRBitMask = 255;
+                    new_ddspf.dwGBitMask = 255;
+                    new_ddspf.dwBBitMask = 255;
                     header.dwCaps = 4198408; //DDSCAPS_COMPLEX | DDSCAPS_TEXTURE | DDSCAPS_MIPMAP
                     break;
             }
+
+            header.ddspf = new_ddspf;
         }
 
         /// <summary>
@@ -208,11 +212,10 @@ namespace D3DTX_TextureConverter.Main
             //copy the data from the source byte array past the header (so we are only getting texture data)
             Array.Copy(sourceFileData, ddsHeaderLength, ddsTextureData, 0, ddsTextureData.Length);
 
-            textureData = new();
-
             //if there are no mip maps
-            if (header.dwMipMapCount <= 1)
+            if(header.dwMipMapCount <= 1)
             {
+                textureData = new();
                 textureData.Add(ddsTextureData);
                 Console.WriteLine("DDS Texture Byte Size = {0}", textureData[0].Length);
             }
@@ -220,11 +223,13 @@ namespace D3DTX_TextureConverter.Main
             {
                 //get mip resolutions
                 //calculated mip resolutions [Pixel Value, Width or Height (0 or 1)]
-                mipMapResolutions = DDS_Functions.DDS_CalculateMipResolutions(header.dwMipMapCount - 1, header.dwWidth, header.dwHeight);
+                mipMapResolutions = DDS_Functions.DDS_CalculateMipResolutions(header.dwMipMapCount, header.dwWidth, header.dwHeight);
 
                 //get byte sizes
-                uint[] byteSizes = DDS_Functions.DDS_GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, !DDS_Functions.DDS_CompressionBool(header));
+                uint[] byteSizes = DDS_Functions.DDS_GetImageByteSizes(mipMapResolutions, DDS_Functions.DDS_CompressionBool(header));
 
+                textureData = new();
+                int test = ddsTextureData.Length;
                 int offset = 0;
 
                 for (int i = 0; i < byteSizes.Length; i++)
@@ -234,36 +239,13 @@ namespace D3DTX_TextureConverter.Main
                     //issue length
                     Array.Copy(ddsTextureData, offset, temp, 0, temp.Length);
 
-                    offset += temp.Length;
+                    offset += temp.Length - 1;
 
                     textureData.Add(temp);
+
+                    test -= (int)byteSizes[i];
                 }
             }
-        }
-
-        public void TEST_WriteDDSToDisk(string destinationPath)
-        {
-            //THIS WORKS
-            string extension = Path.GetExtension(destinationPath);
-            string newPath = destinationPath.Remove(destinationPath.Length - extension.Length, extension.Length);
-            newPath += "_parseTest" + extension;
-
-            byte[] finalData = new byte[0];
-
-            //turn our header data into bytes to be written into a file
-            byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS_Functions.GetHeaderBytes(header));
-
-            //copy the dds header to the file
-            finalData = ByteFunctions.Combine(finalData, dds_header);
-
-            //copy the images
-            for (int i = 0; i <= textureData.Count - 1; i++)
-            {
-                finalData = ByteFunctions.Combine(finalData, textureData[i]);
-            }
-
-            //write the file to the disk
-            File.WriteAllBytes(newPath, finalData);
         }
 
         /// <summary>

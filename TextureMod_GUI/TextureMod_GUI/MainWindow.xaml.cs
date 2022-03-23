@@ -16,6 +16,8 @@ using System.IO;
 using D3DTX_TextureConverter.Telltale;
 using D3DTX_TextureConverter.Main;
 using TextureMod_GUI.UI;
+using D3DTX_TextureConverter.DirectX;
+using D3DTX_TextureConverter.Utilities;
 
 namespace TextureMod_GUI
 {
@@ -36,6 +38,11 @@ namespace TextureMod_GUI
 
             //update our UI
             UpdateUI();
+
+            //ui_datagridtest.ItemsSource = test;
+            //ui_datagridtest.CurrentObject = new D3DTX_V9();
+            //ui_datagridtest.CurrentObject = new MSV6();
+            //ui_datagridtest.CurrentObject = new DDS_HEADER();
         }
 
         /// <summary>
@@ -44,11 +51,7 @@ namespace TextureMod_GUI
         public void InitalizeApplication()
         {
             mainManager = new MainManager(this, consoleWriter);
-            consoleWriter = new ConsoleWriter(ui_console_textbox);
-            Console.SetOut(consoleWriter);
-
-            Console.WriteLine("[Welcome to the D3DTX Texture converter!]");
-            Console.WriteLine("To begin, open a directory that contains d3dtx files.");
+            ui_textureDirectory_convertType_combobox.ItemsSource = Enum.GetNames(typeof(GenericImageFormats.ConverterImageFormat));
         }
 
         /// <summary>
@@ -62,14 +65,14 @@ namespace TextureMod_GUI
             //update our texture directory UI
             ui_textureDirectory_directorypath_textbox.Text = mainManager.Get_WorkingDirectory_Path();
             ui_textureDirectory_files_listview.ItemsSource = mainManager.Get_WorkingDirectory_Files();
-            ui_textureDirectory_convertD3DTX_button.IsEnabled = mainManager.CanConvertTo_D3DTX();
-            ui_textureDirectory_convertDDS_button.IsEnabled = mainManager.CanConvertTo_DDS();
+            //ui_textureDirectory_convertD3DTX_button.IsEnabled = mainManager.CanConvertTo_D3DTX();
+            //ui_textureDirectory_convertDDS_button.IsEnabled = mainManager.CanConvertTo_DDS();
             ui_textureDirectory_refreshdirectory_button.IsEnabled = mainManager.WorkingDirectory_Path_Exists();
 
-            List<UI_D3DTX_6VSM> test = new List<UI_D3DTX_6VSM>();
-            test.Add(new UI_D3DTX_6VSM());
+            //List<UI_D3DTX_6VSM> test = new List<UI_D3DTX_6VSM>();
+            //test.Add(new UI_D3DTX_6VSM());
 
-            ui_imageproperties_propertyGrid.CurrentObject = new UI_D3DTX_6VSM();
+            //ui_imageproperties_propertyGrid.CurrentObject = new UI_D3DTX_6VSM();
         }
 
         /// <summary>
@@ -125,39 +128,6 @@ namespace TextureMod_GUI
             }
         }
 
-        /// <summary>
-        /// Displays basic image properties and info.
-        /// </summary>
-        /// <param name="image"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        private string GetImageProperties_Text(BitmapImage image, string name, string path)
-        {
-            string final = "";
-
-            /*
-            final += string.Format("Image Name : {0}", name);
-            final += Environment.NewLine;
-
-            final += string.Format("Pixel Width : {0}", image.PixelWidth.ToString());
-            final += Environment.NewLine;
-
-            final += string.Format("Pixel Height : {0}", image.PixelHeight.ToString());
-            final += Environment.NewLine;
-
-            final += string.Format("DDS Format : {0}", read_DDS.DDSFormat(path));
-            final += Environment.NewLine;
-
-            final += string.Format("Has Mip Maps : {0}", read_DDS.HasMipMaps(path).ToString());
-            final += Environment.NewLine;
-
-            final += string.Format("Mip Map Count : {0}", read_DDS.MipMapCount(path).ToString());
-            final += Environment.NewLine;
-            */
-
-            return final;
-        }
-
         //------------------------------------- MAIN XAML FUNCTIONS -------------------------------------
 
         private void ui_textureDirectory_opendirectory_button_Click(object sender, RoutedEventArgs e)
@@ -200,6 +170,11 @@ namespace TextureMod_GUI
         private void ui_window_help_button_Click(object sender, RoutedEventArgs e)
         {
             mainManager.Open_AppHelp();
+        }
+
+        private void ui_textureDirectory_files_listview_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+
         }
     }
 }

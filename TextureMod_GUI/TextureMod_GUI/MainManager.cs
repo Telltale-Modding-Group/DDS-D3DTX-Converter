@@ -25,7 +25,6 @@ namespace TextureMod_GUI
         private Converter converter;
         private WorkingDirectory workingDirectory;
         private MainWindow mainWindow;
-        private ConsoleWriter consoleWriter;
 
         public MainManager(MainWindow mainWindow, ConsoleWriter consoleWriter)
         {
@@ -141,29 +140,14 @@ namespace TextureMod_GUI
             workingDirectory.GetFiles(workingDirectory.workingDirectoryPath);
         }
 
-        public bool WorkingDirectory_Path_Exists()
-        {
-            return Directory.Exists(workingDirectory.workingDirectoryPath);
-        }
+        public bool WorkingDirectory_Path_Exists() => Directory.Exists(workingDirectory.workingDirectoryPath);
 
-        public bool CanConvertTo_DDS()
-        {
-            return IOManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".d3dtx").Count > 0;
-        }
+        public bool CanConvertTo_DDS() => IOManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".d3dtx").Count > 0;
 
-        public bool CanConvertTo_D3DTX()
-        {
-            return IOManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".dds").Count > 0 && IOManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".header").Count > 0;
-        }
+        public bool CanConvertTo_D3DTX() => IOManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".dds").Count > 0 && IOManagement.GetFilesPathsByExtension(workingDirectory.workingDirectoryPath, ".header").Count > 0;
 
-        public string Get_WorkingDirectory_Path()
-        {
-            return workingDirectory.workingDirectoryPath;
-        }
+        public string Get_WorkingDirectory_Path() => workingDirectory.workingDirectoryPath;
 
-        public List<WorkingDirectory_File> Get_WorkingDirectory_Files()
-        {
-            return workingDirectory.workingDirectory_files;
-        }
+        public List<WorkingDirectory_File> Get_WorkingDirectory_Files() => workingDirectory.workingDirectory_files;
     }
 }

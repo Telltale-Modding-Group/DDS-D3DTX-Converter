@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using D3DTX_TextureConverter.Utilities;
+using D3DTX_TextureConverter.Telltale;
+using DirectXTexNet;
 
 namespace D3DTX_TextureConverter.DirectX
 {
@@ -13,6 +15,7 @@ namespace D3DTX_TextureConverter.DirectX
         public static uint[,] DDS_CalculateMipResolutions(uint mipCount, uint width, uint height)
         {
             //because I suck at math, we will generate our mip map resolutions using the same method we did in d3dtx to dds (can't figure out how to calculate them in reverse properly)
+            //first [] is the "resolution" index, and the second [] always has a length of 2, and contains the width and height
             uint[,] mipResolutions = new uint[mipCount + 1, 2];
 
             //get our mip image dimensions (have to multiply by 2 as the mip calculations will be off by half)
@@ -36,14 +39,14 @@ namespace D3DTX_TextureConverter.DirectX
 
         public static uint[] DDS_GetImageByteSizes(uint[,] mipResolutions, bool isDXT1)
         {
-            uint[] byteSizes = new uint[mipResolutions.Length];
+            uint[] byteSizes = new uint[mipResolutions.GetLength(0)];
 
             for(int i = 0; i < byteSizes.Length; i++)
             {
                 byteSizes[i] = (uint)CalculateDDS_ByteSize((int)mipResolutions[i, 0], (int)mipResolutions[i, 1], isDXT1);
             }
 
-            return new uint[0];
+            return byteSizes;
         }
 
         /// <summary>
@@ -166,6 +169,110 @@ namespace D3DTX_TextureConverter.DirectX
                 dwCaps3 = 0,
                 dwCaps4 = 0,
             };
+        }
+
+        public static uint Get_FourCC_FromTellale(T3SurfaceFormat format)
+        {
+            switch (format)
+            {
+                default:
+                    return ByteFunctions.Convert_String_To_UInt32("DXT1");
+                case Telltale.T3SurfaceFormat.eSurface_DXT1:
+                    return ByteFunctions.Convert_String_To_UInt32("DXT1");
+                case Telltale.T3SurfaceFormat.eSurface_DXT3:
+                    return ByteFunctions.Convert_String_To_UInt32("DXT3");
+                case Telltale.T3SurfaceFormat.eSurface_DXT5:
+                    return ByteFunctions.Convert_String_To_UInt32("DXT5");
+                case Telltale.T3SurfaceFormat.eSurface_DXN:
+                    return ByteFunctions.Convert_String_To_UInt32("ATI2");
+                case Telltale.T3SurfaceFormat.eSurface_DXT5A:
+                    return ByteFunctions.Convert_String_To_UInt32("ATI1");
+                case Telltale.T3SurfaceFormat.eSurface_A8:
+                    return 0;
+            }
+        }
+
+        public static T3SurfaceFormat Get_T3Format_FromFourCC(uint fourCC)
+        {
+            if (fourCC == ByteFunctions.Convert_String_To_UInt32("DXT1"))
+                return Telltale.T3SurfaceFormat.eSurface_DXT1;
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("DXT3"))
+                return Telltale.T3SurfaceFormat.eSurface_DXT3;
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("DXT5"))
+                return Telltale.T3SurfaceFormat.eSurface_DXT5;
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("ATI2"))
+                return Telltale.T3SurfaceFormat.eSurface_DXN;
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("ATI1"))
+                return Telltale.T3SurfaceFormat.eSurface_DXT5A;
+            else
+                return Telltale.T3SurfaceFormat.eSurface_DXT1;
+        }
+
+        public static DXGI_FORMAT GetSurfaceFormatAsDXGI(T3SurfaceFormat format, T3SurfaceGamma gamma = T3SurfaceGamma.eSurfaceGamma_sRGB)
+        {
+            switch(format)
+            {
+                default:
+                    return DXGI_FORMAT.BC1_UNORM; //just choose classic DXT1 if the format isn't known
+
+                //--------------------DXT1--------------------
+                case T3SurfaceFormat.eSurface_BC1:
+                    if(gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                        return DXGI_FORMAT.BC1_UNORM_SRGB;
+                    else
+                        return DXGI_FORMAT.BC1_UNORM;
+                case T3SurfaceFormat.eSurface_DXT1:
+                    if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                        return DXGI_FORMAT.BC1_UNORM_SRGB;
+                    else
+                        return DXGI_FORMAT.BC1_UNORM;
+
+                //--------------------DXT2 and DXT3--------------------
+                case T3SurfaceFormat.eSurface_BC2:
+                    if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                        return DXGI_FORMAT.BC2_UNORM_SRGB;
+                    else
+                        return DXGI_FORMAT.BC2_UNORM;
+                case T3SurfaceFormat.eSurface_DXT3:
+                    if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                        return DXGI_FORMAT.BC2_UNORM_SRGB;
+                    else
+                        return DXGI_FORMAT.BC2_UNORM;
+
+                //--------------------DXT4 and DXT5--------------------
+                case T3SurfaceFormat.eSurface_BC3:
+                    if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                        return DXGI_FORMAT.BC3_UNORM_SRGB;
+                    else
+                        return DXGI_FORMAT.BC3_UNORM;
+                case T3SurfaceFormat.eSurface_DXT5:
+                    if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                        return DXGI_FORMAT.BC3_UNORM_SRGB;
+                    else
+                        return DXGI_FORMAT.BC3_UNORM;
+
+                //--------------------ATI1--------------------
+                case T3SurfaceFormat.eSurface_BC4:
+                    return DXGI_FORMAT.BC4_UNORM;
+                case T3SurfaceFormat.eSurface_DXT5A:
+                    return DXGI_FORMAT.BC4_UNORM;
+
+                //--------------------ATI2--------------------
+                case T3SurfaceFormat.eSurface_BC5:
+                    return DXGI_FORMAT.BC5_UNORM;
+                case T3SurfaceFormat.eSurface_DXN:
+                    return DXGI_FORMAT.BC5_UNORM;
+
+
+                case T3SurfaceFormat.eSurface_BC6:
+                    return DXGI_FORMAT.BC6H_UF16;
+
+                case T3SurfaceFormat.eSurface_BC7:
+                    if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                        return DXGI_FORMAT.BC7_UNORM_SRGB;
+                    else
+                        return DXGI_FORMAT.BC7_UNORM;
+            }
         }
     }
 }

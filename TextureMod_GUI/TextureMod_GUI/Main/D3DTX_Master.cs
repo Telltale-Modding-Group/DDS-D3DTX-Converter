@@ -311,16 +311,16 @@ namespace D3DTX_TextureConverter.Main
             }
             else if (d3dtx9 != null)
             {
-                d3dtx9.ModifyD3DTX(dds); //ISSUE HERE WITH DXT5 AND MIP MAPS WITH UPSCALED TEXTURES
+                d3dtx9.ModifyD3DTX(dds);
 
                 if (msv5 != null)
                 {
-                    msv5.mDefaultSectionChunkSize = d3dtx9.GetHeaderByteSize(); //this is correct
+                    msv5.mDefaultSectionChunkSize = d3dtx9.GetHeaderByteSize();
                     msv5.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx9.mPixelData);
                 }
                 else if (msv6 != null)
                 {
-                    msv6.mDefaultSectionChunkSize = d3dtx9.GetHeaderByteSize(); //this is correct
+                    msv6.mDefaultSectionChunkSize = d3dtx9.GetHeaderByteSize();
                     msv6.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx9.mPixelData);
                 }
             }

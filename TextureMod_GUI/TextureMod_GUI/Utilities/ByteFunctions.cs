@@ -9,9 +9,74 @@ namespace D3DTX_TextureConverter.Utilities
 {
     public static class ByteFunctions
     {
-        public static bool GetBool(uint value)
+        public static uint Get2DByteArrayTotalSize(List<byte[]> array)
         {
-            return value == 0 ? false : true;
+            uint result = 0;
+
+            for(int i = 0; i < array.Count; i++)
+            {
+                result += (uint)array[i].Length;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Reads a string from the current stream. The string is prefixed with the length, encoded as an integer 32 bits at a time.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <returns></returns>
+        public static string ReadString(BinaryReader reader)
+        {
+            int stringLength = reader.ReadInt32();
+            string value = "";
+
+            for (int i = 0; i < stringLength; i++)
+            {
+                value += reader.ReadChar();
+            }
+
+            return value;
+        }
+
+        public static string ReadFixedString(BinaryReader reader, int length)
+        {
+            string value = "";
+
+            for (int i = 0; i < length; i++)
+            {
+                value += reader.ReadChar();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Writes a length-prefixed string (32 bit integer).
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        public static void WriteString(BinaryWriter writer, string value)
+        {
+            writer.Write(value.Length);
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                writer.Write(value[i]);
+            }
+        }
+
+        /// <summary>
+        /// Writes a string (length specified by the string value itself).
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        public static void WriteFixedString(BinaryWriter writer, string value)
+        {
+            for (int i = 0; i < value.Length; i++)
+            {
+                writer.Write(value[i]);
+            }
         }
 
         public static byte[] GetBytes(string stringValue)
@@ -53,250 +118,6 @@ namespace D3DTX_TextureConverter.Utilities
             int parsedValue = BitConverter.ToInt32(stringBytes, 0);
 
             //return it
-            return parsedValue;
-        }
-
-        /// <summary>
-        /// Gets a single byte and parsed the value into an unsigned integer. Increments the byte pointer position by 1.
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="bytePointerLocation"></param>
-        /// <returns></returns>
-        public static bool ReadBool(byte[] bytes, ref uint bytePointerLocation)
-        {
-            //get the byte at the position in the array
-            byte[] raw_bytes = AllocateBytes(1, bytes, bytePointerLocation);
-
-            //convert the byte into a value
-            bool parsedValue = BitConverter.ToBoolean(raw_bytes, 0);
-
-            //increment the pointer position
-            bytePointerLocation += 1;
-
-            //return the parsed value
-            return parsedValue;
-        }
-
-        /// <summary>
-        /// Gets two bytes and parses the value into an unsigned short. Increments the byte pointer position by 2.
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="bytePointerLocation"></param>
-        /// <returns></returns>
-        public static ushort ReadUnsignedShort(byte[] bytes, ref uint bytePointerLocation)
-        {
-            //allocate the bytes from the main byte array
-            byte[] raw_bytes = AllocateBytes(2, bytes, bytePointerLocation);
-
-            //convert the byte into a value
-            ushort parsedValue = BitConverter.ToUInt16(raw_bytes, 0);
-
-            //increment the pointer position
-            bytePointerLocation += 2;
-
-            //return the parsed value
-            return parsedValue;
-        }
-
-        /// <summary>
-        /// Gets 8 bytes and parses the value into a long. Increments the byte pointer position by 8.
-        /// </summary>
-        /// <param name="fileBytes"></param>
-        /// <param name="bytePointerLocation"></param>
-        /// <returns></returns>
-        public static long ReadLong(byte[] bytes, ref uint bytePointerLocation)
-        {
-            //allocate the bytes from the main byte array
-            byte[] raw_bytes = AllocateBytes(8, bytes, bytePointerLocation);
-
-            //convert the bytes into a value
-            long parsedValue = BitConverter.ToInt64(raw_bytes, 0);
-
-            //increment the pointer position
-            bytePointerLocation += 8;
-
-            //return the parsed value
-            return parsedValue;
-        }
-
-        /// <summary>
-        /// Gets a single byte and parsed the value into an unsigned integer. Increments the byte pointer position by 1.
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="bytePointerLocation"></param>
-        /// <returns></returns>
-        public static uint ReadByte(byte[] bytes, ref uint bytePointerLocation)
-        {
-            //get the byte at the position in the array
-            byte raw_bytes = AllocateByte(bytes, bytePointerLocation);
-
-            //convert the byte into a value
-            uint parsedValue = raw_bytes;
-
-            //increment the pointer position
-            bytePointerLocation += 1;
-
-            //return the parsed value
-            return parsedValue;
-        }
-
-        /// <summary>
-        /// Gets two bytes and parses the value into a short. Increments the byte pointer position by 2.
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="bytePointerLocation"></param>
-        /// <returns></returns>
-        public static short ReadShort(byte[] bytes, ref uint bytePointerLocation)
-        {
-            //allocate the bytes from the main byte array
-            byte[] raw_bytes = AllocateBytes(2, bytes, bytePointerLocation);
-
-            //convert the byte into a value
-            short parsedValue = BitConverter.ToInt16(raw_bytes, 0);
-
-            //increment the pointer position
-            bytePointerLocation += 2;
-
-            //return the parsed value
-            return parsedValue;
-        }
-
-        /// <summary>
-        /// Gets two bytes and parses the value into a half float. Increments the byte pointer position by 2.
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="bytePointerLocation"></param>
-        /// <returns></returns>
-        public static float ReadHalfFloat(byte[] bytes, ref uint bytePointerLocation)
-        {
-            //allocate the bytes from the main byte array
-            byte[] raw_bytes = AllocateBytes(2, bytes, bytePointerLocation);
-
-            //convert the byte into a value
-            float parsedValue = BitConverter.ToInt16(raw_bytes, 0);
-
-            //increment the pointer position
-            bytePointerLocation += 2;
-
-            //return the parsed value
-            return parsedValue;
-        }
-
-        /// <summary>
-        /// Gets 4 bytes and parses the value into an unsigned integer. Increments the byte pointer position by 4.
-        /// </summary>
-        /// <param name="fileBytes"></param>
-        /// <param name="bytePointerLocation"></param>
-        /// <returns></returns>
-        public static uint ReadUnsignedInt(byte[] bytes, ref uint bytePointerLocation)
-        {
-            //allocate the bytes from the main byte array
-            byte[] raw_bytes = AllocateBytes(4, bytes, bytePointerLocation);
-
-            //convert the bytes into a value
-            uint parsedValue = BitConverter.ToUInt32(raw_bytes, 0);
-
-            //increment the pointer position
-            bytePointerLocation += 4;
-
-            //return the parsed value
-            return parsedValue;
-        }
-
-        /// <summary>
-        /// Gets 8 bytes and parses the value into an unsigned long. Increments the byte pointer position by 8.
-        /// </summary>
-        /// <param name="fileBytes"></param>
-        /// <param name="bytePointerLocation"></param>
-        /// <returns></returns>
-        public static ulong ReadUnsignedLong(byte[] bytes, ref uint bytePointerLocation)
-        {
-            //allocate the bytes from the main byte array
-            byte[] raw_bytes = AllocateBytes(8, bytes, bytePointerLocation);
-
-            //convert the bytes into a value
-            ulong parsedValue = BitConverter.ToUInt64(raw_bytes, 0);
-
-            //increment the pointer position
-            bytePointerLocation += 8;
-
-            //return the parsed value
-            return parsedValue;
-        }
-
-        /// <summary>
-        /// Gets 4 bytes and parses the value into an integer. Increments the byte pointer position by 4.
-        /// </summary>
-        /// <param name="fileBytes"></param>
-        /// <param name="bytePointerLocation"></param>
-        /// <returns></returns>
-        public static int ReadInt(byte[] bytes, ref uint bytePointerLocation)
-        {
-            //allocate the bytes from the main byte array
-            byte[] raw_bytes = AllocateBytes(4, bytes, bytePointerLocation);
-
-            //convert the bytes into a value
-            int parsedValue = BitConverter.ToInt32(raw_bytes, 0);
-
-            //increment the pointer position
-            bytePointerLocation += 4;
-
-            //return the parsed value
-            return parsedValue;
-        }
-
-        /// <summary>
-        /// Allocates bytes of the length of the string and parses the value into a string. Increments the byte pointer position by the string length.
-        /// </summary>
-        /// <param name="fileBytes"></param>
-        /// <param name="stringLength"></param>
-        /// <param name="bytePointerLocation"></param>
-        /// <returns></returns>
-        public static string ReadFixedString(byte[] bytes, int stringLength, ref uint bytePointerLocation)
-        {
-            //allocate the bytes from the main byte array
-            byte[] raw_bytes = AllocateBytes(stringLength, bytes, bytePointerLocation);
-
-            //convert the bytes into a value
-            string parsedString = Encoding.ASCII.GetString(raw_bytes);
-
-            //increment the pointer position
-            bytePointerLocation += (uint)stringLength;
-
-            //return the parsed value
-            return parsedString;
-        }
-
-        /// <summary>
-        /// Allocates bytes of the length of the string and parses the value into a string. Increments the byte pointer position by the string length.
-        /// </summary>
-        /// <param name="fileBytes"></param>
-        /// <param name="stringLength"></param>
-        /// <param name="bytePointerLocation"></param>
-        /// <returns></returns>
-        public static string ReadFixedString(byte[] bytes, uint stringLength, ref uint bytePointerLocation)
-        {
-            return ReadFixedString(bytes, (int)stringLength, ref bytePointerLocation);
-        }
-
-        /// <summary>
-        /// Gets 4 bytes and parses the value into a float. Increments the byte pointer position by 4.
-        /// </summary>
-        /// <param name="fileBytes"></param>
-        /// <param name="bytePointerLocation"></param>
-        /// <returns></returns>
-        public static float ReadFloat(byte[] bytes, ref uint bytePointerLocation)
-        {
-            //allocate the bytes from the main byte array
-            byte[] raw_bytes = AllocateBytes(4, bytes, bytePointerLocation);
-
-            //convert the bytes into a value
-            float parsedValue = BitConverter.ToSingle(raw_bytes, 0);
-
-            //increment the pointer position
-            bytePointerLocation += 4;
-
-            //return the parsed value
             return parsedValue;
         }
 

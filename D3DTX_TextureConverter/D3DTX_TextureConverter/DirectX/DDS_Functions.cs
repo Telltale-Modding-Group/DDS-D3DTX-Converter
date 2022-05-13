@@ -104,8 +104,14 @@ namespace D3DTX_TextureConverter.DirectX
             //formula (from microsoft docs)
             //max(1, ( (width + 3) / 4 ) ) x max(1, ( (height + 3) / 4 ) ) x 8(DXT1) or 16(DXT2-5)
 
+            //formula (from here) - http://doc.51windows.net/directx9_sdk/graphics/reference/DDSFileReference/ddstextures.htm
+            //max(1,width ?4)x max(1,height ?4)x 8 (DXT1) or 16 (DXT2-5)
+
             //do the micorosoft magic texture byte size calculation formula
             return Math.Max(1, ((width + 3) / 4)) * Math.Max(1, ((height + 3) / 4)) * compression;
+
+            //formula (from here) - http://doc.51windows.net/directx9_sdk/graphics/reference/DDSFileReference/ddstextures.htm
+            //return Math.Max(1, width / 4) * Math.Max(1, height / 4) * compression;
         }
 
 

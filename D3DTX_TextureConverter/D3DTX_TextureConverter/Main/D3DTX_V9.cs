@@ -379,17 +379,14 @@ namespace D3DTX_TextureConverter.Main
             mWidth = dds.header.dwWidth; //this is correct
             mHeight = dds.header.dwHeight; //this is correct
             mSurfaceFormat = DDS_Functions.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC); //this is correct
-            mDepth = dds.header.dwDepth;
-            mNumMipLevels = dds.header.dwMipMapCount;
-
-            List<byte[]> ddsData = dds.textureData;
-            ddsData.Reverse();
+            mDepth = dds.header.dwDepth; //this is correct
+            mNumMipLevels = dds.header.dwMipMapCount; //this is correct
 
             mPixelData.Clear(); //this is correct
-            mPixelData = ddsData; //this is correct
+            mPixelData = dds.textureData; //this is correct
 
 
-            StreamHeader newStreamHeader = new StreamHeader()
+            StreamHeader newStreamHeader = new()
             {
                 mRegionCount = (int)dds.header.dwMipMapCount, //this is correct
                 mAuxDataCount = mStreamHeader.mAuxDataCount, //this is correct
@@ -398,30 +395,30 @@ namespace D3DTX_TextureConverter.Main
 
             mStreamHeader = newStreamHeader; //this is correct
 
-            List<RegionStreamHeader> regionStreamHeader = new List<RegionStreamHeader>(); //this is correct
-            uint[,] mipMapResolutions = DDS_Functions.DDS_CalculateMipResolutions(mNumMipLevels, mWidth, mHeight);
-            bool blockSizeDouble = DDS_Functions.DDS_CompressionBool(dds.header);
+            List<RegionStreamHeader> regionStreamHeader = new(); //this is correct
+            uint[,] mipMapResolutions = DDS_Functions.DDS_CalculateMipResolutions(mNumMipLevels, mWidth, mHeight); //this is correct
+            bool blockSizeDouble = DDS_Functions.DDS_CompressionBool(dds.header); //NOT CORRECT (WITH DXT5 IT SHOULD BE 8 NOT 16)
 
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
-                RegionStreamHeader region = new RegionStreamHeader()
+                RegionStreamHeader region = new()
                 {
-                    mDataSize = (uint)mPixelData[i].Length,
+                    mDataSize = (uint)mPixelData[i].Length, //this is correct
                     mFaceIndex = 0, //NOTE: for cubemap textures this will need to change
                     mMipCount = 1, //NOTE: for cubemap textures this will need to change
-                    mMipIndex = (mStreamHeader.mRegionCount - 1) - i,
-                    mPitch = DDS_Functions.DDS_ComputePitchValue(mipMapResolutions[mStreamHeader.mRegionCount - i, 0], blockSizeDouble), //this is correct
+                    mMipIndex = (mStreamHeader.mRegionCount - 1) - i, //this is correct
+                    mPitch = DDS_Functions.DDS_ComputePitchValue(mipMapResolutions[i, 0], blockSizeDouble), //this is correct
                     mSlicePitch = mPixelData[i].Length, //this is correct
                 };
 
                 regionStreamHeader.Add(region);
             }
 
-            regionStreamHeader.Reverse();
-            mRegionHeaders = regionStreamHeader.ToArray();
+            regionStreamHeader.Reverse(); //this is correct
+            mRegionHeaders = regionStreamHeader.ToArray(); //this is correct
 
-            UpdateArrayCapacities();
-            PrintConsole();
+            UpdateArrayCapacities(); //this is correct
+            PrintConsole(); //this is correct
         }
 
         public void WriteBinaryData(BinaryWriter writer)

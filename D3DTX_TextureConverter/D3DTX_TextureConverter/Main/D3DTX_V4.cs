@@ -311,7 +311,6 @@ namespace D3DTX_TextureConverter.Main
 
             RegionStreamHeader[] regionStreamHeader = new RegionStreamHeader[mStreamHeader.mRegionCount];
             uint[,] mipMapResolutions = DDS_Functions.DDS_CalculateMipResolutions(mNumMipLevels, mWidth, mHeight);
-            bool blockSizeDouble = DDS_Functions.DDS_CompressionBool(dds.header);
 
             for (int i = 0; i < regionStreamHeader.Length; i++)
             {
@@ -320,7 +319,8 @@ namespace D3DTX_TextureConverter.Main
                     mDataSize = (uint)mPixelData[i].Length,
                     mMipCount = 1, //NOTE: for cubemap textures this will need to change
                     mMipIndex = (regionStreamHeader.Length - 1) - i, //mMipIndex = (regionStreamHeader.Length - 1) - i,
-                    mPitch = DDS_Functions.DDS_ComputePitchValue(mipMapResolutions[regionStreamHeader.Length - i, 0], blockSizeDouble), //this is correct
+                    mPitch = DDS_Functions.DDS_ComputePitchValue(mipMapResolutions[regionStreamHeader.Length - i, 0], (dds.header.ddspf.dwFourCC == 0x44585435u ||
+                        dds.header.ddspf.dwFourCC == 0x35545844u) ? 1 : 0), //this is correct
                 };
             }
 

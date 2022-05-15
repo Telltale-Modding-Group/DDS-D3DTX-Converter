@@ -223,7 +223,8 @@ namespace D3DTX_TextureConverter.Main
                 mipMapResolutions = DDS_Functions.DDS_CalculateMipResolutions(header.dwMipMapCount - 1, header.dwWidth, header.dwHeight);
 
                 //get byte sizes
-                uint[] byteSizes = DDS_Functions.DDS_GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, !DDS_Functions.DDS_CompressionBool(header));
+                uint[] byteSizes = DDS_Functions.DDS_GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, ((header.ddspf.dwFourCC == 0x44585435u ||
+                        header.ddspf.dwFourCC == 0x35545844u) ? false : true));
 
                 int offset = 0;
 

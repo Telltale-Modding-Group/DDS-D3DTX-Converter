@@ -71,18 +71,12 @@ namespace D3DTX_TextureConverter.DirectX
         /// <param name="width"></param>
         /// <param name="blockSizeDouble"></param>
         /// <returns></returns>
-        public static int DDS_ComputePitchValue(uint width, bool blockSizeDouble)
+        public static int DDS_ComputePitchValue(uint width, int bDXT5)
         {
-            int blockSizeValue = 8;
-
-            if (blockSizeDouble)
-                blockSizeValue = 16;
 
             //max(1, ((width + 3) / 4)) * blocksize
-            return (int)MathF.Max(1, ((width + 3) / 4)) * blockSizeValue;
+            return (int)MathF.Max(1, ((width + 3) >> 2)) * 8 * (++bDXT5);
         }
-
-        public static bool DDS_CompressionBool(DDS_HEADER header) => header.ddspf.dwFourCC.Equals("DXT1");
 
         /// <summary>
         /// Calculates the byte size of a DDS non-square texture

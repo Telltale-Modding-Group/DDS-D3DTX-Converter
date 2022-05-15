@@ -75,7 +75,7 @@ namespace D3DTX_TextureConverter.DirectX
         {
 
             //max(1, ((width + 3) / 4)) * blocksize
-            return (int)MathF.Max(1, ((width + 3) >> 2)) * 8 * (++bDXT5);
+            return (int)MathF.Max(1, width * 2 * (++bDXT5));
         }
 
         /// <summary>

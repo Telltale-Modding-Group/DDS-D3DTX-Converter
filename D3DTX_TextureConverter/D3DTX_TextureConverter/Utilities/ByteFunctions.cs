@@ -29,6 +29,7 @@ namespace D3DTX_TextureConverter.Utilities
         public static string ReadString(BinaryReader reader)
         {
             int stringLength = reader.ReadInt32();
+
             string value = "";
 
             for (int i = 0; i < stringLength; i++)
@@ -49,6 +50,21 @@ namespace D3DTX_TextureConverter.Utilities
             }
 
             return value;
+        }
+
+        public static bool ReadBoolean(BinaryReader reader)
+        {
+            char parsedChar = reader.ReadChar();
+
+            switch(parsedChar)
+            {
+                case '1':
+                    return true;
+                case '0':
+                    return false;
+                default:
+                    return false;
+            }
         }
 
         /// <summary>
@@ -79,6 +95,13 @@ namespace D3DTX_TextureConverter.Utilities
             }
         }
 
+        /// <summary>
+        /// Writes a boolean.
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="value"></param>
+        public static void WriteBoolean(BinaryWriter writer, bool value) => writer.Write(value ? '1' : '0');
+
         public static byte[] GetBytes(string stringValue)
         {
             //create byte array of the length of the string
@@ -94,14 +117,7 @@ namespace D3DTX_TextureConverter.Utilities
             return stringBytes;
         }
 
-        public static uint Convert_String_To_UInt32(string sValue)
-        {
-            //convert the bytes into a value
-            uint parsedValue = BitConverter.ToUInt32(GetBytes(sValue), 0);
-
-            //return it
-            return parsedValue;
-        }
+        public static uint Convert_String_To_UInt32(string sValue) => BitConverter.ToUInt32(GetBytes(sValue), 0);
 
         public static int Convert_String_To_Int32(string sValue)
         {
@@ -137,40 +153,19 @@ namespace D3DTX_TextureConverter.Utilities
             return source;
         }
 
-        public static byte[] ModifyBytes(byte[] source, int newValue, uint indexOffset)
-        {
-            return ModifyBytes(source, BitConverter.GetBytes(newValue), indexOffset);
-        }
+        public static byte[] ModifyBytes(byte[] source, int newValue, uint indexOffset) => ModifyBytes(source, BitConverter.GetBytes(newValue), indexOffset);
 
-        public static byte[] ModifyBytes(byte[] source, uint newValue, uint indexOffset)
-        {
-            return ModifyBytes(source, BitConverter.GetBytes(newValue), indexOffset);
-        }
+        public static byte[] ModifyBytes(byte[] source, uint newValue, uint indexOffset) => ModifyBytes(source, BitConverter.GetBytes(newValue), indexOffset);
 
-        public static byte[] ModifyBytes(byte[] source, float newValue, uint indexOffset)
-        {
-            return ModifyBytes(source, BitConverter.GetBytes(newValue), indexOffset);
-        }
+        public static byte[] ModifyBytes(byte[] source, float newValue, uint indexOffset) => ModifyBytes(source, BitConverter.GetBytes(newValue), indexOffset);
 
-        public static byte[] ModifyBytes(byte[] source, bool newValue, uint indexOffset)
-        {
-            return ModifyBytes(source, BitConverter.GetBytes(newValue), indexOffset);
-        }
+        public static byte[] ModifyBytes(byte[] source, bool newValue, uint indexOffset) => ModifyBytes(source, BitConverter.GetBytes(newValue), indexOffset);
 
-        public static byte[] ModifyBytes(byte[] source, short newValue, uint indexOffset)
-        {
-            return ModifyBytes(source, BitConverter.GetBytes(newValue), indexOffset);
-        }
+        public static byte[] ModifyBytes(byte[] source, short newValue, uint indexOffset) => ModifyBytes(source, BitConverter.GetBytes(newValue), indexOffset);
 
-        public static byte[] ModifyBytes(byte[] source, ushort newValue, uint indexOffset)
-        {
-            return ModifyBytes(source, BitConverter.GetBytes(newValue), indexOffset);
-        }
+        public static byte[] ModifyBytes(byte[] source, ushort newValue, uint indexOffset) => ModifyBytes(source, BitConverter.GetBytes(newValue), indexOffset);
 
-        public static byte[] ModifyBytes(byte[] source, string newValue, uint indexOffset)
-        {
-            return ModifyBytes(source, GetBytes(newValue), indexOffset);
-        }
+        public static byte[] ModifyBytes(byte[] source, string newValue, uint indexOffset) => ModifyBytes(source, GetBytes(newValue), indexOffset);
 
         /// <summary>
         /// Combines two byte arrays into one.
@@ -201,10 +196,7 @@ namespace D3DTX_TextureConverter.Utilities
         /// <param name="sourceByteArray"></param>
         /// <param name="offsetLocation"></param>
         /// <returns></returns>
-        public static byte AllocateByte(byte[] sourceByteArray, uint offsetLocation)
-        {
-            return sourceByteArray[offsetLocation];
-        }
+        public static byte AllocateByte(byte[] sourceByteArray, uint offsetLocation) => sourceByteArray[offsetLocation];
 
         /// <summary>
         /// Allocates a byte array of fixed length. 

@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using D3DTX_TextureConverter.Utilities;
-using D3DTX_TextureConverter.Telltale;
+using D3DTX_TextureConverter.TelltaleMeta;
+using D3DTX_TextureConverter.TelltaleEnums;
+using D3DTX_TextureConverter.TelltaleTypes;
+using D3DTX_TextureConverter.TelltaleD3DTX;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
@@ -21,9 +24,6 @@ namespace D3DTX_TextureConverter.Main
 
         //json file extension used for 6VSM and 5VSM d3dtx versions
         public static string jsonExtension = ".json";
-
-        //custom header file extension (used for d3dtx versions older than 5VSM)
-        public static string headerExtension = ".header";
 
         //meta header versions (objects at the top of the file)
         public MSV6 msv6;
@@ -51,20 +51,14 @@ namespace D3DTX_TextureConverter.Main
             //read the d3dtx version of the file
             int d3dtxVersion = Read_D3DTX_File_D3DTXVersionOnly(filePath);
 
-            using (BinaryReader reader = new BinaryReader(File.OpenRead(filePath)))
+            using (BinaryReader reader = new(File.OpenRead(filePath)))
             {
                 //read meta header
                 switch (metaVersion)
                 {
-                    case "6VSM":
-                        msv6 = new(reader);
-                        break;
-                    case "5VSM":
-                        msv5 = new(reader);
-                        break;
-                    case "ERTM":
-                        mtre = new(reader);
-                        break;
+                    case "6VSM": msv6 = new(reader); break;
+                    case "5VSM": msv5 = new(reader); break;
+                    case "ERTM": mtre = new(reader); break;
                     default:
                         ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
                         Console.WriteLine("ERROR! '{0}' meta stream version is not supported!", metaVersion);
@@ -82,24 +76,12 @@ namespace D3DTX_TextureConverter.Main
                 //read d3dtx header
                 switch (d3dtxVersion)
                 {
-                    case 4:
-                        d3dtx4 = new(reader, true);
-                        break;
-                    case 5:
-                        d3dtx5 = new(reader, true);
-                        break;
-                    case 6:
-                        d3dtx6 = new(reader, true);
-                        break;
-                    case 7:
-                        d3dtx7 = new(reader, true);
-                        break;
-                    case 8:
-                        d3dtx8 = new(reader, true);
-                        break;
-                    case 9:
-                        d3dtx9 = new(reader, true);
-                        break;
+                    case 4: d3dtx4 = new(reader, true); break;
+                    case 5: d3dtx5 = new(reader, true); break;
+                    case 6: d3dtx6 = new(reader, true); break;
+                    case 7: d3dtx7 = new(reader, true); break;
+                    case 8: d3dtx8 = new(reader, true); break;
+                    case 9: d3dtx9 = new(reader, true); break;
                     default:
                         ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
                         Console.WriteLine("ERROR! '{0}' d3dtx version is not supported!", d3dtxVersion);
@@ -111,32 +93,21 @@ namespace D3DTX_TextureConverter.Main
 
         public object Get_Meta_Object()
         {
-            if (msv6 != null)
-                return msv6;
-            else if (msv5 != null)
-                return msv5;
-            else if (mtre != null)
-                return mtre;
-            else
-                return null;
+            if (msv6 != null) return msv6;
+            else if (msv5 != null) return msv5;
+            else if (mtre != null) return mtre;
+            else return null;
         }
 
         public object Get_D3DTX_Object()
         {
-            if (d3dtx4 != null)
-                return d3dtx4;
-            else if (d3dtx5 != null)
-                return d3dtx5;
-            else if (d3dtx6 != null)
-                return d3dtx6;
-            else if (d3dtx7 != null)
-                return d3dtx7;
-            else if (d3dtx8 != null)
-                return d3dtx8;
-            else if (d3dtx9 != null)
-                return d3dtx9;
-            else
-                return null;
+            if (d3dtx4 != null) return d3dtx4;
+            else if (d3dtx5 != null) return d3dtx5;
+            else if (d3dtx6 != null) return d3dtx6;
+            else if (d3dtx7 != null) return d3dtx7;
+            else if (d3dtx8 != null) return d3dtx8;
+            else if (d3dtx9 != null) return d3dtx9;
+            else return null;
         }
 
         /// <summary>
@@ -145,29 +116,18 @@ namespace D3DTX_TextureConverter.Main
         /// <param name="destinationPath"></param>
         public void Write_Final_D3DTX(string destinationPath)
         {
-            byte[] finalData = new byte[0];
-
             using(BinaryWriter writer = new BinaryWriter(File.OpenWrite(destinationPath)))
             {
-                if (msv6 != null)
-                    msv6.GetByteData(writer);
-                else if (msv5 != null)
-                    msv5.GetByteData(writer);
-                else if (mtre != null)
-                    mtre.GetByteData(writer);
+                if (msv6 != null) msv6.WriteBinaryData(writer);
+                else if (msv5 != null) msv5.WriteBinaryData(writer);
+                else if (mtre != null) mtre.WriteBinaryData(writer);
 
-                if (d3dtx4 != null)
-                    d3dtx4.WriteBinaryData(writer);
-                else if (d3dtx5 != null)
-                    d3dtx5.WriteBinaryData(writer);
-                else if (d3dtx6 != null)
-                    d3dtx6.WriteBinaryData(writer);
-                else if (d3dtx7 != null)
-                    d3dtx7.WriteBinaryData(writer);
-                else if (d3dtx8 != null)
-                    d3dtx8.WriteBinaryData(writer);
-                else if (d3dtx9 != null)
-                    d3dtx9.WriteBinaryData(writer);
+                if (d3dtx4 != null) d3dtx4.WriteBinaryData(writer);
+                else if (d3dtx5 != null) d3dtx5.WriteBinaryData(writer);
+                else if (d3dtx6 != null) d3dtx6.WriteBinaryData(writer);
+                else if (d3dtx7 != null) d3dtx7.WriteBinaryData(writer);
+                else if (d3dtx8 != null) d3dtx8.WriteBinaryData(writer);
+                else if (d3dtx9 != null) d3dtx9.WriteBinaryData(writer);
             }
         }
 
@@ -192,22 +152,13 @@ namespace D3DTX_TextureConverter.Main
             //loop through each property to get the value of the variable 'mMetaStreamVersion' to determine what version of the meta header to parse.
             foreach (JProperty property in metaObject.Properties())
             {
-                string name = property.Name;
-
-                if (name.Equals("mMetaStreamVersion"))
-                {
-                    metaStreamVersion = (string)property.Value;
-                    break;
-                }
+                if (property.Name.Equals("mMetaStreamVersion")) metaStreamVersion = (string)property.Value; break;
             }
 
             //deserialize the appropriate json object
-            if (metaStreamVersion.Equals("6VSM"))
-                msv6 = metaObject.ToObject<MSV6>();
-            else if (metaStreamVersion.Equals("5VSM"))
-                msv5 = metaObject.ToObject<MSV5>();
-            else if (metaStreamVersion.Equals("ERTM"))
-                mtre = metaObject.ToObject<MTRE>();
+            if (metaStreamVersion.Equals("6VSM")) msv6 = metaObject.ToObject<MSV6>();
+            else if (metaStreamVersion.Equals("5VSM")) msv5 = metaObject.ToObject<MSV5>();
+            else if (metaStreamVersion.Equals("ERTM")) mtre = metaObject.ToObject<MTRE>();
 
             //d3dtx object
             JObject d3dtxObject = jarray[1] as JObject;
@@ -218,39 +169,19 @@ namespace D3DTX_TextureConverter.Main
             //loop through each property to get the value of the variable 'mVersion' to determine what version of the d3dtx header to parse.
             foreach (JProperty property in d3dtxObject.Properties())
             {
-                string name = property.Name;
-
-                if (name.Equals("mVersion"))
-                {
-                    d3dtxVersion = (int)property.Value;
-                    break;
-                }
+                if (property.Name.Equals("mVersion")) d3dtxVersion = (int)property.Value; break;
             }
 
             //deserialize the appropriate json object
             switch (d3dtxVersion)
             {
-                case 4:
-                    d3dtx4 = d3dtxObject.ToObject<D3DTX_V4>();
-                    break;
-                case 5:
-                    d3dtx5 = d3dtxObject.ToObject<D3DTX_V5>();
-                    break;
-                case 6:
-                    d3dtx6 = d3dtxObject.ToObject<D3DTX_V6>();
-                    break;
-                case 7:
-                    d3dtx7 = d3dtxObject.ToObject<D3DTX_V7>();
-                    break;
-                case 8:
-                    d3dtx8 = d3dtxObject.ToObject<D3DTX_V8>();
-                    break;
-                case 9:
-                    d3dtx9 = d3dtxObject.ToObject<D3DTX_V9>();
-                    break;
-                default:
-                    d3dtxOLD = d3dtxObject.ToObject<D3DTX_V_OLD>();
-                    break;
+                case 4: d3dtx4 = d3dtxObject.ToObject<D3DTX_V4>(); break;
+                case 5: d3dtx5 = d3dtxObject.ToObject<D3DTX_V5>(); break;
+                case 6: d3dtx6 = d3dtxObject.ToObject<D3DTX_V6>(); break;
+                case 7: d3dtx7 = d3dtxObject.ToObject<D3DTX_V7>(); break;
+                case 8: d3dtx8 = d3dtxObject.ToObject<D3DTX_V8>(); break;
+                case 9: d3dtx9 = d3dtxObject.ToObject<D3DTX_V9>(); break;
+                default: d3dtxOLD = d3dtxObject.ToObject<D3DTX_V_OLD>(); break;
             }
         }
 
@@ -337,10 +268,7 @@ namespace D3DTX_TextureConverter.Main
 
             using (BinaryReader reader = new BinaryReader(File.OpenRead(sourceFile)))
             {
-                for(int i = 0; i < 4; i++)
-                {
-                    metaStreamVersion += reader.ReadChar();
-                }
+                for(int i = 0; i < 4; i++) metaStreamVersion += reader.ReadChar();
             }
 
             return metaStreamVersion;
@@ -355,30 +283,19 @@ namespace D3DTX_TextureConverter.Main
         public static int Read_D3DTX_File_D3DTXVersionOnly(string sourceFile)
         {
             string metaVersion = Read_D3DTX_File_MetaVersionOnly(sourceFile);
-            int mVersion = -1;
+            MSV6 meta6VSM = null;
+            MSV5 meta5VSM = null;
+            MTRE metaERTM = null;
 
             using (BinaryReader reader = new BinaryReader(File.OpenRead(sourceFile)))
             {
-                if (metaVersion.Equals("6VSM"))
-                {
-                    MSV6 meta6VSM = new(reader, false);
-                }
-                else if (metaVersion.Equals("5VSM"))
-                {
-                    MSV5 meta5VSM = new(reader, false);
-                }
-                else if (metaVersion.Equals("ERTM"))
-                {
-                    MTRE metaERTM = new(reader, false);
-
-                    return mVersion; //return -1 because d3dtx versions older than 4 don't have an mVersion variable (not that I know of atleast)
-                }
+                if (metaVersion.Equals("6VSM")) meta6VSM = new(reader, false);
+                else if (metaVersion.Equals("5VSM")) meta5VSM = new(reader, false);
+                else if (metaVersion.Equals("ERTM")) metaERTM = new(reader, false);
 
                 //read the first int (which is an mVersion d3dtx value)
-                mVersion = reader.ReadInt32();
+                return metaERTM == null ? reader.ReadInt32() : -1; //return -1 because d3dtx versions older than 4 don't have an mVersion variable (not that I know of atleast)
             }
-
-            return mVersion;
         }
     }
 }

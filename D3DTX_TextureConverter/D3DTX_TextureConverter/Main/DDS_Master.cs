@@ -5,7 +5,7 @@ using System.Text;
 using DirectXTexNet;
 using D3DTX_TextureConverter.Utilities;
 using D3DTX_TextureConverter.DirectX;
-using D3DTX_TextureConverter.Telltale;
+using D3DTX_TextureConverter.TelltaleEnums;
 
 /*
  * DXT1 - DXGI_FORMAT_BC1_UNORM / D3DFMT_DXT1
@@ -103,7 +103,7 @@ namespace D3DTX_TextureConverter.Main
         /// <param name="d3dtx"></param>
         public DDS_Master(D3DTX_Master d3dtx)
         {
-            header = DDS_Functions.GetPresetHeader();
+            header = DDS.GetPresetHeader();
             T3SurfaceFormat surfaceFormat = T3SurfaceFormat.eSurface_DXT1;
 
             if (d3dtx.d3dtx4 != null)
@@ -152,15 +152,15 @@ namespace D3DTX_TextureConverter.Main
                 surfaceFormat = d3dtx.d3dtx9.mSurfaceFormat;
             }
 
-            header.ddspf.dwFourCC = DDS_Functions.Get_FourCC_FromTellale(surfaceFormat);
+            header.ddspf.dwFourCC = DDS.Get_FourCC_FromTellale(surfaceFormat);
 
             switch (surfaceFormat)
             {
-                case Telltale.T3SurfaceFormat.eSurface_A8:
+                case T3SurfaceFormat.eSurface_A8:
                     header.ddspf.dwABitMask = 255;
                     header.dwCaps = 4198408; //DDSCAPS_COMPLEX | DDSCAPS_TEXTURE | DDSCAPS_MIPMAP
                     break;
-                case Telltale.T3SurfaceFormat.eSurface_ARGB8:
+                case T3SurfaceFormat.eSurface_ARGB8:
                     header.ddspf.dwABitMask = 255;
                     header.ddspf.dwRBitMask = 255;
                     header.ddspf.dwGBitMask = 255;
@@ -184,7 +184,7 @@ namespace D3DTX_TextureConverter.Main
             byte[] headerBytes = ByteFunctions.AllocateBytes(124, fileData, 4); //skip past the 'DDS '
 
             //this will automatically read all of the byte data in the header
-            header = DDS_Functions.GetHeaderFromBytes(headerBytes);
+            header = DDS.GetHeaderFromBytes(headerBytes);
 
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
             Console.WriteLine("DDS Height = {0}", header.dwHeight);
@@ -220,11 +220,11 @@ namespace D3DTX_TextureConverter.Main
             {
                 //get mip resolutions
                 //calculated mip resolutions [Pixel Value, Width or Height (0 or 1)]
-                mipMapResolutions = DDS_Functions.DDS_CalculateMipResolutions(header.dwMipMapCount - 1, header.dwWidth, header.dwHeight);
+                mipMapResolutions = DDS.CalculateMipResolutions(header.dwMipMapCount - 1, header.dwWidth, header.dwHeight);
 
                 //get byte sizes
-                uint[] byteSizes = DDS_Functions.DDS_GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, ((header.ddspf.dwFourCC == 0x44585435u ||
-                        header.ddspf.dwFourCC == 0x35545844u) ? false : true));
+                //uint[] byteSizes = DDS_Functions.DDS_GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, ((header.ddspf.dwFourCC == 0x44585435u || header.ddspf.dwFourCC == 0x35545844u) ? false : true));
+                uint[] byteSizes = DDS.GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, 8);
 
                 int offset = 0;
 
@@ -232,7 +232,7 @@ namespace D3DTX_TextureConverter.Main
                 {
                     byte[] temp = new byte[byteSizes[i]];
 
-                    //issue length
+                //issue length
                     Array.Copy(ddsTextureData, offset, temp, 0, temp.Length);
 
                     offset += temp.Length;
@@ -252,7 +252,7 @@ namespace D3DTX_TextureConverter.Main
             byte[] finalData = new byte[0];
 
             //turn our header data into bytes to be written into a file
-            byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS_Functions.GetHeaderBytes(header));
+            byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
 
             //copy the dds header to the file
             finalData = ByteFunctions.Combine(finalData, dds_header);
@@ -277,7 +277,7 @@ namespace D3DTX_TextureConverter.Main
             byte[] finalData = new byte[0];
 
             //turn our header data into bytes to be written into a file
-            byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS_Functions.GetHeaderBytes(header));
+            byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
 
             //copy the dds header to the file
             finalData = ByteFunctions.Combine(finalData, dds_header);
@@ -407,7 +407,7 @@ namespace D3DTX_TextureConverter.Main
             //change the compression if needed
             if (options.MatchCompression)
             {
-                DXGI_FORMAT dxgi_format = DDS_Functions.GetSurfaceFormatAsDXGI(d3dtx_format, d3dtx_gamma);
+                DXGI_FORMAT dxgi_format = DDS.GetSurfaceFormatAsDXGI(d3dtx_format, d3dtx_gamma);
                 scratchImage.Convert(dxgi_format, TEX_FILTER_FLAGS.DITHER, 0.0f);
             }
 
@@ -432,19 +432,6 @@ namespace D3DTX_TextureConverter.Main
 
             //resave the newly modified DDS
             scratchImage.SaveToDDSFile(DDS_FLAGS.NONE, ddsPath);
-        }
-
-        /// <summary>
-        /// Manually builds a byte array of a dds header
-        /// </summary>
-        /// <returns></returns>
-        public byte[] Build_DDSHeader_ByteArray()
-        {
-            //allocate our header byte array
-            byte[] ddsHeader = new byte[128];
-
-            //return the result
-            return ddsHeader;
         }
     }
 }

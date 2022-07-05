@@ -3,10 +3,10 @@
     //note: can't find original name, so just using the prefix eTxColor
     public enum eTxColor
     {
-        eTxColorUnknown = 0,
-        eTxColorFull = 1,
-        eTxColorBlack = 2,
-        eTxColorGrayscale = 3,
-        eTxColorGrayscaleAlpha = 4,
+        eTxColorUnknown = -1,
+        eTxColorFull = 0,
+        eTxColorBlack = 1,
+        eTxColorGrayscale = 2,
+        eTxColorGrayscaleAlpha = 3,
     }
 }

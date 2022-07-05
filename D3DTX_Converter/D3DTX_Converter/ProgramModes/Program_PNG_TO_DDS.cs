@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
 using D3DTX_Converter.Utilities;
-using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
-using Newtonsoft.Json;
+using D3DTX_Converter.Texconv;
+using D3DTX_Converter.TexconvOptions;
 
 namespace D3DTX_Converter.ProgramModes
 {
@@ -64,7 +61,7 @@ namespace D3DTX_Converter.ProgramModes
             Console.WriteLine("Filtering Textures..."); //notify the user we are filtering the array
 
             //filter the array so we only get .png files
-            textures = IOManagement.FilterFiles(textures, ".png");
+            textures = IOManagement.FilterFiles(textures, Main_Shared.pngExtension);
 
             //if no png files were found, abort the program from going on any further (we don't have any files to convert!)
             if (textures.Count < 1)
@@ -84,8 +81,6 @@ namespace D3DTX_Converter.ProgramModes
             {
                 //build the path for the resulting file
                 string textureFileName = Path.GetFileName(textures[i]); //get the file name of the file + extension
-                string textureFileNameOnly = Path.GetFileNameWithoutExtension(textures[i]);
-                string textureResultPath = resultPath + "/" + textureFileNameOnly + ".dds"; //add the file name to the resulting folder path, this is where our converted file will be placed
 
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
                 Console.WriteLine("||||||||||||||||||||||||||||||||");
@@ -94,7 +89,7 @@ namespace D3DTX_Converter.ProgramModes
                 Console.ResetColor();
 
                 //runs the main method for converting the texture
-                ConvertTextureFile(textures[i], textureResultPath);
+                ConvertTextureFile(textures[i], resultPath);
 
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
                 Console.WriteLine("Finished converting '{0}'...", textureFileName); //notify the user we finished converting 'x' file.
@@ -107,9 +102,26 @@ namespace D3DTX_Converter.ProgramModes
         /// </summary>
         /// <param name="sourceFile"></param>
         /// <param name="destinationFile"></param>
-        public static void ConvertTextureFile(string sourceFile, string destinationFile)
+        public static void ConvertTextureFile(string sourceFile, string destinationDirectory)
         {
-            //GenericImageFormats.ConvertDDS_To_PSD(destinationFile);
+            MasterOptions options = new();
+            options.outputDirectory = new() { directory = destinationDirectory };
+            options.outputOverwrite = new();
+            options.outputFileType = new() { fileType = TexconvEnums.TexconvEnumFileTypes.dds };
+
+            if (Other.IsImageOpaque(sourceFile))
+            {
+                options.outputFormat = new() { format = DirectXTexNet.DXGI_FORMAT.BC1_UNORM };
+            }
+            else
+            {
+                options.outputSeperateAlpha = new();
+                options.outputStraightAlpha = new();
+                options.outputFormat = new() { format = DirectXTexNet.DXGI_FORMAT.BC3_UNORM };
+            }
+
+
+            TexconvApp.RunTexconv(sourceFile, options);
         }
     }
 }

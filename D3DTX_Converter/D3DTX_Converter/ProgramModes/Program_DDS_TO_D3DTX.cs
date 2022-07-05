@@ -7,6 +7,7 @@ using System.Text;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
+using DirectXTexNet;
 using Newtonsoft.Json;
 
 namespace D3DTX_Converter.ProgramModes
@@ -22,8 +23,8 @@ namespace D3DTX_Converter.ProgramModes
             //-----------------GET TEXTURE FOLDER PATH-----------------
             ConsoleFunctions.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White);
             Console.WriteLine("Enter the folder path with the textures.");
-            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
-            Console.WriteLine("NOTE: Make sure each DDS is accompanied with a .header or .json file (depending on the version)");
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.DarkYellow);
+            Console.WriteLine("NOTE: Make sure each .dds is accompanied with a .json file of the same name");
 
             //texture folder path (containing the path to the textures to be converted)
             string textureFolderPath = Program_Shared.GetFolderPathFromUser();
@@ -105,6 +106,7 @@ namespace D3DTX_Converter.ProgramModes
             //create the names of the following files
             string textureFileNameWithD3DTX = textureFileNameOnly + Main_Shared.d3dtxExtension;
             string textureFileNameWithJSON = textureFileNameOnly + Main_Shared.jsonExtension;
+            string textureFileNameWithDDS = textureFileNameOnly + Main_Shared.ddsExtension;
 
             //create the path of these files. If things go well, these files (depending on the version) should exist in the same directory at the original .dds file.
             string textureFilePath_JSON = textureFileDirectory + "/" + textureFileNameWithJSON;
@@ -112,23 +114,28 @@ namespace D3DTX_Converter.ProgramModes
             //create the final path of the d3dtx
             string textureResultPath_D3DTX = resultDirectoryPath + "/" + textureFileNameWithD3DTX;
 
+            //create the final path of the dds
+            string textureResultPath_DDS = resultDirectoryPath + "/" + textureFileNameWithDDS;
+
             //if a json file exists (for newer 5VSM and 6VSM)
             if (File.Exists(textureFilePath_JSON))
             {
                 //read in our DDS file
-                DDS_Master dds = new DDS_Master(sourceFilePath, false);
+                DDS_Master dds = new(sourceFilePath, false);
+
+                DDS_DirectXTexNet_ImageSection[] sections = DDS_DirectXTexNet.GetDDSImageSections(sourceFilePath);
 
                 //dds parse test
-                //dds.TEST_WriteDDSToDisk(sourceFilePath);
+                //dds.TEST_WriteDDSToDisk(textureResultPath_DDS); //<-------- THIS IS CORRECT AND PARSES A DDS FILE PERFECTLY
 
-                //create our d3dtx object
-                D3DTX_Master d3dtx_file = new D3DTX_Master();
+                //create a new d3dtx object
+                D3DTX_Master d3dtx_file = new();
 
                 //parse the .json file as a d3dtx
                 d3dtx_file.Read_D3DTX_JSON(textureFilePath_JSON);
 
                 //modify the d3dtx file using our dds data
-                d3dtx_file.Modify_D3DTX(dds); //ISSUE HERE WITH DXT5 AND MIP MAPS WITH UPSCALED TEXTURES
+                d3dtx_file.Modify_D3DTX(dds, sections); //ISSUE HERE WITH DXT5 AND MIP MAPS WITH UPSCALED TEXTURES
 
                 //write our final d3dtx file to disk
                 d3dtx_file.Write_Final_D3DTX(textureResultPath_D3DTX);

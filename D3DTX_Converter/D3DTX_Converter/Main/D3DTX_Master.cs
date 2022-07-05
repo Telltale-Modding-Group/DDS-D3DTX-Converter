@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft;
+using DirectXTexNet;
+using D3DTX_Converter.DirectX;
 
 namespace D3DTX_Converter.Main
 {
@@ -110,7 +112,7 @@ namespace D3DTX_Converter.Main
         /// <param name="destinationPath"></param>
         public void Write_Final_D3DTX(string destinationPath)
         {
-            using(BinaryWriter writer = new BinaryWriter(File.OpenWrite(destinationPath)))
+            using(BinaryWriter writer = new(File.OpenWrite(destinationPath)))
             {
                 if (msv6 != null) msv6.WriteBinaryData(writer);
                 else if (msv5 != null) msv5.WriteBinaryData(writer);
@@ -201,97 +203,57 @@ namespace D3DTX_Converter.Main
             }
         }
 
-        public void Modify_D3DTX(DDS_Master dds)
+        public void SetMetaChunkSizes(uint mDefaultSectionChunkSize, uint mAsyncSectionChunkSize)
+        {
+            if (msv5 != null)
+            {
+                msv5.mDefaultSectionChunkSize = mDefaultSectionChunkSize;
+                msv5.mAsyncSectionChunkSize = mAsyncSectionChunkSize;
+            }
+            else if (msv6 != null)
+            {
+                msv6.mDefaultSectionChunkSize = mDefaultSectionChunkSize;
+                msv6.mAsyncSectionChunkSize = mAsyncSectionChunkSize;
+            }
+        }
+
+        public void Modify_D3DTX(DDS_Master dds, DDS_DirectXTexNet_ImageSection[] sections)
         {
             if (d3dtx4 != null)
             {
                 d3dtx4.ModifyD3DTX(dds);
 
-                if (msv5 != null)
-                {
-                    msv5.mDefaultSectionChunkSize = d3dtx4.GetHeaderByteSize();
-                    msv5.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx4.mPixelData);
-                }
-                else if (msv6 != null)
-                {
-                    msv6.mDefaultSectionChunkSize = d3dtx4.GetHeaderByteSize();
-                    msv6.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx4.mPixelData);
-                }
+                SetMetaChunkSizes(d3dtx4.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx4.mPixelData));
             }
             else if (d3dtx5 != null)
             {
                 d3dtx5.ModifyD3DTX(dds);
 
-                if (msv5 != null)
-                {
-                    //msv5.mDefaultSectionChunkSize = d3dtx5.GetHeaderByteSize();
-                    msv5.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx5.mPixelData);
-                }
-                else if (msv6 != null)
-                {
-                    //msv6.mDefaultSectionChunkSize = d3dtx5.GetHeaderByteSize();
-                    msv6.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx5.mPixelData);
-                }
+                //SetMetaChunkSizes(d3dtx5.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx5.mPixelData));
             }
             else if (d3dtx6 != null)
             {
                 d3dtx6.ModifyD3DTX(dds);
 
-                if (msv5 != null)
-                {
-                    //msv5.mDefaultSectionChunkSize = d3dtx6.GetHeaderByteSize();
-                    msv5.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx6.mPixelData);
-                }
-                else if (msv6 != null)
-                {
-                    //msv6.mDefaultSectionChunkSize = d3dtx6.GetHeaderByteSize();
-                    msv6.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx6.mPixelData);
-                }
+                //SetMetaChunkSizes(d3dtx6.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx6.mPixelData));
             }
             else if (d3dtx7 != null)
             {
                 d3dtx7.ModifyD3DTX(dds);
 
-                if (msv5 != null)
-                {
-                    //msv5.mDefaultSectionChunkSize = d3dtx7.GetHeaderByteSize();
-                    msv5.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx7.mPixelData);
-                }
-                else if (msv6 != null)
-                {
-                    //msv6.mDefaultSectionChunkSize = d3dtx7.GetHeaderByteSize();
-                    msv6.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx7.mPixelData);
-                }
+                //SetMetaChunkSizes(d3dtx7.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx7.mPixelData));
             }
             else if (d3dtx8 != null)
             {
                 d3dtx8.ModifyD3DTX(dds);
 
-                if (msv5 != null)
-                {
-                    //msv5.mDefaultSectionChunkSize = d3dtx8.GetHeaderByteSize();
-                    msv5.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx8.mPixelData);
-                }
-                else if (msv6 != null)
-                {
-                    //msv6.mDefaultSectionChunkSize = d3dtx8.GetHeaderByteSize();
-                    msv6.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx8.mPixelData);
-                }
+                //SetMetaChunkSizes(d3dtx8.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx8.mPixelData));
             }
             else if (d3dtx9 != null)
             {
-                d3dtx9.ModifyD3DTX(dds); //ISSUE HERE WITH DXT5 AND MIP MAPS WITH UPSCALED TEXTURES
+                d3dtx9.ModifyD3DTX(dds, sections); //ISSUE HERE WITH DXT5 AND MIP MAPS WITH UPSCALED TEXTURES
 
-                if (msv5 != null)
-                {
-                    msv5.mDefaultSectionChunkSize = d3dtx9.GetHeaderByteSize(); //this is correct
-                    msv5.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx9.mPixelData);
-                }
-                else if (msv6 != null)
-                {
-                    msv6.mDefaultSectionChunkSize = d3dtx9.GetHeaderByteSize(); //this is correct
-                    msv6.mAsyncSectionChunkSize = ByteFunctions.Get2DByteArrayTotalSize(d3dtx9.mPixelData);
-                }
+                SetMetaChunkSizes(d3dtx9.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx9.mPixelData));
             }
         }
 
@@ -334,6 +296,110 @@ namespace D3DTX_Converter.Main
                 //read the first int (which is an mVersion d3dtx value)
                 return metaERTM == null ? reader.ReadInt32() : -1; //return -1 because d3dtx versions older than 4 don't have an mVersion variable (not that I know of atleast)
             }
+        }
+
+        public bool IsCubeTexture()
+        {
+            if (d3dtx7 != null)
+                return d3dtx7.mTextureLayout == T3TextureLayout.eTextureLayout_Cube || d3dtx7.mTextureLayout == T3TextureLayout.eTextureLayout_CubeArray;
+            else if(d3dtx8 != null)
+                return d3dtx8.mTextureLayout == T3TextureLayout.eTextureLayout_Cube || d3dtx8.mTextureLayout == T3TextureLayout.eTextureLayout_CubeArray;
+            else if(d3dtx9 != null)
+                return d3dtx9.mTextureLayout == T3TextureLayout.eTextureLayout_Cube || d3dtx9.mTextureLayout == T3TextureLayout.eTextureLayout_CubeArray;
+            else
+                return false;
+        }
+
+        public int GetRegionCount()
+        {
+            if (d3dtx4 != null)
+                return d3dtx4.mStreamHeader.mRegionCount;
+            else if (d3dtx5 != null)
+                return d3dtx5.mStreamHeader.mRegionCount;
+            else if (d3dtx6 != null)
+                return d3dtx6.mStreamHeader.mRegionCount;
+            else if (d3dtx7 != null)
+                return d3dtx7.mStreamHeader.mRegionCount;
+            else if (d3dtx8 != null)
+                return d3dtx8.mStreamHeader.mRegionCount;
+            else if (d3dtx9 != null)
+                return d3dtx9.mStreamHeader.mRegionCount;
+            else
+                return -1;
+        }
+
+        public uint GetMipMapCount()
+        {
+            if (d3dtx4 != null)
+                return d3dtx4.mNumMipLevels;
+            else if (d3dtx5 != null)
+                return d3dtx5.mNumMipLevels;
+            else if (d3dtx6 != null)
+                return d3dtx6.mNumMipLevels;
+            else if (d3dtx7 != null)
+                return d3dtx7.mNumMipLevels;
+            else if (d3dtx8 != null)
+                return d3dtx8.mNumMipLevels;
+            else if (d3dtx9 != null)
+                return d3dtx9.mNumMipLevels;
+            else
+                return 0;
+        }
+
+        public List<byte[]> GetPixelData()
+        {
+            if (d3dtx4 != null)
+                return d3dtx4.mPixelData;
+            else if (d3dtx5 != null)
+                return d3dtx5.mPixelData;
+            else if (d3dtx6 != null)
+                return d3dtx6.mPixelData;
+            else if (d3dtx7 != null)
+                return d3dtx7.mPixelData;
+            else if (d3dtx8 != null)
+                return d3dtx8.mPixelData;
+            else if (d3dtx9 != null)
+                return d3dtx9.mPixelData;
+            else
+                return null;
+        }
+
+        public List<byte[]> GetPixelDataByFaceIndex(int faceIndex)
+        {
+            List<byte[]> newPixelData = new();
+
+            if (d3dtx7 != null)
+            {
+                for(int i = 0; i < d3dtx7.mRegionHeaders.Length; i++)
+                {
+                    if(d3dtx7.mRegionHeaders[i].mFaceIndex == faceIndex)
+                    {
+                        newPixelData.Add(d3dtx7.mPixelData[i]);
+                    }
+                }
+            }
+            else if (d3dtx8 != null)
+            {
+                for (int i = 0; i < d3dtx8.mRegionHeaders.Length; i++)
+                {
+                    if (d3dtx8.mRegionHeaders[i].mFaceIndex == faceIndex)
+                    {
+                        newPixelData.Add(d3dtx8.mPixelData[i]);
+                    }
+                }
+            }    
+            else if (d3dtx9 != null)
+            {
+                for (int i = 0; i < d3dtx9.mRegionHeaders.Length; i++)
+                {
+                    if (d3dtx9.mRegionHeaders[i].mFaceIndex == faceIndex)
+                    {
+                        newPixelData.Add(d3dtx9.mPixelData[i]);
+                    }
+                }
+            }
+
+            return newPixelData;
         }
     }
 }

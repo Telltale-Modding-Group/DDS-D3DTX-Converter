@@ -10,6 +10,7 @@ using D3DTX_Converter.TelltaleTypes;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
+using DirectXTexNet;
 using System.Runtime.InteropServices;
 
 /*
@@ -275,14 +276,14 @@ namespace D3DTX_Converter.TelltaleD3DTX
             mSurfaceGamma = T3TextureBase.GetSurfaceGamma(reader.ReadInt32()); //mSurfaceGamma [4 bytes]
             mSurfaceMultisample = T3TextureBase.GetSurfaceMultisample(reader.ReadInt32()); //mSurfaceMultisample [4 bytes]
             mResourceUsage = T3TextureBase.GetResourceUsage(reader.ReadInt32()); //mResourceUsage [4 bytes]
-            mType = T3Texture.GetTextureType(reader.ReadInt32()); //mType [4 bytes]
+            mType = (T3TextureType)reader.ReadInt32(); //mType [4 bytes]
             mSwizzleSize = reader.ReadInt32(); //mSwizzleSize [4 bytes]
             mSwizzle = new RenderSwizzleParams(reader); //mSwizzle [4 bytes]
             mSpecularGlossExponent = reader.ReadSingle(); //mSpecularGlossExponent [4 bytes]
             mHDRLightmapScale = reader.ReadSingle(); //mHDRLightmapScale [4 bytes]
             mToonGradientCutoff = reader.ReadSingle(); //mToonGradientCutoff [4 bytes]
-            mAlphaMode = T3Texture.GetAlphaMode(reader.ReadInt32()); //mAlphaMode [4 bytes]
-            mColorMode = T3Texture.GetColorMode(reader.ReadInt32()); //mColorMode [4 bytes]
+            mAlphaMode = (eTxAlpha)reader.ReadInt32(); //mAlphaMode [4 bytes]
+            mColorMode = (eTxColor)reader.ReadInt32(); //mColorMode [4 bytes]
             mUVOffset = new Vector2(reader); //mUVOffset [8 bytes]
             mUVScale = new Vector2(reader); //mUVScale [8 bytes]
 
@@ -339,52 +340,52 @@ namespace D3DTX_Converter.TelltaleD3DTX
                 PrintConsole();
         }
 
-        public void ModifyD3DTX(DDS_Master dds) //ISSUE HERE WITH DXT5 AND MIP MAPS WITH UPSCALED TEXTURES
+        public void ModifyD3DTX(DDS_Master dds, DDS_DirectXTexNet_ImageSection[] sections) //ISSUE HERE WITH DXT5 AND MIP MAPS WITH UPSCALED TEXTURES
         {
-            mWidth = dds.header.dwWidth; //this is correct
-            mHeight = dds.header.dwHeight; //this is correct
-            mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC); //this is correct
-            mDepth = dds.header.dwDepth; //this is correct
-            mNumMipLevels = dds.header.dwMipMapCount; //this is correct
+            mWidth = dds.header.dwWidth; //THIS IS CORRECT
+            mHeight = dds.header.dwHeight; //THIS IS CORRECT
+            mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC); //THIS IS CORRECT
+            mDepth = dds.header.dwDepth; //THIS IS CORRECT
+            mNumMipLevels = dds.header.dwMipMapCount; //THIS IS CORRECT
 
-            mPixelData.Clear(); //this is correct
-            mPixelData = dds.textureData; //this is correct
+            mPixelData.Clear(); //THIS IS CORRECT
+            mPixelData = dds.textureData; //THIS IS CORRECT
 
-
-            StreamHeader newStreamHeader = new()
+            mStreamHeader = new()
             {
-                mRegionCount = (int)dds.header.dwMipMapCount, //this is correct
-                mAuxDataCount = mStreamHeader.mAuxDataCount, //this is correct
-                mTotalDataSize = (int)ByteFunctions.Get2DByteArrayTotalSize(mPixelData) //this is correct
+                mRegionCount = (int)dds.header.dwMipMapCount, //THIS IS CORRECT
+                mAuxDataCount = mStreamHeader.mAuxDataCount, //THIS IS CORRECT
+                mTotalDataSize = (int)ByteFunctions.Get2DByteArrayTotalSize(mPixelData) //THIS IS CORRECT
             };
 
-            mStreamHeader = newStreamHeader; //this is correct
+            //uint[,] mipMapResolutions = DDS.CalculateMipResolutions(mNumMipLevels, mWidth, mHeight);
+            //uint blockSize = DDS.GetDDSBlockSize(dds.header);
 
-            List<RegionStreamHeader> regionStreamHeader = new(); //this is correct
-            uint[,] mipMapResolutions = DDS.CalculateMipResolutions(mNumMipLevels, mWidth, mHeight); //this is correct
-            //bool blockSizeDouble = !DDS_Functions.DDS_CompressionBool(dds.header);
-            uint blockSize = 8;
+            RegionStreamHeader[] NEW_mRegionHeaders = new RegionStreamHeader[mStreamHeader.mRegionCount];
 
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
-                RegionStreamHeader region = new()
+                NEW_mRegionHeaders[i] = new()
                 {
-                    mDataSize = (uint)mPixelData[i].Length, //this is correct
+                    mDataSize = (uint)mPixelData[i].Length, //THIS IS CORRECT
                     mFaceIndex = 0, //NOTE: for cubemap textures this will need to change
                     mMipCount = 1, //NOTE: for cubemap textures this will need to change
-                    mMipIndex = (mStreamHeader.mRegionCount - 1) - i, //this is correct
-                    mPitch = DDS.ComputePitchValue(mipMapResolutions[i, 0], blockSize),
-                    mSlicePitch = mPixelData[i].Length,
+                    mMipIndex = (mStreamHeader.mRegionCount - 1) - i, //THIS IS CORRECT
+                    //mPitch = (int)DDS.ComputePitchValue_BlockCompression(mipMapResolutions[i, 0], blockSize), //THIS IS INCORRECT
+                    mPitch = (int)sections[(mStreamHeader.mRegionCount - 1) - i].RowPitch,
+                    mSlicePitch = (int)sections[(mStreamHeader.mRegionCount - 1) - i].SlicePitch,
                 };
-
-                regionStreamHeader.Add(region);
             }
 
-            regionStreamHeader.Reverse(); //this is correct
-            mRegionHeaders = regionStreamHeader.ToArray(); //this is correct
+            mRegionHeaders = NEW_mRegionHeaders;
 
-            UpdateArrayCapacities(); //this is correct
-            PrintConsole(); //this is correct
+            //reverse the array
+            List<RegionStreamHeader> mRegionHeaders_Reversed = new List<RegionStreamHeader>(mRegionHeaders);
+            mRegionHeaders_Reversed.Reverse();
+            mRegionHeaders = mRegionHeaders_Reversed.ToArray();
+
+            UpdateArrayCapacities(); //THIS IS CORRECT
+            PrintConsole();
         }
 
         public void WriteBinaryData(BinaryWriter writer)
@@ -469,10 +470,10 @@ namespace D3DTX_Converter.TelltaleD3DTX
             totalSize += (uint)Marshal.SizeOf((int)mPlatform); //mPlatform [4 bytes]
             totalSize += (uint)Marshal.SizeOf(mName_BlockSize); //mName Block Size [4 bytes] //mName block size (size + string len)
             totalSize += (uint)Marshal.SizeOf(mName.Length); //mName (strength length prefix) [4 bytes]
-            totalSize += (uint)Marshal.SizeOf(mName);  //mName [x bytes]
+            totalSize += (uint)mName.Length;  //mName [x bytes]
             totalSize += (uint)Marshal.SizeOf(mImportName_BlockSize); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
             totalSize += (uint)Marshal.SizeOf(mImportName.Length); //mImportName (strength length prefix) [4 bytes] (this is always 0)
-            totalSize += (uint)Marshal.SizeOf(mImportName); //mImportName [x bytes] (this is always 0)
+            totalSize += (uint)mImportName.Length; //mImportName [x bytes] (this is always 0)
             totalSize += (uint)Marshal.SizeOf(mImportScale); //mImportScale [4 bytes]
             totalSize += mToolProps.GetByteSize();
             totalSize += (uint)Marshal.SizeOf(mNumMipLevels); //mNumMipLevels [4 bytes]
@@ -480,19 +481,19 @@ namespace D3DTX_Converter.TelltaleD3DTX
             totalSize += (uint)Marshal.SizeOf(mHeight); //mHeight [4 bytes]
             totalSize += (uint)Marshal.SizeOf(mDepth); //mDepth [4 bytes]
             totalSize += (uint)Marshal.SizeOf(mArraySize); //mArraySize [4 bytes]
-            totalSize += (uint)Marshal.SizeOf(mSurfaceFormat); //mSurfaceFormat [4 bytes]
-            totalSize += (uint)Marshal.SizeOf(mTextureLayout); //mTextureLayout [4 bytes]
-            totalSize += (uint)Marshal.SizeOf(mSurfaceGamma); //mSurfaceGamma [4 bytes]
-            totalSize += (uint)Marshal.SizeOf(mSurfaceMultisample); //mSurfaceMultisample [4 bytes]
-            totalSize += (uint)Marshal.SizeOf(mResourceUsage); //mResourceUsage [4 bytes]
-            totalSize += (uint)Marshal.SizeOf(mType); //mType [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mSurfaceFormat); //mSurfaceFormat [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mTextureLayout); //mTextureLayout [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mSurfaceGamma); //mSurfaceGamma [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mSurfaceMultisample); //mSurfaceMultisample [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mResourceUsage); //mResourceUsage [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mType); //mType [4 bytes]
             totalSize += (uint)Marshal.SizeOf(mSwizzleSize); //mSwizzleSize [4 bytes]
             totalSize += mSwizzle.GetByteSize();
             totalSize += (uint)Marshal.SizeOf(mSpecularGlossExponent); //mSpecularGlossExponent [4 bytes]
             totalSize += (uint)Marshal.SizeOf(mHDRLightmapScale); //mHDRLightmapScale [4 bytes]
             totalSize += (uint)Marshal.SizeOf(mToonGradientCutoff); //mToonGradientCutoff [4 bytes]
-            totalSize += (uint)Marshal.SizeOf(mAlphaMode); //mAlphaMode [4 bytes]
-            totalSize += (uint)Marshal.SizeOf(mColorMode); //mColorMode [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mAlphaMode); //mAlphaMode [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mColorMode); //mColorMode [4 bytes]
             totalSize += mUVOffset.GetByteSize(); //[4 bytes]
             totalSize += mUVScale.GetByteSize(); //[4 bytes]
 

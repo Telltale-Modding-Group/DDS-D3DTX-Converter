@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
 using D3DTX_Converter.Utilities;
-using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
 using D3DTX_Converter.Texconv;
-using Newtonsoft.Json;
 using D3DTX_Converter.TexconvOptions;
 
 namespace D3DTX_Converter.ProgramModes
@@ -112,7 +107,7 @@ namespace D3DTX_Converter.ProgramModes
             MasterOptions options = new();
             options.outputDirectory = new() { directory = destinationDirectory };
             options.outputOverwrite = new();
-            options.outputFileType = new() { fileType = TexconvEnums.TexconvEnumFileTypes.tga };
+            options.outputFileType = new() { fileType = TexconvEnums.TexconvEnumFileTypes.png };
 
             TexconvApp.RunTexconv(sourceFile, options);
         }

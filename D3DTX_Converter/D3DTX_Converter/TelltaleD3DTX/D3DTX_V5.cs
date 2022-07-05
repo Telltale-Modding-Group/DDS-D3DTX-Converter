@@ -248,8 +248,8 @@ namespace D3DTX_Converter.TelltaleD3DTX
             mSpecularGlossExponent = reader.ReadSingle(); //mSpecularGlossExponent [4 bytes]
             mHDRLightmapScale = reader.ReadSingle(); //mHDRLightmapScale [4 bytes]
             mToonGradientCutoff = reader.ReadSingle(); //mToonGradientCutoff [4 bytes]
-            mAlphaMode = T3Texture.GetAlphaMode(reader.ReadInt32()); //mAlphaMode [4 bytes]
-            mColorMode = T3Texture.GetColorMode(reader.ReadInt32()); //mColorMode [4 bytes]
+            mAlphaMode = (eTxAlpha)reader.ReadInt32(); //mAlphaMode [4 bytes]
+            mColorMode = (eTxColor)reader.ReadInt32(); //mColorMode [4 bytes]
             mUVOffset = new Vector2() //mUVOffset [8 bytes]
             {
                 x = reader.ReadSingle(), //[4 bytes]

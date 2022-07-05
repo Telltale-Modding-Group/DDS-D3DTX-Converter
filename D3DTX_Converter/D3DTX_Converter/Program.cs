@@ -27,12 +27,13 @@ namespace D3DTX_Converter
         public static bool dds_to_d3dtx = false; //.dds ---> .d3dtx
         public static bool d3dtx_to_dds = false; //.d3dtx ---> .dds
 
-        public static bool dds_to_png = true; //.dds ---> .png
+        public static bool dds_to_png = false; //.dds ---> .png
         public static bool dds_to_tga = false; //.dds ---> .tga
         public static bool dds_to_bmp = false; //.dds ---> .bmp
         public static bool dds_to_tiff = false; //.dds ---> .tiff
         public static bool dds_to_jpeg = false; //.dds ---> .jpeg
-        public static bool png_to_dds = false; //.png ---> .dds
+
+        public static bool png_to_dds = true; //.png ---> .dds
         public static bool tga_to_dds = false; //.tga ---> .dds
         public static bool bmp_to_dds = false; //.bmp ---> .dds
         public static bool tiff_to_dds = false; //.tiff ---> .dds

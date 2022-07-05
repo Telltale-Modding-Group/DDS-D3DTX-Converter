@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
-using D3DTX_Converter.Main;
 using D3DTX_Converter.Utilities;
+using D3DTX_Converter.Main;
 using D3DTX_Converter.Texconv;
 using D3DTX_Converter.TexconvOptions;
-using Newtonsoft.Json;
 
 namespace D3DTX_Converter.ProgramModes
 {

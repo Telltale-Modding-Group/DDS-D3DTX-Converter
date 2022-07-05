@@ -3,9 +3,9 @@
     //note: can't find original name, so just using the prefix eTxAlpha
     public enum eTxAlpha
     {
-        eTxAlphaUnknown = 0,
-        eTxNoAlpha = 1,
-        eTxAlphaTest = 2,
-        eTxAlphaBlend = 3,
+        eTxAlphaUnknown = -1,
+        eTxNoAlpha = 0,
+        eTxAlphaTest = 1,
+        eTxAlphaBlend = 2,
     }
 }

@@ -254,9 +254,12 @@ namespace D3DTX_Converter.Main
                 //calculated mip resolutions [Pixel Value, Width or Height (0 or 1)]
                 mipMapResolutions = DDS.CalculateMipResolutions(header.dwMipMapCount - 1, header.dwWidth, header.dwHeight);
 
+                //get block size
+                uint blockSize = DDS.GetDDSBlockSize(header);
+
                 //get byte sizes
                 //uint[] byteSizes = DDS_Functions.DDS_GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, ((header.ddspf.dwFourCC == 0x44585435u || header.ddspf.dwFourCC == 0x35545844u) ? false : true));
-                uint[] byteSizes = DDS.GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, 8);
+                uint[] byteSizes = DDS.GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, blockSize);
 
                 int offset = 0;
 
@@ -264,7 +267,7 @@ namespace D3DTX_Converter.Main
                 {
                     byte[] temp = new byte[byteSizes[i]];
 
-                //issue length
+                    //issue length
                     Array.Copy(ddsTextureData, offset, temp, 0, temp.Length);
 
                     offset += temp.Length;
@@ -299,6 +302,20 @@ namespace D3DTX_Converter.Main
             File.WriteAllBytes(newPath, finalData);
         }
 
+        public static string GetCubeFaceName(int faceIndex)
+        {
+            switch(faceIndex)
+            {
+                case 0: return "XPOS";
+                case 1: return "XNEG";
+                case 2: return "YPOS";
+                case 3: return "YNEG";
+                case 4: return "ZPOS";
+                case 5: return "ZNEG";
+                default: return "";
+            }
+        }
+
         /// <summary>
         /// Writes a D3DTX into a DDS file on the disk.
         /// </summary>
@@ -306,82 +323,68 @@ namespace D3DTX_Converter.Main
         /// <param name="destinationPath"></param>
         public void Write_D3DTX_AsDDS(D3DTX_Master d3dtx, string destinationPath)
         {
-            byte[] finalData = new byte[0];
+            if(d3dtx.IsCubeTexture())
+            {
+                int regionCount = d3dtx.GetRegionCount();
+                int mipCount = (int)d3dtx.GetMipMapCount();
+                int cubeSurfacesAmount = regionCount / mipCount;
 
-            //turn our header data into bytes to be written into a file
-            byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
+                string fileExtension = Path.GetExtension(destinationPath);
+                string fileName = Path.GetFileNameWithoutExtension(destinationPath);
+                string originalPath = destinationPath.Remove(destinationPath.Length - fileExtension.Length, fileExtension.Length);
+                string newCubeDirectory = originalPath + "/";
 
-            //copy the dds header to the file
-            finalData = ByteFunctions.Combine(finalData, dds_header);
+                if(Directory.Exists(newCubeDirectory) == false)
+                {
+                    Directory.CreateDirectory(newCubeDirectory);
+                }
 
-            if (d3dtx.d3dtx4 != null)
-            {
-                //copy the images
-                for (int i = d3dtx.d3dtx4.mPixelData.Count - 1; i >= 0; i--)
+                for (int i = 0; i < cubeSurfacesAmount; i++)
                 {
-                    finalData = ByteFunctions.Combine(finalData, d3dtx.d3dtx4.mPixelData[i]);
+                    string cubeFaceName = GetCubeFaceName(i);
 
-                    //byte[] pixels = d3dtx.d3dtx4.mPixelData[i];
-                    //List<byte> pixelsReversed = new List<byte>(pixels);
-                    //pixelsReversed.Reverse();
+                    string newFileName = string.Format("{0}{1}_Cube{2}{3}", newCubeDirectory, fileName, cubeFaceName, fileExtension);
 
-                    //finalData = ByteFunctions.Combine(finalData, pixelsReversed.ToArray());
-                }
-            }
-            else if (d3dtx.d3dtx5 != null)
-            {
-                //copy the images
-                for (int i = d3dtx.d3dtx5.mPixelData.Count - 1; i >= 0; i--)
-                {
-                    finalData = ByteFunctions.Combine(finalData, d3dtx.d3dtx5.mPixelData[i]);
-                }
-            }
-            else if (d3dtx.d3dtx6 != null)
-            {
-                //copy the images
-                for (int i = d3dtx.d3dtx6.mPixelData.Count - 1; i >= 0; i--)
-                {
-                    finalData = ByteFunctions.Combine(finalData, d3dtx.d3dtx6.mPixelData[i]);
-                }
-            }
-            else if (d3dtx.d3dtx7 != null)
-            {
-                //copy the images
-                for (int i = d3dtx.d3dtx7.mPixelData.Count - 1; i >= 0; i--)
-                {
-                    finalData = ByteFunctions.Combine(finalData, d3dtx.d3dtx7.mPixelData[i]);
-                }
-            }
-            else if (d3dtx.d3dtx8 != null)
-            {
-                //copy the images
-                for (int i = d3dtx.d3dtx8.mPixelData.Count - 1; i >= 0; i--)
-                {
-                    finalData = ByteFunctions.Combine(finalData, d3dtx.d3dtx8.mPixelData[i]);
-                }
-            }
-            else if (d3dtx.d3dtx9 != null)
-            {
-                if(d3dtx.d3dtx9.mTextureLayout == T3TextureLayout.eTextureLayout_Cube)
-                {
+                    //turn our header data into bytes to be written into a file
+                    byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
+
+                    //copy the dds header to the file
+                    byte[] finalData = new byte[0];
+                    finalData = ByteFunctions.Combine(finalData, dds_header);
+
+                    List<byte[]> pixelData = d3dtx.GetPixelDataByFaceIndex(i);
+
                     //copy the images
-                    for (int i = d3dtx.d3dtx9.mPixelData.Count - 1; i >= 0; i--)
+                    for (int x = mipCount - 1; x >= 0; x--)
                     {
-                        finalData = ByteFunctions.Combine(finalData, d3dtx.d3dtx9.mPixelData[i]);
+                        //int newPixelDataIndex = startingPixelDataIndex + x;
+                        finalData = ByteFunctions.Combine(finalData, pixelData[x]);
                     }
-                }
-                else
-                {
-                    //copy the images
-                    for (int i = d3dtx.d3dtx9.mPixelData.Count - 1; i >= 0; i--)
-                    {
-                        finalData = ByteFunctions.Combine(finalData, d3dtx.d3dtx9.mPixelData[i]);
-                    }
+
+                    //write the file to the disk
+                    File.WriteAllBytes(newFileName, finalData);
                 }
             }
+            else
+            {
+                //turn our header data into bytes to be written into a file
+                byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
 
-            //write the file to the disk
-            File.WriteAllBytes(destinationPath, finalData);
+                //copy the dds header to the file
+                byte[] finalData = new byte[0];
+                finalData = ByteFunctions.Combine(finalData, dds_header);
+
+                List<byte[]> pixelData = d3dtx.GetPixelData();
+
+                //copy the images
+                for (int i = pixelData.Count - 1; i >= 0; i--)
+                {
+                    finalData = ByteFunctions.Combine(finalData, pixelData[i]);
+                }
+
+                //write the file to the disk
+                File.WriteAllBytes(destinationPath, finalData);
+            }
         }
 
         /// <summary>

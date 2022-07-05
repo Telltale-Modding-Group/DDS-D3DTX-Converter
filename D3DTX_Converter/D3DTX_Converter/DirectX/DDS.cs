@@ -16,6 +16,21 @@ namespace D3DTX_Converter.DirectX
 
     public static class DDS
     {
+        public static uint GetDDSBlockSize(DDS_HEADER header)
+        {
+            //Image image = null;
+            //image.SlicePitch
+
+            uint compressionValue = header.ddspf.dwFourCC;
+
+            if (compressionValue == ByteFunctions.Convert_String_To_UInt32("DXT1"))
+                return 8;
+            if (compressionValue == ByteFunctions.Convert_String_To_UInt32("ATI1"))
+                return 8;
+            else
+                return 16;
+        }
+
         public static uint[,] CalculateMipResolutions(uint mipCount, uint width, uint height)
         {
             //because I suck at math, we will generate our mip map resolutions using the same method we did in d3dtx to dds (can't figure out how to calculate them in reverse properly)
@@ -50,17 +65,20 @@ namespace D3DTX_Converter.DirectX
                 uint mipWidth = mipResolutions[i, 0];
                 uint mipHeight = mipResolutions[i, 1];
 
-                if(mipWidth == mipHeight)
-                {
+                byteSizes[i] = CalculateByteSize(mipWidth, mipHeight, blockSize);
+
+                //if (mipWidth == mipHeight) //SQUARE SIZE
+                //{
                     //computed linear size
                     //(mipWidth * mipWidth) / 2
 
-                    byteSizes[i] = Calculate_ByteSize_Square(mipWidth, mipHeight, baseLinearSize, (uint)i, (uint)byteSizes.Length, blockSize);
-                }   
-                else
-                {
-                    byteSizes[i] = Calculate_ByteSize_NonSquare(mipWidth, mipHeight, blockSize);
-                }
+                    //byteSizes[i] = Calculate_ByteSize_Square(mipWidth, mipHeight, baseLinearSize, (uint)i, (uint)byteSizes.Length, blockSize);
+                    //byteSizes[i] = Calculate_ByteSize(mipWidth, mipHeight, blockSize);
+                //}   
+                //else //NON SQUARE
+                //{
+                    //byteSizes[i] = Calculate_ByteSize_NonSquare(mipWidth, mipHeight, blockSize);
+                //}
 
                 //original calculation
                 //byteSizes[i] = CalculateDDS_ByteSize((int)mipResolutions[i, 0], (int)mipResolutions[i, 1], isDXT1);
@@ -75,10 +93,22 @@ namespace D3DTX_Converter.DirectX
         /// <param name="width"></param>
         /// <param name="blockSizeDouble"></param>
         /// <returns></returns>
-        public static int ComputePitchValue(uint width, uint blockSize)
+        public static uint ComputePitchValue_BlockCompression(uint width, uint blockSize)
         {
             //max(1, ((width + 3) / 4)) * blocksize
-            return (int)MathF.Max(1, ((width + 3) / 4)) * (int)blockSize;
+            return (uint)(MathF.Max(1, (width + 3) / 4) * blockSize);
+        }
+
+        public static uint ComputePitchValue_Legacy(uint width)
+        {
+            //((width+1) >> 1) * 4
+            return ((width + 1) >> 1) * 4;
+        }
+
+        public static uint ComputePitchValue_Other(uint width, uint bitsPerPixel)
+        {
+            //( width * bits-per-pixel + 7 ) / 8
+            return (width * bitsPerPixel + 7) / 8;
         }
 
         public static bool CompressionBool(DDS_HEADER header) => header.ddspf.dwFourCC.Equals("DXT1");
@@ -233,13 +263,13 @@ namespace D3DTX_Converter.DirectX
         }
 
         /// <summary>
-        /// Calculates the byte size of a DDS non-square texture
+        /// Calculates the byte size of a DDS texture
         /// </summary>
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <param name="isDXT1"></param>
         /// <returns></returns>
-        public static uint Calculate_ByteSize_NonSquare(uint width, uint height, uint bitPixelSize)
+        public static uint CalculateByteSize(uint width, uint height, uint bitPixelSize)
         {
             //formula (from microsoft docs)
             //max(1, ( (width + 3) / 4 ) ) x max(1, ( (height + 3) / 4 ) ) x 8(DXT1) or 16(DXT2-5)
@@ -248,31 +278,10 @@ namespace D3DTX_Converter.DirectX
             //max(1,width ?4)x max(1,height ?4)x 8 (DXT1) or 16 (DXT2-5)
 
             //do the micorosoft magic texture byte size calculation formula
-            //return Math.Max(1, ((width + 3) / 4)) * Math.Max(1, ((height + 3) / 4)) * bitPixelSize;
+            return Math.Max(1, ((width + 3) / 4)) * Math.Max(1, ((height + 3) / 4)) * bitPixelSize;
 
             //formula (from here) - http://doc.51windows.net/directx9_sdk/graphics/reference/DDSFileReference/ddstextures.htm
-            return Math.Max(1, width / 4) * Math.Max(1, height / 4) * bitPixelSize;
-        }
-
-
-        /// <summary>
-        /// Calculates the byte size of a DDS square texture
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="isDXT1"></param>
-        /// <returns></returns>
-        public static uint Calculate_ByteSize_Square(uint width, uint height, uint dwPitchOrLinearSize, uint mipLevel, uint maxMipLevel, uint bitPixelSize)
-        {
-            //according to formula, if the compression is dxt1 then the number needs to be 8
-            uint finalSize = dwPitchOrLinearSize;
-
-            finalSize = (width * width) / 2;
-
-            if (finalSize < bitPixelSize)
-                finalSize = bitPixelSize;
-
-            return finalSize;
+            //return Math.Max(1, width / 4) * Math.Max(1, height / 4) * bitPixelSize;
         }
 
         /// <summary>
@@ -361,7 +370,9 @@ namespace D3DTX_Converter.DirectX
                 case T3SurfaceFormat.eSurface_DXT5: return ByteFunctions.Convert_String_To_UInt32("DXT5");
                 case T3SurfaceFormat.eSurface_DXN: return ByteFunctions.Convert_String_To_UInt32("ATI2");
                 case T3SurfaceFormat.eSurface_DXT5A: return ByteFunctions.Convert_String_To_UInt32("ATI1");
-                case T3SurfaceFormat.eSurface_A8: return 0;
+                case T3SurfaceFormat.eSurface_BC4: return ByteFunctions.Convert_String_To_UInt32("BC4S");
+                case T3SurfaceFormat.eSurface_BC5: return ByteFunctions.Convert_String_To_UInt32("BC5S");
+                case T3SurfaceFormat.eSurface_A8: return ByteFunctions.Convert_String_To_UInt32("DX10");
             }
         }
 
@@ -372,6 +383,9 @@ namespace D3DTX_Converter.DirectX
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("DXT5")) return T3SurfaceFormat.eSurface_DXT5;
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("ATI2")) return T3SurfaceFormat.eSurface_DXN;
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("ATI1")) return T3SurfaceFormat.eSurface_DXT5A;
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("BC4S")) return T3SurfaceFormat.eSurface_BC4;
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("BC5S")) return T3SurfaceFormat.eSurface_BC5;
+
             else return T3SurfaceFormat.eSurface_DXT1;
         }
 

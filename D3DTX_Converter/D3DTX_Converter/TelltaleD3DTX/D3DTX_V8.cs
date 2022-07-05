@@ -273,20 +273,14 @@ namespace D3DTX_Converter.TelltaleD3DTX
             mSurfaceGamma = T3TextureBase.GetSurfaceGamma(reader.ReadInt32()); //mSurfaceGamma [4 bytes]
             mSurfaceMultisample = T3TextureBase.GetSurfaceMultisample(reader.ReadInt32()); //mSurfaceMultisample [4 bytes]
             mResourceUsage = T3TextureBase.GetResourceUsage(reader.ReadInt32()); //mResourceUsage [4 bytes]
-            mType = T3Texture.GetTextureType(reader.ReadInt32()); //mType [4 bytes]
+            mType = (T3TextureType)reader.ReadInt32(); //mType [4 bytes]
             mSwizzleSize = reader.ReadInt32(); //mSwizzleSize [4 bytes]
-            mSwizzle = new RenderSwizzleParams() //mSwizzle [4 bytes]
-            {
-                mSwizzle1 = (char)reader.ReadByte(),
-                mSwizzle2 = (char)reader.ReadByte(),
-                mSwizzle3 = (char)reader.ReadByte(),
-                mSwizzle4 = (char)reader.ReadByte()
-            };
+            mSwizzle = new(reader); //mSwizzle [4 bytes]
             mSpecularGlossExponent = reader.ReadSingle(); //mSpecularGlossExponent [4 bytes]
             mHDRLightmapScale = reader.ReadSingle(); //mHDRLightmapScale [4 bytes]
             mToonGradientCutoff = reader.ReadSingle(); //mToonGradientCutoff [4 bytes]
-            mAlphaMode = T3Texture.GetAlphaMode(reader.ReadInt32()); //mAlphaMode [4 bytes]
-            mColorMode = T3Texture.GetColorMode(reader.ReadInt32()); //mColorMode [4 bytes]
+            mAlphaMode = (eTxAlpha)reader.ReadInt32(); //mAlphaMode [4 bytes]
+            mColorMode = (eTxColor)reader.ReadInt32(); //mColorMode [4 bytes]
             mUVOffset = new Vector2() //mUVOffset [8 bytes]
             {
                 x = reader.ReadSingle(), //[4 bytes]

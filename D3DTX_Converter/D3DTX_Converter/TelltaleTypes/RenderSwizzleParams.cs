@@ -10,25 +10,29 @@ namespace D3DTX_Converter.TelltaleTypes
 {
     public struct RenderSwizzleParams
     {
-        public char mSwizzle1;
-        public char mSwizzle2;
-        public char mSwizzle3;
-        public char mSwizzle4;
+        public byte mSwizzle1;
+        public byte mSwizzle2;
+        public byte mSwizzle3;
+        public byte mSwizzle4;
 
         public RenderSwizzleParams(BinaryReader reader)
         {
-            mSwizzle1 = (char)reader.ReadByte();
-            mSwizzle2 = (char)reader.ReadByte();
-            mSwizzle3 = (char)reader.ReadByte();
-            mSwizzle4 = (char)reader.ReadByte();
+            mSwizzle1 = reader.ReadByte();
+            mSwizzle2 = reader.ReadByte();
+            mSwizzle3 = reader.ReadByte();
+            mSwizzle4 = reader.ReadByte();
         }
 
         public void WriteBinaryData(BinaryWriter writer)
         {
-            writer.Write(mSwizzle1); //mSwizzle A [1 byte]
-            writer.Write(mSwizzle1); //mSwizzle B [1 byte]
-            writer.Write(mSwizzle1); //mSwizzle C [1 byte]
-            writer.Write(mSwizzle1); //mSwizzle D [1 byte]
+            byte[] combinedData = new byte[4];
+            combinedData[0] = mSwizzle1; //mSwizzle A [1 byte]
+            combinedData[1] = mSwizzle2; //mSwizzle B [1 byte]
+            combinedData[2] = mSwizzle3; //mSwizzle C [1 byte]
+            combinedData[3] = mSwizzle4; //mSwizzle D [1 byte]
+
+            writer.Write(combinedData);
+            //note to self: writing this as a combined byte array because for some reason writing the bytes by themself the values don't appear to be the same in a hex editor.
         }
 
         public uint GetByteSize()

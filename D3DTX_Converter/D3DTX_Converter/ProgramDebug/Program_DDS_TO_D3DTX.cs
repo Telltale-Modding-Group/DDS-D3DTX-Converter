@@ -4,17 +4,18 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
+using D3DTX_Converter.ImageProcessing;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
 using DirectXTexNet;
 using Newtonsoft.Json;
 
-namespace D3DTX_Converter.ProgramModes
+namespace D3DTX_Converter.ProgramDebug
 {
     public static class Program_DDS_TO_D3DTX
     {
-        public static void Execute()
+        public static void Execute(bool applyDDS_Unfixes = false)
         {
             //intro message
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Blue, ConsoleColor.White);
@@ -42,7 +43,7 @@ namespace D3DTX_Converter.ProgramModes
             Console.WriteLine("Conversion Starting...");
 
             //we got our paths, so lets begin
-            Convert_DDS_Bulk(textureFolderPath, resultFolderPath);
+            Convert_DDS_Bulk(textureFolderPath, resultFolderPath, applyDDS_Unfixes);
 
             //once BeginProcess is finished, it will come back here and we will notify the user that we are done
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
@@ -55,7 +56,7 @@ namespace D3DTX_Converter.ProgramModes
         /// </summary>
         /// <param name="texPath"></param>
         /// <param name="resultPath"></param>
-        public static void Convert_DDS_Bulk(string texPath, string resultPath)
+        public static void Convert_DDS_Bulk(string texPath, string resultPath, bool applyDDS_Unfixes = false)
         {
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
             Console.WriteLine("Collecting Files..."); //notify the user we are collecting files
@@ -88,7 +89,7 @@ namespace D3DTX_Converter.ProgramModes
             //run a loop through each of the found textures and convert each one
             for (int i = 0; i < ddsFiles.Count; i++)
             {
-                ConvertTexture_FromDDS_ToD3DTX(ddsFiles[i], resultPath);
+                ConvertTexture_FromDDS_ToD3DTX(ddsFiles[i], resultPath, applyDDS_Unfixes);
             }
         }
 
@@ -97,7 +98,7 @@ namespace D3DTX_Converter.ProgramModes
         /// </summary>
         /// <param name="sourceFile"></param>
         /// <param name="destinationFile"></param>
-        public static void ConvertTexture_FromDDS_ToD3DTX(string sourceFilePath, string resultDirectoryPath)
+        public static void ConvertTexture_FromDDS_ToD3DTX(string sourceFilePath, string resultDirectoryPath, bool applyDDS_Unfixes = false)
         {
             //deconstruct the source file path
             string textureFileDirectory = Path.GetDirectoryName(sourceFilePath);
@@ -115,24 +116,58 @@ namespace D3DTX_Converter.ProgramModes
             string textureResultPath_D3DTX = resultDirectoryPath + "/" + textureFileNameWithD3DTX;
 
             //create the final path of the dds
-            string textureResultPath_DDS = resultDirectoryPath + "/" + textureFileNameWithDDS;
+            string textureResultPath_DDS_Temp = resultDirectoryPath + "/TEMP_" + textureFileNameWithDDS;
 
             //if a json file exists (for newer 5VSM and 6VSM)
             if (File.Exists(textureFilePath_JSON))
             {
-                //read in our DDS file
-                DDS_Master dds = new(sourceFilePath, false);
-
-                DDS_DirectXTexNet_ImageSection[] sections = DDS_DirectXTexNet.GetDDSImageSections(sourceFilePath);
-
-                //dds parse test
-                //dds.TEST_WriteDDSToDisk(textureResultPath_DDS); //<-------- THIS IS CORRECT AND PARSES A DDS FILE PERFECTLY
-
                 //create a new d3dtx object
                 D3DTX_Master d3dtx_file = new();
 
                 //parse the .json file as a d3dtx
                 d3dtx_file.Read_D3DTX_JSON(textureFilePath_JSON);
+
+                //get the d3dtx texture type
+                TelltaleEnums.T3TextureType d3dtxTextureType = d3dtx_file.GetTextureType();
+
+                string ddsFilePath = sourceFilePath;
+
+                //pre stuff
+                if (applyDDS_Unfixes)
+                {
+                    if (d3dtxTextureType == TelltaleEnums.T3TextureType.eTxBumpmap || d3dtxTextureType == TelltaleEnums.T3TextureType.eTxNormalMap)
+                    {
+                        File.Copy(sourceFilePath, textureResultPath_DDS_Temp);
+
+                        ddsFilePath = textureResultPath_DDS_Temp;
+
+                        //this 'technically' works but the problem is that it's starting a different process so this acts like an async operation when everything else in here is synchronous
+                        //MasterOptions options = new();
+                        //options.outputDirectory = new() { directory = Path.GetDirectoryName(sourceFilePath) };
+                        //options.outputOverwrite = new();
+                        //options.outputSwizzle = new() { mask = "abgr" };
+
+                        //TexconvApp.RunTexconv(destinationFile, options);
+
+                        NormalMapProcessing.NormalMapSwizzleChannels(ddsFilePath);
+                    }
+                    else if (d3dtxTextureType == TelltaleEnums.T3TextureType.eTxNormalXYMap)
+                    {
+                        File.Copy(sourceFilePath, textureResultPath_DDS_Temp);
+
+                        ddsFilePath = textureResultPath_DDS_Temp;
+
+                        NormalMapProcessing.NormalMapOmitZ(ddsFilePath);
+                    }
+                }
+
+                //read in our DDS file
+                DDS_Master dds = new(ddsFilePath, false);
+
+                DDS_DirectXTexNet_ImageSection[] sections = DDS_DirectXTexNet.GetDDSImageSections(ddsFilePath);
+
+                //dds parse test
+                //dds.TEST_WriteDDSToDisk(textureResultPath_DDS); //<-------- THIS IS CORRECT AND PARSES A DDS FILE PERFECTLY
 
                 //modify the d3dtx file using our dds data
                 d3dtx_file.Modify_D3DTX(dds, sections); //ISSUE HERE WITH DXT5 AND MIP MAPS WITH UPSCALED TEXTURES
@@ -140,8 +175,18 @@ namespace D3DTX_Converter.ProgramModes
                 //write our final d3dtx file to disk
                 d3dtx_file.Write_Final_D3DTX(textureResultPath_D3DTX);
 
-                //File.Delete(textureFilePath_JSON);
-                //File.Delete(sourceFilePath);
+                //pre stuff
+                if (applyDDS_Unfixes)
+                {
+                    if (d3dtxTextureType == TelltaleEnums.T3TextureType.eTxBumpmap || d3dtxTextureType == TelltaleEnums.T3TextureType.eTxNormalMap)
+                    {
+                        File.Delete(ddsFilePath);
+                    }
+                    else if (d3dtxTextureType == TelltaleEnums.T3TextureType.eTxNormalXYMap)
+                    {
+                        File.Delete(ddsFilePath);
+                    }
+                }
             }
             //if we didn't find a json file, we're screwed!
             else

@@ -5,8 +5,9 @@ using D3DTX_Converter.Utilities;
 using D3DTX_Converter.Main;
 using D3DTX_Converter.Texconv;
 using D3DTX_Converter.TexconvOptions;
+using D3DTX_Converter.DirectX;
 
-namespace D3DTX_Converter.ProgramModes
+namespace D3DTX_Converter.ProgramDebug
 {
     public static class Program_PNG_TO_DDS
     {
@@ -102,26 +103,77 @@ namespace D3DTX_Converter.ProgramModes
         /// </summary>
         /// <param name="sourceFile"></param>
         /// <param name="destinationFile"></param>
-        public static void ConvertTextureFile(string sourceFile, string destinationDirectory)
+        public static void ConvertTextureFile(string sourceFilePath, string destinationDirectory)
         {
-            MasterOptions options = new();
-            options.outputDirectory = new() { directory = destinationDirectory };
-            options.outputOverwrite = new();
-            options.outputFileType = new() { fileType = TexconvEnums.TexconvEnumFileTypes.dds };
+            //deconstruct the source file path
+            string textureFileDirectory = Path.GetDirectoryName(sourceFilePath);
+            string textureFileNameOnly = Path.GetFileNameWithoutExtension(sourceFilePath);
 
-            if (Other.IsImageOpaque(sourceFile))
+            //create the names of the following files
+            string textureFileNameWithJSON = textureFileNameOnly + Main_Shared.jsonExtension;
+
+            //create the path of these files. If things go well, these files (depending on the version) should exist in the same directory at the original .dds file.
+            string textureFilePath_JSON = textureFileDirectory + "/" + textureFileNameWithJSON;
+
+            //if a json file exists (for newer 5VSM and 6VSM)
+            if (File.Exists(textureFilePath_JSON))
             {
-                options.outputFormat = new() { format = DirectXTexNet.DXGI_FORMAT.BC1_UNORM };
+                //create a new d3dtx object
+                D3DTX_Master d3dtx_file = new();
+
+                //parse the .json file as a d3dtx
+                d3dtx_file.Read_D3DTX_JSON(textureFilePath_JSON);
+
+                TelltaleEnums.T3TextureType textureType = d3dtx_file.GetTextureType();
+
+                MasterOptions options = new();
+                options.outputDirectory = new() { directory = destinationDirectory };
+                options.outputOverwrite = new();
+                options.outputFileType = new() { fileType = TexconvEnums.TexconvEnumFileTypes.dds };
+
+                if (textureType == TelltaleEnums.T3TextureType.eTxSingleChannelSDFDetailMap)
+                {
+                    options.outputFormat = new() { format = DirectXTexNet.DXGI_FORMAT.BC3_UNORM };
+                }
+                else if (textureType == TelltaleEnums.T3TextureType.eTxBumpmap)
+                {
+                    options.outputFormat = new() { format = DirectXTexNet.DXGI_FORMAT.BC3_UNORM };
+                }
+                else if (textureType == TelltaleEnums.T3TextureType.eTxNormalMap)
+                {
+                    options.outputFormat = new() { format = DirectXTexNet.DXGI_FORMAT.BC3_UNORM };
+                }
+                else if(textureType == TelltaleEnums.T3TextureType.eTxNormalXYMap)
+                {
+                    options.outputFormat = new() { format = DirectXTexNet.DXGI_FORMAT.BC3_UNORM };
+                }
+                else
+                {
+                    if (ImageUtilities.IsImageOpaque(sourceFilePath))
+                    {
+                        options.outputFormat = new() { format = DirectXTexNet.DXGI_FORMAT.BC1_UNORM };
+                    }
+                    else
+                    {
+                        //options.outputSeperateAlpha = new();
+                        //options.outputStraightAlpha = new();
+                        options.outputFormat = new() { format = DirectXTexNet.DXGI_FORMAT.BC3_UNORM };
+                    }
+                }
+
+                TexconvApp.RunTexconv(sourceFilePath, options);
             }
+            //if we didn't find a json file, we're screwed!
             else
             {
-                options.outputSeperateAlpha = new();
-                options.outputStraightAlpha = new();
-                options.outputFormat = new() { format = DirectXTexNet.DXGI_FORMAT.BC3_UNORM };
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
+                Console.WriteLine("No .json was found for the file were trying to convert!!!!");
+                Console.WriteLine("{0}", textureFileNameOnly);
+                Console.WriteLine("Skipping conversion on this file.", textureFileNameOnly);
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+
+                return;
             }
-
-
-            TexconvApp.RunTexconv(sourceFile, options);
         }
     }
 }

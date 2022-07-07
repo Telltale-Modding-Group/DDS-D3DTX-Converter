@@ -10,7 +10,7 @@ namespace D3DTX_Converter.DirectX
 
             DDS_DirectXTexNet_ImageSection[] section = new DDS_DirectXTexNet_ImageSection[ddsImage.GetImageCount()];
 
-            for(int i = 0; i < section.Length; i++)
+            for (int i = 0; i < section.Length; i++)
             {
                 Image image = ddsImage.GetImage(i);
 

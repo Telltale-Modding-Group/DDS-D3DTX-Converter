@@ -9,7 +9,7 @@ using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
 using Newtonsoft.Json;
 
-namespace D3DTX_Converter.ProgramModes
+namespace D3DTX_Converter.ProgramDebug
 {
     public static class Program_Shared
     {

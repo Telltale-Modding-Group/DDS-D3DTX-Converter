@@ -310,6 +310,24 @@ namespace D3DTX_Converter.Main
                 return false;
         }
 
+        public T3TextureType GetTextureType()
+        {
+            if (d3dtx4 != null)
+                return d3dtx4.mType;
+            //else if (d3dtx5 != null)
+                //return d3dtx5.mType;
+            else if (d3dtx6 != null)
+                return d3dtx6.mType;
+            else if (d3dtx7 != null)
+                return d3dtx7.mType;
+            else if (d3dtx8 != null)
+                return d3dtx8.mType;
+            else if (d3dtx9 != null)
+                return d3dtx9.mType;
+            else
+                return T3TextureType.eTxUnknown;
+        }
+
         public int GetRegionCount()
         {
             if (d3dtx4 != null)

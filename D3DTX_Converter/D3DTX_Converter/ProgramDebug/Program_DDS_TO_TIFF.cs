@@ -6,26 +6,26 @@ using D3DTX_Converter.Main;
 using D3DTX_Converter.Texconv;
 using D3DTX_Converter.TexconvOptions;
 
-namespace D3DTX_Converter.ProgramModes
+namespace D3DTX_Converter.ProgramDebug
 {
-    public static class Program_JPEG_TO_DDS
+    public static class Program_DDS_TO_TIFF
     {
         public static void Execute()
         {
             //intro message
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Blue, ConsoleColor.White);
-            Console.WriteLine("JPEG to DDS Texture Converter");
+            Console.WriteLine("DDS to TIFF Texture Converter");
 
             //-----------------GET TEXTURE FOLDER PATH-----------------
             ConsoleFunctions.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White);
-            Console.WriteLine("Enter the folder path with the JPEG textures.");
+            Console.WriteLine("Enter the folder path with the DDS textures.");
 
             //texture folder path (containing the path to the textures to be converted)
             string textureFolderPath = Program_Shared.GetFolderPathFromUser();
 
             //-----------------GET RESULT FOLDER PATH-----------------
             ConsoleFunctions.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White);
-            Console.WriteLine("Enter the resulting path where converted DDS textures will be stored.");
+            Console.WriteLine("Enter the resulting path where converted TIFF textures will be stored.");
 
             //result folder path (will contain the converted textures)
             string resultFolderPath = Program_Shared.GetFolderPathFromUser();
@@ -60,20 +60,20 @@ namespace D3DTX_Converter.ProgramModes
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
             Console.WriteLine("Filtering Textures..."); //notify the user we are filtering the array
 
-            //filter the array so we only get .jpeg files
-            textures = IOManagement.FilterFiles(textures, new string[2] { Main_Shared.jpgExtension, Main_Shared.jpegExtension });
+            //filter the array so we only get .dds files
+            textures = IOManagement.FilterFiles(textures, Main_Shared.ddsExtension);
 
-            //if no jpeg files were found, abort the program from going on any further (we don't have any files to convert!)
+            //if no dds files were found, abort the program from going on any further (we don't have any files to convert!)
             if (textures.Count < 1)
             {
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
-                Console.WriteLine("No .jpeg files were found, aborting."); //notify the user we found x amount of jpeg files in the array
+                Console.WriteLine("No .dds files were found, aborting."); //notify the user we found x amount of dds files in the array
                 Console.ResetColor();
                 return;
             }
 
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
-            Console.WriteLine("Found {0} Textures.", textures.Count.ToString()); //notify the user we found x amount of jpeg files in the array
+            Console.WriteLine("Found {0} Textures.", textures.Count.ToString()); //notify the user we found x amount of dds files in the array
             Console.WriteLine("Starting...");//notify the user we are starting
 
             //run a loop through each of the found textures and convert each one
@@ -98,7 +98,7 @@ namespace D3DTX_Converter.ProgramModes
         }
 
         /// <summary>
-        /// The main function for reading and converting said .jpeg into a .dds file
+        /// The main function for reading and converting said .dds into a .tiff file
         /// </summary>
         /// <param name="sourceFile"></param>
         /// <param name="destinationFile"></param>
@@ -107,8 +107,7 @@ namespace D3DTX_Converter.ProgramModes
             MasterOptions options = new();
             options.outputDirectory = new() { directory = destinationDirectory };
             options.outputOverwrite = new();
-            options.outputFormat = new() { format = DirectXTexNet.DXGI_FORMAT.BC1_UNORM };
-            options.outputFileType = new() { fileType = TexconvEnums.TexconvEnumFileTypes.dds };
+            options.outputFileType = new() { fileType = TexconvEnums.TexconvEnumFileTypes.tiff };
 
             TexconvApp.RunTexconv(sourceFile, options);
         }

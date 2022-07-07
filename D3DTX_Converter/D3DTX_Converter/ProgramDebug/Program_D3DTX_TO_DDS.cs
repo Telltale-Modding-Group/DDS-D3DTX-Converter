@@ -1,24 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Text;
 using D3DTX_Converter.Utilities;
+using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
 using D3DTX_Converter.Texconv;
 using D3DTX_Converter.TexconvOptions;
+using D3DTX_Converter.ImageProcessing;
+using Newtonsoft.Json;
 
-namespace D3DTX_Converter.ProgramModes
+namespace D3DTX_Converter.ProgramDebug
 {
-    public static class Program_TIFF_TO_DDS
+    public static class Program_D3DTX_TO_DDS
     {
-        public static void Execute()
+        public static void Execute(bool applyDDS_Fixes = false)
         {
             //intro message
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Blue, ConsoleColor.White);
-            Console.WriteLine("TIFF to DDS Texture Converter");
+            Console.WriteLine("D3DTX to DDS Texture Converter");
 
             //-----------------GET TEXTURE FOLDER PATH-----------------
             ConsoleFunctions.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White);
-            Console.WriteLine("Enter the folder path with the TIFF textures.");
+            Console.WriteLine("Enter the folder path with the D3DTX textures.");
 
             //texture folder path (containing the path to the textures to be converted)
             string textureFolderPath = Program_Shared.GetFolderPathFromUser();
@@ -36,7 +42,7 @@ namespace D3DTX_Converter.ProgramModes
             Console.WriteLine("Conversion Starting...");
 
             //we got our paths, so lets begin
-            ConvertBulk(textureFolderPath, resultFolderPath);
+            Convert_D3DTX_Bulk(textureFolderPath, resultFolderPath, applyDDS_Fixes);
 
             //once the process is finished, it will come back here and we will notify the user that we are done
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
@@ -49,7 +55,7 @@ namespace D3DTX_Converter.ProgramModes
         /// </summary>
         /// <param name="texPath"></param>
         /// <param name="resultPath"></param>
-        public static void ConvertBulk(string texPath, string resultPath)
+        public static void Convert_D3DTX_Bulk(string texPath, string resultPath, bool applyDDS_Fixes = false)
         {
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
             Console.WriteLine("Collecting Files..."); //notify the user we are collecting files
@@ -60,20 +66,20 @@ namespace D3DTX_Converter.ProgramModes
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
             Console.WriteLine("Filtering Textures..."); //notify the user we are filtering the array
 
-            //filter the array so we only get .tiff files
-            textures = IOManagement.FilterFiles(textures, new string[2] { Main_Shared.tifExtension, Main_Shared.tiffExtension});
+            //filter the array so we only get .d3dtx files
+            textures = IOManagement.FilterFiles(textures, Main_Shared.d3dtxExtension);
 
-            //if no tiff files were found, abort the program from going on any further (we don't have any files to convert!)
+            //if no d3dtx files were found, abort the program from going on any further (we don't have any files to convert!)
             if (textures.Count < 1)
             {
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
-                Console.WriteLine("No .tiff files were found, aborting."); //notify the user we found x amount of tiff files in the array
+                Console.WriteLine("No .d3dtx files were found, aborting."); //notify the user we found x amount of d3dtx files in the array
                 Console.ResetColor();
                 return;
             }
 
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
-            Console.WriteLine("Found {0} Textures.", textures.Count.ToString()); //notify the user we found x amount of tiff files in the array
+            Console.WriteLine("Found {0} Textures.", textures.Count.ToString()); //notify the user we found x amount of d3dtx files in the array
             Console.WriteLine("Starting...");//notify the user we are starting
 
             //run a loop through each of the found textures and convert each one
@@ -81,6 +87,8 @@ namespace D3DTX_Converter.ProgramModes
             {
                 //build the path for the resulting file
                 string textureFileName = Path.GetFileName(textures[i]); //get the file name of the file + extension
+                string textureFileNameOnly = Path.GetFileNameWithoutExtension(textures[i]);
+                string textureResultPath = resultPath + "/" + textureFileNameOnly + Main_Shared.ddsExtension; //add the file name to the resulting folder path, this is where our converted file will be placed
 
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
                 Console.WriteLine("||||||||||||||||||||||||||||||||");
@@ -89,7 +97,7 @@ namespace D3DTX_Converter.ProgramModes
                 Console.ResetColor();
 
                 //runs the main method for converting the texture
-                ConvertTextureFile(textures[i], resultPath);
+                ConvertTexture_FromD3DTX_ToDDS(textures[i], textureResultPath, applyDDS_Fixes);
 
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
                 Console.WriteLine("Finished converting '{0}'...", textureFileName); //notify the user we finished converting 'x' file.
@@ -98,19 +106,46 @@ namespace D3DTX_Converter.ProgramModes
         }
 
         /// <summary>
-        /// The main function for reading and converting said .tiff into a .dds file
+        /// The main function for reading and converting said .d3dtx into a .dds file
         /// </summary>
         /// <param name="sourceFile"></param>
         /// <param name="destinationFile"></param>
-        public static void ConvertTextureFile(string sourceFile, string destinationDirectory)
+        public static void ConvertTexture_FromD3DTX_ToDDS(string sourceFile, string destinationFile, bool applyDDS_Fixes = false)
         {
-            MasterOptions options = new();
-            options.outputDirectory = new() { directory = destinationDirectory };
-            options.outputOverwrite = new();
-            options.outputFormat = new() { format = DirectXTexNet.DXGI_FORMAT.BC1_UNORM };
-            options.outputFileType = new() { fileType = TexconvEnums.TexconvEnumFileTypes.dds };
+            D3DTX_Master d3dtx_file = new();
+            d3dtx_file.Read_D3DTX_File(sourceFile);
 
-            TexconvApp.RunTexconv(sourceFile, options);
+            DDS_Master dds_file = new(d3dtx_file);
+
+            //write the dds file to disk
+            dds_file.Write_D3DTX_AsDDS(d3dtx_file, destinationFile);
+
+            //write the d3dtx data into a file
+            d3dtx_file.Write_D3DTX_JSON(destinationFile);
+
+            //apply fixes after converting
+            if(applyDDS_Fixes)
+            {
+                //if a json file exists (for newer 5VSM and 6VSM)
+                TelltaleEnums.T3TextureType textureType = d3dtx_file.GetTextureType();
+
+                if (textureType == TelltaleEnums.T3TextureType.eTxBumpmap || textureType == TelltaleEnums.T3TextureType.eTxNormalMap)
+                {
+                    //this 'technically' works but the problem is that it's starting a different process so this acts like an async operation when everything else in here is synchronous
+                    //MasterOptions options = new();
+                    //options.outputDirectory = new() { directory = Path.GetDirectoryName(destinationFile) };
+                    //options.outputOverwrite = new();
+                    //options.outputSwizzle = new() { mask = "abgr" };
+
+                    //TexconvApp.RunTexconv(destinationFile, options);
+
+                    NormalMapProcessing.NormalMapSwizzleChannels(destinationFile);
+                }
+                else if (textureType == TelltaleEnums.T3TextureType.eTxNormalXYMap)
+                {
+                    NormalMapProcessing.NormalMapReconstructZ(destinationFile);
+                }
+            }
         }
     }
 }

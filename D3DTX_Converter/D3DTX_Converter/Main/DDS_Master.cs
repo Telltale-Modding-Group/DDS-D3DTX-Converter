@@ -154,34 +154,6 @@ namespace D3DTX_Converter.Main
                 header.dwMipMapCount = d3dtx.d3dtx9.mNumMipLevels;
                 header.dwDepth = d3dtx.d3dtx9.mDepth;
                 surfaceFormat = d3dtx.d3dtx9.mSurfaceFormat;
-
-                if (d3dtx.d3dtx9.mTextureLayout == T3TextureLayout.eTextureLayout_Cube)
-                {
-                    DDSCAPS ddscaps1 = (DDSCAPS)header.dwCaps;
-                    DDSCAPS2 ddscaps2 = (DDSCAPS2)header.dwCaps2;
-
-                    //bool test1 = FlagHelpers.IsSet(ddscaps1, DDSCAPS.DDSCAPS_TEXTURE);
-                    //bool test2 = FlagHelpers.IsSet(ddscaps1, DDSCAPS.DDSCAPS_MIPMAP);
-                    //bool test3 = FlagHelpers.IsSet(ddscaps1, DDSCAPS.DDSCAPS_COMPLEX);
-
-                    //Console.WriteLine("ddscaps1: DDSCAPS_TEXTURE {0}", test1);
-                    //Console.WriteLine("ddscaps2: DDSCAPS_MIPMAP {0}", test2);
-                    //Console.WriteLine("ddscaps3: DDSCAPS_COMPLEX {0}", test3);
-
-                    FlagHelpers.Set(ref ddscaps1, DDSCAPS.DDSCAPS_COMPLEX);
-                    FlagHelpers.Set(ref ddscaps2, DDSCAPS2.DDSCAPS2_CUBEMAP);
-
-                    header.dwCaps = (uint)ddscaps1;
-                    header.dwCaps2 = (uint)ddscaps1;
-
-                    Console.WriteLine(header.dwCaps);
-                    Console.WriteLine(header.dwCaps2);
-                }
-                else
-                {
-                    Console.WriteLine(header.dwCaps);
-                    Console.WriteLine(header.dwCaps2);
-                }
             }
 
             header.ddspf.dwFourCC = DDS.Get_FourCC_FromTellale(surfaceFormat);
@@ -395,98 +367,7 @@ namespace D3DTX_Converter.Main
         /// <param name="options"></param>
         public void Match_DDS_With_D3DTX(string ddsPath, D3DTX_Master d3dtx, DDS_Matching_Options options)
         {
-            //load in the DDS image using DirectXTexNet
-            ScratchImage scratchImage = TexHelper.Instance.LoadFromDDSFile(ddsPath, DDS_FLAGS.NONE);
-
-            //create our main variables that will be used when doing conversion operations
-            int d3dtx_width = 0;
-            int d3dtx_height = 0;
-            int d3dtx_mipAmount = 0;
-            T3SurfaceFormat d3dtx_format = T3SurfaceFormat.eSurface_DXT1;
-            T3SurfaceGamma d3dtx_gamma = T3SurfaceGamma.eSurfaceGamma_sRGB;
-
-            //assign the values depending on which version is active
-            if(d3dtx.d3dtx9 != null)
-            {
-                d3dtx_width = (int)d3dtx.d3dtx9.mWidth;
-                d3dtx_height = (int)d3dtx.d3dtx9.mHeight;
-                d3dtx_mipAmount = (int)d3dtx.d3dtx9.mNumMipLevels;
-                d3dtx_format = d3dtx.d3dtx9.mSurfaceFormat;
-                d3dtx_gamma = d3dtx.d3dtx9.mSurfaceGamma;
-            }
-            else if (d3dtx.d3dtx8 != null)
-            {
-                d3dtx_width = (int)d3dtx.d3dtx8.mWidth;
-                d3dtx_height = (int)d3dtx.d3dtx8.mHeight;
-                d3dtx_mipAmount = (int)d3dtx.d3dtx8.mNumMipLevels;
-                d3dtx_format = d3dtx.d3dtx8.mSurfaceFormat;
-                d3dtx_gamma = d3dtx.d3dtx8.mSurfaceGamma;
-            }
-            else if (d3dtx.d3dtx7 != null)
-            {
-                d3dtx_width = (int)d3dtx.d3dtx7.mWidth;
-                d3dtx_height = (int)d3dtx.d3dtx7.mHeight;
-                d3dtx_mipAmount = (int)d3dtx.d3dtx7.mNumMipLevels;
-                d3dtx_format = d3dtx.d3dtx7.mSurfaceFormat;
-                d3dtx_gamma = d3dtx.d3dtx7.mSurfaceGamma;
-            }
-            else if (d3dtx.d3dtx6 != null)
-            {
-                d3dtx_width = (int)d3dtx.d3dtx6.mWidth;
-                d3dtx_height = (int)d3dtx.d3dtx6.mHeight;
-                d3dtx_mipAmount = (int)d3dtx.d3dtx6.mNumMipLevels;
-                d3dtx_format = d3dtx.d3dtx6.mSurfaceFormat;
-                d3dtx_gamma = T3SurfaceGamma.eSurfaceGamma_sRGB; //this version doesn't have a surface gamma field, so give it an SRGB by default
-            }
-            else if (d3dtx.d3dtx5 != null)
-            {
-                d3dtx_width = (int)d3dtx.d3dtx5.mWidth;
-                d3dtx_height = (int)d3dtx.d3dtx5.mHeight;
-                d3dtx_mipAmount = (int)d3dtx.d3dtx5.mNumMipLevels;
-                d3dtx_format = d3dtx.d3dtx5.mSurfaceFormat;
-                d3dtx_gamma = T3SurfaceGamma.eSurfaceGamma_sRGB; //this version doesn't have a surface gamma field, so give it an SRGB by default
-            }
-            else if (d3dtx.d3dtx4 != null)
-            {
-                d3dtx_width = (int)d3dtx.d3dtx4.mWidth;
-                d3dtx_height = (int)d3dtx.d3dtx4.mHeight;
-                d3dtx_mipAmount = (int)d3dtx.d3dtx4.mNumMipLevels;
-                d3dtx_format = d3dtx.d3dtx4.mSurfaceFormat;
-                d3dtx_gamma = T3SurfaceGamma.eSurfaceGamma_sRGB; //this version doesn't have a surface gamma field, so give it an SRGB by default
-            }
-
-            //-------------------------------------- CONVERSION START --------------------------------------
-            //change the compression if needed
-            if (options.MatchCompression)
-            {
-                DXGI_FORMAT dxgi_format = DDS.GetSurfaceFormatAsDXGI(d3dtx_format, d3dtx_gamma);
-                scratchImage.Convert(dxgi_format, TEX_FILTER_FLAGS.DITHER, 0.0f);
-            }
-
-            //rescale the image to match if needed
-            if (options.MatchResolution)
-            {
-                scratchImage.Resize(d3dtx_width, d3dtx_height, TEX_FILTER_FLAGS.CUBIC);
-            }
-
-            //generate mip maps if needed
-            if (options.GenerateMipMaps)
-            {
-                if(options.MatchMipMapCount)
-                {
-                    scratchImage.GenerateMipMaps(0, TEX_FILTER_FLAGS.CUBIC, d3dtx_mipAmount, false);
-                }
-                else
-                {
-                    scratchImage.GenerateMipMaps(0, TEX_FILTER_FLAGS.CUBIC, 0, false);
-                }
-            }
-
-            //var test1 = scratchImage.GetImage(0);
-            //test1.
-
-            //resave the newly modified DDS
-            scratchImage.SaveToDDSFile(DDS_FLAGS.NONE, ddsPath);
+            
         }
     }
 }

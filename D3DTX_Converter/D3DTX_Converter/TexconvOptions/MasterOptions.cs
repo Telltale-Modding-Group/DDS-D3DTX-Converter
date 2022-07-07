@@ -71,6 +71,8 @@ namespace D3DTX_Converter.TexconvOptions
 
             arguments.Add(inputFilePath);
 
+            if (outputOverwrite != null) arguments.Add(outputOverwrite.GetArgumentOutput());
+
             if (outputWidth != null) arguments.Add(outputWidth.GetArgumentOutput());
             if (outputHeight != null) arguments.Add(outputHeight.GetArgumentOutput());
             if (outputMipMaps != null) arguments.Add(outputMipMaps.GetArgumentOutput());
@@ -97,7 +99,6 @@ namespace D3DTX_Converter.TexconvOptions
             if (outputNormalFromHeight != null) arguments.Add(outputNormalFromHeight.GetArgumentOutput());
             if (outputNormalFromHeightAmplitude != null) arguments.Add(outputNormalFromHeightAmplitude.GetArgumentOutput());
             if (outputNoWIC != null) arguments.Add(outputNoWIC.GetArgumentOutput());
-            if (outputOverwrite != null) arguments.Add(outputOverwrite.GetArgumentOutput());
             if (outputPowerOfTwo != null) arguments.Add(outputPowerOfTwo.GetArgumentOutput());
             if (outputPrefixString != null) arguments.Add(outputPrefixString.GetArgumentOutput());
             if (outputPremultiplyAlpha != null) arguments.Add(outputPremultiplyAlpha.GetArgumentOutput());

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ using System.Drawing.Imaging;
 
 namespace D3DTX_Converter.Utilities
 {
-    public static class Other
+    public static class ImageUtilities
     {
         public static bool IsImageOpaque(string imagePath)
         {

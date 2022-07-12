@@ -5,12 +5,13 @@ using D3DTX_Converter.Utilities;
 using D3DTX_Converter.Main;
 using D3DTX_Converter.Texconv;
 using D3DTX_Converter.TexconvOptions;
+using D3DTX_Converter.ImageProcessing;
 
 namespace D3DTX_Converter.ProgramDebug
 {
     public static class Program_DDS_TO_PNG
     {
-        public static void Execute()
+        public static void Execute(bool fixes_dds_to_generic)
         {
             //intro message
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Blue, ConsoleColor.White);
@@ -36,7 +37,7 @@ namespace D3DTX_Converter.ProgramDebug
             Console.WriteLine("Conversion Starting...");
 
             //we got our paths, so lets begin
-            ConvertBulk(textureFolderPath, resultFolderPath);
+            ConvertBulk(textureFolderPath, resultFolderPath, fixes_dds_to_generic);
 
             //once the process is finished, it will come back here and we will notify the user that we are done
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
@@ -49,7 +50,7 @@ namespace D3DTX_Converter.ProgramDebug
         /// </summary>
         /// <param name="texPath"></param>
         /// <param name="resultPath"></param>
-        public static void ConvertBulk(string texPath, string resultPath)
+        public static void ConvertBulk(string texPath, string resultPath, bool fixes_dds_to_generic)
         {
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
             Console.WriteLine("Collecting Files..."); //notify the user we are collecting files
@@ -89,7 +90,7 @@ namespace D3DTX_Converter.ProgramDebug
                 Console.ResetColor();
 
                 //runs the main method for converting the texture
-                ConvertTextureFile(textures[i], resultPath);
+                ConvertTextureFile(textures[i], resultPath, fixes_dds_to_generic);
 
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
                 Console.WriteLine("Finished converting '{0}'...", textureFileName); //notify the user we finished converting 'x' file.
@@ -102,7 +103,7 @@ namespace D3DTX_Converter.ProgramDebug
         /// </summary>
         /// <param name="sourceFile"></param>
         /// <param name="destinationFile"></param>
-        public static void ConvertTextureFile(string sourceFile, string destinationDirectory)
+        public static void ConvertTextureFile(string sourceFile, string destinationDirectory, bool fixes_dds_to_generic)
         {
             //deconstruct the source file path
             string textureFileDirectory = Path.GetDirectoryName(sourceFile);
@@ -110,12 +111,10 @@ namespace D3DTX_Converter.ProgramDebug
 
             //create the names of the following files
             string textureFileNameWithJSON = textureFileNameOnly + Main_Shared.jsonExtension;
-            string textureFileNameWithDDS = textureFileNameOnly + Main_Shared.ddsExtension;
 
             //create the path of these files. If things go well, these files (depending on the version) should exist in the same directory at the original .dds file.
-            string textureFilePath_JSON = textureFileDirectory + "/" + textureFileNameWithJSON;
-
-            string textureFilePath_DDS_temp = textureFileDirectory + "/TEMP_" + textureFileNameWithDDS;
+            string textureFilePath_JSON = textureFileDirectory + @"\" + textureFileNameWithJSON;
+            string outputTextureFilePath_PNG = destinationDirectory + @"\" + textureFileNameOnly + Main_Shared.pngExtension;
 
             //if a json file exists (for newer 5VSM and 6VSM)
             if (File.Exists(textureFilePath_JSON))
@@ -131,45 +130,55 @@ namespace D3DTX_Converter.ProgramDebug
 
                 if (d3dtxTextureType == TelltaleEnums.T3TextureType.eTxBumpmap || d3dtxTextureType == TelltaleEnums.T3TextureType.eTxNormalMap)
                 {
-                    //File.Copy(sourceFile, textureFilePath_DDS_temp);
+                    MasterOptions options = new();
+                    options.outputDirectory = new() { directory = destinationDirectory };
+                    options.outputOverwrite = new();
+                    options.outputFileType = new() { fileType = TexconvEnums.TexconvEnumFileTypes.png };
 
-                    //ddsFilePath = textureResultPath_DDS_Temp;
+                    if (fixes_dds_to_generic)
+                        options.outputSwizzle = new() { mask = "abgr" };
 
-                    //this 'technically' works but the problem is that it's starting a different process so this acts like an async operation when everything else in here is synchronous
-                    //MasterOptions options = new();
-                    //options.outputDirectory = new() { directory = Path.GetDirectoryName(sourceFilePath) };
-                    //options.outputOverwrite = new();
-                    //options.outputSwizzle = new() { mask = "abgr" };
-
-                    //TexconvApp.RunTexconv(destinationFile, options);
-
-                    //NormalMapProcessing.NormalMapSwizzleChannels(ddsFilePath);
+                    TexconvApp.RunTexconv(sourceFile, options);
                 }
                 else if (d3dtxTextureType == TelltaleEnums.T3TextureType.eTxNormalXYMap)
                 {
-                    //File.Copy(sourceFilePath, textureResultPath_DDS_Temp);
-
-                    //ddsFilePath = textureResultPath_DDS_Temp;
-
-                    //NormalMapProcessing.NormalMapOmitZ(ddsFilePath);
+                    if (fixes_dds_to_generic)
+                        NormalMapProcessing.FromDDS_NormalMapReconstructZ(sourceFile, System.Drawing.Imaging.ImageFormat.Png, outputTextureFilePath_PNG);
+                    else
+                        NormalMapConvert.ConvertNormalMapToPNG(sourceFile);
+                }
+                else
+                {
+                    MasterOptions options = new();
+                    options.outputDirectory = new() { directory = destinationDirectory };
+                    options.outputOverwrite = new();
+                    options.outputFileType = new() { fileType = TexconvEnums.TexconvEnumFileTypes.png };
+                    TexconvApp.RunTexconv(sourceFile, options);
                 }
             }
             //if we didn't find a json file, we're screwed!
             else
             {
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.DarkYellow);
-                Console.WriteLine("No .json was found for the file were trying to convert!!!!");
+                Console.WriteLine("NO '.json' WAS FOUND FOR THE FILE WE ARE TRYING TO CONVERT!!!!");
                 Console.WriteLine("{0}", textureFileNameOnly);
                 Console.WriteLine("Defaulting to classic conversion", textureFileNameOnly);
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.White);
+
+                MasterOptions options = new();
+                options.outputDirectory = new() { directory = destinationDirectory };
+                options.outputOverwrite = new();
+                options.outputFileType = new() { fileType = TexconvEnums.TexconvEnumFileTypes.png };
+                TexconvApp.RunTexconv(sourceFile, options);
             }
 
-            MasterOptions options = new();
-            options.outputDirectory = new() { directory = destinationDirectory };
-            options.outputOverwrite = new();
-            options.outputFileType = new() { fileType = TexconvEnums.TexconvEnumFileTypes.png };
-
-            TexconvApp.RunTexconv(sourceFile, options);
+            //check if the output file exists, if it doesn't then the conversion failed so notify the user
+            if (File.Exists(outputTextureFilePath_PNG) == false)
+            {
+                ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Red);
+                Console.WriteLine("Failed to convert DDS image into a PNG!!!");
+                Console.WriteLine("{0}", textureFileNameOnly);
+            }
         }
     }
 }

@@ -31,6 +31,7 @@ namespace D3DTX_Converter.Texconv
             Process texconvProcess = new();
             texconvProcess.StartInfo = textconvProcessStartInfo;
             texconvProcess.Start();
+            texconvProcess.WaitForExit(); //normally i'd let it run async but I like to work syncrhonsouly, just makes things easier.
         }
     }
 }

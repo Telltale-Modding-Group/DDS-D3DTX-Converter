@@ -21,6 +21,8 @@ namespace D3DTX_Converter.Main
     /// </summary>
     public class D3DTX_Master
     {
+        public string filePath;
+
         //meta header versions (objects at the top of the file)
         public MSV6 msv6;
         public MSV5 msv5;
@@ -41,6 +43,8 @@ namespace D3DTX_Converter.Main
         /// <param name="filePath"></param>
         public void Read_D3DTX_File(string filePath)
         {
+            this.filePath = filePath;
+
             //read meta version of the file
             string metaVersion = Read_D3DTX_File_MetaVersionOnly(filePath);
 
@@ -181,11 +185,9 @@ namespace D3DTX_Converter.Main
             }
         }
 
-        public void Write_D3DTX_JSON(string destinationPath)
+        public void Write_D3DTX_JSON(string fileName, string destinationDirectory)
         {
-            string fileName = Path.GetFileNameWithoutExtension(destinationPath);
-            string fileDirectory = Path.GetDirectoryName(destinationPath);
-            string newPath = fileDirectory + "/" + fileName + Main_Shared.jsonExtension;
+            string newPath = destinationDirectory + "/" + fileName + Main_Shared.jsonExtension;
 
             //open a stream writer to create the text file and write to it
             using (StreamWriter file = File.CreateText(newPath))
@@ -362,6 +364,19 @@ namespace D3DTX_Converter.Main
                 return d3dtx9.mNumMipLevels;
             else
                 return 0;
+        }
+
+        public bool HasMipMaps()
+        {
+            bool state;
+            uint mipCount = GetMipMapCount();
+
+            if (mipCount > 1)
+                state = true;
+            else
+                state = false;
+
+            return state;
         }
 
         public List<byte[]> GetPixelData()

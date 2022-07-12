@@ -293,18 +293,18 @@ namespace D3DTX_Converter.Main
         /// </summary>
         /// <param name="d3dtx"></param>
         /// <param name="destinationPath"></param>
-        public void Write_D3DTX_AsDDS(D3DTX_Master d3dtx, string destinationPath)
+        public void Write_D3DTX_AsDDS(D3DTX_Master d3dtx, string destinationDirectory)
         {
-            if(d3dtx.IsCubeTexture())
+            string d3dtxFilePath = d3dtx.filePath;
+            string fileName = Path.GetFileNameWithoutExtension(d3dtxFilePath);
+
+            if (d3dtx.IsCubeTexture())
             {
                 int regionCount = d3dtx.GetRegionCount();
                 int mipCount = (int)d3dtx.GetMipMapCount();
                 int cubeSurfacesAmount = regionCount / mipCount;
 
-                string fileExtension = Path.GetExtension(destinationPath);
-                string fileName = Path.GetFileNameWithoutExtension(destinationPath);
-                string originalPath = destinationPath.Remove(destinationPath.Length - fileExtension.Length, fileExtension.Length);
-                string newCubeDirectory = originalPath + "/";
+                string newCubeDirectory = destinationDirectory + "/" + fileName + "/";
 
                 if(Directory.Exists(newCubeDirectory) == false)
                 {
@@ -315,13 +315,13 @@ namespace D3DTX_Converter.Main
                 {
                     string cubeFaceName = GetCubeFaceName(i);
 
-                    string newFileName = string.Format("{0}{1}_Cube{2}{3}", newCubeDirectory, fileName, cubeFaceName, fileExtension);
+                    string newFileName = string.Format("{0}{1}_Cube{2}{3}", newCubeDirectory, fileName, cubeFaceName, Main_Shared.ddsExtension);
 
                     //turn our header data into bytes to be written into a file
                     byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
 
                     //copy the dds header to the file
-                    byte[] finalData = new byte[0];
+                    byte[] finalData = Array.Empty<byte>();
                     finalData = ByteFunctions.Combine(finalData, dds_header);
 
                     List<byte[]> pixelData = d3dtx.GetPixelDataByFaceIndex(i);
@@ -343,7 +343,7 @@ namespace D3DTX_Converter.Main
                 byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
 
                 //copy the dds header to the file
-                byte[] finalData = new byte[0];
+                byte[] finalData = Array.Empty<byte>();
                 finalData = ByteFunctions.Combine(finalData, dds_header);
 
                 List<byte[]> pixelData = d3dtx.GetPixelData();
@@ -355,7 +355,8 @@ namespace D3DTX_Converter.Main
                 }
 
                 //write the file to the disk
-                File.WriteAllBytes(destinationPath, finalData);
+                string newDDSPath = destinationDirectory + "/" + fileName + Main_Shared.ddsExtension;
+                File.WriteAllBytes(newDDSPath, finalData);
             }
         }
 

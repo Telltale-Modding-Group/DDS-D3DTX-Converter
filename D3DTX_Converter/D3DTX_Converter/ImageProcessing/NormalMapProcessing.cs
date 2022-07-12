@@ -16,83 +16,10 @@ namespace D3DTX_Converter.ImageProcessing
     public static class NormalMapProcessing
     {
         /// <summary>
-        /// Custom color struct that has singles/floats instead of bytes
-        /// </summary>
-        private struct ColorFloat
-        {
-            public float r;
-            public float g;
-            public float b;
-            public float a;
-
-            public ColorFloat(Color color)
-            {
-                r = (float)color.R / (float)byte.MaxValue;
-                g = (float)color.G / (float)byte.MaxValue;
-                b = (float)color.B / (float)byte.MaxValue;
-                a = (float)color.A / (float)byte.MaxValue;
-            }
-
-            /// <summary>
-            /// Returns a (System.Drawing.Color) Color object.
-            /// </summary>
-            /// <returns></returns>
-            public Color GetColor()
-            {
-                byte scaledR = (byte)(r * (float)byte.MaxValue);
-                byte scaledG = (byte)(g * (float)byte.MaxValue);
-                byte scaledB = (byte)(b * (float)byte.MaxValue);
-                byte scaledA = (byte)(a * (float)byte.MaxValue);
-
-                return Color.FromArgb(scaledA, scaledR, scaledG, scaledB);
-            }
-        }
-
-        public static float ClampFloat(float value, float min, float max)
-        {
-            return value < min ? min : value > max ? max : value;
-        }
-        
-        public static PixelFormat GetPixelFormat(Pfim.ImageFormat format)
-        {
-            PixelFormat newFormat = PixelFormat.Undefined;
-
-            switch (format)
-            {
-                case Pfim.ImageFormat.Rgba32:
-                    newFormat = PixelFormat.Format32bppArgb;
-                    break;
-                case Pfim.ImageFormat.Rgba16:
-                    newFormat = PixelFormat.Format16bppArgb1555;
-                    break;
-                case Pfim.ImageFormat.R5g5b5a1:
-                    newFormat = PixelFormat.Format16bppArgb1555;
-                    break;
-                case Pfim.ImageFormat.R5g5b5:
-                    newFormat = PixelFormat.Format16bppRgb555;
-                    break;
-                case Pfim.ImageFormat.R5g6b5:
-                    newFormat = PixelFormat.Format16bppRgb565;
-                    break;
-                case Pfim.ImageFormat.Rgb24:
-                    newFormat = PixelFormat.Format24bppRgb;
-                    break;
-                case Pfim.ImageFormat.Rgb8:
-                    newFormat = PixelFormat.Format8bppIndexed;
-                    break;
-                default:
-                    // see the sample for more details
-                    throw new NotImplementedException();
-            }
-
-            return newFormat;
-        }
-
-        /// <summary>
         /// Reconstructs the Blue/Z channel on a normal map image and saves it to the disk.
         /// </summary>
-        /// <param name="sourceFile"></param>
-        public static void NormalMapReconstructZ(string sourceFile)
+        /// <param name="sourceFilePath"></param>
+        public static void FromDDS_NormalMapReconstructZ(string sourceFilePath, System.Drawing.Imaging.ImageFormat savedFormat, string outputPath)
         {
             /*
              * Note: Yes texconv.exe does have a -reconstructz option...
@@ -102,9 +29,9 @@ namespace D3DTX_Converter.ImageProcessing
             */
 
             //open up the image
-            using (var image = Pfim.Pfim.FromFile(sourceFile))
+            using (var image = Pfim.Pfim.FromFile(sourceFilePath))
             {
-                PixelFormat format = GetPixelFormat(image.Format);
+                PixelFormat format = ImageProcessingShared.GetPixelFormat(image.Format);
 
                 var handle = GCHandle.Alloc(image.Data, GCHandleType.Pinned);
 
@@ -163,106 +90,7 @@ namespace D3DTX_Converter.ImageProcessing
                     }
 
                     //save the new image
-                    bitmap.Save(sourceFile);
-                    bitmap.Dispose();
-                }
-                finally
-                {
-                    handle.Free();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Removes the Blue/Z channel on a normal map image and saves it to the disk.
-        /// </summary>
-        /// <param name="sourceFile"></param>
-        public static void NormalMapOmitZ(string sourceFile)
-        {
-            //open up the image
-            using (var image = Pfim.Pfim.FromFile(sourceFile))
-            {
-                PixelFormat format = GetPixelFormat(image.Format);
-
-                var handle = GCHandle.Alloc(image.Data, GCHandleType.Pinned);
-
-                try
-                {
-                    var data = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
-                    var bitmap = new Bitmap(image.Width, image.Height, image.Stride, format, data);
-
-                    //get the original width/height
-                    int imageWidth = bitmap.Width;
-                    int imageHeight = bitmap.Height;
-
-                    //loop through each pixel (x and y)
-                    for (int x = 0; x < imageWidth; x++)
-                    {
-                        for (int y = 0; y < imageHeight; y++)
-                        {
-                            //get the current pixel value at the current position
-                            Color currentPixel = bitmap.GetPixel(x, y); //8 bit pixel color value... (System.Drawing.Color)
-
-                            //convert it back to a System.Drawing.Color (which is back to 8 bit...)
-                            Color newPixel = Color.FromArgb(currentPixel.A, currentPixel.R, currentPixel.G, 0);
-
-                            //set the new color value to the coresponding pixel
-                            bitmap.SetPixel(x, y, newPixel);
-                        }
-                    }
-
-                    //save the new image
-                    bitmap.Save(sourceFile);
-                    bitmap.Dispose();
-                }
-                finally
-                {
-                    handle.Free();
-                }
-            }
-        }
-
-        public static void NormalMapSwizzleChannels(string sourceFile)
-        {
-            /*
-            * Note: Yes texconv.exe does have a swizzle option and it does work.
-            * But I have this in here just in case.
-            */
-
-            //open up the image
-            using (var image = Pfim.Pfim.FromFile(sourceFile))
-            {
-                PixelFormat format = GetPixelFormat(image.Format);
-
-                var handle = GCHandle.Alloc(image.Data, GCHandleType.Pinned);
-
-                try
-                {
-                    var data = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
-                    var bitmap = new Bitmap(image.Width, image.Height, image.Stride, format, data);
-
-                    //get the original width/height
-                    int imageWidth = bitmap.Width;
-                    int imageHeight = bitmap.Height;
-
-                    //loop through each pixel (x and y)
-                    for (int x = 0; x < imageWidth; x++)
-                    {
-                        for (int y = 0; y < imageHeight; y++)
-                        {
-                            //get the current pixel value at the current position
-                            Color currentPixel = bitmap.GetPixel(x, y); //8 bit pixel color value... (System.Drawing.Color)
-
-                            //convert it back to a System.Drawing.Color (which is back to 8 bit...)
-                            Color newPixel = Color.FromArgb(currentPixel.R, currentPixel.A, currentPixel.B, currentPixel.G);
-
-                            //set the new color value to the coresponding pixel
-                            bitmap.SetPixel(x, y, newPixel);
-                        }
-                    }
-
-                    //save the new image
-                    bitmap.Save(sourceFile);
+                    bitmap.Save(outputPath, savedFormat);
                     bitmap.Dispose();
                 }
                 finally

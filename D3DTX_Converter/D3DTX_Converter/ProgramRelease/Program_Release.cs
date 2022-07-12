@@ -26,10 +26,6 @@ namespace D3DTX_Converter.ProgramRelease
 
             ArgumentInputPath argumentInputPath;
             ArgumentMode argumentMode;
-            ArgumentMatchCompressionWithOriginal argumentMatchCompressionWithOriginal;
-            ArgumentMatchMipMapsWithOriginal argumentMatchMipMapsWithOriginal;
-            ArgumentMatchResolutionWithOriginal argumentMatchResolutionWithOriginal;
-            ArgumentSwizzleNormals argumentSwizzleNormals;
             ArgumentOutputPath argumentOutputPath;
 
             for(int i = 0; i < args.Length; i++)

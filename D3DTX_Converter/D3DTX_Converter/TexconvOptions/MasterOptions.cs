@@ -67,17 +67,16 @@ namespace D3DTX_Converter.TexconvOptions
 
         public string GetArguments(string inputFilePath)
         {
-            List<string> arguments = new List<string>();
+            List<string> arguments = new();
 
             arguments.Add(inputFilePath);
+            arguments.Add("-r");
 
             if (outputOverwrite != null) arguments.Add(outputOverwrite.GetArgumentOutput());
 
             if (outputWidth != null) arguments.Add(outputWidth.GetArgumentOutput());
             if (outputHeight != null) arguments.Add(outputHeight.GetArgumentOutput());
             if (outputMipMaps != null) arguments.Add(outputMipMaps.GetArgumentOutput());
-
-            if (outputFileType != null) arguments.Add(outputFileType.GetArgumentOutput());
 
             if (outputAlphaThreshold != null) arguments.Add(outputAlphaThreshold.GetArgumentOutput());
             if (outputAlphaWeighting != null) arguments.Add(outputAlphaWeighting.GetArgumentOutput());
@@ -126,11 +125,11 @@ namespace D3DTX_Converter.TexconvOptions
             if (outputWICMultiFrameEncoding != null) arguments.Add(outputWICMultiFrameEncoding.GetArgumentOutput());
             if (outputWrapMode != null) arguments.Add(outputWrapMode.GetArgumentOutput());
 
+            if (outputFileType != null) arguments.Add(outputFileType.GetArgumentOutput());
+
             if (outputDirectory != null) arguments.Add(outputDirectory.GetArgumentOutput());
 
-            string finalizedArguments = string.Join(" ", arguments.ToArray());
-
-            return finalizedArguments;
+            return string.Join(" ", arguments.ToArray());
         }
     }
 }

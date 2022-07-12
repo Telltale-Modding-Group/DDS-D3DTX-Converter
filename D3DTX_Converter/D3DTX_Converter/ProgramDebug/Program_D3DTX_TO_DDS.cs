@@ -16,7 +16,7 @@ namespace D3DTX_Converter.ProgramDebug
 {
     public static class Program_D3DTX_TO_DDS
     {
-        public static void Execute(bool applyDDS_Fixes = false)
+        public static void Execute()
         {
             //intro message
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Blue, ConsoleColor.White);
@@ -42,7 +42,7 @@ namespace D3DTX_Converter.ProgramDebug
             Console.WriteLine("Conversion Starting...");
 
             //we got our paths, so lets begin
-            Convert_D3DTX_Bulk(textureFolderPath, resultFolderPath, applyDDS_Fixes);
+            Convert_D3DTX_Bulk(textureFolderPath, resultFolderPath);
 
             //once the process is finished, it will come back here and we will notify the user that we are done
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
@@ -55,13 +55,13 @@ namespace D3DTX_Converter.ProgramDebug
         /// </summary>
         /// <param name="texPath"></param>
         /// <param name="resultPath"></param>
-        public static void Convert_D3DTX_Bulk(string texPath, string resultPath, bool applyDDS_Fixes = false)
+        public static void Convert_D3DTX_Bulk(string texPath, string resultPath)
         {
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
             Console.WriteLine("Collecting Files..."); //notify the user we are collecting files
 
             //gather the files from the texture folder path into an array
-            List<string> textures = new List<string>(Directory.GetFiles(texPath));
+            List<string> textures = new(Directory.GetFiles(texPath));
 
             ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Yellow);
             Console.WriteLine("Filtering Textures..."); //notify the user we are filtering the array
@@ -97,7 +97,7 @@ namespace D3DTX_Converter.ProgramDebug
                 Console.ResetColor();
 
                 //runs the main method for converting the texture
-                ConvertTexture_FromD3DTX_ToDDS(textures[i], textureResultPath, applyDDS_Fixes);
+                ConvertTexture_FromD3DTX_ToDDS(textures[i], textureResultPath);
 
                 ConsoleFunctions.SetConsoleColor(ConsoleColor.Black, ConsoleColor.Green);
                 Console.WriteLine("Finished converting '{0}'...", textureFileName); //notify the user we finished converting 'x' file.
@@ -110,41 +110,35 @@ namespace D3DTX_Converter.ProgramDebug
         /// </summary>
         /// <param name="sourceFile"></param>
         /// <param name="destinationFile"></param>
-        public static void ConvertTexture_FromD3DTX_ToDDS(string sourceFile, string destinationFile, bool applyDDS_Fixes = false)
+        public static void ConvertTexture_FromD3DTX_ToDDS(string sourceFile, string destinationFile)
         {
             D3DTX_Master d3dtx_file = new();
             d3dtx_file.Read_D3DTX_File(sourceFile);
 
+            TelltaleEnums.T3TextureType textureType = d3dtx_file.GetTextureType();
+
             DDS_Master dds_file = new(d3dtx_file);
 
-            //write the dds file to disk
-            dds_file.Write_D3DTX_AsDDS(d3dtx_file, destinationFile);
+            string destinationDirectory = Path.GetDirectoryName(destinationFile);
 
-            //write the d3dtx data into a file
-            d3dtx_file.Write_D3DTX_JSON(destinationFile);
-
-            //apply fixes after converting
-            if(applyDDS_Fixes)
+            //write cubemap
+            if(textureType == TelltaleEnums.T3TextureType.eTxEnvMap || textureType == TelltaleEnums.T3TextureType.eTxPrefilteredEnvCubeMapHDR || textureType == TelltaleEnums.T3TextureType.eTxPrefilteredEnvCubeMapHDRScaled)
             {
-                //if a json file exists (for newer 5VSM and 6VSM)
-                TelltaleEnums.T3TextureType textureType = d3dtx_file.GetTextureType();
+                //write the dds file to disk
+                dds_file.Write_D3DTX_AsDDS(d3dtx_file, destinationDirectory);
 
-                if (textureType == TelltaleEnums.T3TextureType.eTxBumpmap || textureType == TelltaleEnums.T3TextureType.eTxNormalMap)
-                {
-                    //this 'technically' works but the problem is that it's starting a different process so this acts like an async operation when everything else in here is synchronous
-                    //MasterOptions options = new();
-                    //options.outputDirectory = new() { directory = Path.GetDirectoryName(destinationFile) };
-                    //options.outputOverwrite = new();
-                    //options.outputSwizzle = new() { mask = "abgr" };
+                //write the d3dtx data into a file
+                string jsonPath = destinationDirectory + "/" + Path.GetFileNameWithoutExtension(d3dtx_file.filePath);
+                d3dtx_file.Write_D3DTX_JSON(Path.GetFileNameWithoutExtension(d3dtx_file.filePath), jsonPath);
+            }
+            //write regular single images
+            else
+            {
+                //write the dds file to disk
+                dds_file.Write_D3DTX_AsDDS(d3dtx_file, destinationDirectory);
 
-                    //TexconvApp.RunTexconv(destinationFile, options);
-
-                    NormalMapProcessing.NormalMapSwizzleChannels(destinationFile);
-                }
-                else if (textureType == TelltaleEnums.T3TextureType.eTxNormalXYMap)
-                {
-                    NormalMapProcessing.NormalMapReconstructZ(destinationFile);
-                }
+                //write the d3dtx data into a file
+                d3dtx_file.Write_D3DTX_JSON(Path.GetFileNameWithoutExtension(d3dtx_file.filePath), destinationDirectory);
             }
         }
     }

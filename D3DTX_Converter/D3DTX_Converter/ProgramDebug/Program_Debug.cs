@@ -27,7 +27,7 @@ namespace D3DTX_Converter.ProgramDebug
 
         //main conversion to and from d3dtx
         public static bool mode_d3dtx_to_dds = false; //.d3dtx ---> .dds
-        public static bool mode_dds_to_d3dtx = false; //.dds ---> .d3dtx
+        public static bool mode_dds_to_d3dtx = true; //.dds ---> .d3dtx
 
         public static bool fixes_generic_to_dds = true; //FIXES normal maps and swizzle channels
         public static bool fixes_dds_to_generic = true; //FIXES normal maps and swizzle channels
@@ -52,9 +52,24 @@ namespace D3DTX_Converter.ProgramDebug
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.Blue, ConsoleColor.White);
+            Console.WriteLine("D3DTX to DDS Texture Converter");
+
+            ConsoleFunctions.SetConsoleColor(ConsoleColor.DarkGreen, ConsoleColor.White);
+            Console.WriteLine("Enter 1 for d3dtx to dds. Enter 2 for d3dtx to dds.");
+
+            //texture folder path (containing the path to the textures to be converted)
+            string val = Console.ReadLine();
+            int a = Convert.ToInt32(val);
+            if (a == 1) { Program_D3DTX_TO_DDS.Execute(); return; }
+            else if (a == 2) { Program_DDS_TO_D3DTX.Execute(); return; }
+            else { ConsoleFunctions.SetConsoleColor(ConsoleColor.Red, ConsoleColor.White); ;  Console.WriteLine("Invalid Input."); return; }
+
+
+
             //main conversion to and from d3dtx
-            if (mode_d3dtx_to_dds) { Program_D3DTX_TO_DDS.Execute(); return; }
-            if (mode_dds_to_d3dtx) { Program_DDS_TO_D3DTX.Execute(); return; }
+            //if (mode_d3dtx_to_dds) { Program_D3DTX_TO_DDS.Execute(); return; }
+            //if (mode_dds_to_d3dtx) { Program_DDS_TO_D3DTX.Execute(); return; }
 
             //dds into standard images
             if (mode_dds_to_png) { Program_DDS_TO_PNG.Execute(fixes_dds_to_generic); return; }

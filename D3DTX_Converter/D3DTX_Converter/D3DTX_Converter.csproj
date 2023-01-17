@@ -10,6 +10,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  
+  
 
   <ItemGroup>
     <PackageReference Include="DirectXTexNet" Version="1.0.3" />

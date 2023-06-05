@@ -21,6 +21,8 @@ This is an application designed for converting **.d3dtx textures (Telltale Tool 
 
 This is currently being developed and tested only with ***"The Walking Dead Telltale Definitive Series"*** textures. (for the time being)
 
+For The Walking Dead Season 1 (2012) and older games texture editing check out [this tutorial.](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BTutorial%5D-The-Walking-Dead-Season-1-(and-older-games)-Texture-Editing-Tutorial)
+
 ### Limitations
 
 1. Only supports **The Walking Dead Definitive Edition** textures *(for the time being)*

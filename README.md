@@ -25,25 +25,27 @@ For The Walking Dead Season 1 (2012) and older games texture editing check out [
 
 ### Limitations
 
-1. Only supports **The Walking Dead Definitive Edition** textures *(for the time being)*
-2. Can't upscale or downscale the texture resolution *(for the time being)*
-3. Not all textures are supported, textures like **'specular maps'** *(some of them)*, **'ink maps'**, **'normal maps'** *(some of them)* may not be converted by the tool properly. *(for the time being)* **However the majority of the regular color/diffuse/albedo and even alpha textures should be supported.**
+1. Can't upscale or downscale the texture resolution *(for the time being)*
+2. Not all textures are supported, textures like **'specular maps'** *(some of them)*, **'ink maps'**, **'normal maps'** *(some of them)* may not be converted by the tool properly. *(for the time being)* **However the majority of the regular color/diffuse/albedo and even alpha textures should be supported.**
+3. Untested on most of the games, but it should work. Please report any issues.
 
-**NOTE: (NOT CURRENTLY, BUT FOR VERSION 2)**
+**TESTED**
 - The Wolf Among Us *(5VSM)*
-- The Walking Dead: Season Two *(5VSM)*
-- Tales from the Borderlands *(5VSM)*
-- Game of Thrones *(5VSM)*
 - Minecraft: Story Mode *(5VSM)*
+- The Walking Dead: Season Two *(5VSM)*
 - The Walking Dead: Michonne *(5VSM)*
-- Batman: The Telltale Series *(6VSM)*
-- The Walking Dead: A New Frontier *(6VSM)*
-- Guardians of the Galaxy: The Telltale Series *(6VSM)*
+- Tales from the Borderlands *(5VSM)*
 - Minecraft: Story Mode – Season Two *(6VSM)*
-- Batman: The Enemy Within *(6VSM)*
-- The Walking Dead Collection? (not sure) *(6VSM)*
+- The Walking Dead: A New Frontier *(6VSM)*
 - The Walking Dead: The Final Season *(6VSM)*
 - The Walking Dead: The Telltale Definitive Series *(6VSM)*
+
+**UNTESTED**
+- Game of Thrones *(5VSM)*
+- Batman: The Telltale Series *(6VSM)*
+- Guardians of the Galaxy: The Telltale Series *(6VSM)*
+- Batman: The Enemy Within *(6VSM)*
+- The Walking Dead Collection? (not sure) *(6VSM)*
 
 ## How to use?
 
@@ -57,12 +59,13 @@ For The Walking Dead Season 1 (2012) and older games texture editing check out [
 
 *Only for modders/developers who plan on forking/modifying/downloading the project*
 
-There are 2 projects in this repository, **TextureMod_GUI** being the main application release with a GUI and it has the texture conversion functionality. The other project **D3DTX_TextureConverter** is a console application has texture conversion functionality as well but no GUI, however this ocassionally will be more up to date and newer than the GUI project's conversion functionality. The reason for that is that it's faster to test and iterate with the console application than the GUI application.
+There are 3 projects in this repository, **TextureMod_GUI** being the main application release with a GUI and it has the texture conversion functionality. The other project **D3DTX_TextureConverter** is a console application has texture conversion functionality as well but no GUI, however this ocassionally will be more up to date and newer than the GUI project's conversion functionality. The reason for that is that it's faster to test and iterate with the console application than the GUI application. **DDS_D3DTX_Converter** is the latest application, which is a GUI of **D3DTX_TextureConverter**. **DDS_D3DTX_Converter** aims to be cross-platform, however currently it only supports .d3dtx -> .dds file conversions.
 
-If you are new and don't want to deal with a console application and would rather have a user-friendly interface then use **TextureMod_GUI**, however if your comfortable with using a console application you can use the  **D3DTX_TextureConverter** BUT it will require you to change the code directly to set some parameters or switch to a different mode.
+If you are new and don't want to deal with a console application and would rather have a user-friendly interface then use **DDS_D3DTX_Converter** (**TextureMod_GUI is outdated**), however if your comfortable with using a console application you can use the  **D3DTX_TextureConverter** BUT it will require you to change the code directly to set some parameters or switch to a different mode.
 
 **If you want to learn about the file format** I suggest you look in the **D3DTX_TextureConverter** and look at the **[Main Folder](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/tree/main/D3DTX_TextureConverter/D3DTX_TextureConverter/Main)** scripts, it's is well documented and describes the .d3dtx format and .dds format well.
 
 ### CREDITS
 
 - I would like to thank [Lucas Saragosa](https://github.com/LucasSaragosa) especially for helping me figure out and perfect my scripting for parsing the D3DTX file format. I've also used his [TelltaleToolLib](https://github.com/LucasSaragosa/TelltaleToolLib) as an inspiration and guide to helping me out as well.
+- [SVG Repo](https://www.svgrepo.com/) for the GUI icons.

@@ -25,13 +25,16 @@ For The Walking Dead Season 1 (2012) and older games texture editing check out [
 
 ### Limitations
 
-1. Only supports **The Walking Dead Definitive Edition** textures *(for the time being)*
-2. Can't upscale or downscale the texture resolution *(for the time being)*
-3. Not all textures are supported, textures like **'specular maps'** *(some of them)*, **'ink maps'**, **'normal maps'** *(some of them)* may not be converted by the tool properly. *(for the time being)* **However the majority of the regular color/diffuse/albedo and even alpha textures should be supported.**
+1. Can't upscale or downscale the texture resolution *(for the time being)*
+2. Not all textures are supported, textures like **'specular maps'** *(some of them)*, **'ink maps'**, **'normal maps'** *(some of them)* may not be converted by the tool properly. *(for the time being)* **However the majority of the regular color/diffuse/albedo and even alpha textures should be supported.**
+3. Untested on most of the games, but it should work. Please report any issues.
 
-**NOTE: (NOT CURRENTLY, BUT FOR VERSION 2)**
-- The Wolf Among Us *(5VSM)*
+**TESTED**
+- The Walking Dead Definitive Edition
 - The Walking Dead: Season Two *(5VSM)*
+
+**UNTESTED**
+- The Wolf Among Us *(5VSM)*
 - Tales from the Borderlands *(5VSM)*
 - Game of Thrones *(5VSM)*
 - Minecraft: Story Mode *(5VSM)*

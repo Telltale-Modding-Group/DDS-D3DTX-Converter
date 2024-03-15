@@ -47,23 +47,7 @@ public partial class App : Application
         {
             try
             {
-                // Create the "Crashes" directory if it doesn't exist
-                string crashesDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Crashes");
-                Directory.CreateDirectory(crashesDirectory);
-
-                // Create a new text file with the current date as the file name
-                string logFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".txt";
-                string logFilePath = Path.Combine(crashesDirectory, logFileName);
-
-                using (StreamWriter writer = new StreamWriter(logFilePath))
-                {
-                    writer.WriteLine("Timestamp: " + DateTime.Now);
-                    writer.WriteLine("Error Details: " + e.Message);
-                    writer.WriteLine("Stack Trace:\n" + e.StackTrace);
-                    writer.WriteLine("------------------------------------------");
-                    writer.Close();
-                }
-                
+                Logger.Instance.Log(e);
             }
             catch (IOException ex)
             {

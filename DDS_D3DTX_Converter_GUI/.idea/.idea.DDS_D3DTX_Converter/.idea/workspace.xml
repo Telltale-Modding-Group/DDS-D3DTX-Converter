@@ -7,7 +7,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9eb1dd33-8c4a-4170-a41b-24b670d63eb4" name="Changes" comment="" />
+    <list default="true" id="9eb1dd33-8c4a-4170-a41b-24b670d63eb4" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/DDS_D3DTX_Converter/Logger.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.DDS_D3DTX_Converter/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DDS_D3DTX_Converter/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DDS_D3DTX_Converter/App.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DDS_D3DTX_Converter/App.axaml.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,37 +20,41 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 8
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2dit2CffnamuDalkIJQEl9vX6Wz" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "rider.external.source.directories": [
-      "C:\\Users\\ivani\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\DecompilerCache",
-      "C:\\Users\\ivani\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\SourcesCache",
-      "C:\\Users\\ivani\\AppData\\Local\\Symbols\\src"
+  &quot;keyToStringList&quot;: {
+    &quot;rider.external.source.directories&quot;: [
+      &quot;C:\\Users\\ivani\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\DecompilerCache&quot;,
+      &quot;C:\\Users\\ivani\\AppData\\Roaming\\JetBrains\\Rider2023.3\\resharper-host\\SourcesCache&quot;,
+      &quot;C:\\Users\\ivani\\AppData\\Local\\Symbols\\src&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager">
+    <configuration name="DDS_D3DTX_Converter: FolderProfile" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
+      <riderPublish publish_profile="FolderProfile.pubxml" pubxml_path="$PROJECT_DIR$/DDS_D3DTX_Converter/Properties/PublishProfiles/FolderProfile.pubxml" uuid_high="4997415041525302690" uuid_low="-5031551572421469166" />
+      <method v="2" />
+    </configuration>
     <configuration name="DDS_D3DTX_Converter: FolderProfile" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
       <riderPublish publish_profile="FolderProfile.pubxml" pubxml_path="$PROJECT_DIR$/DDS_D3DTX_Converter/Properties/PublishProfiles/FolderProfile.pubxml" uuid_high="4997415041525302690" uuid_low="-5031551572421469166" />
       <method v="2" />
@@ -61,6 +69,7 @@
       <option name="presentableId" value="Default" />
       <updated>1710502518362</updated>
       <workItem from="1710502519665" duration="1398000" />
+      <workItem from="1710508017975" duration="3373000" />
     </task>
     <servers />
   </component>

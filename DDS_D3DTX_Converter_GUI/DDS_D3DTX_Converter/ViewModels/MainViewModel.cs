@@ -23,6 +23,8 @@ namespace DDS_D3DTX_Converter.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
+    #region MEMBERS
+
     private readonly ObservableCollection<FormatItemViewModel> _d3dtxTypes =
         [new FormatItemViewModel { Name = ".dds", ItemStatus = true }];
 
@@ -39,18 +41,14 @@ public partial class MainViewModel : ViewModelBase
         [new FormatItemViewModel { Name = ".dds", ItemStatus = true }];
 
     private readonly List<string> _allTypes = [".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".d3dtx", ".dds"];
-
-    #region Members
-
     private readonly MainManager mainManager = MainManager.GetInstance();
     private readonly Uri _assetsUri = new("avares://DDS_D3DTX_Converter/Assets/");
     private static readonly string ErrorSvgFilename = "error.svg";
-
     private WorkingDirectoryFile? _dataGridSelectedItem;
 
     #endregion
 
-    #region Properties
+    #region UI PROPERTIES
 
     [ObservableProperty] private ImageProperties _imageProperties;
     [ObservableProperty] private FormatItemViewModel _selectedFormat;
@@ -421,8 +419,6 @@ public partial class MainViewModel : ViewModelBase
 
     #endregion
 
-    ////------------------------------------- MAIN AXAML FUNCTIONS -------------------------------------
-
     #region CONVERTER PANEL ACTIONS
 
     /// <summary>
@@ -479,8 +475,8 @@ public partial class MainViewModel : ViewModelBase
             var mainWindow = GetMainWindow();
             var messageBox =
                 MessageBoxes.GetErrorBox(ex.Message);
-
             MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+            Logger.Instance.Log(ex);
         }
         finally
         {

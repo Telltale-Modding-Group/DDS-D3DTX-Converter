@@ -30,23 +30,22 @@ For The Walking Dead Season 1 (2012) and older games texture editing check out [
 3. Untested on most of the games, but it should work. Please report any issues.
 
 **TESTED**
-- The Walking Dead Definitive Edition
-- The Walking Dead: Season Two *(5VSM)*
-
-**UNTESTED**
 - The Wolf Among Us *(5VSM)*
-- Tales from the Borderlands *(5VSM)*
-- Game of Thrones *(5VSM)*
 - Minecraft: Story Mode *(5VSM)*
+- The Walking Dead: Season Two *(5VSM)*
 - The Walking Dead: Michonne *(5VSM)*
-- Batman: The Telltale Series *(6VSM)*
-- The Walking Dead: A New Frontier *(6VSM)*
-- Guardians of the Galaxy: The Telltale Series *(6VSM)*
+- Tales from the Borderlands *(5VSM)*
 - Minecraft: Story Mode – Season Two *(6VSM)*
-- Batman: The Enemy Within *(6VSM)*
-- The Walking Dead Collection? (not sure) *(6VSM)*
+- The Walking Dead: A New Frontier *(6VSM)*
 - The Walking Dead: The Final Season *(6VSM)*
 - The Walking Dead: The Telltale Definitive Series *(6VSM)*
+
+**UNTESTED**
+- Game of Thrones *(5VSM)*
+- Batman: The Telltale Series *(6VSM)*
+- Guardians of the Galaxy: The Telltale Series *(6VSM)*
+- Batman: The Enemy Within *(6VSM)*
+- The Walking Dead Collection? (not sure) *(6VSM)*
 
 ## How to use?
 

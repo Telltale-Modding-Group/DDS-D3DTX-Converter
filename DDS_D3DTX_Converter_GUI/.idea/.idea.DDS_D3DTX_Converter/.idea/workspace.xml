@@ -9,7 +9,6 @@
   <component name="ChangeListManager">
     <list default="true" id="9eb1dd33-8c4a-4170-a41b-24b670d63eb4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.DDS_D3DTX_Converter/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.DDS_D3DTX_Converter/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DDS_D3DTX_Converter/Texconv/TexconvApp.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DDS_D3DTX_Converter/Texconv/TexconvApp.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,6 +17,10 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/756ffe1faa6f4c7a927e1bdd63bd2f1d5400/b5/1db9d640/ScratchImage.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/756ffe1faa6f4c7a927e1bdd63bd2f1d5400/e7/f48b9c5b/TexHelper.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -69,7 +72,7 @@
       <updated>1710502518362</updated>
       <workItem from="1710502519665" duration="1398000" />
       <workItem from="1710508017975" duration="3792000" />
-      <workItem from="1710514003520" duration="3138000" />
+      <workItem from="1710514003520" duration="4484000" />
     </task>
     <servers />
   </component>

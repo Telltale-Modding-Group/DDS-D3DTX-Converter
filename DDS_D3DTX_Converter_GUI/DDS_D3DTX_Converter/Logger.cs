@@ -7,7 +7,12 @@ public class Logger
 {
     static readonly string CrashesDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Crashes");
 
-    public static Logger Instance { get; private set; }
+    private static Logger? _instance;
+
+    public static Logger Instance()
+    {
+        return _instance ??= new Logger();
+    }
 
     static Logger()
     {

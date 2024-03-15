@@ -476,7 +476,7 @@ public partial class MainViewModel : ViewModelBase
             var messageBox =
                 MessageBoxes.GetErrorBox(ex.Message);
             MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
-            Logger.Instance.Log(ex);
+            Logger.Instance().Log(ex);
         }
         finally
         {

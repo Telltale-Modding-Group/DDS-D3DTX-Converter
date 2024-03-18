@@ -378,15 +378,15 @@ namespace D3DTX_Converter.Main
             if (d3dtx4 != null)
                 return d3dtx4.mHeight;
             else if (d3dtx5 != null)
-                return d3dtx4.mHeight;
+                return d3dtx5.mHeight;
             else if (d3dtx6 != null)
-                return d3dtx4.mHeight;
+                return d3dtx6.mHeight;
             else if (d3dtx7 != null)
-                return d3dtx4.mHeight;
+                return d3dtx7.mHeight;
             else if (d3dtx8 != null)
-                return d3dtx4.mHeight;
+                return d3dtx8.mHeight;
             else if (d3dtx9 != null)
-                return d3dtx4.mHeight;
+                return d3dtx9.mHeight;
             else
                 return 0;
         }

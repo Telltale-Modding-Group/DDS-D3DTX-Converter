@@ -11,6 +11,7 @@ on:
     
 env:
   GUI_PROJECT_PATH : 'DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/DDS_D3DTX_Converter.csproj'
+  OUTPUT_PROJECT_PATH : 'Builds'
 
 jobs:
   build:
@@ -29,3 +30,12 @@ jobs:
       run: dotnet build ${{env.GUI_PROJECT_PATH}} --configuration Release --no-restore
     - name: Test
       run: dotnet test ${{env.GUI_PROJECT_PATH}} --no-build --verbosity normal
+    - name: Publish
+      run: dotnet publish ${{env.GUI_PROJECT_PATH}} --configuration Release --no-build
+    - name: Zip
+      run: zip -r DDS_D3DTX_Converter.zip ./my_project/bin/Release/net8.0/publish/
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: DDS_D3DTX_Converter
+        path: Builds/DDS_D3DTX_Converter.zip

@@ -33,7 +33,7 @@ jobs:
     - name: Publish
       run: dotnet publish ${{env.GUI_PROJECT_PATH}} --configuration Release --no-build
     - name: Zip
-      run: zip -r DDS_D3DTX_Converter.zip ./my_project/bin/Release/net8.0/publish/
+      run: zip -r DDS_D3DTX_Converter.zip ./DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/bin/Release/net8.0/publish/
     - name: Upload build artifact
       uses: actions/upload-artifact@v2
       with:

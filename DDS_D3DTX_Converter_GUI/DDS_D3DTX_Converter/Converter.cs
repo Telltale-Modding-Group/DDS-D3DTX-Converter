@@ -296,18 +296,14 @@ namespace DDS_D3DTX_Converter
                     if (fixesDdsToGeneric)
                         options.outputSwizzle = new() { mask = "abgr" };
 
-                    Console.WriteLine("EXEC1");
                     TexconvApp.RunTexconv(sourceFilePath, options);
-                    Console.WriteLine("OUT1");
                 }
                 else if (d3dtxTextureType == D3DTX_Converter.TelltaleEnums.T3TextureType.eTxNormalXYMap)
                 {
-                    Console.WriteLine("EXEC2");
                     if (fixesDdsToGeneric)
                         NormalMapProcessing.FromDDS_NormalMapReconstructZ(sourceFilePath, outputTextureFilePath);
                     else
-                        NormalMapConvert.ConvertNormalMapToOthers(sourceFilePath, newFileType); //lol
-                    Console.WriteLine("OUT2");
+                        NormalMapConvert.ConvertNormalMapToOthers(sourceFilePath, newFileType);
                 }
                 else
                 {

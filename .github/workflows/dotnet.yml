@@ -22,9 +22,9 @@ jobs:
         dotnet-version: 8.0.x
     - name: Restore dependencies
       run: dotnet restore
-      working-directory: ./DDS-D3DTX-Converter/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter
+      working-directory: ./DDS-D3DTX-Converter/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/
     - name: Build
       run: dotnet build --no-restore
-      working-directory: ./DDS-D3DTX-Converter/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter
+      working-directory: ./DDS-D3DTX-Converter/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/
     - name: Test
       run: dotnet test --no-build --verbosity normal

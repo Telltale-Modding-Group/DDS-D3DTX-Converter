@@ -25,7 +25,6 @@ using System.Runtime.InteropServices;
  * Batman Season One (Re-Release?) (TESTED)
  * The Walking Dead: A New Frontier (TESTED)
  * Guardians of the Galaxy: The Telltale Series (UNTESTED)
- * Minecraft Story Mode: Season Two (TESTED)
  * Batman: The Enemy Within (UNTESTED)
  * The Walking Dead Collection (UNTESTED)
  * The Walking Dead: The Final Season (TESTED)

@@ -37,5 +37,5 @@ jobs:
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
       with:
-        name: DDS_D3DTX_Converter.zip
+        name: DDS_D3DTX_Converter
         path: ./DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/bin/Release/net8.0/publish/

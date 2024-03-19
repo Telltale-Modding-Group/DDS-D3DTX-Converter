@@ -10,7 +10,7 @@ on:
     branches: [ "main" ]
     
 env:
-  GUI_PROJECT_PATH : 'DDS-D3DTX-Converter/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/DDS_D3DTX_Converter.csproj'
+  GUI_PROJECT_PATH : 'DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/DDS_D3DTX_Converter.csproj'
 
 jobs:
   build:

@@ -24,6 +24,6 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-      working-directory: ./DDS-D3DTX-Converter/DDS_D3DTX_Converter_GUI
+      working-directory: ./DDS-D3DTX-Converter/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter
     - name: Test
       run: dotnet test --no-build --verbosity normal

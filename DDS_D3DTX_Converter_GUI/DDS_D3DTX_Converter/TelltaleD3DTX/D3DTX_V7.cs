@@ -148,7 +148,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
         /// <summary>
         /// [4 bytes] Defines the format of the normal map.
         /// </summary>
-        public float mNormalMapFormat { get; set; }
+        public int mNormalMapFormat { get; set; }
 
         /// <summary>
         /// [4 bytes] Defines the brightness scale of the texture. (used for lightmaps)

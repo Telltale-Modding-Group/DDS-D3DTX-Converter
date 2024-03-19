@@ -124,7 +124,7 @@ namespace D3DTX_Converter.Main
         public void Write_Final_D3DTX(string destinationPath)
         {
             using BinaryWriter writer = new(File.OpenWrite(destinationPath));
-            
+
             if (msv6 != null) msv6.WriteBinaryData(writer);
             else if (msv5 != null) msv5.WriteBinaryData(writer);
             else if (mtre != null) mtre.WriteBinaryData(writer);
@@ -289,7 +289,7 @@ namespace D3DTX_Converter.Main
             string metaStreamVersion = "";
 
             using BinaryReader reader = new(File.OpenRead(sourceFile));
-            
+
             for (int i = 0; i < 4; i++) metaStreamVersion += reader.ReadChar();
 
             return metaStreamVersion;
@@ -309,7 +309,7 @@ namespace D3DTX_Converter.Main
             MTRE metaERTM = null;
 
             using BinaryReader reader = new(File.OpenRead(sourceFile));
-            
+
             if (metaVersion.Equals("6VSM")) meta6VSM = new(reader, false);
             else if (metaVersion.Equals("5VSM")) meta5VSM = new(reader, false);
             else if (metaVersion.Equals("ERTM")) metaERTM = new(reader, false);
@@ -341,8 +341,8 @@ namespace D3DTX_Converter.Main
         {
             if (d3dtx4 != null)
                 return d3dtx4.mType;
-            //else if (d3dtx5 != null)
-            //return d3dtx5.mType;
+            else if (d3dtx5 != null)
+                return d3dtx5.mType;
             else if (d3dtx6 != null)
                 return d3dtx6.mType;
             else if (d3dtx7 != null)

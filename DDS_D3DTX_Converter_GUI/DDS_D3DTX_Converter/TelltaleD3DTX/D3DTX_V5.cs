@@ -27,6 +27,7 @@ using D3DTX_Converter.Main;
  * Tales from the Borderlands (Original?) (UNTESTED)
  * Game of Thrones (UNTESTED)
  * Minecraft Story Mode: Season One (TESTED)
+ * Minecraft Story Mode: Season Two (UNTESTED)
 */
 
 namespace D3DTX_Converter.TelltaleD3DTX
@@ -132,14 +133,14 @@ namespace D3DTX_Converter.TelltaleD3DTX
         public int Unknown2 { get; set; }
 
         /// <summary>
-        /// [4 bytes] Unknown Value 3 in d3dtx.
+        /// [4 bytes] An enum, defines what kind of texture it is.
         /// </summary>
-        public int Unknown3 { get; set; }
+        public T3TextureType mType { get; set; }
 
         /// <summary>
-        /// [4 bytes] Unknown Value 4 in d3dtx.
+        /// [4 bytes] Defines the format of the normal map.
         /// </summary>
-        public int Unknown4 { get; set; }
+        public int mNormalMapFormat { get; set; }
 
         /// <summary>
         /// [4 bytes] Defines how glossy the texture is.
@@ -243,8 +244,8 @@ namespace D3DTX_Converter.TelltaleD3DTX
             mResourceUsage = T3TextureBase.GetResourceUsage(reader.ReadInt32()); //mResourceUsage [4 bytes]
             Unknown1 = reader.ReadInt32(); //Unknown 1 [4 bytes]
             Unknown2 = reader.ReadInt32(); //Unknown 2 [4 bytes]
-            Unknown3 = reader.ReadInt32(); //Unknown 3 [4 bytes]
-            Unknown4 = reader.ReadInt32(); //Unknown 4 [4 bytes]
+            mType = (T3TextureType)reader.ReadInt32(); //mType [4 bytes]
+            mNormalMapFormat = reader.ReadInt32(); //mNormalMapFormat [4 bytes]
             mSpecularGlossExponent = reader.ReadSingle(); //mSpecularGlossExponent [4 bytes]
             mHDRLightmapScale = reader.ReadSingle(); //mHDRLightmapScale [4 bytes]
             mToonGradientCutoff = reader.ReadSingle(); //mToonGradientCutoff [4 bytes]
@@ -348,8 +349,8 @@ namespace D3DTX_Converter.TelltaleD3DTX
             writer.Write((int)mResourceUsage); //mResourceUsage [4 bytes]
             writer.Write(Unknown1); //Unknown1 [4 bytes]
             writer.Write(Unknown2); //Unknown2 [4 bytes]
-            writer.Write(Unknown3); //Unknown3 [4 bytes]
-            writer.Write(Unknown4); //Unknown4 [4 bytes]
+            writer.Write((int)mType); //Unknown3 [4 bytes]
+            writer.Write(mNormalMapFormat); //Unknown4 [4 bytes]
             writer.Write(mSpecularGlossExponent); //mSpecularGlossExponent [4 bytes]
             writer.Write(mHDRLightmapScale); //mHDRLightmapScale [4 bytes]
             writer.Write(mToonGradientCutoff); //mToonGradientCutoff [4 bytes]
@@ -413,8 +414,8 @@ namespace D3DTX_Converter.TelltaleD3DTX
             Console.WriteLine("D3DTX mResourceUsage = {0} ({1})", Enum.GetName(typeof(T3ResourceUsage), mResourceUsage), (int)mResourceUsage);
             Console.WriteLine("Unknown 1 = {0}", Unknown1);
             Console.WriteLine("Unknown 2 = {0}", Unknown2);
-            Console.WriteLine("Unknown 3 = {0}", Unknown3);
-            Console.WriteLine("Unknown 4 = {0}", Unknown4);
+            Console.WriteLine("D3DTX mType = {0}", mType);
+            Console.WriteLine("D3DTX mNormalMapFormat = {0}", mNormalMapFormat);
             Console.WriteLine("D3DTX mSpecularGlossExponent = {0}", mSpecularGlossExponent);
             Console.WriteLine("D3DTX mHDRLightmapScale = {0}", mHDRLightmapScale);
             Console.WriteLine("D3DTX mToonGradientCutoff = {0}", mToonGradientCutoff);
@@ -423,9 +424,9 @@ namespace D3DTX_Converter.TelltaleD3DTX
             Console.WriteLine("D3DTX mUVOffset = {0}", mUVOffset);
             Console.WriteLine("D3DTX mUVScale = {0}", mUVScale);
 
-          
+
             Console.WriteLine("----------- mToonRegions -----------");
-       
+
             Console.WriteLine("D3DTX mToonRegions_ArrayCapacity = {0}", mToonRegions_ArrayCapacity);
             Console.WriteLine("D3DTX mToonRegions_ArrayLength = {0}", mToonRegions_ArrayLength);
             for (int i = 0; i < mToonRegions_ArrayLength; i++)
@@ -440,7 +441,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
             Console.WriteLine("----------- mRegionHeaders -----------");
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
-  
+
                 Console.WriteLine("[mRegionHeader {0}]", i);
                 Console.WriteLine("D3DTX mFaceIndex = {0}", mRegionHeaders[i].mFaceIndex);
                 Console.WriteLine("D3DTX mMipIndex = {0}", mRegionHeaders[i].mMipIndex);

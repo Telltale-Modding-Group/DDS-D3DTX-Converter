@@ -233,10 +233,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
             mImportName = ByteFunctions.ReadString(reader); //mImportName [x bytes] (this is always 0)
             mImportScale = reader.ReadSingle(); //mImportScale [4 bytes]
             Unknown0 = reader.ReadInt32(); //Unknown 0 [4 bytes] always zero (tool props byte structure size?)
-            mToolProps = new ToolProps() //mToolProps [1 byte]
-            {
-                mbHasProps = reader.ReadBoolean()
-            };
+            mToolProps = new ToolProps(reader); //mToolProps [1 byte]
             mNumMipLevels = reader.ReadUInt32(); //mNumMipLevels [4 bytes]
             mWidth = reader.ReadUInt32(); //mWidth [4 bytes]
             mHeight = reader.ReadUInt32(); //mHeight [4 bytes]

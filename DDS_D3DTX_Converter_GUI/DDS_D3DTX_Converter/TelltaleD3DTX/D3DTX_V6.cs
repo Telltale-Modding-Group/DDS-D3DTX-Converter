@@ -296,7 +296,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
         {
             mWidth = dds.header.dwWidth;
             mHeight = dds.header.dwHeight;
-            mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC);
+            mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC, dds);
             //mDepth = dds.header.dwDepth;
         }
 

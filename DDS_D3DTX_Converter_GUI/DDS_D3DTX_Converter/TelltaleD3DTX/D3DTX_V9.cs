@@ -339,7 +339,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
         {
             mWidth = dds.header.dwWidth; //THIS IS CORRECT
             mHeight = dds.header.dwHeight; //THIS IS CORRECT
-            mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC); //THIS IS CORRECT
+            mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC, dds); //THIS IS CORRECT
             mDepth = dds.header.dwDepth; //THIS IS CORRECT
             mNumMipLevels = dds.header.dwMipMapCount; //THIS IS CORRECT
 

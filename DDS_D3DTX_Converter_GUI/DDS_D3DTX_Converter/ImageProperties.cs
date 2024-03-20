@@ -46,7 +46,7 @@ public class ImageProperties : ObservableObject
             MipMapCount = master.GetMipMapCount().ToString()
         };
     }
-    
+
     /// <summary>
     /// Gets the properties of the selected .dds file
     /// </summary>
@@ -57,19 +57,21 @@ public class ImageProperties : ObservableObject
 
         byte[] headerBytes = ByteFunctions.AllocateBytes(124, sourceFileData, 4);
 
+        //TODO: CHECK ALPHA IF IT'S CORRECT
+
         var header = DDS.GetHeaderFromBytes(headerBytes);
 
         byte[] bytes = BitConverter.GetBytes(header.ddspf.dwFourCC);
         string result = System.Text.Encoding.UTF8.GetString(bytes);
 
         result.Reverse();
-            
+
         string hasAlpha = "False";
-        if (header.ddspf.dwABitMask  > 0)
+        if (header.ddspf.dwABitMask > 0)
         {
             hasAlpha = "True";
         }
-            
+
         return new ImageProperties
         {
             Name = Path.GetFileNameWithoutExtension(ddsFilePath),
@@ -82,7 +84,7 @@ public class ImageProperties : ObservableObject
             MipMapCount = header.dwMipMapCount.ToString()
         };
     }
-    
+
     /// <summary>
     /// Get the needed image properties from the selected file, excluding .dds and .d3dtx.
     /// </summary>

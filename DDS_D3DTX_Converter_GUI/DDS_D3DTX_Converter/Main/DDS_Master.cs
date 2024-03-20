@@ -302,10 +302,9 @@ namespace D3DTX_Converter.Main
                 int mipCount = (int)d3dtx.GetMipMapCount();
                 int cubeSurfacesAmount = regionCount / mipCount;
 
-                string newCubeDirectory = destinationDirectory + +Path.DirectorySeparatorChar + fileName +
-                                          +Path.DirectorySeparatorChar;
+                string newCubeDirectory = destinationDirectory + Path.DirectorySeparatorChar + fileName + Path.DirectorySeparatorChar;
 
-                if (Directory.Exists(newCubeDirectory) == false)
+                if (!Directory.Exists(newCubeDirectory))
                 {
                     Directory.CreateDirectory(newCubeDirectory);
                 }

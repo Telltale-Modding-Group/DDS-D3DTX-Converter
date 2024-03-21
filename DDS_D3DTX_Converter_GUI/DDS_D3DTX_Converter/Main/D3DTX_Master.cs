@@ -449,6 +449,7 @@ namespace D3DTX_Converter.Main
         {
             if (d3dtx4 != null)
             {
+          
                 switch (d3dtx4.mColorMode)
                 {
                     case eTxColor.eTxColorFull:
@@ -460,7 +461,7 @@ namespace D3DTX_Converter.Main
                     case eTxColor.eTxColorGrayscaleAlpha:
                         return "2"; // Grayscale and alpha
                     default:
-                        return "Unknown";
+                        return "0";
                 }
             }
             else if (d3dtx5 != null)
@@ -476,7 +477,7 @@ namespace D3DTX_Converter.Main
                     case eTxColor.eTxColorGrayscaleAlpha:
                         return "2"; // Grayscale and alpha
                     default:
-                        return "Unknown";
+                        return "0";
                 }
             }
 
@@ -493,7 +494,7 @@ namespace D3DTX_Converter.Main
                     case eTxColor.eTxColorGrayscaleAlpha:
                         return "2"; // Grayscale and alpha
                     default:
-                        return "Unknown";
+                        return "0";
                 }
             }
 
@@ -510,7 +511,7 @@ namespace D3DTX_Converter.Main
                     case eTxColor.eTxColorGrayscaleAlpha:
                         return "2"; // Grayscale and alpha
                     default:
-                        return "Unknown";
+                        return "0";
                 }
             }
 
@@ -527,7 +528,7 @@ namespace D3DTX_Converter.Main
                     case eTxColor.eTxColorGrayscaleAlpha:
                         return "2"; // Grayscale and alpha
                     default:
-                        return "Unknown";
+                        return "0";
                 }
             }
 
@@ -544,7 +545,7 @@ namespace D3DTX_Converter.Main
                     case eTxColor.eTxColorGrayscaleAlpha:
                         return "2"; // Grayscale and alpha
                     default:
-                        return "Unknown";
+                        return "0";
                 }
             }
 

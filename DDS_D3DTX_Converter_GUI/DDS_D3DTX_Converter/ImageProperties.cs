@@ -32,8 +32,6 @@ public class ImageProperties : ObservableObject
     {
         var master = new D3DTX_Master();
         master.Read_D3DTX_File(filePath);
-        master.HasMipMaps();
-        master.GetMipMapCount();
 
         return new ImageProperties()
         {
@@ -65,6 +63,13 @@ public class ImageProperties : ObservableObject
         string result = System.Text.Encoding.UTF8.GetString(bytes);
 
         result.Reverse();
+
+        if (result == "DX10")
+        {
+            byte[] dx10_headerBytes = ByteFunctions.AllocateBytes(20, sourceFileData, 128);
+            var dx10_header = DDS.GetDX10HeaderFromBytes(dx10_headerBytes);
+            result += " (" + Enum.GetName(dx10_header.dxgiFormat) + ")";
+        }
 
         string hasAlpha = "False";
         if (header.ddspf.dwABitMask > 0)

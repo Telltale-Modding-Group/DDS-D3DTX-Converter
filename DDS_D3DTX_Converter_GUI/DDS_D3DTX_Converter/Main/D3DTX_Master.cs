@@ -409,7 +409,7 @@ namespace D3DTX_Converter.Main
                 return 0;
         }
 
-        public string GetCompressionType()
+        public string GetStringCompressionType()
         {
             if (d3dtx4 != null)
                 return Enum.GetName(d3dtx4.mSurfaceFormat).Remove(0, 9);
@@ -425,6 +425,24 @@ namespace D3DTX_Converter.Main
                 return Enum.GetName(d3dtx9.mSurfaceFormat).Remove(0, 9);
             else
                 return "Not Available";
+        }
+
+        public T3SurfaceFormat GetCompressionType()
+        {
+            if (d3dtx4 != null)
+                return d3dtx4.mSurfaceFormat;
+            else if (d3dtx5 != null)
+                return d3dtx5.mSurfaceFormat;
+            else if (d3dtx6 != null)
+                return d3dtx6.mSurfaceFormat;
+            else if (d3dtx7 != null)
+                return d3dtx7.mSurfaceFormat;
+            else if (d3dtx8 != null)
+                return d3dtx8.mSurfaceFormat;
+            else if (d3dtx9 != null)
+                return d3dtx9.mSurfaceFormat;
+            else
+                return T3SurfaceFormat.eSurface_Unknown;
         }
 
         public string GetChannelCount()

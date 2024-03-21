@@ -38,7 +38,7 @@ public class ImageProperties : ObservableObject
         return new ImageProperties()
         {
             Name = master.GetTextureName(),
-            CompressionType = master.GetCompressionType(),
+            CompressionType = master.GetStringCompressionType(),
             Width = master.GetWidth().ToString(),
             Height = master.GetHeight().ToString(),
             HasAlpha = master.GetHasAlpha(),

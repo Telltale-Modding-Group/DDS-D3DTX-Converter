@@ -301,15 +301,26 @@ namespace D3DTX_Converter.DirectX
 
             Marshal.Copy(byteArray, 0, ptr, size);
 
-
-            //Initialize DDS_HEADER_DXT10
-            DDS_HEADER_DXT10 dxt10HeaderObject = new();
-            //   dxt10HeaderObject.dxgiFormat = ;
-
             headerObject = (DDS_HEADER)Marshal.PtrToStructure(ptr, headerObject.GetType());
             Marshal.FreeHGlobal(ptr);
 
             return headerObject;
+        }
+
+        public static DDS_HEADER_DXT10 GetDX10HeaderFromBytes(byte[] byteArray)
+        {
+            DDS_HEADER_DXT10 dxt10HeaderObject = new();
+
+            int dx10_size = Marshal.SizeOf(dxt10HeaderObject);
+            IntPtr dx10_ptr = Marshal.AllocHGlobal(dx10_size);
+
+            Marshal.Copy(byteArray, 0, dx10_ptr, dx10_size);
+
+            dxt10HeaderObject = (DDS_HEADER_DXT10)Marshal.PtrToStructure(dx10_ptr, dxt10HeaderObject.GetType());
+            Marshal.FreeHGlobal(dx10_ptr);
+
+            Console.WriteLine("DXGI FORMAT: " + dxt10HeaderObject.dxgiFormat);
+            return dxt10HeaderObject;
         }
 
         /// <summary>
@@ -318,6 +329,24 @@ namespace D3DTX_Converter.DirectX
         /// <param name="header"></param>
         /// <returns></returns>
         public static byte[] GetHeaderBytes(DDS_HEADER header)
+        {
+            int size = Marshal.SizeOf(header);
+            byte[] arr = new byte[size];
+
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(header, ptr, true);
+            Marshal.Copy(ptr, arr, 0, size);
+            Marshal.FreeHGlobal(ptr);
+
+            return arr;
+        }
+
+        /// <summary>
+        /// Converts a DDS_HEADER_DXT10 object into a byte array.
+        /// </summary>
+        /// <param name="header"></param>
+        /// <returns></returns>
+        public static byte[] GetDXT10HeaderBytes(DDS_HEADER_DXT10 header)
         {
             int size = Marshal.SizeOf(header);
             byte[] arr = new byte[size];
@@ -365,6 +394,15 @@ namespace D3DTX_Converter.DirectX
                 dwCaps2 = 0,
                 dwCaps3 = 0,
                 dwCaps4 = 0,
+            };
+        }
+
+        public static DDS_HEADER_DXT10 GetPresetDXT10Header()
+        {
+            return new()
+            {
+                dxgiFormat = DXGI_FORMAT.R32G32B32_SINT,
+                resourceDimension = D3D10_RESOURCE_DIMENSION.D3D10_RESOURCE_DIMENSION_TEXTURE2D
             };
         }
 
@@ -433,17 +471,14 @@ namespace D3DTX_Converter.DirectX
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("ATI1")) return T3SurfaceFormat.eSurface_DXT5A;
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("BC4S")) return T3SurfaceFormat.eSurface_BC4;
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("BC5S")) return T3SurfaceFormat.eSurface_BC5;
-            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("DX10")) return Parse_T3Format_FromDX10(dds.sourceFileData);
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("DX10")) return Parse_T3Format_FromDX10(dds.dxt10_header.dxgiFormat);
             else return T3SurfaceFormat.eSurface_DXT1;
         }
 
-        public static T3SurfaceFormat Parse_T3Format_FromDX10(byte[] data)
+        public static T3SurfaceFormat Parse_T3Format_FromDX10(DXGI_FORMAT dxgi_format)
         {
-            int startIndex = 128;
-
-            int dxgi_format = BitConverter.ToInt32(data, startIndex);
-
-            return dxgi_format switch
+            Console.WriteLine((int)dxgi_format);
+            return (int)dxgi_format switch
             {
                 (int)DXGI_FORMAT.R8G8B8A8_UNORM_SRGB => T3SurfaceFormat.eSurface_ARGB8,
                 (int)DXGI_FORMAT.R8G8B8A8_UNORM => T3SurfaceFormat.eSurface_ARGB8,

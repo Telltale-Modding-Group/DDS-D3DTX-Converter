@@ -7,6 +7,7 @@ using D3DTX_Converter.Texconv;
 using D3DTX_Converter.TexconvOptions;
 using D3DTX_Converter.ImageProcessing;
 
+//DEPRECATED
 namespace D3DTX_Converter.ProgramDebug
 {
     public static class Program_DDS_TO_BMP

@@ -15,7 +15,7 @@ namespace D3DTX_Converter.Utilities
 {
     public static class ImageUtilities
     {
-        
+
         /// <summary>
         /// Checks if the image from a file path is transparent.
         /// </summary>
@@ -59,7 +59,7 @@ namespace D3DTX_Converter.Utilities
         /// <returns></returns>
         public static bool IsImageOpaque(Image<Rgba32> image)
         {
-            
+
             bool hasAlpha = false;
 
             image.ProcessPixelRows(pixelAccessor =>
@@ -86,7 +86,7 @@ namespace D3DTX_Converter.Utilities
 
             return hasAlpha;
         }
-      
+
         /// <summary>
         /// Converts .dds (and .tga) files to a bitmap. This is only used in the image preview.
         /// </summary>
@@ -97,12 +97,12 @@ namespace D3DTX_Converter.Utilities
         {
             //load the image
             using var image = Pfimage.FromFile(filePath);
-            
+
             //get the data
             var newData = image.Data;
             var newDataLen = image.DataLen;
             var stride = image.Stride;
-            
+
             //get the color type
             SKColorType colorType;
             switch (image.Format)
@@ -138,7 +138,7 @@ namespace D3DTX_Converter.Utilities
                 default:
                     throw new ArgumentException($"Skia unable to interpret pfim format: {image.Format}");
             }
-            
+
             //Converts the data into writeableBitmap. (TODO Insert a link to the code)
             var imageInfo = new SKImageInfo(image.Width, image.Height, colorType);
             var handle = GCHandle.Alloc(newData, GCHandleType.Pinned);
@@ -170,7 +170,7 @@ namespace D3DTX_Converter.Utilities
             // read the dimensions
             var width = tifImg.GetField(TiffTag.IMAGEWIDTH)[0].ToInt();
             var height = tifImg.GetField(TiffTag.IMAGELENGTH)[0].ToInt();
-            
+
             //Experimentation, ignore this
             //var smth = tifImg.GetField(TiffTag.COMPRESSION)[0].ToInt();
 
@@ -212,7 +212,7 @@ namespace D3DTX_Converter.Utilities
         }
 
         /// <summary>
-        /// Converts .d3dtx files to a bitmap. This is only used in the image preview.
+        /// Converts .d3dtx files to a bitmap (by converting to .dds first). This is only used in the image preview. 
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
@@ -221,20 +221,21 @@ namespace D3DTX_Converter.Utilities
             var d3dtx = new D3DTX_Master();
             d3dtx.Read_D3DTX_File(filePath);
             DDS_Master ddsFile = new(d3dtx);
+            //implement get without header (to see)
             var array = ddsFile.GetData(d3dtx);
             Stream stream = new MemoryStream(array);
+
             var image = Pfimage.FromStream(stream);
+            WriteableBitmap writeableBitmap = new WriteableBitmap(
+                  new PixelSize(image.Width, image.Height),
+                  new Vector(96, 96),
+                  PixelFormat.Bgra8888,
+                  AlphaFormat.Premul);
 
-          WriteableBitmap  writeableBitmap = new WriteableBitmap(
-                new PixelSize(image.Width, image.Height),
-                new Vector(96, 96),
-                PixelFormat.Bgra8888,
-                AlphaFormat.Premul);
+            using var lockedBitmap = writeableBitmap.Lock();
+            Marshal.Copy(image.Data, 0, lockedBitmap.Address, image.DataLen);
 
-          using var lockedBitmap = writeableBitmap.Lock();
-          Marshal.Copy(image.Data, 0, lockedBitmap.Address, image.DataLen);
-
-          return writeableBitmap;
+            return writeableBitmap;
         }
     }
 }

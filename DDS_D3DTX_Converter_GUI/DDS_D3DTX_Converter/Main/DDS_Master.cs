@@ -4,6 +4,9 @@ using System.IO;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
 using D3DTX_Converter.TelltaleEnums;
+using DirectXTexNet;
+using System.ComponentModel;
+using ExCSS;
 
 /*
  * DXT1 - DXGI_FORMAT_BC1_UNORM / D3DFMT_DXT1
@@ -50,6 +53,8 @@ namespace D3DTX_Converter.Main
         public uint[,] mipMapResolutions;
 
         public DDS_HEADER header;
+
+        public DDS_HEADER_DXT10 dxt10_header;
 
         /// <summary>
         /// A struct used when matching a DDS with a D3DTX.
@@ -105,7 +110,6 @@ namespace D3DTX_Converter.Main
             header = DDS.GetPresetHeader();
 
             T3SurfaceFormat surfaceFormat = T3SurfaceFormat.eSurface_DXT1;
-
             //header.dwCaps = DDSCAPS.DDSCAPS_TEXTURE | DDSCAPS.DDSCAPS_MIPMAP;
 
             if (d3dtx.d3dtx4 != null)
@@ -144,6 +148,7 @@ namespace D3DTX_Converter.Main
                 header.dwMipMapCount = d3dtx.d3dtx8.mNumMipLevels;
                 header.dwDepth = d3dtx.d3dtx8.mDepth;
                 surfaceFormat = d3dtx.d3dtx8.mSurfaceFormat;
+
             }
             else if (d3dtx.d3dtx9 != null)
             {
@@ -156,6 +161,19 @@ namespace D3DTX_Converter.Main
 
             header.ddspf.dwFourCC = DDS.Get_FourCC_FromTellale(surfaceFormat);
 
+            if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10"))
+            {
+                dxt10_header = DDS.GetPresetDXT10Header();
+                dxt10_header.dxgiFormat = DDS.GetSurfaceFormatAsDXGI(surfaceFormat);
+                dxt10_header.resourceDimension = d3dtx.IsCubeTexture() ? D3D10_RESOURCE_DIMENSION.D3D10_RESOURCE_DIMENSION_TEXTURE3D : D3D10_RESOURCE_DIMENSION.D3D10_RESOURCE_DIMENSION_TEXTURE2D;
+                dxt10_header.arraySize = 1; //TODO NEEDS TESTING
+            }
+
+            //Get the channel count for all formats in case they are not specified 
+            header.ddspf.dwRGBBitCount = UInt32.Parse(d3dtx.GetChannelCount()) * 8;
+
+
+            //TODO ADD OTHER FORMATS
             switch (surfaceFormat)
             {
                 case T3SurfaceFormat.eSurface_A8:
@@ -193,6 +211,13 @@ namespace D3DTX_Converter.Main
             Console.WriteLine("DDS Mip Map Count = {0}", header.dwMipMapCount);
             Console.WriteLine("DDS Compression = {0}", header.ddspf.dwFourCC);
 
+            //get dxt10 header if it exists
+            if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10"))
+            {
+                byte[] dxt10headerBytes = ByteFunctions.AllocateBytes(20, fileData, 128); //skip the main header
+                dxt10_header = DDS.GetDX10HeaderFromBytes(dxt10headerBytes);
+            }
+
             if (headerOnly)
                 return;
 
@@ -200,14 +225,17 @@ namespace D3DTX_Converter.Main
             //calculate dds header length (we add 4 because we skipped the 4 bytes which contain the ddsPrefix, it isn't necessary to parse this data)
             uint ddsHeaderLength = 4 + header.dwSize;
 
+            //if dxt10Header is present, add additional 20 bytes
+            uint dxt10HeaderLength = (uint)((header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10")) ? 20 : 0);
+
             //calculate the length of just the dds texture data
-            uint ddsTextureDataLength = (uint)sourceFileData.Length - ddsHeaderLength;
+            uint ddsTextureDataLength = (uint)sourceFileData.Length - ddsHeaderLength - dxt10HeaderLength;
 
             //allocate a byte array of dds texture length
             byte[] ddsTextureData = new byte[ddsTextureDataLength];
 
             //copy the data from the source byte array past the header (so we are only getting texture data)
-            Array.Copy(sourceFileData, ddsHeaderLength, ddsTextureData, 0, ddsTextureData.Length);
+            Array.Copy(sourceFileData, ddsHeaderLength + dxt10HeaderLength, ddsTextureData, 0, ddsTextureData.Length);
 
             textureData = new();
 
@@ -302,10 +330,9 @@ namespace D3DTX_Converter.Main
                 int mipCount = (int)d3dtx.GetMipMapCount();
                 int cubeSurfacesAmount = regionCount / mipCount;
 
-                string newCubeDirectory = destinationDirectory + +Path.DirectorySeparatorChar + fileName +
-                                          +Path.DirectorySeparatorChar;
+                string newCubeDirectory = destinationDirectory + Path.DirectorySeparatorChar + fileName + Path.DirectorySeparatorChar;
 
-                if (Directory.Exists(newCubeDirectory) == false)
+                if (!Directory.Exists(newCubeDirectory))
                 {
                     Directory.CreateDirectory(newCubeDirectory);
                 }
@@ -343,6 +370,11 @@ namespace D3DTX_Converter.Main
                 //turn our header data into bytes to be written into a file
                 byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
 
+                if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10"))
+                {
+                    dds_header = ByteFunctions.Combine(dds_header, DDS.GetDXT10HeaderBytes(dxt10_header));
+                }
+
                 //copy the dds header to the file
                 byte[] finalData = Array.Empty<byte>();
                 finalData = ByteFunctions.Combine(finalData, dds_header);
@@ -371,8 +403,6 @@ namespace D3DTX_Converter.Main
         public void Match_DDS_With_D3DTX(string ddsPath, D3DTX_Master d3dtx, DDS_Matching_Options options)
         {
         }
-
-      
 
         public byte[] GetData(D3DTX_Master d3dtx)
         {
@@ -411,6 +441,10 @@ namespace D3DTX_Converter.Main
             {
                 //turn our header data into bytes to be written into a file
                 byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
+                if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10"))
+                {
+                    dds_header = ByteFunctions.Combine(dds_header, DDS.GetDXT10HeaderBytes(dxt10_header));
+                }
 
                 //copy the dds header to the file
                 byte[] finalData = Array.Empty<byte>();

@@ -148,7 +148,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
         /// <summary>
         /// [4 bytes] Defines the format of the normal map.
         /// </summary>
-        public float mNormalMapFormat { get; set; }
+        public int mNormalMapFormat { get; set; }
 
         /// <summary>
         /// [4 bytes] Defines the brightness scale of the texture. (used for lightmaps)
@@ -250,14 +250,10 @@ namespace D3DTX_Converter.TelltaleD3DTX
             mImportName_BlockSize = reader.ReadInt32(); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
             mImportName = ByteFunctions.ReadString(reader); //mImportName [x bytes] (this is always 0)
             mImportScale = reader.ReadSingle(); //mImportScale [4 bytes]
-            mToolProps = new ToolProps() //mToolProps [1 byte]
-            {
-                mbHasProps = reader.ReadBoolean()
-            };
+            mToolProps = new ToolProps(reader); //mToolProps [1 byte]
             mNumMipLevels = reader.ReadUInt32(); //mNumMipLevels [4 bytes]
             mWidth = reader.ReadUInt32(); //mWidth [4 bytes]
             mHeight = reader.ReadUInt32(); //mHeight [4 bytes]
-
             mSurfaceFormat = T3TextureBase.GetSurfaceFormat(reader.ReadInt32()); //mSurfaceFormat [4 bytes]
             mTextureLayout = T3TextureBase.GetTextureLayout(reader.ReadInt32()); //mTextureLayout [4 bytes]
             mSurfaceGamma = T3TextureBase.GetSurfaceGamma(reader.ReadInt32()); //mSurfaceGamma [4 bytes]
@@ -359,7 +355,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
         {
             mWidth = dds.header.dwWidth;
             mHeight = dds.header.dwHeight;
-            mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC);
+            mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC, dds);
             //mDepth = dds.header.dwDepth;
         }
 
@@ -375,7 +371,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
             writer.Write(mImportName_BlockSize); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
             ByteFunctions.WriteString(writer, mImportName); //mImportName [x bytes] (this is always 0)
             writer.Write(mImportScale); //mImportScale [4 bytes]
-            writer.Write(mToolProps.mbHasProps); //mToolProps mbHasProps [1 byte]
+            ByteFunctions.WriteBoolean(writer, mToolProps.mbHasProps); //mToolProps mbHasProps [1 byte]
             writer.Write(mNumMipLevels); //mNumMipLevels [4 bytes]
             writer.Write(mWidth); //mWidth [4 bytes]
             writer.Write(mHeight); //mHeight [4 bytes]

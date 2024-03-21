@@ -1,19 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
-using D3DTX_Converter.Utilities;
-using D3DTX_Converter.ImageProcessing;
-using D3DTX_Converter.DirectX;
-using D3DTX_Converter.Main;
-using D3DTX_Converter.ProgramDebug;
-using Newtonsoft.Json;
-using System.Runtime.InteropServices;
-using D3DTX_Converter.TelltaleTypes;
-using D3DTX_Converter.TelltaleD3DTX;
-
+﻿//DEPRECATED
 namespace D3DTX_Converter.ProgramDebug
 {
     public static class Program_Debug

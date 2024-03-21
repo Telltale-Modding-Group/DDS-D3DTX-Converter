@@ -1,20 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
 using D3DTX_Converter_Avalonia_GUI.DirectX;
-using D3DTX_Converter.ImageProcessing;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
-using D3DTX_Converter.ImageProcessing;
-using D3DTX_Converter.Texconv;
-using D3DTX_Converter.TexconvOptions;
-using DirectXTexNet;
-using Newtonsoft.Json;
 
+//DEPRECATED
 namespace D3DTX_Converter.ProgramDebug
 {
     public static class Program_DDS_TO_D3DTX

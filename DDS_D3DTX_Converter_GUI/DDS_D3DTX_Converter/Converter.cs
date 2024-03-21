@@ -296,18 +296,14 @@ namespace DDS_D3DTX_Converter
                     if (fixesDdsToGeneric)
                         options.outputSwizzle = new() { mask = "abgr" };
 
-                    Console.WriteLine("EXEC1");
                     TexconvApp.RunTexconv(sourceFilePath, options);
-                    Console.WriteLine("OUT1");
                 }
                 else if (d3dtxTextureType == D3DTX_Converter.TelltaleEnums.T3TextureType.eTxNormalXYMap)
                 {
-                    Console.WriteLine("EXEC2");
                     if (fixesDdsToGeneric)
                         NormalMapProcessing.FromDDS_NormalMapReconstructZ(sourceFilePath, outputTextureFilePath);
                     else
-                        NormalMapConvert.ConvertNormalMapToOthers(sourceFilePath, newFileType); //lol
-                    Console.WriteLine("OUT2");
+                        NormalMapConvert.ConvertNormalMapToOthers(sourceFilePath, newFileType);
                 }
                 else
                 {
@@ -362,6 +358,8 @@ namespace DDS_D3DTX_Converter
 
             DDS_Master ddsFile = new(d3dtxFile);
 
+            //Literally the same? Probably for debugging reasons
+            
             //write cubemap
             if (textureType == D3DTX_Converter.TelltaleEnums.T3TextureType.eTxEnvMap ||
                 textureType == D3DTX_Converter.TelltaleEnums.T3TextureType.eTxPrefilteredEnvCubeMapHDR || textureType ==
@@ -371,9 +369,7 @@ namespace DDS_D3DTX_Converter
                 ddsFile.Write_D3DTX_AsDDS(d3dtxFile, destinationDirectory);
 
                 //write the d3dtx data into a file
-                string jsonPath = destinationDirectory + Path.DirectorySeparatorChar +
-                                  Path.GetFileNameWithoutExtension(d3dtxFile.filePath);
-                d3dtxFile.Write_D3DTX_JSON(Path.GetFileNameWithoutExtension(d3dtxFile.filePath), jsonPath);
+                d3dtxFile.Write_D3DTX_JSON(Path.GetFileNameWithoutExtension(d3dtxFile.filePath), destinationDirectory);
             }
             //write regular single images
             else

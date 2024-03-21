@@ -60,7 +60,7 @@ namespace D3DTX_Converter.Utilities
                 case '0':
                     return false;
                 default:
-                    return false;
+                    throw new Exception("Invalid mToolProps data.");
             }
         }
 

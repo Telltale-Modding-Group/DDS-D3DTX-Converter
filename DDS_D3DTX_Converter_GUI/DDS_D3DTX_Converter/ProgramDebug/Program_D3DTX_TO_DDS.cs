@@ -4,6 +4,7 @@ using System.IO;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.Main;
 
+//DEPRECATED
 namespace D3DTX_Converter.ProgramDebug
 {
     public static class Program_D3DTX_TO_DDS

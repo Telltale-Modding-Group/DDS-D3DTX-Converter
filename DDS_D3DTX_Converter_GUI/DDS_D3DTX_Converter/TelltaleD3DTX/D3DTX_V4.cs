@@ -205,10 +205,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
             mImportName_BlockSize = reader.ReadInt32(); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
             mImportName = ByteFunctions.ReadString(reader); //mImportName [x bytes] (this is always 0)
             mImportScale = reader.ReadSingle(); //mImportScale [4 bytes]
-            mToolProps = new ToolProps() //mToolProps [1 byte]
-            {
-                mbHasProps = reader.ReadBoolean()
-            };
+            mToolProps = new ToolProps(reader); //mToolProps [1 byte]
             mNumMipLevels = reader.ReadUInt32(); //mNumMipLevels [4 bytes]
             mWidth = reader.ReadUInt32(); //mWidth [4 bytes]
             mHeight = reader.ReadUInt32(); //mHeight [4 bytes]
@@ -291,7 +288,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
         {
             mWidth = dds.header.dwWidth;
             mHeight = dds.header.dwHeight;
-            mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC);
+            mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC, dds);
             mNumMipLevels = dds.header.dwMipMapCount;
 
             List<byte[]> ddsData = new List<byte[]>(dds.textureData); //this is correct
@@ -347,8 +344,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
             writer.Write(mImportName_BlockSize); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
             ByteFunctions.WriteString(writer, mImportName); //mImportName [x bytes] (this is always 0)
             writer.Write(mImportScale); //mImportScale [4 bytes]
-            //writer.Write(mToolProps.mbHasProps); //mToolProps mbHasProps [1 byte]
-            writer.Write('0');
+            ByteFunctions.WriteBoolean(writer, mToolProps.mbHasProps); //mToolProps mbHasProps [1 byte]
             writer.Write(mNumMipLevels); //mNumMipLevels [4 bytes]
             writer.Write(mWidth); //mWidth [4 bytes]
             writer.Write(mHeight); //mHeight [4 bytes]
@@ -357,7 +353,6 @@ namespace D3DTX_Converter.TelltaleD3DTX
 
             int padding = 0;
             writer.Write(padding); //extra padding [4 bytes]
-
             writer.Write(mNormalMapFormat); //mNormalMapFormat [4 bytes]
             writer.Write(mHDRLightmapScale); //mHDRLightmapScale [4 bytes]
             writer.Write(mToonGradientCutoff); //mToonGradientCutoff [4 bytes]

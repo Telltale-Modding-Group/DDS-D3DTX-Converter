@@ -1,4 +1,6 @@
-﻿using D3DTX_Converter.TelltaleEnums;
+﻿using CommunityToolkit.Mvvm.ComponentModel.__Internals;
+using D3DTX_Converter.Main;
+using D3DTX_Converter.TelltaleEnums;
 using D3DTX_Converter.TelltaleTypes;
 using D3DTX_Converter.Utilities;
 using DirectXTexNet;
@@ -14,6 +16,14 @@ namespace D3DTX_Converter.DirectX
     //Texutre Block Compression in D3D11 - https://docs.microsoft.com/en-us/windows/win32/direct3d11/texture-block-compression-in-direct3d-11
     //DDS Programming Guide - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide
 
+    //TODO Fix documentation
+    //TODO Other functions need documentation.
+    //TODO Delete functions which aren't used
+    //TODO Test formats
+
+    /// <summary>
+    /// The class is used for decoding and encoding .dds headers. 
+    /// </summary>
     public static class DDS
     {
         public static uint GetDDSBlockSize(DDS_HEADER header)
@@ -60,7 +70,7 @@ namespace D3DTX_Converter.DirectX
         {
             uint[] byteSizes = new uint[mipResolutions.GetLength(0)];
 
-            for(int i = 0; i < byteSizes.Length; i++)
+            for (int i = 0; i < byteSizes.Length; i++)
             {
                 uint mipWidth = mipResolutions[i, 0];
                 uint mipHeight = mipResolutions[i, 1];
@@ -304,12 +314,46 @@ namespace D3DTX_Converter.DirectX
             return headerObject;
         }
 
+        public static DDS_HEADER_DXT10 GetDX10HeaderFromBytes(byte[] byteArray)
+        {
+            DDS_HEADER_DXT10 dxt10HeaderObject = new();
+
+            int dx10_size = Marshal.SizeOf(dxt10HeaderObject);
+            IntPtr dx10_ptr = Marshal.AllocHGlobal(dx10_size);
+
+            Marshal.Copy(byteArray, 0, dx10_ptr, dx10_size);
+
+            dxt10HeaderObject = (DDS_HEADER_DXT10)Marshal.PtrToStructure(dx10_ptr, dxt10HeaderObject.GetType());
+            Marshal.FreeHGlobal(dx10_ptr);
+
+            Console.WriteLine("DXGI FORMAT: " + dxt10HeaderObject.dxgiFormat);
+            return dxt10HeaderObject;
+        }
+
         /// <summary>
         /// Converts a DDS_HEADER object into a byte array.
         /// </summary>
         /// <param name="header"></param>
         /// <returns></returns>
         public static byte[] GetHeaderBytes(DDS_HEADER header)
+        {
+            int size = Marshal.SizeOf(header);
+            byte[] arr = new byte[size];
+
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(header, ptr, true);
+            Marshal.Copy(ptr, arr, 0, size);
+            Marshal.FreeHGlobal(ptr);
+
+            return arr;
+        }
+
+        /// <summary>
+        /// Converts a DDS_HEADER_DXT10 object into a byte array.
+        /// </summary>
+        /// <param name="header"></param>
+        /// <returns></returns>
+        public static byte[] GetDXT10HeaderBytes(DDS_HEADER_DXT10 header)
         {
             int size = Marshal.SizeOf(header);
             byte[] arr = new byte[size];
@@ -335,6 +379,10 @@ namespace D3DTX_Converter.DirectX
             };
         }
 
+        /// <summary>
+        /// Returns a preset DDS_Header. We modify it later when we need it.
+        /// </summary>
+        /// <returns></returns>
         public static DDS_HEADER GetPresetHeader()
         {
             return new()
@@ -360,23 +408,87 @@ namespace D3DTX_Converter.DirectX
             };
         }
 
-        public static uint Get_FourCC_FromTellale(T3SurfaceFormat format)
+        /// <summary>
+        /// Returns a preset DDS_Header_DXT10, when the compression format is DXT10. We modify it later when we need it.
+        /// </summary>
+        /// <returns></returns>
+        public static DDS_HEADER_DXT10 GetPresetDXT10Header()
         {
-            switch (format)
+            return new()
             {
-                default: return ByteFunctions.Convert_String_To_UInt32("DXT1");
-                case T3SurfaceFormat.eSurface_DXT1: return ByteFunctions.Convert_String_To_UInt32("DXT1");
-                case T3SurfaceFormat.eSurface_DXT3: return ByteFunctions.Convert_String_To_UInt32("DXT3");
-                case T3SurfaceFormat.eSurface_DXT5: return ByteFunctions.Convert_String_To_UInt32("DXT5");
-                case T3SurfaceFormat.eSurface_DXN: return ByteFunctions.Convert_String_To_UInt32("ATI2");
-                case T3SurfaceFormat.eSurface_DXT5A: return ByteFunctions.Convert_String_To_UInt32("ATI1");
-                case T3SurfaceFormat.eSurface_BC4: return ByteFunctions.Convert_String_To_UInt32("BC4S");
-                case T3SurfaceFormat.eSurface_BC5: return ByteFunctions.Convert_String_To_UInt32("BC5S");
-                case T3SurfaceFormat.eSurface_A8: return ByteFunctions.Convert_String_To_UInt32("DX10");
-            }
+                dxgiFormat = DXGI_FORMAT.R32G32B32_SINT,
+                resourceDimension = D3D10_RESOURCE_DIMENSION.D3D10_RESOURCE_DIMENSION_TEXTURE2D
+            };
         }
 
-        public static T3SurfaceFormat Get_T3Format_FromFourCC(uint fourCC)
+        /// <summary>
+        /// Returns a four-character code for the compression format of our new .dds file, from a Telltale surface format.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        public static uint Get_FourCC_FromTellale(T3SurfaceFormat format)
+        {
+            return format switch
+            {
+                T3SurfaceFormat.eSurface_ARGB8 or
+                T3SurfaceFormat.eSurface_ARGB16 or
+                T3SurfaceFormat.eSurface_RGB565 or
+                T3SurfaceFormat.eSurface_ARGB1555 or
+                T3SurfaceFormat.eSurface_ARGB2101010 or
+                T3SurfaceFormat.eSurface_R16 or
+                T3SurfaceFormat.eSurface_RG16 or
+                T3SurfaceFormat.eSurface_RGBA16 or
+                T3SurfaceFormat.eSurface_RG8 or
+                T3SurfaceFormat.eSurface_RGBA8 or
+                T3SurfaceFormat.eSurface_R32 or
+                T3SurfaceFormat.eSurface_RG32 or
+                T3SurfaceFormat.eSurface_RGBA32 or
+                T3SurfaceFormat.eSurface_R8 or
+                T3SurfaceFormat.eSurface_RGBA8S or
+                T3SurfaceFormat.eSurface_A8 or
+                T3SurfaceFormat.eSurface_L8 or
+                T3SurfaceFormat.eSurface_AL8 or
+                T3SurfaceFormat.eSurface_L16 or
+                T3SurfaceFormat.eSurface_RG16S or
+                T3SurfaceFormat.eSurface_RGBA16S or
+                T3SurfaceFormat.eSurface_R16UI or
+                T3SurfaceFormat.eSurface_RG16UI or
+                T3SurfaceFormat.eSurface_R16F or
+                T3SurfaceFormat.eSurface_RG16F or
+                T3SurfaceFormat.eSurface_RGBA16F or
+                T3SurfaceFormat.eSurface_R32F or
+                T3SurfaceFormat.eSurface_RG32F or
+                T3SurfaceFormat.eSurface_RGBA32F or
+                T3SurfaceFormat.eSurface_RGBA1010102F or
+                T3SurfaceFormat.eSurface_RGB111110F or
+                T3SurfaceFormat.eSurface_RGB9E5F or
+                T3SurfaceFormat.eSurface_DepthPCF16 or
+                T3SurfaceFormat.eSurface_DepthPCF24 or
+                T3SurfaceFormat.eSurface_Depth16 or
+                T3SurfaceFormat.eSurface_Depth24 or
+                T3SurfaceFormat.eSurface_DepthStencil32 or
+                T3SurfaceFormat.eSurface_Depth32F or
+                T3SurfaceFormat.eSurface_Depth32F_Stencil8 or
+                T3SurfaceFormat.eSurface_Depth24F_Stencil8 => ByteFunctions.Convert_String_To_UInt32("DX10"),
+                T3SurfaceFormat.eSurface_DXT1 => ByteFunctions.Convert_String_To_UInt32("DXT1"),
+                T3SurfaceFormat.eSurface_DXT3 => ByteFunctions.Convert_String_To_UInt32("DXT3"),
+                T3SurfaceFormat.eSurface_DXT5 => ByteFunctions.Convert_String_To_UInt32("DXT5"),
+                T3SurfaceFormat.eSurface_DXN => ByteFunctions.Convert_String_To_UInt32("ATI2"),
+                T3SurfaceFormat.eSurface_DXT5A => ByteFunctions.Convert_String_To_UInt32("ATI1"),
+                T3SurfaceFormat.eSurface_BC4 => ByteFunctions.Convert_String_To_UInt32("BC4S"),
+                T3SurfaceFormat.eSurface_BC5 => ByteFunctions.Convert_String_To_UInt32("BC5S"),
+                _ => ByteFunctions.Convert_String_To_UInt32("DXT1"),
+            };
+
+        }
+
+        /// <summary>
+        /// Returns the corresponding Telltale surface format from a .dds four-character code.
+        /// </summary>
+        /// <param name="fourCC"></param>
+        /// <param name="dds"></param>
+        /// <returns></returns>
+        public static T3SurfaceFormat Get_T3Format_FromFourCC(uint fourCC, DDS_Master dds)
         {
             if (fourCC == ByteFunctions.Convert_String_To_UInt32("DXT1")) return T3SurfaceFormat.eSurface_DXT1;
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("DXT3")) return T3SurfaceFormat.eSurface_DXT3;
@@ -385,20 +497,259 @@ namespace D3DTX_Converter.DirectX
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("ATI1")) return T3SurfaceFormat.eSurface_DXT5A;
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("BC4S")) return T3SurfaceFormat.eSurface_BC4;
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("BC5S")) return T3SurfaceFormat.eSurface_BC5;
-
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("DX10")) return Parse_T3Format_FromDX10(dds.dxt10_header.dxgiFormat);
             else return T3SurfaceFormat.eSurface_DXT1;
         }
 
+        /// <summary>
+        /// If the four-character code is DX10, we have an additional parser for the format.
+        /// </summary>
+        /// <param name="dxgi_format"></param>
+        /// <returns></returns>
+        public static T3SurfaceFormat Parse_T3Format_FromDX10(DXGI_FORMAT dxgi_format)
+        {
+            //TODO Check if other formats are needed
+            return (int)dxgi_format switch
+            {
+                (int)DXGI_FORMAT.R8G8B8A8_UNORM_SRGB => T3SurfaceFormat.eSurface_ARGB8,
+                (int)DXGI_FORMAT.R8G8B8A8_UNORM => T3SurfaceFormat.eSurface_ARGB8,
+                (int)DXGI_FORMAT.R16G16B16A16_SNORM => T3SurfaceFormat.eSurface_ARGB16,
+                (int)DXGI_FORMAT.B5G6R5_UNORM => T3SurfaceFormat.eSurface_RGB565,
+                (int)DXGI_FORMAT.B5G5R5A1_UNORM => T3SurfaceFormat.eSurface_ARGB1555,
+                (int)DXGI_FORMAT.B4G4R4A4_UNORM => T3SurfaceFormat.eSurface_ARGB4,
+                (int)DXGI_FORMAT.R10G10B10A2_UNORM => T3SurfaceFormat.eSurface_ARGB2101010,
+                (int)DXGI_FORMAT.R16_UNORM => T3SurfaceFormat.eSurface_R16,
+                (int)DXGI_FORMAT.R16G16_UNORM => T3SurfaceFormat.eSurface_RG16,
+                (int)DXGI_FORMAT.R16G16B16A16_UNORM => T3SurfaceFormat.eSurface_RGBA16,
+                (int)DXGI_FORMAT.R8G8_UNORM => T3SurfaceFormat.eSurface_RG8,
+                //(int)DXGI_FORMAT.R8G8B8A8_UNORM => T3SurfaceFormat.eSurface_RGBA8,
+                //TODO FIX R32 (could be int here)
+                (int)DXGI_FORMAT.R32_FLOAT => T3SurfaceFormat.eSurface_R32,
+                (int)DXGI_FORMAT.R32G32_FLOAT => T3SurfaceFormat.eSurface_RG32,
+                (int)DXGI_FORMAT.R32G32B32A32_FLOAT => T3SurfaceFormat.eSurface_RGBA32,
+                (int)DXGI_FORMAT.R8_UNORM => T3SurfaceFormat.eSurface_R8,
+                (int)DXGI_FORMAT.R8G8B8A8_SNORM => T3SurfaceFormat.eSurface_RGBA8S,
+                (int)DXGI_FORMAT.A8_UNORM => T3SurfaceFormat.eSurface_A8,
+                //(int)DXGI_FORMAT.R8_UNORM =>T3SurfaceFormat.eSurface_L8,
+                //(int)DXGI_FORMAT.R8G8_UNORM => T3SurfaceFormat.eSurface_AL8,
+                //(int) DXGI_FORMAT.R16_UNORM => T3SurfaceFormat.eSurface_L16,
+                (int)DXGI_FORMAT.R16G16_SNORM => T3SurfaceFormat.eSurface_RG16S,
+                //(int)DXGI_FORMAT.R16G16B16A16_SNORM=>T3SurfaceFormat.eSurface_RGBA16S,
+                (int)DXGI_FORMAT.R16G16B16A16_UINT => T3SurfaceFormat.eSurface_R16UI,
+                (int)DXGI_FORMAT.R16_FLOAT => T3SurfaceFormat.eSurface_R16F,
+                (int)DXGI_FORMAT.R16G16B16A16_FLOAT => T3SurfaceFormat.eSurface_RGBA16F,
+                //(int)DXGI_FORMAT.R32_FLOAT => T3SurfaceFormat.eSurface_R32F,
+                //(int)DXGI_FORMAT.R32G32_FLOAT=>T3SurfaceFormat.eSurface_RG32F,
+                //(int)DXGI_FORMAT.R32G32B32A32_FLOAT=>T3SurfaceFormat.eSurface_RGBA32F,
+                //TODO SAME HERE, IS IT INT?
+                // (int)DXGI_FORMAT.R10G10B10A2_UNORM=>T3SurfaceFormat.eSurface_RGBA1010102F,
+                (int)DXGI_FORMAT.R11G11B10_FLOAT => T3SurfaceFormat.eSurface_RGB111110F,
+                (int)DXGI_FORMAT.R9G9B9E5_SHAREDEXP => T3SurfaceFormat.eSurface_RGB9E5F,
+                (int)DXGI_FORMAT.D16_UNORM => T3SurfaceFormat.eSurface_DepthPCF16,
+                (int)DXGI_FORMAT.D24_UNORM_S8_UINT => T3SurfaceFormat.eSurface_DepthPCF24,
+                //??
+                //(int)DXGI_FORMAT.D16_UNORM =>T3SurfaceFormat.eSurface_Depth16,
+                //(int)DXGI_FORMAT.D24_UNORM_S8_UINT => T3SurfaceFormat.eSurface_Depth24,
+                (int)DXGI_FORMAT.D32_FLOAT_S8X24_UINT => T3SurfaceFormat.eSurface_DepthStencil32,
+                (int)DXGI_FORMAT.D32_FLOAT => T3SurfaceFormat.eSurface_Depth32F,
+                //(int)DXGI_FORMAT.D32_FLOAT_S8X24_UINT => T3SurfaceFormat.eSurface_Depth32F_Stencil8,
+                //(int)DXGI_FORMAT.D24_UNORM_S8_UINT =>T3SurfaceFormat.eSurface_Depth24F_Stencil8,
+                _ => T3SurfaceFormat.eSurface_Unknown,
+            };
+
+        }
+
+        /// <summary>
+        /// Returns the corresponding DXGI_Format from a Telltale surface format. This is used for the conversion process from .d3dtx to .dds.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="gamma"></param>
+        /// <returns></returns>
         public static DXGI_FORMAT GetSurfaceFormatAsDXGI(T3SurfaceFormat format, T3SurfaceGamma gamma = T3SurfaceGamma.eSurfaceGamma_sRGB)
         {
-            switch(format)
+            switch (format)
             {
+
                 default:
                     return DXGI_FORMAT.BC1_UNORM; //just choose classic DXT1 if the format isn't known
 
+
+                //In order of T3SurfaceFormat enum
+                //TODO
+                //--------------------ARGB8--------------------
+                case T3SurfaceFormat.eSurface_ARGB8:
+                    if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                        return DXGI_FORMAT.R8G8B8A8_UNORM_SRGB;
+                    else
+                        return DXGI_FORMAT.R8G8B8A8_UNORM;
+                //TODO
+                //--------------------ARGB16--------------------
+                case T3SurfaceFormat.eSurface_ARGB16:
+                    return DXGI_FORMAT.R16G16B16A16_SNORM;
+
+                //TODO
+                //--------------------RGB565--------------------
+                case T3SurfaceFormat.eSurface_RGB565:
+                    return DXGI_FORMAT.B5G6R5_UNORM;
+
+                //TODO
+                //--------------------ARGB1555--------------------
+                case T3SurfaceFormat.eSurface_ARGB1555:
+                    return DXGI_FORMAT.B5G5R5A1_UNORM;
+
+                //TODO
+                //--------------------ARGB4--------------------
+                case T3SurfaceFormat.eSurface_ARGB4:
+                    return DXGI_FORMAT.B4G4R4A4_UNORM;
+
+                //TODO
+                //--------------------ARGB2101010--------------------
+                case T3SurfaceFormat.eSurface_ARGB2101010:
+                    return DXGI_FORMAT.R10G10B10A2_UNORM;
+
+                //--------------------R16--------------------
+                case T3SurfaceFormat.eSurface_R16:
+                    return DXGI_FORMAT.R16_UNORM;
+
+                //--------------------RG16--------------------
+                case T3SurfaceFormat.eSurface_RG16:
+                    return DXGI_FORMAT.R16G16_UNORM;
+
+                //--------------------RGBA16--------------------
+                case T3SurfaceFormat.eSurface_RGBA16:
+                    return DXGI_FORMAT.R16G16B16A16_UNORM;
+
+                //--------------------RG8--------------------
+                case T3SurfaceFormat.eSurface_RG8:
+                    return DXGI_FORMAT.R8G8_UNORM;
+
+                //--------------------RGBA8--------------------
+                case T3SurfaceFormat.eSurface_RGBA8:
+                    if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                        return DXGI_FORMAT.R8G8B8A8_UNORM_SRGB;
+                    else
+                        return DXGI_FORMAT.R8G8B8A8_UNORM;
+
+                //TODO
+                //--------------------R32--------------------
+                case T3SurfaceFormat.eSurface_R32:
+                    return DXGI_FORMAT.R32_FLOAT;
+
+                //TODO
+                //--------------------RG32--------------------
+                case T3SurfaceFormat.eSurface_RG32:
+                    return DXGI_FORMAT.R32G32_FLOAT;
+
+                //TODO
+                //--------------------RGBA32--------------------
+                case T3SurfaceFormat.eSurface_RGBA32:
+                    return DXGI_FORMAT.R32G32B32A32_FLOAT;
+
+                //TODO
+                //--------------------R8--------------------
+                case T3SurfaceFormat.eSurface_R8:
+                    return DXGI_FORMAT.R8_UNORM;
+
+                //TODO
+                //--------------------RGBA8S--------------------
+                case T3SurfaceFormat.eSurface_RGBA8S:
+                    return DXGI_FORMAT.R8G8B8A8_SNORM;
+
+                //--------------------A8--------------------
+                case T3SurfaceFormat.eSurface_A8:
+                    return DXGI_FORMAT.A8_UNORM;
+
+                //--------------------L8--------------------
+                case T3SurfaceFormat.eSurface_L8:
+                    return DXGI_FORMAT.R8_UNORM;
+
+                //--------------------AL8--------------------
+                case T3SurfaceFormat.eSurface_AL8:
+                    return DXGI_FORMAT.R8G8_UNORM;
+
+                //--------------------R16--------------------
+                case T3SurfaceFormat.eSurface_L16:
+                    return DXGI_FORMAT.R16_UNORM;
+
+                //--------------------RG16S--------------------
+                case T3SurfaceFormat.eSurface_RG16S:
+                    return DXGI_FORMAT.R16G16_SNORM;
+
+                //--------------------RGBA16S--------------------
+                case T3SurfaceFormat.eSurface_RGBA16S:
+                    return DXGI_FORMAT.R16G16B16A16_SNORM;
+
+                //--------------------RGBA16UI--------------------
+                case T3SurfaceFormat.eSurface_R16UI:
+                    return DXGI_FORMAT.R16G16B16A16_UINT;
+
+                //--------------------RG16F--------------------
+                case T3SurfaceFormat.eSurface_R16F:
+                    return DXGI_FORMAT.R16_FLOAT;
+
+                //--------------------RGBA16F--------------------
+                case T3SurfaceFormat.eSurface_RGBA16F:
+                    return DXGI_FORMAT.R16G16B16A16_FLOAT;
+
+                //--------------------R32F--------------------
+                case T3SurfaceFormat.eSurface_R32F:
+                    return DXGI_FORMAT.R32_FLOAT;
+
+                //--------------------RG32F--------------------
+                case T3SurfaceFormat.eSurface_RG32F:
+                    return DXGI_FORMAT.R32G32_FLOAT;
+
+                //--------------------RGBA32F--------------------
+                case T3SurfaceFormat.eSurface_RGBA32F:
+                    return DXGI_FORMAT.R32G32B32A32_FLOAT;
+
+                //--------------------RGBA1010102F--------------------
+                case T3SurfaceFormat.eSurface_RGBA1010102F:
+                    return DXGI_FORMAT.R10G10B10A2_UNORM;
+
+                //--------------------RGB111110F--------------------
+                case T3SurfaceFormat.eSurface_RGB111110F:
+                    return DXGI_FORMAT.R11G11B10_FLOAT;
+
+                //--------------------RGB9E5F--------------------
+                case T3SurfaceFormat.eSurface_RGB9E5F:
+                    return DXGI_FORMAT.R9G9B9E5_SHAREDEXP;
+
+                //--------------------DepthPCF16--------------------
+                case T3SurfaceFormat.eSurface_DepthPCF16:
+                    return DXGI_FORMAT.D16_UNORM;
+
+                //--------------------DepthPCF24--------------------
+                case T3SurfaceFormat.eSurface_DepthPCF24:
+                    return DXGI_FORMAT.D24_UNORM_S8_UINT;
+
+                //--------------------Depth16--------------------
+                case T3SurfaceFormat.eSurface_Depth16:
+                    return DXGI_FORMAT.D16_UNORM;
+
+                //--------------------Depth24--------------------
+                case T3SurfaceFormat.eSurface_Depth24:
+                    return DXGI_FORMAT.D24_UNORM_S8_UINT;
+
+                //--------------------DepthStencil32--------------------
+                case T3SurfaceFormat.eSurface_DepthStencil32:
+                    return DXGI_FORMAT.D32_FLOAT_S8X24_UINT;
+
+                //--------------------Depth32F--------------------
+                case T3SurfaceFormat.eSurface_Depth32F:
+                    return DXGI_FORMAT.D32_FLOAT;
+
+                //--------------------Depth32F_Stencil8--------------------
+                case T3SurfaceFormat.eSurface_Depth32F_Stencil8:
+                    return DXGI_FORMAT.D32_FLOAT_S8X24_UINT;
+
+                //--------------------Depth24F_Stencil8--------------------
+                case T3SurfaceFormat.eSurface_Depth24F_Stencil8:
+                    return DXGI_FORMAT.D24_UNORM_S8_UINT;
+
                 //--------------------DXT1--------------------
                 case T3SurfaceFormat.eSurface_BC1:
-                    if(gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                    if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
                         return DXGI_FORMAT.BC1_UNORM_SRGB;
                     else
                         return DXGI_FORMAT.BC1_UNORM;
@@ -451,6 +802,10 @@ namespace D3DTX_Converter.DirectX
                         return DXGI_FORMAT.BC7_UNORM_SRGB;
                     else
                         return DXGI_FORMAT.BC7_UNORM;
+
+                //--------------------UNKNOWN--------------------
+                case T3SurfaceFormat.eSurface_Unknown:
+                    return DXGI_FORMAT.UNKNOWN;
             }
         }
     }

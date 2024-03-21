@@ -4,7 +4,6 @@ using D3DTX_Converter.TelltaleEnums;
 using D3DTX_Converter.TelltaleTypes;
 using D3DTX_Converter.Utilities;
 using DirectXTexNet;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Runtime.InteropServices;
 
@@ -17,6 +16,14 @@ namespace D3DTX_Converter.DirectX
     //Texutre Block Compression in D3D11 - https://docs.microsoft.com/en-us/windows/win32/direct3d11/texture-block-compression-in-direct3d-11
     //DDS Programming Guide - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide
 
+    //TODO Fix documentation
+    //TODO Other functions need documentation.
+    //TODO Delete functions which aren't used
+    //TODO Test formats
+
+    /// <summary>
+    /// The class is used for decoding and encoding .dds headers. 
+    /// </summary>
     public static class DDS
     {
         public static uint GetDDSBlockSize(DDS_HEADER header)
@@ -372,6 +379,10 @@ namespace D3DTX_Converter.DirectX
             };
         }
 
+        /// <summary>
+        /// Returns a preset DDS_Header. We modify it later when we need it.
+        /// </summary>
+        /// <returns></returns>
         public static DDS_HEADER GetPresetHeader()
         {
             return new()
@@ -397,6 +408,10 @@ namespace D3DTX_Converter.DirectX
             };
         }
 
+        /// <summary>
+        /// Returns a preset DDS_Header_DXT10, when the compression format is DXT10. We modify it later when we need it.
+        /// </summary>
+        /// <returns></returns>
         public static DDS_HEADER_DXT10 GetPresetDXT10Header()
         {
             return new()
@@ -406,6 +421,11 @@ namespace D3DTX_Converter.DirectX
             };
         }
 
+        /// <summary>
+        /// Returns a four-character code for the compression format of our new .dds file, from a Telltale surface format.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <returns></returns>
         public static uint Get_FourCC_FromTellale(T3SurfaceFormat format)
         {
             return format switch
@@ -462,6 +482,12 @@ namespace D3DTX_Converter.DirectX
 
         }
 
+        /// <summary>
+        /// Returns the corresponding Telltale surface format from a .dds four-character code.
+        /// </summary>
+        /// <param name="fourCC"></param>
+        /// <param name="dds"></param>
+        /// <returns></returns>
         public static T3SurfaceFormat Get_T3Format_FromFourCC(uint fourCC, DDS_Master dds)
         {
             if (fourCC == ByteFunctions.Convert_String_To_UInt32("DXT1")) return T3SurfaceFormat.eSurface_DXT1;
@@ -475,9 +501,14 @@ namespace D3DTX_Converter.DirectX
             else return T3SurfaceFormat.eSurface_DXT1;
         }
 
+        /// <summary>
+        /// If the four-character code is DX10, we have an additional parser for the format.
+        /// </summary>
+        /// <param name="dxgi_format"></param>
+        /// <returns></returns>
         public static T3SurfaceFormat Parse_T3Format_FromDX10(DXGI_FORMAT dxgi_format)
         {
-            Console.WriteLine((int)dxgi_format);
+            //TODO Check if other formats are needed
             return (int)dxgi_format switch
             {
                 (int)DXGI_FORMAT.R8G8B8A8_UNORM_SRGB => T3SurfaceFormat.eSurface_ARGB8,
@@ -528,16 +559,22 @@ namespace D3DTX_Converter.DirectX
 
         }
 
+        /// <summary>
+        /// Returns the corresponding DXGI_Format from a Telltale surface format. This is used for the conversion process from .d3dtx to .dds.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="gamma"></param>
+        /// <returns></returns>
         public static DXGI_FORMAT GetSurfaceFormatAsDXGI(T3SurfaceFormat format, T3SurfaceGamma gamma = T3SurfaceGamma.eSurfaceGamma_sRGB)
         {
             switch (format)
             {
 
-                //In order of T3SurfaceFormat enum
-
                 default:
                     return DXGI_FORMAT.BC1_UNORM; //just choose classic DXT1 if the format isn't known
 
+
+                //In order of T3SurfaceFormat enum
                 //TODO
                 //--------------------ARGB8--------------------
                 case T3SurfaceFormat.eSurface_ARGB8:

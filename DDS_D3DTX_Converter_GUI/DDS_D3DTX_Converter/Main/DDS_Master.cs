@@ -6,6 +6,7 @@ using D3DTX_Converter.DirectX;
 using D3DTX_Converter.TelltaleEnums;
 using DirectXTexNet;
 using System.ComponentModel;
+using ExCSS;
 
 /*
  * DXT1 - DXGI_FORMAT_BC1_UNORM / D3DFMT_DXT1
@@ -156,7 +157,6 @@ namespace D3DTX_Converter.Main
                 header.dwMipMapCount = d3dtx.d3dtx9.mNumMipLevels;
                 header.dwDepth = d3dtx.d3dtx9.mDepth;
                 surfaceFormat = d3dtx.d3dtx9.mSurfaceFormat;
-
             }
 
             header.ddspf.dwFourCC = DDS.Get_FourCC_FromTellale(surfaceFormat);
@@ -169,6 +169,11 @@ namespace D3DTX_Converter.Main
                 dxt10_header.arraySize = 1; //TODO NEEDS TESTING
             }
 
+            //Get the channel count for all formats in case they are not specified 
+            header.ddspf.dwRGBBitCount = UInt32.Parse(d3dtx.GetChannelCount()) * 8;
+
+
+            //TODO ADD OTHER FORMATS
             switch (surfaceFormat)
             {
                 case T3SurfaceFormat.eSurface_A8:
@@ -364,7 +369,11 @@ namespace D3DTX_Converter.Main
             {
                 //turn our header data into bytes to be written into a file
                 byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
-                dds_header = ByteFunctions.Combine(dds_header, DDS.GetDXT10HeaderBytes(dxt10_header));
+
+                if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10"))
+                {
+                    dds_header = ByteFunctions.Combine(dds_header, DDS.GetDXT10HeaderBytes(dxt10_header));
+                }
 
                 //copy the dds header to the file
                 byte[] finalData = Array.Empty<byte>();
@@ -394,8 +403,6 @@ namespace D3DTX_Converter.Main
         public void Match_DDS_With_D3DTX(string ddsPath, D3DTX_Master d3dtx, DDS_Matching_Options options)
         {
         }
-
-
 
         public byte[] GetData(D3DTX_Master d3dtx)
         {
@@ -434,7 +441,10 @@ namespace D3DTX_Converter.Main
             {
                 //turn our header data into bytes to be written into a file
                 byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
-                dds_header = ByteFunctions.Combine(dds_header, DDS.GetDXT10HeaderBytes(dxt10_header));
+                if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10"))
+                {
+                    dds_header = ByteFunctions.Combine(dds_header, DDS.GetDXT10HeaderBytes(dxt10_header));
+                }
 
                 //copy the dds header to the file
                 byte[] finalData = Array.Empty<byte>();

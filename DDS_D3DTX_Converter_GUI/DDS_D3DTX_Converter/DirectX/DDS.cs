@@ -511,8 +511,8 @@ namespace D3DTX_Converter.DirectX
             //TODO Check if other formats are needed
             return (int)dxgi_format switch
             {
-                (int)DXGI_FORMAT.R8G8B8A8_UNORM_SRGB => T3SurfaceFormat.eSurface_ARGB8,
-                (int)DXGI_FORMAT.R8G8B8A8_UNORM => T3SurfaceFormat.eSurface_ARGB8,
+                (int)DXGI_FORMAT.B8G8R8A8_UNORM_SRGB => T3SurfaceFormat.eSurface_ARGB8,
+                (int)DXGI_FORMAT.B8G8R8A8_UNORM => T3SurfaceFormat.eSurface_ARGB8,
                 (int)DXGI_FORMAT.R16G16B16A16_SNORM => T3SurfaceFormat.eSurface_ARGB16,
                 (int)DXGI_FORMAT.B5G6R5_UNORM => T3SurfaceFormat.eSurface_RGB565,
                 (int)DXGI_FORMAT.B5G5R5A1_UNORM => T3SurfaceFormat.eSurface_ARGB1555,
@@ -522,7 +522,8 @@ namespace D3DTX_Converter.DirectX
                 (int)DXGI_FORMAT.R16G16_UNORM => T3SurfaceFormat.eSurface_RG16,
                 (int)DXGI_FORMAT.R16G16B16A16_UNORM => T3SurfaceFormat.eSurface_RGBA16,
                 (int)DXGI_FORMAT.R8G8_UNORM => T3SurfaceFormat.eSurface_RG8,
-                //(int)DXGI_FORMAT.R8G8B8A8_UNORM => T3SurfaceFormat.eSurface_RGBA8,
+                (int)DXGI_FORMAT.R8G8B8A8_UNORM_SRGB => T3SurfaceFormat.eSurface_RGBA8,
+                (int)DXGI_FORMAT.R8G8B8A8_UNORM => T3SurfaceFormat.eSurface_RGBA8,
                 //TODO FIX R32 (could be int here)
                 (int)DXGI_FORMAT.R32_FLOAT => T3SurfaceFormat.eSurface_R32,
                 (int)DXGI_FORMAT.R32G32_FLOAT => T3SurfaceFormat.eSurface_RG32,
@@ -554,6 +555,7 @@ namespace D3DTX_Converter.DirectX
                 (int)DXGI_FORMAT.D32_FLOAT => T3SurfaceFormat.eSurface_Depth32F,
                 //(int)DXGI_FORMAT.D32_FLOAT_S8X24_UINT => T3SurfaceFormat.eSurface_Depth32F_Stencil8,
                 //(int)DXGI_FORMAT.D24_UNORM_S8_UINT =>T3SurfaceFormat.eSurface_Depth24F_Stencil8,
+                //TODO ADD BC1, BC2, BC3, BC4, BC5, BC6H, BC7
                 _ => T3SurfaceFormat.eSurface_Unknown,
             };
 
@@ -579,9 +581,9 @@ namespace D3DTX_Converter.DirectX
                 //--------------------ARGB8--------------------
                 case T3SurfaceFormat.eSurface_ARGB8:
                     if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
-                        return DXGI_FORMAT.R8G8B8A8_UNORM_SRGB;
+                        return DXGI_FORMAT.B8G8R8A8_UNORM_SRGB;
                     else
-                        return DXGI_FORMAT.R8G8B8A8_UNORM;
+                        return DXGI_FORMAT.B8G8R8A8_UNORM;
                 //TODO
                 //--------------------ARGB16--------------------
                 case T3SurfaceFormat.eSurface_ARGB16:

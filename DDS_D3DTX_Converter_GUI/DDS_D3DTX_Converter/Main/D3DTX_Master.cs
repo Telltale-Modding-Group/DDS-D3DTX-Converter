@@ -445,113 +445,106 @@ namespace D3DTX_Converter.Main
                 return T3SurfaceFormat.eSurface_Unknown;
         }
 
-        public string GetChannelCount()
+
+
+        /// <summary>
+        /// Gets the channel count of .d3dtx surface format. Needs verification for some formats. eTxColor could also play part for the unknown formats.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="alpha"></param>
+        /// <returns></returns>
+        public static uint GetChannelCount(T3SurfaceFormat format, eTxAlpha alpha = eTxAlpha.eTxAlphaUnknown)
         {
-            if (d3dtx4 != null)
+            switch (format)
             {
-          
-                switch (d3dtx4.mColorMode)
-                {
-                    case eTxColor.eTxColorFull:
-                        return "4"; // Assuming RGBA
-                    case eTxColor.eTxColorBlack:
-                        return "1"; // Only one color channel
-                    case eTxColor.eTxColorGrayscale:
-                        return "1"; // Only one color channel
-                    case eTxColor.eTxColorGrayscaleAlpha:
-                        return "2"; // Grayscale and alpha
-                    default:
-                        return "0";
-                }
-            }
-            else if (d3dtx5 != null)
-            {
-                switch (d3dtx5.mColorMode)
-                {
-                    case eTxColor.eTxColorFull:
-                        return "4"; // Assuming RGBA
-                    case eTxColor.eTxColorBlack:
-                        return "1"; // Only one color channel
-                    case eTxColor.eTxColorGrayscale:
-                        return "1"; // Only one color channel
-                    case eTxColor.eTxColorGrayscaleAlpha:
-                        return "2"; // Grayscale and alpha
-                    default:
-                        return "0";
-                }
-            }
+                default:
+                    return 0;
 
-            else if (d3dtx6 != null)
-            {
-                switch (d3dtx6.mColorMode)
-                {
-                    case eTxColor.eTxColorFull:
-                        return "4"; // Assuming RGBA
-                    case eTxColor.eTxColorBlack:
-                        return "1"; // Only one color channel
-                    case eTxColor.eTxColorGrayscale:
-                        return "1"; // Only one color channel
-                    case eTxColor.eTxColorGrayscaleAlpha:
-                        return "2"; // Grayscale and alpha
-                    default:
-                        return "0";
-                }
-            }
+                case T3SurfaceFormat.eSurface_R8:
+                case T3SurfaceFormat.eSurface_A8:
+                case T3SurfaceFormat.eSurface_L8:
+                case T3SurfaceFormat.eSurface_R16:
+                case T3SurfaceFormat.eSurface_R32:
+                case T3SurfaceFormat.eSurface_R16UI:
+                case T3SurfaceFormat.eSurface_R16F:
+                case T3SurfaceFormat.eSurface_R32F:
+                case T3SurfaceFormat.eSurface_BC4:
+                case T3SurfaceFormat.eSurface_DXT5A:
+                case T3SurfaceFormat.eSurface_ETC2_R: //Needs verification
+                case T3SurfaceFormat.eSurface_Depth16:
+                case T3SurfaceFormat.eSurface_Depth24:
+                case T3SurfaceFormat.eSurface_DepthPCF16: //Percentage-closer filtering?
+                case T3SurfaceFormat.eSurface_DepthPCF24: //Percentage-closer filtering
+                case T3SurfaceFormat.eSurface_DepthStencil32:
+                case T3SurfaceFormat.eSurface_Depth24F_Stencil8:
+                case T3SurfaceFormat.eSurface_Depth32F:
+                case T3SurfaceFormat.eSurface_Depth32F_Stencil8:
+                    return 1;
 
-            else if (d3dtx7 != null)
-            {
-                switch (d3dtx7.mColorMode)
-                {
-                    case eTxColor.eTxColorFull:
-                        return "4"; // Assuming RGBA
-                    case eTxColor.eTxColorBlack:
-                        return "1"; // Only one color channel
-                    case eTxColor.eTxColorGrayscale:
-                        return "1"; // Only one color channel
-                    case eTxColor.eTxColorGrayscaleAlpha:
-                        return "2"; // Grayscale and alpha
-                    default:
-                        return "0";
-                }
-            }
+                case T3SurfaceFormat.eSurface_RG16:
+                case T3SurfaceFormat.eSurface_RG32:
+                case T3SurfaceFormat.eSurface_RG16UI:
+                case T3SurfaceFormat.eSurface_RG16S:
+                case T3SurfaceFormat.eSurface_RG16F:
+                case T3SurfaceFormat.eSurface_RG32F:
+                case T3SurfaceFormat.eSurface_AL8:
+                case T3SurfaceFormat.eSurface_DXN:
+                case T3SurfaceFormat.eSurface_BC5:
+                case T3SurfaceFormat.eSurface_ETC2_RG: //Needs verification
+                    return 2;
 
-            else if (d3dtx8 != null)
-            {
-                switch (d3dtx8.mColorMode)
-                {
-                    case eTxColor.eTxColorFull:
-                        return "4"; // Assuming RGBA
-                    case eTxColor.eTxColorBlack:
-                        return "1"; // Only one color channel
-                    case eTxColor.eTxColorGrayscale:
-                        return "1"; // Only one color channel
-                    case eTxColor.eTxColorGrayscaleAlpha:
-                        return "2"; // Grayscale and alpha
-                    default:
-                        return "0";
-                }
-            }
+                case T3SurfaceFormat.eSurface_RGB565:
+                case T3SurfaceFormat.eSurface_RGB111110F:
+                case T3SurfaceFormat.eSurface_RGB9E5F:
+                case T3SurfaceFormat.eSurface_BC6:
+                case T3SurfaceFormat.eSurface_ETC1_RGB:
+                case T3SurfaceFormat.eSurface_ETC2_RGB:
+                case T3SurfaceFormat.eSurface_PVRTC2: //Needs verification
+                case T3SurfaceFormat.eSurface_PVRTC4: //Needs verification
+                case T3SurfaceFormat.eSurface_ATC_RGB:
+                case T3SurfaceFormat.eSurface_FrontBuffer: //Needs verification
+                case T3SurfaceFormat.eSurface_CTX1://Needs verification
+                    return 3;
 
-            else if (d3dtx9 != null)
-            {
-                switch (d3dtx9.mColorMode)
-                {
-                    case eTxColor.eTxColorFull:
-                        return "4"; // Assuming RGBA
-                    case eTxColor.eTxColorBlack:
-                        return "1"; // Only one color channel
-                    case eTxColor.eTxColorGrayscale:
-                        return "1"; // Only one color channel
-                    case eTxColor.eTxColorGrayscaleAlpha:
-                        return "2"; // Grayscale and alpha
-                    default:
-                        return "0";
-                }
-            }
+                case T3SurfaceFormat.eSurface_ARGB8:
+                case T3SurfaceFormat.eSurface_ARGB16:
+                case T3SurfaceFormat.eSurface_ARGB1555:
+                case T3SurfaceFormat.eSurface_ARGB4:
+                case T3SurfaceFormat.eSurface_ARGB2101010:
+                case T3SurfaceFormat.eSurface_RGBA16:
+                case T3SurfaceFormat.eSurface_RGBA8:
+                case T3SurfaceFormat.eSurface_RGBA32:
+                case T3SurfaceFormat.eSurface_RGBA8S:
+                case T3SurfaceFormat.eSurface_RGBA16S:
+                case T3SurfaceFormat.eSurface_RGBA16F:
+                case T3SurfaceFormat.eSurface_RGBA32F:
+                case T3SurfaceFormat.eSurface_RGBA1010102F:
+                case T3SurfaceFormat.eSurface_DXT3:
+                case T3SurfaceFormat.eSurface_BC2:
+                case T3SurfaceFormat.eSurface_DXT5:
+                case T3SurfaceFormat.eSurface_BC3:
+                case T3SurfaceFormat.eSurface_ETC2_RGB1A:
+                case T3SurfaceFormat.eSurface_ETC2_RGBA:
+                case T3SurfaceFormat.eSurface_PVRTC2a: //Needs verification
+                case T3SurfaceFormat.eSurface_PVRTC4a: //Needs verification
+                case T3SurfaceFormat.eSurface_ATC_RGB1A:
+                case T3SurfaceFormat.eSurface_ATC_RGBA:
+                case T3SurfaceFormat.eSurface_ATSC_RGBA_4x4: //Needs verification
+                    return 4;
 
-            return "Unknown";
+                case T3SurfaceFormat.eSurface_DXT1: //Needs checking (alpha is optional)
+                case T3SurfaceFormat.eSurface_BC1: //Needs checking (alpha is optional)
+                case T3SurfaceFormat.eSurface_BC7: //Needs checking (alpha is optional)
+                    if (alpha > 0)
+                    {
+                        return 4;
+                    }
+                    return 3;
+                case T3SurfaceFormat.eSurface_Count: //Needs verification
+                case T3SurfaceFormat.eSurface_Unknown:
+                    return 0;
+            }
         }
-
 
         public string GetHasAlpha()
         {
@@ -569,6 +562,58 @@ namespace D3DTX_Converter.Main
                 return d3dtx9.mAlphaMode > 0 ? "True" : "False";
             else
                 return "Not Available";
+        }
+
+        /// <summary>
+        /// Gets a string version of the channel count of .d3dtx surface format. 
+        /// </summary>
+        /// <returns></returns>
+        public string GetChannelCount()
+        {
+
+            uint channelCount = 0;
+
+            T3SurfaceFormat surfaceFormat = T3SurfaceFormat.eSurface_Unknown;
+            eTxAlpha alpha = eTxAlpha.eTxAlphaUnknown;
+
+            if (d3dtx4 != null)
+            {
+                surfaceFormat = d3dtx4.mSurfaceFormat;
+                alpha = d3dtx4.mAlphaMode;
+            }
+            else if (d3dtx5 != null)
+            {
+                surfaceFormat = d3dtx5.mSurfaceFormat;
+                alpha = d3dtx5.mAlphaMode;
+            }
+
+            else if (d3dtx6 != null)
+            {
+                surfaceFormat = d3dtx6.mSurfaceFormat;
+                alpha = d3dtx6.mAlphaMode;
+            }
+
+            else if (d3dtx7 != null)
+            {
+                surfaceFormat = d3dtx7.mSurfaceFormat;
+                alpha = d3dtx7.mAlphaMode;
+            }
+
+            else if (d3dtx8 != null)
+            {
+                surfaceFormat = d3dtx8.mSurfaceFormat;
+                alpha = d3dtx8.mAlphaMode;
+            }
+
+            else if (d3dtx9 != null)
+            {
+                surfaceFormat = d3dtx9.mSurfaceFormat;
+                alpha = d3dtx9.mAlphaMode;
+            }
+
+            channelCount = D3DTX_Master.GetChannelCount(surfaceFormat, alpha);
+
+            return channelCount.ToString();
         }
 
         public int GetRegionCount()

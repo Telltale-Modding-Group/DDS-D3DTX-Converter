@@ -4,7 +4,7 @@
     {
 
         #region DXGI_FORMATS
-        eSurface_ARGB8 = 0,
+        eSurface_ARGB8 = 0, 
         eSurface_ARGB16 = 1,
         eSurface_RGB565 = 2,
         eSurface_ARGB1555 = 3,
@@ -41,15 +41,16 @@
         #endregion
         /*
         PCF probably stands for percentage-closer filtering, which is used for shadow mapping. No idea why it's different than Depth16 and Depth24.
+        https://github.com/bkaradzic/bimg/blob/master/src/image.cpp
         */
-        eSurface_DepthPCF16 = 48, //30h
-        eSurface_DepthPCF24 = 201, //31h
-        eSurface_Depth16 = 50, //32h
-        eSurface_Depth24 = 51, //33h
-        eSurface_DepthStencil32 = 52, //34h
-        eSurface_Depth32F = 53, //35h
-        eSurface_Depth32F_Stencil8 = 54, //36h
-        eSurface_Depth24F_Stencil8 = 40, //37h
+        eSurface_DepthPCF16 = 48, //30h D3DFMT, probably used for PC versions
+        eSurface_DepthPCF24 = 201, //31h D3DFMT probably used for PC versions
+        eSurface_Depth16 = 50, //32h D3DFMT regular depth
+        eSurface_Depth24 = 51, //33h D3DFMT regular depth
+        eSurface_DepthStencil32 = 52, //34h D3DFMT
+        eSurface_Depth32F = 53, //35h D3DFMT
+        eSurface_Depth32F_Stencil8 = 54, //36h DepthF 32 + 8 stencil
+        eSurface_Depth24F_Stencil8 = 40, //37h D3DFMT
         eSurface_BC1 = 41, //40h
         eSurface_DXT1 = 64, //40h
         eSurface_BC2 = 43, //41h
@@ -68,8 +69,8 @@
         /*
         CTX1 is a format that according to the limited information that exists online, is specific to the Xbox360 platform. 
         CTX1 is similar to DXN format in that it is a two channel texture designed for tangent space normal maps, but it is lower quality. 
-        Now information for this format is scarce, and so are tools regarding compressing/decompressing the format. 
-        So with that we will ignore support for this format for the time being especially as Xbox360 also had support for DXT compressions which were likely more commonly used than this one.
+        Information for this format is scarce, and so are tools regarding compressing/decompressing the format. 
+        We will ignore support for this format for the time being especially as Xbox360 also had support for DXT compressions which were likely more commonly used than this one.
         https://forum.xen-tax.com/viewtopic.php@p=83846.html 
         https://github.com/Xenomega/Alteration/blob/master/Alteration/Halo%203/Map%20File/Raw/BitmapRaw/DXTDecoder.cs 
         https://fileadmin.cs.lth.se/cs/Personal/Michael_Doggett/talks/unc-xenos-doggett.pdf)
@@ -79,22 +80,22 @@
         eSurface_BC7 = 71, //47h
 
         /*
-        The following formats are used for iOS/Android platforms only:
-        PVRTC2
-        PVRTC4
-        PVRTC2a
-        PVRTC4a
-        ATC_RGB
-        ATC_RGB1A (Presumably 1 bit for the alpha)
-        ATC_RGBA
-        ETC1_RGB
-        ETC2_RGB
-        ETC2_RGB1A
-        ETC2_RGBA
-        ETC2_R
-        ETC2_RG
-        ATSC_RGBA_4x4 
-        */
+         *The following formats are used for iOS/Android platforms only:
+         * PVRTC2
+         * PVRTC4
+         * PVRTC2a
+         * PVRTC4a
+         * ATC_RGB (.dds)
+         * ATC_RGB1A (Presumably 1 bit for the alpha) (.dds)
+         * ATC_RGBA (.dds)
+         * ETC1_RGB (.dds)
+         * ETC2_RGB  (.dds)
+         * ETC2_RGB1A (.dds)
+         * ETC2_RGBA (.dds)
+         * ETC2_R
+         * ETC2_RG
+         * ATSC_RGBA_4x4 
+         */
         eSurface_PVRTC2 = 80, //50h
         eSurface_PVRTC4 = 81, //51h
         eSurface_PVRTC2a = 82, //52h
@@ -108,16 +109,20 @@
         eSurface_ETC2_RGBA = 115, //73h
         eSurface_ETC2_R = 116, //74h
         eSurface_ETC2_RG = 117, //75h
+
+        /*
+        * Presumably eSurface_ETC2_RGBM exists, but it is not used. ETC2_R
+
+        Aticct
+        */
+
         eSurface_ATSC_RGBA_4x4 = 128, //80h
         eSurface_FrontBuffer = 202, //90h
 
         /*
-        Probably related to RLE encoding, which is rarely used in texture compression.
-
-        Example: WWWWWWWWWWWWBWWWWWWWWWWWWBBBWWWWWWWWWWWWWWWWWWWWWWWWBWWWWWWWWWWWWWW 
-        With a run-length encoding (RLE) data compression algorithm applied to the above hypothetical scan line, it can be rendered as follows:
-        12W1B12W3B24W1B14W 
-        */
+         * The total amount of formats 
+         *
+         */
         eSurface_Count = 203, //91h
         eSurface_Unknown = -1, //0FFFFFFFFh
     }

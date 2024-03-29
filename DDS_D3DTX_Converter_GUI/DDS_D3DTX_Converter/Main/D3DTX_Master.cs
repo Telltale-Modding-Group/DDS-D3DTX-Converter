@@ -8,6 +8,7 @@ using D3DTX_Converter.TelltaleD3DTX;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using D3DTX_Converter.DirectX;
+using CommunityToolkit.Mvvm.ComponentModel.__Internals;
 
 namespace D3DTX_Converter.Main
 {
@@ -251,13 +252,13 @@ namespace D3DTX_Converter.Main
             {
                 d3dtx5.ModifyD3DTX(dds);
 
-                //SetMetaChunkSizes(d3dtx5.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx5.mPixelData));
+                SetMetaChunkSizes(d3dtx5.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx5.mPixelData));
             }
             else if (d3dtx6 != null)
             {
                 d3dtx6.ModifyD3DTX(dds);
 
-                //SetMetaChunkSizes(d3dtx6.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx6.mPixelData));
+                SetMetaChunkSizes(d3dtx6.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx6.mPixelData));
             }
             else if (d3dtx7 != null)
             {
@@ -444,8 +445,6 @@ namespace D3DTX_Converter.Main
             else
                 return T3SurfaceFormat.eSurface_Unknown;
         }
-
-
 
         /// <summary>
         /// Gets the channel count of .d3dtx surface format. Needs verification for some formats. eTxColor could also play part for the unknown formats.
@@ -673,6 +672,94 @@ namespace D3DTX_Converter.Main
                 return d3dtx9.mPixelData;
             else
                 return null;
+        }
+
+        public static bool IsTextureCompressed(T3SurfaceFormat format)
+        {
+
+            return format switch
+            {
+                T3SurfaceFormat.eSurface_DXT1 => true,
+                T3SurfaceFormat.eSurface_DXT3 => true,
+                T3SurfaceFormat.eSurface_DXT5 => true,
+                T3SurfaceFormat.eSurface_DXT5A => true,
+                T3SurfaceFormat.eSurface_BC1 => true,
+                T3SurfaceFormat.eSurface_BC2 => true,
+                T3SurfaceFormat.eSurface_BC3 => true,
+                T3SurfaceFormat.eSurface_BC4 => true,
+                T3SurfaceFormat.eSurface_BC5 => true,
+                T3SurfaceFormat.eSurface_BC6 => true,
+                T3SurfaceFormat.eSurface_BC7 => true,
+                T3SurfaceFormat.eSurface_DXN => true,
+                T3SurfaceFormat.eSurface_CTX1 => true,
+                _ => false,
+            };
+        }
+
+        public static uint GetD3DTXBlockSize(T3SurfaceFormat format)
+        {
+            if (IsTextureCompressed(format))
+            {
+                return format switch
+                {
+                    T3SurfaceFormat.eSurface_DXT1 => 8,
+                    T3SurfaceFormat.eSurface_DXT3 => 8,
+                    T3SurfaceFormat.eSurface_BC4 => 8,
+                    _ => 16,
+                };
+            }
+
+            return 0;
+        }
+
+        public static uint GetBitsPerPixel(T3SurfaceFormat surfaceFormat)
+        {
+            switch (surfaceFormat)
+            {
+                case T3SurfaceFormat.eSurface_L8:
+                case T3SurfaceFormat.eSurface_A8:
+                case T3SurfaceFormat.eSurface_L16:
+                    return 8;
+
+                case T3SurfaceFormat.eSurface_RG8:
+                case T3SurfaceFormat.eSurface_AL8:
+                case T3SurfaceFormat.eSurface_R16:
+                case T3SurfaceFormat.eSurface_R16F:
+                case T3SurfaceFormat.eSurface_R16UI:
+                case T3SurfaceFormat.eSurface_RGB565:
+                case T3SurfaceFormat.eSurface_ARGB1555:
+                case T3SurfaceFormat.eSurface_ARGB4:
+                    return 16;
+
+                case T3SurfaceFormat.eSurface_ARGB8:
+                case T3SurfaceFormat.eSurface_RGBA8:
+                case T3SurfaceFormat.eSurface_ARGB2101010:
+                case T3SurfaceFormat.eSurface_RG16:
+                case T3SurfaceFormat.eSurface_RG16S:
+                case T3SurfaceFormat.eSurface_RGBA16S:
+                case T3SurfaceFormat.eSurface_RG16UI:
+                case T3SurfaceFormat.eSurface_RGBA8S:
+                case T3SurfaceFormat.eSurface_RGBA1010102F:
+                case T3SurfaceFormat.eSurface_RGB111110F:
+                case T3SurfaceFormat.eSurface_RGB9E5F:
+                case T3SurfaceFormat.eSurface_RG16F:
+                case T3SurfaceFormat.eSurface_R32:
+                case T3SurfaceFormat.eSurface_R32F:
+                    return 32;
+
+                case T3SurfaceFormat.eSurface_ARGB16:
+                case T3SurfaceFormat.eSurface_RGBA16:
+                case T3SurfaceFormat.eSurface_RG32:
+                case T3SurfaceFormat.eSurface_RG32F:
+                    return 64; // 16 bits per channel * 4 channels (RGBA)
+
+                case T3SurfaceFormat.eSurface_RGBA32:
+                case T3SurfaceFormat.eSurface_RGBA32F:
+                    return 128; // 32 bits per channel * 4 channels (RGBA)
+
+                default:
+                    return 0; // Unknown format or unsupported format
+            }
         }
 
         public List<byte[]> GetPixelDataByFaceIndex(int faceIndex)

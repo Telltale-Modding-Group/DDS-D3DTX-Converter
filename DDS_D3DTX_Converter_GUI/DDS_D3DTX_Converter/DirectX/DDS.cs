@@ -4,7 +4,9 @@ using D3DTX_Converter.TelltaleEnums;
 using D3DTX_Converter.TelltaleTypes;
 using D3DTX_Converter.Utilities;
 using DirectXTexNet;
+using Pfim;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 
 namespace D3DTX_Converter.DirectX
@@ -421,6 +423,19 @@ namespace D3DTX_Converter.DirectX
             };
         }
 
+
+        //TODO ADD GET BITS PER PIXEL TO REFACTOR
+        public static uint GetPitchOrLinearSizeFromD3DTX(T3SurfaceFormat format, uint width)
+        {
+            if (D3DTX_Master.IsTextureCompressed(format))
+            {
+                return Math.Max(1, (width + 3) / 4 * D3DTX_Master.GetD3DTXBlockSize(format));
+            }
+
+            return (width * D3DTX_Master.GetBitsPerPixel(format) + 7) / 8;
+        }
+
+
         /// <summary>
         /// Returns a four-character code for the compression format of our new .dds file, from a Telltale surface format.
         /// </summary>
@@ -525,9 +540,9 @@ namespace D3DTX_Converter.DirectX
                 (int)DXGI_FORMAT.R8G8B8A8_UNORM_SRGB => T3SurfaceFormat.eSurface_RGBA8,
                 (int)DXGI_FORMAT.R8G8B8A8_UNORM => T3SurfaceFormat.eSurface_RGBA8,
                 //TODO FIX R32 (could be int here)
-                (int)DXGI_FORMAT.R32_FLOAT => T3SurfaceFormat.eSurface_R32,
-                (int)DXGI_FORMAT.R32G32_FLOAT => T3SurfaceFormat.eSurface_RG32,
-                (int)DXGI_FORMAT.R32G32B32A32_FLOAT => T3SurfaceFormat.eSurface_RGBA32,
+                (int)DXGI_FORMAT.R32_UINT => T3SurfaceFormat.eSurface_R32,
+                (int)DXGI_FORMAT.R32G32_SINT => T3SurfaceFormat.eSurface_RG32,
+                (int)DXGI_FORMAT.R32G32B32A32_FLOAT => T3SurfaceFormat.eSurface_RGBA32F,
                 (int)DXGI_FORMAT.R8_UNORM => T3SurfaceFormat.eSurface_R8,
                 (int)DXGI_FORMAT.R8G8B8A8_SNORM => T3SurfaceFormat.eSurface_RGBA8S,
                 (int)DXGI_FORMAT.A8_UNORM => T3SurfaceFormat.eSurface_A8,
@@ -539,8 +554,8 @@ namespace D3DTX_Converter.DirectX
                 (int)DXGI_FORMAT.R16G16B16A16_UINT => T3SurfaceFormat.eSurface_R16UI,
                 (int)DXGI_FORMAT.R16_FLOAT => T3SurfaceFormat.eSurface_R16F,
                 (int)DXGI_FORMAT.R16G16B16A16_FLOAT => T3SurfaceFormat.eSurface_RGBA16F,
-                //(int)DXGI_FORMAT.R32_FLOAT => T3SurfaceFormat.eSurface_R32F,
-                //(int)DXGI_FORMAT.R32G32_FLOAT=>T3SurfaceFormat.eSurface_RG32F,
+                (int)DXGI_FORMAT.R32_FLOAT => T3SurfaceFormat.eSurface_R32F,
+                (int)DXGI_FORMAT.R32G32_FLOAT => T3SurfaceFormat.eSurface_RG32F,
                 //(int)DXGI_FORMAT.R32G32B32A32_FLOAT=>T3SurfaceFormat.eSurface_RGBA32F,
                 //TODO SAME HERE, IS IT INT?
                 // (int)DXGI_FORMAT.R10G10B10A2_UNORM=>T3SurfaceFormat.eSurface_RGBA1010102F,
@@ -571,7 +586,6 @@ namespace D3DTX_Converter.DirectX
         {
             switch (format)
             {
-
                 default:
                     return DXGI_FORMAT.BC1_UNORM; //just choose classic DXT1 if the format isn't known
 
@@ -635,17 +649,17 @@ namespace D3DTX_Converter.DirectX
                 //TODO
                 //--------------------R32--------------------
                 case T3SurfaceFormat.eSurface_R32:
-                    return DXGI_FORMAT.R32_FLOAT;
+                    return DXGI_FORMAT.R32_UINT; //from https://www.khronos.org/opengl/wiki/Image_Format
 
                 //TODO
                 //--------------------RG32--------------------
                 case T3SurfaceFormat.eSurface_RG32:
-                    return DXGI_FORMAT.R32G32_FLOAT;
+                    return DXGI_FORMAT.R32G32_UINT; // from https://www.khronos.org/opengl/wiki/Image_Format
 
                 //TODO
                 //--------------------RGBA32--------------------
                 case T3SurfaceFormat.eSurface_RGBA32:
-                    return DXGI_FORMAT.R32G32B32A32_FLOAT;
+                    return DXGI_FORMAT.R32G32B32A32_UINT;
 
                 //TODO
                 //--------------------R8--------------------
@@ -730,11 +744,11 @@ namespace D3DTX_Converter.DirectX
                     return DXGI_FORMAT.D16_UNORM;
 
                 //--------------------Depth24--------------------
-                case T3SurfaceFormat.eSurface_Depth24:
+                case T3SurfaceFormat.eSurface_Depth24: //TODO LEGACY D3D9FORMAT D24X8
                     return DXGI_FORMAT.D24_UNORM_S8_UINT;
 
                 //--------------------DepthStencil32--------------------
-                case T3SurfaceFormat.eSurface_DepthStencil32:
+                case T3SurfaceFormat.eSurface_DepthStencil32: //TODO LEGACY D3D9FORMAT
                     return DXGI_FORMAT.D32_FLOAT_S8X24_UINT;
 
                 //--------------------Depth32F--------------------
@@ -746,7 +760,7 @@ namespace D3DTX_Converter.DirectX
                     return DXGI_FORMAT.D32_FLOAT_S8X24_UINT;
 
                 //--------------------Depth24F_Stencil8--------------------
-                case T3SurfaceFormat.eSurface_Depth24F_Stencil8:
+                case T3SurfaceFormat.eSurface_Depth24F_Stencil8: //TODO LEGACY D3D9FORMAT
                     return DXGI_FORMAT.D24_UNORM_S8_UINT;
 
                 //--------------------DXT1--------------------

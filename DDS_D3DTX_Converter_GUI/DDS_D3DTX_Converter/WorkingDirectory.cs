@@ -8,7 +8,7 @@ public class WorkingDirectoryFile
 {
     public string? FileName { get; set; }
     public string? FileType { get; set; }
-    
+
     public DateTime FileLastWrite { get; set; }
     public string? FilePath { get; set; }
 }
@@ -17,6 +17,9 @@ public class WorkingDirectory
 {
     public string WorkingDirectoryPath = string.Empty;
     public List<WorkingDirectoryFile> WorkingDirectoryFiles = [];
+
+    //hardcoded filters
+    public List<string> filterFileExtensions = [".d3dtx", ".dds", ".png", ".jpg", ".jpeg", ".tiff", ".tif", ".bmp", ".json"];
 
     /// <summary>
     /// Gets the files from the provided directory path.
@@ -43,7 +46,12 @@ public class WorkingDirectory
         {
             string fileName = Path.GetFileNameWithoutExtension(file);
             string fileExt = Path.GetExtension(file);
-            
+
+            if (!filterFileExtensions.Contains(fileExt))
+            {
+                continue;
+            }
+
             WorkingDirectoryFile workingDirectoryFile = new WorkingDirectoryFile
             {
                 FileName = fileName,

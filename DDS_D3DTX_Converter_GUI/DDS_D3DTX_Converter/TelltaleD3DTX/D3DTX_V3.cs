@@ -119,7 +119,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
     /// <summary>
     /// [4 bytes] The type of the texture. No enums were found, need more anylizing. Could be texture layout too.
     /// </summary>
-    public uint mType { get; set; }
+    public uint mType { get; set; } //mTextureDataFormats?
 
     /// <summary>
     /// [4 bytes] The texture data format. No enums were found, need more anylizing. Could be a flag.
@@ -174,7 +174,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
     /// <summary>
     /// [4 bytes] Map brightness for the Detail map type.
     /// </summary>
-    public uint mDetailMapBrightness { get; set; }
+    public float mDetailMapBrightness { get; set; }
 
     /// <summary>
     /// [4 bytes] Unknown flag. It's used with bitwise OR 1 (_DAT_00ab1d84 | 1)
@@ -184,7 +184,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
     /// <summary>
     /// [4 bytes] Normal map related stuff. 
     /// </summary>
-    public uint mNormalMapFmt { get; set; }
+    public int mNormalMapFmt { get; set; }
 
     /// <summary>
     /// [8 bytes] A vector, defines the UV offset values when the shader on a material samples the texture.
@@ -201,7 +201,9 @@ namespace D3DTX_Converter.TelltaleD3DTX
     /// </summary>
     public byte mbForcePreviewRebuild { get; set; }
 
-
+    /// <summary>
+    /// A byte array of the pixel regions in a texture. Starts from smallest mip map to largest mip map. (Since this is a pure dds, this statement could be wrong)
+    /// </summary>
     public List<byte[]> mPixelData { get; set; }
 
     /// <summary>
@@ -243,7 +245,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
       mbEncrypted = reader.ReadByte();
       mDetailMapBrightness = reader.ReadUInt32();
       unknownFlag = reader.ReadUInt32();
-      mNormalMapFmt = reader.ReadUInt32();
+      mNormalMapFmt = reader.ReadInt32();
       mUVOffset = new Vector2() //mUVOffset [8 bytes]
       {
         x = reader.ReadSingle(), //[4 bytes]

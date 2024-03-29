@@ -356,7 +356,45 @@ namespace D3DTX_Converter.TelltaleD3DTX
             mWidth = dds.header.dwWidth;
             mHeight = dds.header.dwHeight;
             mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC, dds);
-            //mDepth = dds.header.dwDepth;
+            mNumMipLevels = dds.header.dwMipMapCount;
+
+            List<byte[]> ddsData = new List<byte[]>(dds.textureData); //this is correct
+            ddsData.Reverse(); //this is correct
+
+            mPixelData.Clear(); //this is correct
+            mPixelData = ddsData; //this is correct
+
+            StreamHeader newStreamHeader = new StreamHeader()
+            {
+                mRegionCount = (int)dds.header.dwMipMapCount,
+                mAuxDataCount = mStreamHeader.mAuxDataCount,
+                mTotalDataSize = (int)ByteFunctions.Get2DByteArrayTotalSize(mPixelData) //this is correct
+            };
+
+            mStreamHeader = newStreamHeader;
+
+            RegionStreamHeader[] regionStreamHeader = new RegionStreamHeader[mStreamHeader.mRegionCount];
+            uint[,] mipMapResolutions = DDS.CalculateMipResolutions(mNumMipLevels, mWidth, mHeight);
+
+            for (int i = 0; i < regionStreamHeader.Length; i++)
+            {
+                regionStreamHeader[i] = new RegionStreamHeader()
+                {
+                    mDataSize = (uint)mPixelData[i].Length,
+                    mMipCount = 1, //NOTE: for cubemap textures this will need to change
+                    mMipIndex = (regionStreamHeader.Length - 1) - i, //mMipIndex = (regionStreamHeader.Length - 1) - i,
+                                                                     // mPitch = DDS_Functions.DDS_ComputePitchValue(mipMapResolutions[regionStreamHeader.Length - i, 0], (dds.header.ddspf.dwFourCC == 0x44585435u || dds.header.ddspf.dwFourCC == 0x35545844u) ? 1 : 0), //this is correct
+                };
+            }
+
+            mRegionHeaders = regionStreamHeader;
+            UpdateArrayCapacities();
+        }
+
+        public void UpdateArrayCapacities()
+        {
+            mToonRegions_ArrayCapacity = 8 + (uint)(20 * mToonRegions.Length);
+            mToonRegions_ArrayLength = mToonRegions.Length;
         }
 
         public void WriteBinaryData(BinaryWriter writer)

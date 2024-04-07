@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using D3DTX_Converter.DirectX;
 using CommunityToolkit.Mvvm.ComponentModel.__Internals;
+using System.Runtime.ConstrainedExecution;
 
 namespace D3DTX_Converter.Main
 {
@@ -244,33 +245,33 @@ namespace D3DTX_Converter.Main
         {
             if (d3dtx4 != null)
             {
-                d3dtx4.ModifyD3DTX(dds);
+                d3dtx4.ModifyD3DTX(dds, sections);
 
                 SetMetaChunkSizes(d3dtx4.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx4.mPixelData));
             }
             else if (d3dtx5 != null)
             {
-                d3dtx5.ModifyD3DTX(dds);
+                d3dtx5.ModifyD3DTX(dds, sections);
 
                 SetMetaChunkSizes(d3dtx5.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx5.mPixelData));
             }
             else if (d3dtx6 != null)
             {
-                d3dtx6.ModifyD3DTX(dds);
+                d3dtx6.ModifyD3DTX(dds, sections);
 
                 SetMetaChunkSizes(d3dtx6.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx6.mPixelData));
             }
             else if (d3dtx7 != null)
             {
-                d3dtx7.ModifyD3DTX(dds);
+                d3dtx7.ModifyD3DTX(dds, sections);
 
-                //SetMetaChunkSizes(d3dtx7.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx7.mPixelData));
+                SetMetaChunkSizes(d3dtx7.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx7.mPixelData));
             }
             else if (d3dtx8 != null)
             {
-                d3dtx8.ModifyD3DTX(dds);
+                d3dtx8.ModifyD3DTX(dds, sections);
 
-                //SetMetaChunkSizes(d3dtx8.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx8.mPixelData));
+                SetMetaChunkSizes(d3dtx8.GetHeaderByteSize(), ByteFunctions.Get2DByteArrayTotalSize(d3dtx8.mPixelData));
             }
             else if (d3dtx9 != null)
             {

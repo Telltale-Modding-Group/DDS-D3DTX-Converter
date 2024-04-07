@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using D3DTX_Converter.TelltaleFunctions;
@@ -331,7 +331,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
                 mPixelData.Add(imageData);
             }
 
-            if(showConsole)
+            if (showConsole)
                 PrintConsole();
         }
 
@@ -353,34 +353,38 @@ namespace D3DTX_Converter.TelltaleD3DTX
                 mTotalDataSize = (int)ByteFunctions.Get2DByteArrayTotalSize(mPixelData) //THIS IS CORRECT
             };
 
-            //uint[,] mipMapResolutions = DDS.CalculateMipResolutions(mNumMipLevels, mWidth, mHeight);
-            //uint blockSize = DDS.GetDDSBlockSize(dds.header);
-
-            RegionStreamHeader[] NEW_mRegionHeaders = new RegionStreamHeader[mStreamHeader.mRegionCount];
+            RegionStreamHeader[] regionStreamHeader = new RegionStreamHeader[mStreamHeader.mRegionCount];
 
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
-                NEW_mRegionHeaders[i] = new()
+                regionStreamHeader[i] = new()
                 {
-                    mDataSize = (uint)mPixelData[i].Length, //THIS IS CORRECT
+                    mDataSize = (uint)mPixelData[mStreamHeader.mRegionCount - 1 - i].Length, //THIS IS CORRECT
                     mFaceIndex = 0, //NOTE: for cubemap textures this will need to change
-                    mMipCount = 1, //NOTE: for cubemap textures this will need to change
-                    mMipIndex = (mStreamHeader.mRegionCount - 1) - i, //THIS IS CORRECT
-                    //mPitch = (int)DDS.ComputePitchValue_BlockCompression(mipMapResolutions[i, 0], blockSize), //THIS IS INCORRECT
-                    mPitch = (int)sections[(mStreamHeader.mRegionCount - 1) - i].RowPitch,
-                    mSlicePitch = (int)sections[(mStreamHeader.mRegionCount - 1) - i].SlicePitch,
+                    mMipCount = 1, //NOTE: for cubemap textures this will need to change (check with TextureLayout)
+                    mMipIndex = mStreamHeader.mRegionCount - 1 - i, //THIS IS CORRECT
+                    mPitch = (int)sections[mStreamHeader.mRegionCount - 1 - i].RowPitch,
+                    mSlicePitch = (int)sections[mStreamHeader.mRegionCount - 1 - i].SlicePitch,
                 };
             }
 
-            mRegionHeaders = NEW_mRegionHeaders;
+            mRegionHeaders = regionStreamHeader;
 
-            //reverse the array
+            //reverse the region headers
             List<RegionStreamHeader> mRegionHeaders_Reversed = new List<RegionStreamHeader>(mRegionHeaders);
             mRegionHeaders_Reversed.Reverse();
             mRegionHeaders = mRegionHeaders_Reversed.ToArray();
 
             UpdateArrayCapacities(); //THIS IS CORRECT
-            PrintConsole();
+        }
+
+        public void UpdateArrayCapacities()
+        {
+            mArrayFrameNames_ArrayCapacity = 8 + (uint)(8 * mArrayFrameNames.Length);
+            mArrayFrameNames_ArrayLength = mArrayFrameNames.Length;
+
+            mToonRegions_ArrayCapacity = 8 + (uint)(20 * mToonRegions.Length);
+            mToonRegions_ArrayLength = mToonRegions.Length;
         }
 
         public void WriteBinaryData(BinaryWriter writer)
@@ -520,16 +524,6 @@ namespace D3DTX_Converter.TelltaleD3DTX
 
             return totalSize;
         }
-
-        public void UpdateArrayCapacities()
-        {
-            mArrayFrameNames_ArrayCapacity = 8 + (uint)(8 * mArrayFrameNames.Length);
-            mArrayFrameNames_ArrayLength = mArrayFrameNames.Length;
-
-            mToonRegions_ArrayCapacity = 8 + (uint)(20 * mToonRegions.Length);
-            mToonRegions_ArrayLength = mToonRegions.Length;
-        }
-
         public void PrintConsole()
         {
             Console.WriteLine("||||||||||| D3DTX Header |||||||||||");

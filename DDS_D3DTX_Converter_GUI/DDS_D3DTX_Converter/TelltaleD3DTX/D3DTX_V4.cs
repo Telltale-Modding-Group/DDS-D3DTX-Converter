@@ -171,7 +171,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
         public StreamHeader mStreamHeader { get; set; }
 
         /// <summary>
-        /// [24 bytes for each element] An array containing each pixel region in the texture.
+        /// [16 bytes for each element] An array containing each pixel region in the texture.
         /// </summary>
         public RegionStreamHeader[] mRegionHeaders { get; set; }
 
@@ -284,44 +284,43 @@ namespace D3DTX_Converter.TelltaleD3DTX
             if (showConsole) PrintConsole();
         }
 
-        public void ModifyD3DTX(DDS_Master dds)
+        public void ModifyD3DTX(DDS_Master dds, DDS_DirectXTexNet_ImageSection[] sections)
         {
             mWidth = dds.header.dwWidth;
             mHeight = dds.header.dwHeight;
             mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC, dds);
             mNumMipLevels = dds.header.dwMipMapCount;
 
-            List<byte[]> ddsData = new List<byte[]>(dds.textureData); //this is correct
-            ddsData.Reverse(); //this is correct
+            mPixelData.Clear(); //THIS IS CORRECT
+            mPixelData = dds.textureData; //THIS IS CORRECT
 
-            mPixelData.Clear(); //this is correct
-            mPixelData = ddsData; //this is correct
-
-            StreamHeader newStreamHeader = new StreamHeader()
+            mStreamHeader = new StreamHeader()
             {
                 mRegionCount = (int)dds.header.dwMipMapCount,
                 mAuxDataCount = mStreamHeader.mAuxDataCount,
                 mTotalDataSize = (int)ByteFunctions.Get2DByteArrayTotalSize(mPixelData) //this is correct
             };
 
-            mStreamHeader = newStreamHeader;
-
             RegionStreamHeader[] regionStreamHeader = new RegionStreamHeader[mStreamHeader.mRegionCount];
-            uint[,] mipMapResolutions = DDS.CalculateMipResolutions(mNumMipLevels, mWidth, mHeight);
 
-            for (int i = 0; i < regionStreamHeader.Length; i++)
+            for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 regionStreamHeader[i] = new RegionStreamHeader()
                 {
-                    mDataSize = (uint)mPixelData[i].Length,
+                    mDataSize = (uint)mPixelData[mStreamHeader.mRegionCount - 1 - i].Length, //THIS IS CORRECT
                     mMipCount = 1, //NOTE: for cubemap textures this will need to change
-                    mMipIndex = (regionStreamHeader.Length - 1) - i, //mMipIndex = (regionStreamHeader.Length - 1) - i,
-                    //mPitch = DDS_Functions.DDS_ComputePitchValue(mipMapResolutions[regionStreamHeader.Length - i, 0], (dds.header.ddspf.dwFourCC == 0x44585435u || dds.header.ddspf.dwFourCC == 0x35545844u) ? 1 : 0), //this is correct
+                    mMipIndex = regionStreamHeader.Length - 1 - i,
+                    mPitch = (int)sections[mStreamHeader.mRegionCount - 1 - i].RowPitch,
                 };
             }
 
             mRegionHeaders = regionStreamHeader;
 
+            //reverse the region headers
+            List<RegionStreamHeader> mRegionHeaders_Reversed = new List<RegionStreamHeader>(mRegionHeaders);
+            mRegionHeaders_Reversed.Reverse();
+            mRegionHeaders = mRegionHeaders_Reversed.ToArray();
+            
             UpdateArrayCapacities();
             //PrintConsole();
         }
@@ -412,12 +411,9 @@ namespace D3DTX_Converter.TelltaleD3DTX
             totalSize += 4; //mNumMipLevels [4 bytes]
             totalSize += 4; //mWidth [4 bytes]
             totalSize += 4; //mHeight [4 bytes]
-
             totalSize += 4; //mSurfaceFormat [4 bytes]
             totalSize += 4; //mResourceUsage [4 bytes]
-
-            totalSize += 4; //padding [4 bytes]
-
+            totalSize += 4; //padding [4 bytes] ??? mtype??
             totalSize += 4; //mNormalMapFormat [4 bytes]
             totalSize += 4; //mHDRLightmapScale [4 bytes]
             totalSize += 4; //mToonGradientCutoff [4 bytes]

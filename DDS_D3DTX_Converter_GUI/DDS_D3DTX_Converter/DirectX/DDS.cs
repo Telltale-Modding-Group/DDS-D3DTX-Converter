@@ -7,6 +7,7 @@ using DirectXTexNet;
 using Pfim;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace D3DTX_Converter.DirectX
@@ -28,47 +29,44 @@ namespace D3DTX_Converter.DirectX
     /// </summary>
     public static class DDS
     {
-        public static uint GetDDSBlockSize(DDS_HEADER header)
+        public static uint GetDDSBlockSize(DDS_HEADER header, DDS_HEADER_DXT10 dx10_header)
         {
-            //Image image = null;
-            //image.SlicePitch
-
             uint compressionValue = header.ddspf.dwFourCC;
 
-            if (compressionValue == ByteFunctions.Convert_String_To_UInt32("DXT1"))
-                return 8;
-            if (compressionValue == ByteFunctions.Convert_String_To_UInt32("ATI1"))
-                return 8;
-            else
-                return 16;
+            if (compressionValue == ByteFunctions.Convert_String_To_UInt32("DX10"))
+            {
+                compressionValue = (uint)dx10_header.dxgiFormat;
+            }
+
+            return GetDXGICompressionBlockSize(compressionValue);
         }
 
         public static uint[,] CalculateMipResolutions(uint mipCount, uint width, uint height)
         {
             //because I suck at math, we will generate our mip map resolutions using the same method we did in d3dtx to dds (can't figure out how to calculate them in reverse properly)
             //first [] is the "resolution" index, and the second [] always has a length of 2, and contains the width and height
-            uint[,] mipResolutions = new uint[mipCount + 1, 2];
+            uint[,] mipResolutions = new uint[mipCount, 2];
 
             //get our mip image dimensions (have to multiply by 2 as the mip calculations will be off by half)
             uint mipImageWidth = width * 2;
             uint mipImageHeight = height * 2;
 
             //add the resolutions in reverse
-            for (uint i = mipCount; i > 0; i--)
+            for (int i = (int)mipCount - 1; i >= 0; i--)
             {
                 //divide the resolutions by 2
                 mipImageWidth /= 2;
                 mipImageHeight /= 2;
-
+                Console.WriteLine(i);
                 //assign the resolutions
-                mipResolutions[i, 0] = mipImageWidth;
-                mipResolutions[i, 1] = mipImageHeight;
+                mipResolutions[i, 0] = Math.Max(1, mipImageWidth);
+                mipResolutions[i, 1] = Math.Max(1, mipImageHeight);
             }
 
             return mipResolutions;
         }
 
-        public static uint[] GetImageByteSizes(uint[,] mipResolutions, uint baseLinearSize, uint blockSize)
+        public static uint[] GetImageByteSizes(uint[,] mipResolutions, uint baseLinearSize, uint bitPixelSize, bool isCompressed)
         {
             uint[] byteSizes = new uint[mipResolutions.GetLength(0)];
 
@@ -77,13 +75,15 @@ namespace D3DTX_Converter.DirectX
                 uint mipWidth = mipResolutions[i, 0];
                 uint mipHeight = mipResolutions[i, 1];
 
-                byteSizes[i] = CalculateByteSize(mipWidth, mipHeight, blockSize);
-
+                // It works for square textures
+                byteSizes[i] = CalculateByteSize(mipWidth, mipHeight, bitPixelSize, isCompressed);
+                Console.WriteLine("Mip " + i + " size: " + byteSizes[i]);
+                // This is outdated code, used only for reference
                 // if (mipWidth == mipHeight) //SQUARE SIZE
                 // {
                 //     computed linear size
                 //     (mipWidth * mipWidth) / 2
-                //
+
                 //     byteSizes[i] = Calculate_ByteSize_Square(mipWidth, mipHeight, baseLinearSize, (uint)i, (uint)byteSizes.Length, blockSize);
                 //     byteSizes[i] = Calculate_ByteSize(mipWidth, mipHeight, blockSize);
                 // }   
@@ -281,7 +281,7 @@ namespace D3DTX_Converter.DirectX
         /// <param name="height"></param>
         /// <param name="isDXT1"></param>
         /// <returns></returns>
-        public static uint CalculateByteSize(uint width, uint height, uint bitPixelSize)
+        public static uint CalculateByteSize(uint width, uint height, uint bitPixelSize, bool isCompressed)
         {
             //formula (from microsoft docs)
             //max(1, ( (width + 3) / 4 ) ) x max(1, ( (height + 3) / 4 ) ) x 8(DXT1) or 16(DXT2-5)
@@ -290,7 +290,15 @@ namespace D3DTX_Converter.DirectX
             //max(1,width ?4)x max(1,height ?4)x 8 (DXT1) or 16 (DXT2-5)
 
             //do the micorosoft magic texture byte size calculation formula
-            return Math.Max(1, ((width + 3) / 4)) * Math.Max(1, ((height + 3) / 4)) * bitPixelSize;
+
+            if (isCompressed)
+            {
+                return Math.Max(1, ((width + 3) / 4)) * Math.Max(1, ((height + 3) / 4)) * bitPixelSize;
+            }
+            else
+            {
+                return width * height * bitPixelSize;
+            }
 
             //formula (from here) - http://doc.51windows.net/directx9_sdk/graphics/reference/DDSFileReference/ddstextures.htm
             //return Math.Max(1, width / 4) * Math.Max(1, height / 4) * bitPixelSize;
@@ -511,7 +519,9 @@ namespace D3DTX_Converter.DirectX
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("ATI2")) return T3SurfaceFormat.eSurface_DXN;
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("ATI1")) return T3SurfaceFormat.eSurface_DXT5A;
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("BC4S")) return T3SurfaceFormat.eSurface_BC4;
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("BC4U")) return T3SurfaceFormat.eSurface_BC4;
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("BC5S")) return T3SurfaceFormat.eSurface_BC5;
+            else if (fourCC == ByteFunctions.Convert_String_To_UInt32("BC5U")) return T3SurfaceFormat.eSurface_BC5;
             else if (fourCC == ByteFunctions.Convert_String_To_UInt32("DX10")) return Parse_T3Format_FromDX10(dds.dxt10_header.dxgiFormat);
             else return T3SurfaceFormat.eSurface_DXT1;
         }
@@ -824,5 +834,316 @@ namespace D3DTX_Converter.DirectX
                     return DXGI_FORMAT.UNKNOWN;
             }
         }
+        public static uint GetDXGIBitsPerPixel(DXGI_FORMAT fmt)
+        {
+            switch (fmt)
+            {
+                case DXGI_FORMAT.R32G32B32A32_TYPELESS:
+                case DXGI_FORMAT.R32G32B32A32_FLOAT:
+                case DXGI_FORMAT.R32G32B32A32_UINT:
+                case DXGI_FORMAT.R32G32B32A32_SINT:
+                    return 128;
+
+                case DXGI_FORMAT.R32G32B32_TYPELESS:
+                case DXGI_FORMAT.R32G32B32_FLOAT:
+                case DXGI_FORMAT.R32G32B32_UINT:
+                case DXGI_FORMAT.R32G32B32_SINT:
+                    return 96;
+
+                case DXGI_FORMAT.R16G16B16A16_TYPELESS:
+                case DXGI_FORMAT.R16G16B16A16_FLOAT:
+                case DXGI_FORMAT.R16G16B16A16_UNORM:
+                case DXGI_FORMAT.R16G16B16A16_UINT:
+                case DXGI_FORMAT.R16G16B16A16_SNORM:
+                case DXGI_FORMAT.R16G16B16A16_SINT:
+                case DXGI_FORMAT.R32G32_TYPELESS:
+                case DXGI_FORMAT.R32G32_FLOAT:
+                case DXGI_FORMAT.R32G32_UINT:
+                case DXGI_FORMAT.R32G32_SINT:
+                case DXGI_FORMAT.R32G8X24_TYPELESS:
+                case DXGI_FORMAT.D32_FLOAT_S8X24_UINT:
+                case DXGI_FORMAT.R32_FLOAT_X8X24_TYPELESS:
+                case DXGI_FORMAT.X32_TYPELESS_G8X24_UINT:
+                case DXGI_FORMAT.Y416:
+                case DXGI_FORMAT.Y210:
+                case DXGI_FORMAT.Y216:
+                    return 64;
+
+                case DXGI_FORMAT.R10G10B10A2_TYPELESS:
+                case DXGI_FORMAT.R10G10B10A2_UNORM:
+                case DXGI_FORMAT.R10G10B10A2_UINT:
+                case DXGI_FORMAT.R11G11B10_FLOAT:
+                case DXGI_FORMAT.R8G8B8A8_TYPELESS:
+                case DXGI_FORMAT.R8G8B8A8_UNORM:
+                case DXGI_FORMAT.R8G8B8A8_UNORM_SRGB:
+                case DXGI_FORMAT.R8G8B8A8_UINT:
+                case DXGI_FORMAT.R8G8B8A8_SNORM:
+                case DXGI_FORMAT.R8G8B8A8_SINT:
+                case DXGI_FORMAT.R16G16_TYPELESS:
+                case DXGI_FORMAT.R16G16_FLOAT:
+                case DXGI_FORMAT.R16G16_UNORM:
+                case DXGI_FORMAT.R16G16_UINT:
+                case DXGI_FORMAT.R16G16_SNORM:
+                case DXGI_FORMAT.R16G16_SINT:
+                case DXGI_FORMAT.R32_TYPELESS:
+                case DXGI_FORMAT.D32_FLOAT:
+                case DXGI_FORMAT.R32_FLOAT:
+                case DXGI_FORMAT.R32_UINT:
+                case DXGI_FORMAT.R32_SINT:
+                case DXGI_FORMAT.R24G8_TYPELESS:
+                case DXGI_FORMAT.D24_UNORM_S8_UINT:
+                case DXGI_FORMAT.R24_UNORM_X8_TYPELESS:
+                case DXGI_FORMAT.X24_TYPELESS_G8_UINT:
+                case DXGI_FORMAT.R9G9B9E5_SHAREDEXP:
+                case DXGI_FORMAT.R8G8_B8G8_UNORM:
+                case DXGI_FORMAT.G8R8_G8B8_UNORM:
+                case DXGI_FORMAT.B8G8R8A8_UNORM:
+                case DXGI_FORMAT.B8G8R8X8_UNORM:
+                case DXGI_FORMAT.R10G10B10_XR_BIAS_A2_UNORM:
+                case DXGI_FORMAT.B8G8R8A8_TYPELESS:
+                case DXGI_FORMAT.B8G8R8A8_UNORM_SRGB:
+                case DXGI_FORMAT.B8G8R8X8_TYPELESS:
+                case DXGI_FORMAT.B8G8R8X8_UNORM_SRGB:
+                case DXGI_FORMAT.AYUV:
+                case DXGI_FORMAT.Y410:
+                case DXGI_FORMAT.YUY2:
+                    return 32;
+
+                case DXGI_FORMAT.P010:
+                case DXGI_FORMAT.P016:
+                case DXGI_FORMAT.V408:
+                    return 24;
+
+                case DXGI_FORMAT.R8G8_TYPELESS:
+                case DXGI_FORMAT.R8G8_UNORM:
+                case DXGI_FORMAT.R8G8_UINT:
+                case DXGI_FORMAT.R8G8_SNORM:
+                case DXGI_FORMAT.R8G8_SINT:
+                case DXGI_FORMAT.R16_TYPELESS:
+                case DXGI_FORMAT.R16_FLOAT:
+                case DXGI_FORMAT.D16_UNORM:
+                case DXGI_FORMAT.R16_UNORM:
+                case DXGI_FORMAT.R16_UINT:
+                case DXGI_FORMAT.R16_SNORM:
+                case DXGI_FORMAT.R16_SINT:
+                case DXGI_FORMAT.B5G6R5_UNORM:
+                case DXGI_FORMAT.B5G5R5A1_UNORM:
+                case DXGI_FORMAT.A8P8:
+                case DXGI_FORMAT.B4G4R4A4_UNORM:
+                case DXGI_FORMAT.P208:
+                case DXGI_FORMAT.V208:
+                    return 16;
+
+                case DXGI_FORMAT.NV12:
+                case DXGI_FORMAT.OPAQUE_420:
+                case DXGI_FORMAT.NV11:
+                    return 12;
+
+                case DXGI_FORMAT.R8_TYPELESS:
+                case DXGI_FORMAT.R8_UNORM:
+                case DXGI_FORMAT.R8_UINT:
+                case DXGI_FORMAT.R8_SNORM:
+                case DXGI_FORMAT.R8_SINT:
+                case DXGI_FORMAT.A8_UNORM:
+                case DXGI_FORMAT.BC2_TYPELESS:
+                case DXGI_FORMAT.BC2_UNORM:
+                case DXGI_FORMAT.BC2_UNORM_SRGB:
+                case DXGI_FORMAT.BC3_TYPELESS:
+                case DXGI_FORMAT.BC3_UNORM:
+                case DXGI_FORMAT.BC3_UNORM_SRGB:
+                case DXGI_FORMAT.BC5_TYPELESS:
+                case DXGI_FORMAT.BC5_UNORM:
+                case DXGI_FORMAT.BC5_SNORM:
+                case DXGI_FORMAT.BC6H_TYPELESS:
+                case DXGI_FORMAT.BC6H_UF16:
+                case DXGI_FORMAT.BC6H_SF16:
+                case DXGI_FORMAT.BC7_TYPELESS:
+                case DXGI_FORMAT.BC7_UNORM:
+                case DXGI_FORMAT.BC7_UNORM_SRGB:
+                case DXGI_FORMAT.AI44:
+                case DXGI_FORMAT.IA44:
+                case DXGI_FORMAT.P8:
+                    return 8;
+
+                case DXGI_FORMAT.R1_UNORM:
+                    return 1;
+
+                case DXGI_FORMAT.BC1_TYPELESS:
+                case DXGI_FORMAT.BC1_UNORM:
+                case DXGI_FORMAT.BC1_UNORM_SRGB:
+                case DXGI_FORMAT.BC4_TYPELESS:
+                case DXGI_FORMAT.BC4_UNORM:
+                case DXGI_FORMAT.BC4_SNORM:
+                    return 4;
+
+                default:
+                    return 0;
+            }
+        }
+
+        public static uint GetD3D9FORMATBitsPerPifxel(D3DFORMAT fmt)
+        {
+            switch (fmt)
+            {
+                case D3DFORMAT.A32B32G32R32F:
+                    return 128;
+
+                case D3DFORMAT.A16B16G16R16:
+                case D3DFORMAT.Q16W16V16U16:
+                case D3DFORMAT.A16B16G16R16F:
+                case D3DFORMAT.G32R32F:
+                    return 64;
+
+                case D3DFORMAT.A8R8G8B8:
+                case D3DFORMAT.X8R8G8B8:
+                case D3DFORMAT.A2B10G10R10:
+                case D3DFORMAT.A8B8G8R8:
+                case D3DFORMAT.X8B8G8R8:
+                case D3DFORMAT.G16R16:
+                case D3DFORMAT.A2R10G10B10:
+                case D3DFORMAT.Q8W8V8U8:
+                case D3DFORMAT.V16U16:
+                case D3DFORMAT.X8L8V8U8:
+                case D3DFORMAT.A2W10V10U10:
+                case D3DFORMAT.D32:
+                case D3DFORMAT.D24S8:
+                case D3DFORMAT.D24X8:
+                case D3DFORMAT.D24X4S4:
+                case D3DFORMAT.D32F_LOCKABLE:
+                case D3DFORMAT.D24FS8:
+                case D3DFORMAT.INDEX32:
+                case D3DFORMAT.G16R16F:
+                case D3DFORMAT.R32F:
+                case D3DFORMAT.D32_LOCKABLE:
+                    return 32;
+
+                case D3DFORMAT.R8G8B8:
+                    return 24;
+
+                case D3DFORMAT.A4R4G4B4:
+                case D3DFORMAT.X4R4G4B4:
+                case D3DFORMAT.R5G6B5:
+                case D3DFORMAT.L16:
+                case D3DFORMAT.A8L8:
+                case D3DFORMAT.X1R5G5B5:
+                case D3DFORMAT.A1R5G5B5:
+                case D3DFORMAT.A8R3G3B2:
+                case D3DFORMAT.V8U8:
+                case D3DFORMAT.CxV8U8:
+                case D3DFORMAT.L6V5U5:
+                case D3DFORMAT.G8R8_G8B8:
+                case D3DFORMAT.R8G8_B8G8:
+                case D3DFORMAT.D16_LOCKABLE:
+                case D3DFORMAT.D15S1:
+                case D3DFORMAT.D16:
+                case D3DFORMAT.INDEX16:
+                case D3DFORMAT.R16F:
+                case D3DFORMAT.YUY2:
+                // From DX docs, reference/d3d/enums/d3dformat.asp
+                // (note how it says that D3DFMT_R8G8_B8G8 is "A 16-bit packed RGB format analogous to UYVY (U0Y0, V0Y1, U2Y2, and so on)")
+                case D3DFORMAT.UYVY:
+                    return 16;
+
+                case D3DFORMAT.R3G3B2:
+                case D3DFORMAT.A8:
+                case D3DFORMAT.A8P8:
+                case D3DFORMAT.P8:
+                case D3DFORMAT.L8:
+                case D3DFORMAT.A4L4:
+                case D3DFORMAT.DXT2:
+                case D3DFORMAT.DXT3:
+                case D3DFORMAT.DXT4:
+                case D3DFORMAT.DXT5:
+                // http://msdn.microsoft.com/library/default.asp?url=/library/en-us/directshow/htm/directxvideoaccelerationdxvavideosubtypes.asp
+                case D3DFORMAT.AI44:
+                case D3DFORMAT.IA44:
+                case D3DFORMAT.S8_LOCKABLE:
+                    return 8;
+
+                case D3DFORMAT.DXT1:
+                    return 4;
+
+                case D3DFORMAT.YV12:
+                    return 12;
+
+                case D3DFORMAT.A1:
+                    return 1;
+
+                default:
+                    return 0;
+            }
+        }
+
+        public static bool IsTextureFormatCompressed(uint format)
+        {
+
+            switch (format)
+            {
+                // DXGI formats
+                case (uint)DXGI_FORMAT.BC1_TYPELESS:
+                case (uint)DXGI_FORMAT.BC1_UNORM:
+                case (uint)DXGI_FORMAT.BC1_UNORM_SRGB:
+                case (uint)DXGI_FORMAT.BC2_TYPELESS:
+                case (uint)DXGI_FORMAT.BC2_UNORM:
+                case (uint)DXGI_FORMAT.BC2_UNORM_SRGB:
+                case (uint)DXGI_FORMAT.BC3_TYPELESS:
+                case (uint)DXGI_FORMAT.BC3_UNORM:
+                case (uint)DXGI_FORMAT.BC3_UNORM_SRGB:
+                case (uint)DXGI_FORMAT.BC4_TYPELESS:
+                case (uint)DXGI_FORMAT.BC4_UNORM:
+                case (uint)DXGI_FORMAT.BC4_SNORM:
+                case (uint)DXGI_FORMAT.BC5_TYPELESS:
+                case (uint)DXGI_FORMAT.BC5_UNORM:
+                case (uint)DXGI_FORMAT.BC5_SNORM:
+                case (uint)DXGI_FORMAT.BC6H_TYPELESS:
+                case (uint)DXGI_FORMAT.BC6H_UF16:
+                case (uint)DXGI_FORMAT.BC6H_SF16:
+                case (uint)DXGI_FORMAT.BC7_TYPELESS:
+                case (uint)DXGI_FORMAT.BC7_UNORM:
+                case (uint)DXGI_FORMAT.BC7_UNORM_SRGB:
+
+                // D3D9 formats
+                case (uint)D3DFORMAT.DXT1:
+                case (uint)D3DFORMAT.DXT2:
+                case (uint)D3DFORMAT.DXT3:
+                case (uint)D3DFORMAT.DXT4:
+                case (uint)D3DFORMAT.DXT5:
+
+                // FourCC formats
+                // Note: Other FourCC compressed formats do exist, but they are rare: https://github.com/microsoft/DirectXTex/blob/fa22a4ec53dcc67505e66eca0c788ad8feed6b34/DirectXTex/DirectXTexDDS.cpp#L60
+                // TODO: Refactor code
+                case 0x31495441: // "ATI1"
+                case 0x32495441: // "ATI2"
+                case 0x55344342: // "BC4U"
+                case 0x53344342: // "BC4S"
+                case 0x55354342: // "BC5U"
+                case 0x53354342: // "BC5S"
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static uint GetDXGICompressionBlockSize(uint format)
+        {
+            switch (format)
+            {
+                case (uint)D3DFORMAT.DXT1:
+                case (uint)DXGI_FORMAT.BC1_TYPELESS:
+                case (uint)DXGI_FORMAT.BC1_UNORM:
+                case (uint)DXGI_FORMAT.BC1_UNORM_SRGB:
+                case (uint)DXGI_FORMAT.BC4_TYPELESS:
+                case (uint)DXGI_FORMAT.BC4_UNORM:
+                case (uint)DXGI_FORMAT.BC4_SNORM:
+                case 0x31495441: // "ATI1"
+                case 0x55344342: // "BC4U"
+                case 0x53344342: // "BC4S"
+                    return 8;
+            }
+
+            return 16;
+        }
     }
+
 }
+

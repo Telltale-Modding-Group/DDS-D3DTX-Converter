@@ -8,6 +8,7 @@ using DirectXTexNet;
 using System.ComponentModel;
 using ExCSS;
 using D3DTX_Converter.TelltaleD3DTX;
+using System.Linq;
 
 /*
  * DXT1 - DXGI_FORMAT_BC1_UNORM / D3DFMT_DXT1
@@ -426,21 +427,46 @@ namespace D3DTX_Converter.Main
                 //get mip resolutions
                 //calculated mip resolutions [Pixel Value, Width or Height (0 or 1)]
                 mipMapResolutions =
-                    DDS.CalculateMipResolutions(header.dwMipMapCount - 1, header.dwWidth, header.dwHeight);
+                    DDS.CalculateMipResolutions(header.dwMipMapCount, header.dwWidth, header.dwHeight);
 
-                //TODO CALCULATE BLOCKSIZE CORRECTLY
-                //get block size
-                uint blockSize = DDS.GetDDSBlockSize(header);
+                uint byteSize;
+                bool isCompressed = false;
+                bool isFormatLegacy = true;
+                uint format = header.ddspf.dwFourCC;
 
-                //get byte sizes
-                //uint[] byteSizes = DDS_Functions.DDS_GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, ((header.ddspf.dwFourCC == 0x44585435u || header.ddspf.dwFourCC == 0x35545844u) ? false : true));
-                uint[] byteSizes = DDS.GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, blockSize);
+                if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10"))
+                {
+                    format = (uint)dxt10_header.dxgiFormat;
+                    isFormatLegacy = false;
+                }
+
+                //check if it's compressed
+                //get the block size if true
+                //get the pixel size if false
+                if (DDS.IsTextureFormatCompressed(format))
+                {
+                    isCompressed = true;
+                    byteSize = DDS.GetDDSBlockSize(header, dxt10_header);
+                }
+                else
+                {
+                    if (isFormatLegacy)
+                    {
+                        byteSize = DDS.GetD3D9FORMATBitsPerPifxel((D3DFORMAT)header.ddspf.dwFourCC) / 8;
+                    }
+                    else
+                    {
+                        byteSize = DDS.GetDXGIBitsPerPixel(dxt10_header.dxgiFormat) / 8;
+                    }
+                }
+
+                uint[] byteSizes = DDS.GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, byteSize, isCompressed);
 
                 int offset = 0;
 
                 for (int i = 0; i < byteSizes.Length; i++)
                 {
-                    byte[] temp = new byte[byteSizes[i]];
+                    byte[] temp = new byte[byteSizes[header.dwMipMapCount - i - 1]];
 
                     //issue length
                     Array.Copy(ddsTextureData, offset, temp, 0, temp.Length);
@@ -449,7 +475,10 @@ namespace D3DTX_Converter.Main
 
                     textureData.Add(temp);
                 }
+                
+                textureData.Reverse();
             }
+
         }
 
         public void TEST_WriteDDSToDisk(string destinationPath)
@@ -588,7 +617,6 @@ namespace D3DTX_Converter.Main
                 int regionCount = d3dtx.GetRegionCount();
                 int mipCount = (int)d3dtx.GetMipMapCount();
                 int cubeSurfacesAmount = regionCount / mipCount;
-
 
                 for (int i = 0; i < cubeSurfacesAmount; i++)
                 {

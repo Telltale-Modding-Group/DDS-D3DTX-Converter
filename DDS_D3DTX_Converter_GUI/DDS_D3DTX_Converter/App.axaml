@@ -7,38 +7,38 @@
              x:Class="DDS_D3DTX_Converter.App"
              RequestedThemeVariant="Dark">
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
-
     <Application.Resources>
         <Color x:Key="MainPanelColor">#424242</Color>
         <Color x:Key="PanelSplitterColor">#303030</Color>
         <Color x:Key="ButtonColor">#3e3f52</Color>
     </Application.Resources>
-    
     <Application.Styles>
         <!-- <Style Selector="ads:MsBox"> -->
-        <!--     <Setter Property="Background" Value="#FFDDDDDD" /> -->
+        <!-- <Setter Property="Background" Value="#FFDDDDDD" /> -->
         <!-- </Style> -->
         <avalonia:HyperLinkStyle />
         <Style Selector="mscontrols|MsBoxStandardView">
-            <Setter Property="Background" Value="#424242"/>
+            <Setter Property="Background"
+                    Value="#424242" />
         </Style>
         <Style Selector="Button:disabled">
-            <Setter Property="Background" Value="#ffffff"/>
+            <Setter Property="Background"
+                    Value="#ffffff" />
         </Style>
         <FluentTheme>
             <FluentTheme.Palettes>
                 <!-- Palette for Light theme variant -->
-                <ColorPaletteResources x:Key="Light" Accent="Green" RegionColor="White" ErrorText="Red" />
+                <ColorPaletteResources x:Key="Light"
+                                       Accent="Green"
+                                       RegionColor="White"
+                                       ErrorText="Red" />
                 <!-- Palette for Dark theme variant -->
-                <ColorPaletteResources x:Key="Dark" Accent="DarkGreen" RegionColor="Black" ErrorText="Yellow" />
+                <ColorPaletteResources x:Key="Dark"
+                                       Accent="DarkGreen"
+                                       RegionColor="Black"
+                                       ErrorText="Yellow" />
             </FluentTheme.Palettes>
         </FluentTheme>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
-
     </Application.Styles>
-    
-    
-    
-    
-   
 </Application>

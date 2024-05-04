@@ -53,14 +53,14 @@ namespace D3DTX_Converter.Utilities
         {
             char parsedChar = reader.ReadChar();
 
-            switch(parsedChar)
+            switch (parsedChar)
             {
                 case '1':
                     return true;
                 case '0':
                     return false;
                 default:
-                    return false;
+                    throw new Exception("Invalid mToolProps data.");
             }
         }
 
@@ -312,6 +312,11 @@ namespace D3DTX_Converter.Utilities
                 Console.WriteLine("(Offset Check) Offset = {0}", offsetPoint);
             }
 
+        }
+
+        public static uint MakeFourCC(char ch0, char ch1, char ch2, char ch3)
+        {
+            return ((uint)ch0) | ((uint)ch1 << 8) | ((uint)ch2 << 16) | ((uint)ch3 << 24);
         }
     }
 }

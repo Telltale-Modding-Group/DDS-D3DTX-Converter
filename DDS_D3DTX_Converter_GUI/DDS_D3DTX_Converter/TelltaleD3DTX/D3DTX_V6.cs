@@ -10,6 +10,7 @@ using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
 using System.IO;
+using System.Runtime.InteropServices;
 
 /*
  * NOTE:
@@ -122,7 +123,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
         /// <summary>
         /// [4 bytes] Defines the format of the normal map.
         /// </summary>
-        public float mNormalMapFormat { get; set; }
+        public int mNormalMapFormat { get; set; }
 
         /// <summary>
         /// [4 bytes] Defines the brightness scale of the texture. (used for lightmaps)
@@ -209,10 +210,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
             mImportName_BlockSize = reader.ReadInt32(); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
             mImportName = ByteFunctions.ReadString(reader); //mImportName [x bytes] (this is always 0)
             mImportScale = reader.ReadSingle(); //mImportScale [4 bytes]
-            mToolProps = new ToolProps() //mToolProps [1 byte]
-            {
-                mbHasProps = reader.ReadBoolean()
-            };
+            mToolProps = new ToolProps(reader); //mToolProps [1 byte]
             mNumMipLevels = reader.ReadUInt32(); //mNumMipLevels [4 bytes]
             mWidth = reader.ReadUInt32(); //mWidth [4 bytes]
             mHeight = reader.ReadUInt32(); //mHeight [4 bytes]
@@ -294,12 +292,53 @@ namespace D3DTX_Converter.TelltaleD3DTX
                 PrintConsole();
         }
 
-        public void ModifyD3DTX(DDS_Master dds)
+        public void ModifyD3DTX(DDS_Master dds, DDS_DirectXTexNet_ImageSection[] sections)
         {
             mWidth = dds.header.dwWidth;
             mHeight = dds.header.dwHeight;
-            mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC);
-            //mDepth = dds.header.dwDepth;
+            mSurfaceFormat = DDS.Get_T3Format_FromFourCC(dds.header.ddspf.dwFourCC, dds);
+            mNumMipLevels = dds.header.dwMipMapCount;
+
+            mPixelData.Clear(); //THIS IS CORRECT
+            mPixelData = dds.textureData; //THIS IS CORRECT
+
+            mStreamHeader = new StreamHeader()
+            {
+                mRegionCount = (int)dds.header.dwMipMapCount,
+                mAuxDataCount = mStreamHeader.mAuxDataCount,
+                mTotalDataSize = (int)ByteFunctions.Get2DByteArrayTotalSize(mPixelData) //this is correct
+            };
+
+            RegionStreamHeader[] regionStreamHeader = new RegionStreamHeader[mStreamHeader.mRegionCount];
+
+            for (int i = 0; i < mStreamHeader.mRegionCount; i++)
+            {
+                regionStreamHeader[i] = new RegionStreamHeader()
+                {
+                    mDataSize = (uint)mPixelData[mStreamHeader.mRegionCount - 1 - i].Length, //THIS IS CORRECT
+                    mFaceIndex = 0, //NOTE: for cubemap textures this will need to change
+                    mMipCount = 1, //NOTE: for cubemap textures this will need to change
+                    mMipIndex = mStreamHeader.mRegionCount - 1 - i, //THIS IS CORRECT
+                    mPitch = (int)sections[mStreamHeader.mRegionCount - 1 - i].RowPitch,
+                    mSlicePitch = (int)sections[mStreamHeader.mRegionCount - 1 - i].SlicePitch,
+                };
+            }
+
+            mRegionHeaders = regionStreamHeader;
+
+            //reverse the region headers
+            List<RegionStreamHeader> mRegionHeaders_Reversed = new List<RegionStreamHeader>(mRegionHeaders);
+            mRegionHeaders_Reversed.Reverse();
+            mRegionHeaders = mRegionHeaders_Reversed.ToArray();
+
+            UpdateArrayCapacities();
+            //PrintConsole();
+        }
+
+        public void UpdateArrayCapacities()
+        {
+            mToonRegions_ArrayCapacity = 8 + (uint)(20 * mToonRegions.Length);
+            mToonRegions_ArrayLength = mToonRegions.Length;
         }
 
         public void WriteBinaryData(BinaryWriter writer)
@@ -314,7 +353,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
             writer.Write(mImportName_BlockSize); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
             ByteFunctions.WriteString(writer, mImportName); //mImportName [x bytes] (this is always 0)
             writer.Write(mImportScale); //mImportScale [4 bytes]
-            writer.Write(mToolProps.mbHasProps); //mToolProps mbHasProps [1 byte]
+            ByteFunctions.WriteBoolean(writer, mToolProps.mbHasProps); //mToolProps mbHasProps [1 byte]
             writer.Write(mNumMipLevels); //mNumMipLevels [4 bytes]
             writer.Write(mWidth); //mWidth [4 bytes]
             writer.Write(mHeight); //mHeight [4 bytes]
@@ -362,9 +401,62 @@ namespace D3DTX_Converter.TelltaleD3DTX
             }
         }
 
+        public uint GetHeaderByteSize()
+        {
+            uint totalSize = 0;
+
+            totalSize += (uint)Marshal.SizeOf(mVersion); //mVersion [4 bytes]
+            totalSize += (uint)Marshal.SizeOf(mSamplerState_BlockSize); //mSamplerState Block Size [4 bytes]
+            totalSize += mSamplerState.GetByteSize(); //mSamplerState mData [4 bytes] 
+            totalSize += (uint)Marshal.SizeOf(mPlatform_BlockSize); //mPlatform Block Size [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mPlatform); //mPlatform [4 bytes]
+            totalSize += (uint)Marshal.SizeOf(mName_BlockSize); //mName Block Size [4 bytes] //mName block size (size + string len)
+            totalSize += (uint)Marshal.SizeOf(mName.Length); //mName (strength length prefix) [4 bytes]
+            totalSize += (uint)mName.Length;  //mName [x bytes]
+            totalSize += (uint)Marshal.SizeOf(mImportName_BlockSize); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
+            totalSize += (uint)Marshal.SizeOf(mImportName.Length); //mImportName (strength length prefix) [4 bytes] (this is always 0)
+            totalSize += (uint)mImportName.Length; //mImportName [x bytes] (this is always 0)
+            totalSize += (uint)Marshal.SizeOf(mImportScale); //mImportScale [4 bytes]
+            totalSize += mToolProps.GetByteSize();
+            totalSize += (uint)Marshal.SizeOf(mNumMipLevels); //mNumMipLevels [4 bytes]
+            totalSize += (uint)Marshal.SizeOf(mWidth); //mWidth [4 bytes]
+            totalSize += (uint)Marshal.SizeOf(mHeight); //mHeight [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mSurfaceFormat); //mSurfaceFormat [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mResourceUsage); //mResourceUsage [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mType); //mType [4 bytes]
+            totalSize += (uint)Marshal.SizeOf(mNormalMapFormat); //mNormalMapFormat [4 bytes]
+            totalSize += (uint)Marshal.SizeOf(mHDRLightmapScale); //mHDRLightmapScale [4 bytes]
+            totalSize += (uint)Marshal.SizeOf(mToonGradientCutoff); //mToonGradientCutoff [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mAlphaMode); //mAlphaMode [4 bytes]
+            totalSize += (uint)Marshal.SizeOf((int)mColorMode); //mColorMode [4 bytes]
+            totalSize += mUVOffset.GetByteSize(); //[4 bytes]
+            totalSize += mUVScale.GetByteSize(); //[4 bytes]
+
+            totalSize += (uint)Marshal.SizeOf(mToonRegions_ArrayCapacity); //mToonRegions DCArray Capacity [4 bytes]
+            totalSize += (uint)Marshal.SizeOf(mToonRegions_ArrayLength); //mToonRegions DCArray Length [4 bytes]
+            for (int i = 0; i < mToonRegions_ArrayLength; i++)
+            {
+                totalSize += mToonRegions[i].GetByteSize();
+            }
+
+            totalSize += mStreamHeader.GetByteSize();
+
+            for (int i = 0; i < mStreamHeader.mRegionCount; i++)
+            {
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+                totalSize += 4; //[4 bytes]
+            }
+
+            return totalSize;
+        }
+
         public void PrintConsole()
         {
-       
+
             Console.WriteLine("||||||||||| D3DTX Header |||||||||||");
 
             Console.WriteLine("D3DTX mVersion = {0}", mVersion);

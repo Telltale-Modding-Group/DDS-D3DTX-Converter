@@ -3,7 +3,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DDS_D3DTX_Converter.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+             mc:Ignorable="d"
+             d:DesignWidth="500"
+             d:DesignHeight="500"
              Width="450"
              Height="450"
              x:Class="D3DTX_Converter.Views.AboutView">
@@ -12,40 +14,50 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:AboutViewModel />
     </Design.DataContext>
-
     <Panel>
         <ExperimentalAcrylicBorder IsHitTestVisible="False">
             <ExperimentalAcrylicBorder.Material>
-                <ExperimentalAcrylicMaterial
-                    BackgroundSource="Digger"
-                    TintColor="Black"
-                    TintOpacity="1"
-                    MaterialOpacity="0.65" />
+                <ExperimentalAcrylicMaterial BackgroundSource="Digger"
+                                             TintColor="Black"
+                                             TintOpacity="1"
+                                             MaterialOpacity="0.65" />
             </ExperimentalAcrylicBorder.Material>
         </ExperimentalAcrylicBorder>
-
         <StackPanel Margin="10">
             <!-- <controls:Hyperlink  Alias="{Binding Alias}" Url="{Binding Url}" -->
-            <!--                     Command="{Binding OpenUrl}" -->
-            <!--                     CommandParameter="{Binding HyperlinkContentProvider}" -->
+            <!-- Command="{Binding OpenUrl}" -->
+            <!-- CommandParameter="{Binding HyperlinkContentProvider}" -->
             <!-- /> -->
-            <Image Source="/Assets/telltale_modding_community.png" Width="200" Height="200" />
-            <TextBlock FontWeight="Bold" FontSize="18" Margin="0,10,0,0" HorizontalAlignment="Center">DDS-D3DTX Texture Converter 2.0.0</TextBlock>
-            <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center"
-                       Text="DDS-D3DTX Texture Converter is software developed to convert .d3dtx texture files to more accessible image formats and vice versa.">
-            </TextBlock>
-
-            <TextBlock Margin="0,25,0,0" HorizontalAlignment="Center" FontSize="18" >Credits:</TextBlock>
-            <TextBlock FontWeight="Bold" Margin="0,0,0,0" HorizontalAlignment="Center">Developed by Telltale Modding Group</TextBlock>
-            <TextBlock Margin="0,5,0,0" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center">
+            <Image Source="/Assets/telltale_modding_community.png"
+                   Width="200"
+                   Height="200" />
+            <TextBlock FontWeight="Bold"
+                       FontSize="18"
+                       Margin="0,10,0,0"
+                       HorizontalAlignment="Center">DDS-D3DTX Texture Converter 2.3.0</TextBlock>
+            <TextBlock Margin="0,10,0,0"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center"
+                       Text="DDS-D3DTX Texture Converter is software developed to convert .d3dtx texture files to more accessible image formats and vice versa." />
+            <TextBlock Margin="0,25,0,0"
+                       HorizontalAlignment="Center"
+                       FontSize="18">Credits:</TextBlock>
+            <TextBlock FontWeight="Bold"
+                       Margin="0,0,0,0"
+                       HorizontalAlignment="Center">Developed by Telltale Modding Group</TextBlock>
+            <TextBlock Margin="0,5,0,0"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center">
                 <Run Text="Special thanks to" />
-                <Run FontWeight="Bold" Text="David Matos (frostbone25)" />
-                <Run Text="for the original project and guiding me throughout the development, &#10; and" />
-                <Run FontWeight="Bold" Text="Lucas Saragosa" />
+                <Run FontWeight="Bold"
+                     Text="David Matos (frostbone25)" />
+                <Run Text="for the original project and guiding me throughout the development, &#xA; and" />
+                <Run FontWeight="Bold"
+                     Text="Lucas Saragosa" />
                 <Run Text="for figuring out the D3DTX file format." />
             </TextBlock>
-
-
         </StackPanel>
     </Panel>
 </UserControl>

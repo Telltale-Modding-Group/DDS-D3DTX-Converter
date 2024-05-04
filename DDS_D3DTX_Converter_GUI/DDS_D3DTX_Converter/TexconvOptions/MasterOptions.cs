@@ -65,6 +65,11 @@ namespace D3DTX_Converter.TexconvOptions
         {
             List<string> arguments = new();
 
+            if (inputFilePath.Contains(" "))
+            {
+                inputFilePath = $"\"{inputFilePath}\"";
+            }
+
             arguments.Add(inputFilePath);
             arguments.Add("-r");
 

@@ -10,6 +10,8 @@ using D3DTX_Converter.ProgramDebug;
 using D3DTX_Converter.Texconv;
 using D3DTX_Converter.TexconvOptions;
 using D3DTX_Converter.Utilities;
+using System.Threading;
+using System.Collections.Concurrent;
 
 namespace DDS_D3DTX_Converter
 {
@@ -29,40 +31,6 @@ namespace DDS_D3DTX_Converter
             return _instance ??= new Converter();
         }
 
-        public void Execute(bool fixes_generic_to_dds)
-        {
-            //intro message
-            //   ConsoleFunctions.SetConsoleColor(ConsoleColor.Blue, ConsoleColor.White);
-            //  Console.WriteLine("BMP to DDS Texture Converter");
-
-            //-----------------GET TEXTURE FOLDER PATH-----------------
-            //  ConsoleFunctions.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White);
-            //Console.WriteLine("Enter the folder path with the BMP textures.");
-
-            //texture folder path (containing the path to the textures to be converted)
-            // string textureFolderPath = Program_Shared.GetFolderPathFromUser();
-
-            //-----------------GET RESULT FOLDER PATH-----------------
-            // ConsoleFunctions.SetConsoleColor(ConsoleColor.DarkGray, ConsoleColor.White);
-            Console.WriteLine("Enter the resulting path where converted DDS textures will be stored.");
-
-            //result folder path (will contain the converted textures)
-            string resultFolderPath = Program_Shared.GetFolderPathFromUser();
-
-            //-----------------START CONVERSION-----------------
-            //notify the user we are starting
-            Console.WriteLine("Conversion Starting...");
-
-            //we got our paths, so lets begin
-            ConvertBulk(_workingDirectory.WorkingDirectoryPath, resultFolderPath, fixes_generic_to_dds);
-
-
-            //  ConvertTextureFile(_workingDirectory.workingDirectoryFile, _workingDirectory.workingDirectoryPath, fixes_generic_to_dds);
-
-            //once the process is finished, it will come back here and we will notify the user that we are done
-            Console.WriteLine("Conversion Finished.");
-        }
-
         /// <summary>
         /// Starts the conversion process for the CLI app.
         /// Originally used for converting all files in a folder in the user's desired format.
@@ -70,49 +38,113 @@ namespace DDS_D3DTX_Converter
         /// <param name="texPath"></param>
         /// <param name="resultPath"></param>
         /// <param name="fixesGenericToDds"></param>
-        public static void ConvertBulk(string texPath, string resultPath, bool fixesGenericToDds)
+        public static bool ConvertBulk(string texPath, string resultPath, string oldFileType, string newFileType = "")
         {
-            Console.WriteLine("Collecting Files..."); //notify the user we are collecting files
-
             //gather the files from the texture folder path into an array
             List<string> textures = new List<string>(Directory.GetFiles(texPath));
 
-            Console.WriteLine("Filtering Textures..."); //notify the user we are filtering the array
-
-            //filter the array so we only get .bmp files
-            textures = IOManagement.FilterFiles(textures, Main_Shared.bmpExtension);
+            //filter the array so we only get the files required to convert
+            textures = IOManagement.FilterFiles(textures, "." + oldFileType);
 
             //if no bmp files were found, abort the program from going on any further (we don't have any files to convert!)
             if (textures.Count < 1)
             {
-                Console.WriteLine(
-                    "No .bmp files were found, aborting."); //notify the user we found x amount of bmp files in the array
-                Console.ResetColor();
-                return;
+                throw new FileNotFoundException($"No files with file type {oldFileType} were found in the directory.");
             }
 
-            Console.WriteLine("Found {0} Textures.",
-                textures.Count.ToString()); //notify the user we found x amount of bmp files in the array
-            Console.WriteLine("Starting..."); //notify the user we are starting
+            //TODO REFACTOR
+
+            short mode = -1;
+
+            if ("d3dtx".Equals(oldFileType))
+            {
+                mode = 0; //d3dtx to dds
+            }
+            else if ("dds".Equals(oldFileType) && "d3dtx".Equals(newFileType))
+            {
+                mode = 1; //dds to d3dtx
+            }
+            else if ("dds".Equals(oldFileType) &&
+            ("png".Equals(newFileType)
+            || "jpg".Equals(newFileType)
+            || "jpeg".Equals(newFileType)
+            || "bmp".Equals(newFileType)
+            || "tiff".Equals(newFileType)
+            || "tif".Equals(newFileType)))
+            {
+                mode = 2; //dds to others
+            }
+            else if ("png".Equals(oldFileType)
+            || "jpg".Equals(oldFileType)
+            || "jpeg".Equals(oldFileType)
+            || "bmp".Equals(oldFileType)
+            || "tiff".Equals(oldFileType)
+            || "tif".Equals(oldFileType))
+            {
+                mode = 3; //others to dds
+            }
+            else
+            {
+                throw new Exception("Invalid file type.");
+            }
 
             //Thread[] threads = new Thread[textures.Count];
 
             //run a loop through each of the found textures and convert each one
-            foreach (var name in textures)
+            // Create an array of threads
+            Thread[] threads = new Thread[textures.Count];
+            int failedConversions = 0;
+            for (int i = 0; i < textures.Count; i++)
             {
-                //build the path for the resulting file
-                string textureFileName = Path.GetFileName(name); //get the file name of the file + extension
+                var name = textures[i];
 
-                Console.WriteLine("||||||||||||||||||||||||||||||||");
-                Console.WriteLine("Converting '{0}'...", textureFileName); //notify the user are converting 'x' file.
-                Console.ResetColor();
+                // Create a new thread and pass the conversion method as a parameter
+                threads[i] = new Thread(() =>
+                {
+                    try
+                    {
+                        if (mode == 0)
+                        {
+                            ConvertTextureFromD3DtxToDds(name, resultPath);
+                        }
+                        else if (mode == 1)
+                        {
+                            ConvertTextureFromDdsToD3Dtx(name, resultPath);
+                        }
+                        else if (mode == 2)
+                        {
+                            ConvertTextureFromDdsToOthers(name, resultPath, newFileType, true);
+                        }
+                        else if (mode == 3)
+                        {
+                            ConvertTextureFileFromOthersToDds(name, resultPath, true);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // If an exception is thrown, add the name of the file to the failedConversions collection
+                        Interlocked.Increment(ref failedConversions);
+                    }
+                });
 
-                //runs the main method for converting the texture
-                //   ConvertTextureFile(textures[i], resultPath, fixes_generic_to_dds);
-
-                Console.WriteLine("Finished converting '{0}'...",
-                    textureFileName); //notify the user we finished converting 'x' file.
+                // Start the thread
+                threads[i].Start();
             }
+
+            // Wait for all threads to finish
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
+            if (failedConversions > 0)
+            {
+                throw new Exception($"{failedConversions} conversions failed. Please check the files and try again.");
+            }
+
+            //TODO Add a pop up message box to notify the user that the conversion is finished
+            return true;
+            throw new Exception("Bulk conversion is finished");
+
         }
 
         /// <summary>
@@ -296,18 +328,14 @@ namespace DDS_D3DTX_Converter
                     if (fixesDdsToGeneric)
                         options.outputSwizzle = new() { mask = "abgr" };
 
-                    Console.WriteLine("EXEC1");
                     TexconvApp.RunTexconv(sourceFilePath, options);
-                    Console.WriteLine("OUT1");
                 }
                 else if (d3dtxTextureType == D3DTX_Converter.TelltaleEnums.T3TextureType.eTxNormalXYMap)
                 {
-                    Console.WriteLine("EXEC2");
                     if (fixesDdsToGeneric)
                         NormalMapProcessing.FromDDS_NormalMapReconstructZ(sourceFilePath, outputTextureFilePath);
                     else
-                        NormalMapConvert.ConvertNormalMapToOthers(sourceFilePath, newFileType); //lol
-                    Console.WriteLine("OUT2");
+                        NormalMapConvert.ConvertNormalMapToOthers(sourceFilePath, newFileType);
                 }
                 else
                 {
@@ -362,6 +390,8 @@ namespace DDS_D3DTX_Converter
 
             DDS_Master ddsFile = new(d3dtxFile);
 
+            //Literally the same? Probably for debugging reasons
+
             //write cubemap
             if (textureType == D3DTX_Converter.TelltaleEnums.T3TextureType.eTxEnvMap ||
                 textureType == D3DTX_Converter.TelltaleEnums.T3TextureType.eTxPrefilteredEnvCubeMapHDR || textureType ==
@@ -371,9 +401,7 @@ namespace DDS_D3DTX_Converter
                 ddsFile.Write_D3DTX_AsDDS(d3dtxFile, destinationDirectory);
 
                 //write the d3dtx data into a file
-                string jsonPath = destinationDirectory + Path.DirectorySeparatorChar +
-                                  Path.GetFileNameWithoutExtension(d3dtxFile.filePath);
-                d3dtxFile.Write_D3DTX_JSON(Path.GetFileNameWithoutExtension(d3dtxFile.filePath), jsonPath);
+                d3dtxFile.Write_D3DTX_JSON(Path.GetFileNameWithoutExtension(d3dtxFile.filePath), destinationDirectory);
             }
             //write regular single images
             else
@@ -464,12 +492,12 @@ namespace DDS_D3DTX_Converter
 
             switch (extension)
             {
-                case ".bmp": return D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.bmp;
-                case ".png": return D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.png;
-                case ".jpg": return D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.jpg;
-                case ".jpeg": return D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.jpeg;
-                case ".tif": return D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.tif;
-                case ".tiff": return D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.tiff;
+                case "bmp": return D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.bmp;
+                case "png": return D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.png;
+                case "jpg": return D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.jpg;
+                case "jpeg": return D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.jpeg;
+                case "tif": return D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.tif;
+                case "tiff": return D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.tiff;
                 default: throw new Exception("File type " + extension + " is not supported.");
             }
         }

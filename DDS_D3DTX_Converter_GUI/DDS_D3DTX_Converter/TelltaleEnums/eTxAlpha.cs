@@ -1,6 +1,7 @@
 ﻿namespace D3DTX_Converter.TelltaleEnums
 {
     //note: can't find original name, so just using the prefix eTxAlpha
+    //Update: Original name could be eTxExactAlphaMode or eTxAlphaMode from WalkingDead100.exe
     public enum eTxAlpha
     {
         eTxAlphaUnknown = -1,

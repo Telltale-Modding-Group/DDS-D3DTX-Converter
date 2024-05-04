@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -26,19 +27,33 @@ public partial class MainViewModel : ViewModelBase
     #region MEMBERS
 
     private readonly ObservableCollection<FormatItemViewModel> _d3dtxTypes =
-        [new FormatItemViewModel { Name = ".dds", ItemStatus = true }];
+        [new FormatItemViewModel { Name = "dds", ItemStatus = true }];
 
     private readonly ObservableCollection<FormatItemViewModel> _ddsTypes =
     [
-        new FormatItemViewModel { Name = ".png", ItemStatus = true },
-        new FormatItemViewModel { Name = ".jpg", ItemStatus = true },
-        new FormatItemViewModel { Name = ".bmp", ItemStatus = true },
-        new FormatItemViewModel { Name = ".tif", ItemStatus = true },
-        new FormatItemViewModel { Name = ".d3dtx", ItemStatus = true }
+        new FormatItemViewModel { Name = "d3dtx", ItemStatus = true},
+        new FormatItemViewModel { Name = "png", ItemStatus = true },
+        new FormatItemViewModel { Name = "jpg", ItemStatus = true },
+        new FormatItemViewModel { Name = "bmp", ItemStatus = true },
+        new FormatItemViewModel { Name = "tif", ItemStatus = true }
     ];
 
     private readonly ObservableCollection<FormatItemViewModel> _otherTypes =
-        [new FormatItemViewModel { Name = ".dds", ItemStatus = true }];
+        [new FormatItemViewModel { Name = "dds", ItemStatus = true }];
+
+    private readonly ObservableCollection<FormatItemViewModel> _folderTypes =
+    [
+        new FormatItemViewModel { Name = "d3dtx -> dds", ItemStatus = true},
+        new FormatItemViewModel { Name = "dds -> d3dtx", ItemStatus = true},
+        new FormatItemViewModel { Name = "dds -> png", ItemStatus = true},
+        new FormatItemViewModel { Name = "dds -> jpg", ItemStatus = true},
+        new FormatItemViewModel { Name = "dds -> bmp", ItemStatus = true},
+        new FormatItemViewModel { Name = "dds -> tif", ItemStatus = true},
+        new FormatItemViewModel { Name = "png -> dds", ItemStatus = true},
+        new FormatItemViewModel { Name = "jpg -> dds", ItemStatus = true},
+        new FormatItemViewModel { Name = "bmp -> dds", ItemStatus = true},
+        new FormatItemViewModel { Name = "tif -> dds", ItemStatus = true},
+];
 
     private readonly List<string> _allTypes = [".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".d3dtx", ".dds"];
     private readonly MainManager mainManager = MainManager.GetInstance();
@@ -65,6 +80,8 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private string? _directoryPath;
     [ObservableProperty] private bool _returnDirectoryButtonStatus;
     [ObservableProperty] private bool _refreshDirectoryButtonStatus;
+
+    [ObservableProperty] private bool _chooseOutputDirectoryCheckboxStatus;
     [ObservableProperty] private ObservableCollection<WorkingDirectoryFile>? _workingDirectoryFiles;
 
     public class FormatItemViewModel
@@ -96,6 +113,8 @@ public partial class MainViewModel : ViewModelBase
         {
             Source = SvgSource.Load(ErrorSvgFilename, _assetsUri)
         };
+
+        WorkingDirectoryFiles = new ObservableCollection<WorkingDirectoryFile>();
     }
 
     #region MAIN MENU BUTTONS ACTIONS
@@ -426,7 +445,7 @@ public partial class MainViewModel : ViewModelBase
     /// Error dialogs appear when something goes wrong with the conversion process.
     /// </summary>
     [RelayCommand]
-    public void ConvertButton_Click()
+    public async Task ConvertButton_ClickAsync()
     {
         try
         {
@@ -437,38 +456,109 @@ public partial class MainViewModel : ViewModelBase
 
             string? textureFilePath = workingDirectoryFile.FilePath;
 
+            if (!File.Exists(textureFilePath) && !Directory.Exists(textureFilePath))
+                throw new DirectoryNotFoundException("File/Directory was not found.");
+
+            string outputDirectoryPath = mainManager.GetWorkingDirectoryPath();
+
+            if (ChooseOutputDirectoryCheckboxStatus)
+            {
+                var topLevel = GetMainWindow();
+
+                // Start async operation to open the dialog.
+                var folderPath = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+                {
+                    Title = "Choose your output folder location.",
+                    AllowMultiple = false,
+                });
+
+                if (folderPath is null || folderPath.Count == 0)
+                {
+                    return;
+                }
+
+                outputDirectoryPath = folderPath.First().Path.AbsolutePath;
+            }
+
             //Select the correct convert function from the combobox.
             switch (SelectedFormat.Name)
             {
-                case ".d3dtx":
-                    Converter.ConvertTextureFromDdsToD3Dtx(textureFilePath, mainManager.GetWorkingDirectoryPath());
+                case "d3dtx":
+                    Converter.ConvertTextureFromDdsToD3Dtx(textureFilePath, outputDirectoryPath);
                     break;
-                case ".dds":
+                case "dds":
                     if (workingDirectoryFile.FileType == ".d3dtx")
                         Converter.ConvertTextureFromD3DtxToDds(textureFilePath,
-                            mainManager.GetWorkingDirectoryPath());
+                            outputDirectoryPath);
                     else
                         Converter.ConvertTextureFileFromOthersToDds(textureFilePath,
-                            mainManager.GetWorkingDirectoryPath(),
+                            outputDirectoryPath,
                             true);
                     break;
-                case ".png":
-                    Converter.ConvertTextureFromDdsToOthers(textureFilePath, mainManager.GetWorkingDirectoryPath(),
+                case "png":
+                    Converter.ConvertTextureFromDdsToOthers(textureFilePath, outputDirectoryPath,
                         SelectedFormat.Name, true);
                     break;
-                case ".jpg":
-                    Converter.ConvertTextureFromDdsToOthers(textureFilePath, mainManager.GetWorkingDirectoryPath(),
+                case "jpg":
+                    Converter.ConvertTextureFromDdsToOthers(textureFilePath, outputDirectoryPath,
                         SelectedFormat.Name, true);
                     break;
-                case ".tif":
-                    Converter.ConvertTextureFromDdsToOthers(textureFilePath, mainManager.GetWorkingDirectoryPath(),
+                case "tif":
+                    Converter.ConvertTextureFromDdsToOthers(textureFilePath, outputDirectoryPath,
                         SelectedFormat.Name, true);
                     break;
-                case ".bmp":
-                    Converter.ConvertTextureFromDdsToOthers(textureFilePath, mainManager.GetWorkingDirectoryPath(),
+                case "bmp":
+                    Converter.ConvertTextureFromDdsToOthers(textureFilePath, outputDirectoryPath,
                         SelectedFormat.Name, true);
                     break;
             }
+
+            //Folder options
+            switch (SelectedFormat.Name)
+            {
+                case "d3dtx -> dds":
+                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "d3dtx", "dds");
+                    break;
+
+                case "dds -> d3dtx":
+                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "dds", "d3dtx");
+                    break;
+
+                case "dds -> png":
+                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "dds", "png");
+                    break;
+
+                case "dds -> jpg":
+                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "dds", ".jpg");
+                    break;
+
+                case "dds -> bmp":
+                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "dds", "bmp");
+                    break;
+
+                case "dds -> tif":
+                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "dds", "tif");
+                    break;
+
+                case "png -> dds":
+                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "png", "dds");
+                    break;
+
+                case "jpg -> dds":
+                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "jpg", "dds");
+                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "jpeg", "dds");
+                    break;
+
+                case "bmp -> dds":
+                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "bmp", "dds");
+                    break;
+
+                case "tif -> dds":
+                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "tif", "dds");
+                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "tiff", "dds");
+                    break;
+            }
+
         }
         catch (Exception ex)
         {
@@ -480,11 +570,8 @@ public partial class MainViewModel : ViewModelBase
         }
         finally
         {
-            ChangeComboBoxItemsByItemExtension("");
             mainManager.RefreshWorkingDirectory();
             UpdateUi();
-            SaveButtonStatus = false;
-            DeleteButtonStatus = false;
         }
     }
 
@@ -498,10 +585,29 @@ public partial class MainViewModel : ViewModelBase
         //update our texture directory UI
         try
         {
-            WorkingDirectoryFiles =
-                new ObservableCollection<WorkingDirectoryFile>(mainManager.GetWorkingDirectoryFiles());
-
             DirectoryPath = mainManager.GetWorkingDirectoryPath();
+            var workingDirectoryFiles = mainManager.GetWorkingDirectoryFiles();
+
+            //  DataGrid_SelectedItem = null;
+            for (int i = WorkingDirectoryFiles.Count - 1; i >= 0; i--)
+            {
+                if (!workingDirectoryFiles.Contains(WorkingDirectoryFiles[i]))
+                {
+                    WorkingDirectoryFiles.RemoveAt(i);
+                }
+            }
+
+            // Add items from the list to the observable collection if they are not already present
+            foreach (var item in workingDirectoryFiles)
+            {
+                if (!WorkingDirectoryFiles.Contains(item))
+                {
+                    WorkingDirectoryFiles.Add(item);
+                }
+            }
+            DataGrid_SelectedItem = null;
+            // WorkingDirectoryFiles =
+            //     new ObservableCollection<WorkingDirectoryFile>(mainManager.GetWorkingDirectoryFiles());
         }
         catch (Exception ex)
         {
@@ -516,7 +622,7 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             if (Directory.GetParent(DirectoryPath) == null) return;
-
+            WorkingDirectoryFiles.Clear();
             await mainManager.SetWorkingDirectoryPath(Directory.GetParent(DirectoryPath).ToString());
         }
         catch (Exception ex)
@@ -564,16 +670,22 @@ public partial class MainViewModel : ViewModelBase
             { ".bmp", _otherTypes },
             { ".tga", _otherTypes },
             { ".tif", _otherTypes },
-            { ".tiff", _otherTypes }
+            { ".tiff", _otherTypes },
+            {"", _folderTypes}
         };
 
-        if (extensionMappings.TryGetValue(itemExtension, out var selectedItems))
+        if (itemExtension == null)
+        {
+            FormatsList = null;
+            ConvertButtonStatus = false;
+            ComboBoxStatus = false;
+        }
+        else if (extensionMappings.TryGetValue(itemExtension, out var selectedItems))
         {
             FormatsList = selectedItems;
             ConvertButtonStatus = true;
             SelectedComboBoxIndex = 0;
             ComboBoxStatus = true;
-
             //There is an issue in Avalonia relating to dynamic sources and binding indexes.
             //Github issue: https://github.com/AvaloniaUI/Avalonia/issues/13736
             //When fixed, the line below can be removed.
@@ -614,6 +726,7 @@ public partial class MainViewModel : ViewModelBase
                 else
                 {
                     await mainManager.SetWorkingDirectoryPath(workingDirectoryFile.FilePath);
+                    WorkingDirectoryFiles.Clear();
                     UpdateUi();
                 }
             }
@@ -641,19 +754,33 @@ public partial class MainViewModel : ViewModelBase
         ContextOpenFolderStatus = Directory.Exists(workingDirectoryFile.FilePath);
 
         var extension = Path.GetExtension(workingDirectoryFile.FilePath).ToLowerInvariant();
-        ChangeComboBoxItemsByItemExtension(extension);
-
+        Console.WriteLine(extension);
+        if (extension == string.Empty && !Directory.Exists(workingDirectoryFile.FilePath))
+        {
+            ChangeComboBoxItemsByItemExtension(null);
+        }
+        else
+        {
+            ChangeComboBoxItemsByItemExtension(extension);
+        }
         ImageNamePreview = workingDirectoryFile.FileName + workingDirectoryFile.FileType;
 
         var filePath = workingDirectoryFile.FilePath;
 
+        if (!File.Exists(filePath) && !Directory.Exists(filePath))
+        {
+            //TODO
+            return;
+        }
+
         try
         {
-            ImagePreview = GetImagePreview(filePath, extension);
             ImageProperties = GetImageProperties(filePath, extension);
+            ImagePreview = GetImagePreview(filePath, extension);
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.StackTrace);
             HandleImagePreviewError(ex);
         }
     }
@@ -713,10 +840,11 @@ public partial class MainViewModel : ViewModelBase
 
     private void HandleImagePreviewError(Exception ex)
     {
-        HandleException("Error during previewing image.\nCheck if the image is valid" + ex.Message);
+        HandleException("Error during previewing image.\nCheck if the image is valid.\nError message:" + ex.Message);
 
         ImagePreview = new SvgImage { Source = SvgSource.Load(ErrorSvgFilename, _assetsUri) };
-        ImageProperties = ImageProperties.GetImagePropertiesFromInvalid();
+        //TODO FIX THIS
+        //  ImageProperties = ImageProperties.GetImagePropertiesFromInvalid();
     }
 
     private void HandleException(string message)

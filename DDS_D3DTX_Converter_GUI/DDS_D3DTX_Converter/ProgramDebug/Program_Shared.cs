@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
-using D3DTX_Converter.Utilities;
-using D3DTX_Converter.DirectX;
-using D3DTX_Converter.Main;
-using Newtonsoft.Json;
 
+//DEPRECATED
 namespace D3DTX_Converter.ProgramDebug
 {
     public static class Program_Shared

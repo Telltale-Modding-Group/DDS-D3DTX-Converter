@@ -66,6 +66,19 @@ namespace DDS_D3DTX_Converter
         }
 
         /// <summary>
+        /// Returns the output directory path using a folder picker.
+        /// </summary>
+        /// <param name="provider"></param>
+        public async Task<string> GetOutputDirectoryPath(IStorageProvider provider)
+        {
+            string path = await IOManagement.GetFilePathAsync(provider,
+                "Choose your output folder location.");
+
+            return path;
+        }
+
+
+        /// <summary>
         /// Opens a file using its preferred software.
         /// </summary>
         /// <param name="directoryPath"></param>
@@ -103,7 +116,7 @@ namespace DDS_D3DTX_Converter
                 UseShellExecute = true,
                 Verb = "open"
             };
-            
+
             //start the process
             Process.Start(processStartInfo);
         }

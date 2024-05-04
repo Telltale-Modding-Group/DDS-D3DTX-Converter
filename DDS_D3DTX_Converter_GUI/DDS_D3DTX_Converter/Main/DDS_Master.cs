@@ -4,6 +4,11 @@ using System.IO;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
 using D3DTX_Converter.TelltaleEnums;
+using DirectXTexNet;
+using System.ComponentModel;
+using ExCSS;
+using D3DTX_Converter.TelltaleD3DTX;
+using System.Linq;
 
 /*
  * DXT1 - DXGI_FORMAT_BC1_UNORM / D3DFMT_DXT1
@@ -50,6 +55,8 @@ namespace D3DTX_Converter.Main
         public uint[,] mipMapResolutions;
 
         public DDS_HEADER header;
+
+        public DDS_HEADER_DXT10 dxt10_header;
 
         /// <summary>
         /// A struct used when matching a DDS with a D3DTX.
@@ -103,9 +110,9 @@ namespace D3DTX_Converter.Main
             //Some normal maps specifically with type 4 (eTxNormalMap) channels are all reversed (ABGR instead of RGBA)
 
             header = DDS.GetPresetHeader();
+            //TODO add depth textures
 
             T3SurfaceFormat surfaceFormat = T3SurfaceFormat.eSurface_DXT1;
-
             //header.dwCaps = DDSCAPS.DDSCAPS_TEXTURE | DDSCAPS.DDSCAPS_MIPMAP;
 
             if (d3dtx.d3dtx4 != null)
@@ -114,6 +121,7 @@ namespace D3DTX_Converter.Main
                 header.dwHeight = d3dtx.d3dtx4.mHeight;
                 header.dwMipMapCount = d3dtx.d3dtx4.mNumMipLevels;
                 surfaceFormat = d3dtx.d3dtx4.mSurfaceFormat;
+
             }
             else if (d3dtx.d3dtx5 != null)
             {
@@ -144,6 +152,7 @@ namespace D3DTX_Converter.Main
                 header.dwMipMapCount = d3dtx.d3dtx8.mNumMipLevels;
                 header.dwDepth = d3dtx.d3dtx8.mDepth;
                 surfaceFormat = d3dtx.d3dtx8.mSurfaceFormat;
+
             }
             else if (d3dtx.d3dtx9 != null)
             {
@@ -156,22 +165,208 @@ namespace D3DTX_Converter.Main
 
             header.ddspf.dwFourCC = DDS.Get_FourCC_FromTellale(surfaceFormat);
 
+            if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10"))
+            {
+                dxt10_header = DDS.GetPresetDXT10Header();
+                dxt10_header.dxgiFormat = DDS.GetSurfaceFormatAsDXGI(surfaceFormat);
+                //Needs checking
+                dxt10_header.resourceDimension = d3dtx.IsCubeTexture() ? D3D10_RESOURCE_DIMENSION.D3D10_RESOURCE_DIMENSION_TEXTURE3D : D3D10_RESOURCE_DIMENSION.D3D10_RESOURCE_DIMENSION_TEXTURE2D;
+
+                //TODO NEEDS TESTING
+                if (d3dtx.d3dtx9 != null)
+                {
+                    dxt10_header.arraySize = d3dtx.d3dtx9.mArraySize;
+                }
+                else
+                {
+                    dxt10_header.arraySize = 1;
+                }
+            }
+
+            //header.dwPitchOrLinearSize;
+
+            //Get the channel count for all formats in case they are not specified 
+            //  header.ddspf.dwRGBBitCount = uint.Parse(d3dtx.GetChannelCount()) * 8;
+
+            Console.WriteLine(d3dtx.GetChannelCount());
+            header.dwCaps = 4198408; //ALL FLAGS ARE ENABLED
+
+            //TODO ADD OTHER FORMATS
+            //TODO REFACTOR THIS SPAGHETTI CODE
             switch (surfaceFormat)
             {
-                case T3SurfaceFormat.eSurface_A8:
-                    header.ddspf.dwABitMask = 255;
-                    header.dwCaps = 4198408; //DDSCAPS_COMPLEX | DDSCAPS_TEXTURE | DDSCAPS_MIPMAP
+                case T3SurfaceFormat.eSurface_A8: //DDSCAPS_COMPLEX | DDSCAPS_TEXTURE | DDSCAPS_MIPMAP
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 8, 0x00, 0x00, 0x00, 0xFF);
                     break;
-                case T3SurfaceFormat.eSurface_ARGB8:
-                    header.ddspf.dwABitMask = 255;
-                    header.ddspf.dwRBitMask = 255;
-                    header.ddspf.dwGBitMask = 255;
-                    header.ddspf.dwBBitMask = 255;
-                    header.dwCaps = 4198408; //DDSCAPS_COMPLEX | DDSCAPS_TEXTURE | DDSCAPS_MIPMAP
+                case T3SurfaceFormat.eSurface_ARGB8: //TODO This is actually a legacy format // DDPF_RGB | DDPF_ALPHAPIXELS
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x41, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
                     break;
-                default: return;
+                case T3SurfaceFormat.eSurface_ARGB16: // DDPF_RGB | DDPF_ALPHAPIXELS
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x41, ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0, 0, 0, 0);
+                    break;
+                case T3SurfaceFormat.eSurface_RGB565:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x40, ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x0000F800, 0x000007E0, 0x0000001F, 0x00); // DDPF_RGB
+                    break;
+                case T3SurfaceFormat.eSurface_ARGB1555: // DDPF_RGB | DDPF_ALPHAPIXELS
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x41, ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00007C00, 0x000003E0, 0x0000001F, 0x00008000);
+                    break;
+                case T3SurfaceFormat.eSurface_ARGB4:// DDPF_RGB | DDPF_ALPHAPIXELS
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x41, ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00000F00, 0x000000F0, 0x0000000F, 0x0000F000);
+                    break;
+                case T3SurfaceFormat.eSurface_ARGB2101010: // DDPF_RGB | DDPF_ALPHAPIXELS
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x41, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0, 0, 0, 0);
+                    break;
+                case T3SurfaceFormat.eSurface_R16:// DDPF_RGB
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0xFFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_RG16: // DDPF_RGB
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0xFFFF0000, 0x0000FFFF, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_RGBA16:  // DDPF_RGB | DDPF_ALPHAPIXELS
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0, 0, 0x00000000FFFF0000, 0);
+                    break;
+                case T3SurfaceFormat.eSurface_RG8: // DDPF_RGB
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0xFF00, 0x00FF, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_RGBA8: // DDPF_RGB | DDPF_ALPHAPIXELS
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+                    break;
+                case T3SurfaceFormat.eSurface_R32:  // DDPF_RGB
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0xFFFFFFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_RG32:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0, 0, 0, 0);
+                    break;
+                case T3SurfaceFormat.eSurface_RGBA32:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 128, 0, 0, 0, 0);
+                    break;
+                case T3SurfaceFormat.eSurface_R8:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 8, 0xFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_RGBA8S:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x41, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+                    break;
+                case T3SurfaceFormat.eSurface_L8:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 8, 0xFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_AL8:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 8, 0x00, 0x00, 0x00, 0xFF);
+                    break;
+                case T3SurfaceFormat.eSurface_L16:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0xFFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_RG16S:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x41, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0xFFFF0000, 0x0000FFFF, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_RGBA16S:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0, 0, 0, 0);
+                    break;
+                case T3SurfaceFormat.eSurface_R16UI:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0xFFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_RG16UI:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0xFFFF0000, 0x0000FFFF, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_R16F:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0xFFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_RG16F:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0xFFFF0000, 0x0000FFFF, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_RGBA16F:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0, 0, 0, 0);
+                    break;
+                case T3SurfaceFormat.eSurface_R32F:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0xFFFFFFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_RG32F:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0, 0x00000000FFFFFFFF, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_RGBA32F:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 128, 0, 0, 0, 0);
+                    break;
+                case T3SurfaceFormat.eSurface_RGBA1010102F:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0, 0, 0, 0);
+                    break;
+                case T3SurfaceFormat.eSurface_RGB111110F:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0, 0, 0, 0);
+                    break;
+                case T3SurfaceFormat.eSurface_RGB9E5F:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x01, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0, 0, 0, 0);
+                    break;
+                case T3SurfaceFormat.eSurface_DepthPCF16:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x0000FFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_DepthPCF24:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 24, 0x00FFFFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_Depth16:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x0000FFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_Depth24:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 24, 0x00FFFFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_DepthStencil32:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0xFFFFFFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_Depth32F:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0xFFFFFFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_Depth32F_Stencil8:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0xFFFFFFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_Depth24F_Stencil8:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0xFFFFFFFF, 0x00, 0x00, 0x00);
+                    break;
+                case T3SurfaceFormat.eSurface_BC1:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 0, 0, 0, 0, 0); // 'DXT1'
+                    break;
+                case T3SurfaceFormat.eSurface_DXT1:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DXT1"), 0, 0, 0, 0, 0); // 'DXT1'
+                    break;
+                case T3SurfaceFormat.eSurface_BC2:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 0, 0, 0, 0, 0); // 'DXT2'
+                    break;
+                case T3SurfaceFormat.eSurface_DXT3:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DXT3"), 0, 0, 0, 0, 0); // 'DXT3'
+                    break;
+                case T3SurfaceFormat.eSurface_BC3:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 0, 0, 0, 0, 0); // 'DXT4'
+                    break;
+                case T3SurfaceFormat.eSurface_DXT5:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DXT5"), 0, 0, 0, 0, 0); // 'DXT5'
+                    break;
+                case T3SurfaceFormat.eSurface_DXT5A:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("ATI1"), 0, 0, 0, 0, 0); // 'DXT5'
+                    break;
+                case T3SurfaceFormat.eSurface_BC6:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 0, 0, 0, 0, 0); // 'BC6H'
+                    break;
+                case T3SurfaceFormat.eSurface_BC7:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("DX10"), 0, 0, 0, 0, 0); // 'BC7U'
+                    break;
+                case T3SurfaceFormat.eSurface_DXN:
+                    SetPixelFormatHeader(ref header.ddspf, 32, 0x04, ByteFunctions.Convert_String_To_UInt32("ATI2"), 0, 0, 0, 0, 0); // 'DXN'
+                    break;
+                default:
+                    break;
             }
+            header.ddspf.dwFlags = header.ddspf.dwFlags | 0x4;
+            header.dwPitchOrLinearSize = DDS.GetPitchOrLinearSizeFromD3DTX(surfaceFormat, header.dwWidth);
         }
+
+        private void SetPixelFormatHeader(ref DDS_PIXELFORMAT ddspf, uint dwSize, uint dwFlags, uint dwFourCC, uint dwRGBBitCount, uint dwRBitMask, uint dwGBitMask, uint dwBBitMask, uint dwABitMask)
+        {
+            ddspf.dwSize = dwSize;
+            ddspf.dwFlags = dwFlags;
+            ddspf.dwFourCC = dwFourCC;
+            ddspf.dwRGBBitCount = dwRGBBitCount;
+            ddspf.dwRBitMask = dwRBitMask;
+            ddspf.dwGBitMask = dwGBitMask;
+            ddspf.dwBBitMask = dwBBitMask;
+            ddspf.dwABitMask = dwABitMask;
+        }
+
 
         /// <summary>
         /// Parses the data from a DDS byte array. (Can also read just the header only)
@@ -193,6 +388,13 @@ namespace D3DTX_Converter.Main
             Console.WriteLine("DDS Mip Map Count = {0}", header.dwMipMapCount);
             Console.WriteLine("DDS Compression = {0}", header.ddspf.dwFourCC);
 
+            //get dxt10 header if it exists
+            if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10"))
+            {
+                byte[] dxt10headerBytes = ByteFunctions.AllocateBytes(20, fileData, 128); //skip the main header
+                dxt10_header = DDS.GetDX10HeaderFromBytes(dxt10headerBytes);
+            }
+
             if (headerOnly)
                 return;
 
@@ -200,14 +402,17 @@ namespace D3DTX_Converter.Main
             //calculate dds header length (we add 4 because we skipped the 4 bytes which contain the ddsPrefix, it isn't necessary to parse this data)
             uint ddsHeaderLength = 4 + header.dwSize;
 
+            //if dxt10Header is present, add additional 20 bytes
+            uint dxt10HeaderLength = (uint)((header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10")) ? 20 : 0);
+
             //calculate the length of just the dds texture data
-            uint ddsTextureDataLength = (uint)sourceFileData.Length - ddsHeaderLength;
+            uint ddsTextureDataLength = (uint)sourceFileData.Length - ddsHeaderLength - dxt10HeaderLength;
 
             //allocate a byte array of dds texture length
             byte[] ddsTextureData = new byte[ddsTextureDataLength];
 
             //copy the data from the source byte array past the header (so we are only getting texture data)
-            Array.Copy(sourceFileData, ddsHeaderLength, ddsTextureData, 0, ddsTextureData.Length);
+            Array.Copy(sourceFileData, ddsHeaderLength + dxt10HeaderLength, ddsTextureData, 0, ddsTextureData.Length);
 
             textureData = new();
 
@@ -222,20 +427,46 @@ namespace D3DTX_Converter.Main
                 //get mip resolutions
                 //calculated mip resolutions [Pixel Value, Width or Height (0 or 1)]
                 mipMapResolutions =
-                    DDS.CalculateMipResolutions(header.dwMipMapCount - 1, header.dwWidth, header.dwHeight);
+                    DDS.CalculateMipResolutions(header.dwMipMapCount, header.dwWidth, header.dwHeight);
 
-                //get block size
-                uint blockSize = DDS.GetDDSBlockSize(header);
+                uint byteSize;
+                bool isCompressed = false;
+                bool isFormatLegacy = true;
+                uint format = header.ddspf.dwFourCC;
 
-                //get byte sizes
-                //uint[] byteSizes = DDS_Functions.DDS_GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, ((header.ddspf.dwFourCC == 0x44585435u || header.ddspf.dwFourCC == 0x35545844u) ? false : true));
-                uint[] byteSizes = DDS.GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, blockSize);
+                if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10"))
+                {
+                    format = (uint)dxt10_header.dxgiFormat;
+                    isFormatLegacy = false;
+                }
+
+                //check if it's compressed
+                //get the block size if true
+                //get the pixel size if false
+                if (DDS.IsTextureFormatCompressed(format))
+                {
+                    isCompressed = true;
+                    byteSize = DDS.GetDDSBlockSize(header, dxt10_header);
+                }
+                else
+                {
+                    if (isFormatLegacy)
+                    {
+                        byteSize = DDS.GetD3D9FORMATBitsPerPifxel((D3DFORMAT)header.ddspf.dwFourCC) / 8;
+                    }
+                    else
+                    {
+                        byteSize = DDS.GetDXGIBitsPerPixel(dxt10_header.dxgiFormat) / 8;
+                    }
+                }
+
+                uint[] byteSizes = DDS.GetImageByteSizes(mipMapResolutions, header.dwPitchOrLinearSize, byteSize, isCompressed);
 
                 int offset = 0;
 
                 for (int i = 0; i < byteSizes.Length; i++)
                 {
-                    byte[] temp = new byte[byteSizes[i]];
+                    byte[] temp = new byte[byteSizes[header.dwMipMapCount - i - 1]];
 
                     //issue length
                     Array.Copy(ddsTextureData, offset, temp, 0, temp.Length);
@@ -244,7 +475,10 @@ namespace D3DTX_Converter.Main
 
                     textureData.Add(temp);
                 }
+                
+                textureData.Reverse();
             }
+
         }
 
         public void TEST_WriteDDSToDisk(string destinationPath)
@@ -302,10 +536,9 @@ namespace D3DTX_Converter.Main
                 int mipCount = (int)d3dtx.GetMipMapCount();
                 int cubeSurfacesAmount = regionCount / mipCount;
 
-                string newCubeDirectory = destinationDirectory + +Path.DirectorySeparatorChar + fileName +
-                                          +Path.DirectorySeparatorChar;
+                string newCubeDirectory = destinationDirectory + Path.DirectorySeparatorChar + fileName + Path.DirectorySeparatorChar;
 
-                if (Directory.Exists(newCubeDirectory) == false)
+                if (!Directory.Exists(newCubeDirectory))
                 {
                     Directory.CreateDirectory(newCubeDirectory);
                 }
@@ -343,6 +576,11 @@ namespace D3DTX_Converter.Main
                 //turn our header data into bytes to be written into a file
                 byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
 
+                if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10"))
+                {
+                    dds_header = ByteFunctions.Combine(dds_header, DDS.GetDXT10HeaderBytes(dxt10_header));
+                }
+
                 //copy the dds header to the file
                 byte[] finalData = Array.Empty<byte>();
                 finalData = ByteFunctions.Combine(finalData, dds_header);
@@ -372,8 +610,6 @@ namespace D3DTX_Converter.Main
         {
         }
 
-      
-
         public byte[] GetData(D3DTX_Master d3dtx)
         {
             if (d3dtx.IsCubeTexture())
@@ -381,7 +617,6 @@ namespace D3DTX_Converter.Main
                 int regionCount = d3dtx.GetRegionCount();
                 int mipCount = (int)d3dtx.GetMipMapCount();
                 int cubeSurfacesAmount = regionCount / mipCount;
-
 
                 for (int i = 0; i < cubeSurfacesAmount; i++)
                 {
@@ -411,11 +646,15 @@ namespace D3DTX_Converter.Main
             {
                 //turn our header data into bytes to be written into a file
                 byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes("DDS "), DDS.GetHeaderBytes(header));
+                if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32("DX10"))
+                {
+                    dds_header = ByteFunctions.Combine(dds_header, DDS.GetDXT10HeaderBytes(dxt10_header));
+                }
 
                 //copy the dds header to the file
                 byte[] finalData = Array.Empty<byte>();
                 finalData = ByteFunctions.Combine(finalData, dds_header);
-
+                Console.WriteLine(finalData.Length);
                 List<byte[]> pixelData = d3dtx.GetPixelData();
 
                 //copy the images
@@ -423,7 +662,7 @@ namespace D3DTX_Converter.Main
                 {
                     finalData = ByteFunctions.Combine(finalData, pixelData[i]);
                 }
-
+                Console.WriteLine(finalData.Length);
                 return finalData;
                 //write the file to the disk
             }

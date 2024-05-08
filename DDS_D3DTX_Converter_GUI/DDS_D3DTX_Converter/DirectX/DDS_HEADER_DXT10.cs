@@ -1,48 +1,90 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using DirectXTexNet;
 
-namespace D3DTX_Converter.DirectX
+namespace D3DTX_Converter.DirectX;
+
+// DDS Docs - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-header
+// DDS PIXEL FORMAT - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-pixelformat
+// DDS DDS_HEADER_DXT10 - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-header-dxt10
+// DDS File Layout https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-file-layout-for-textures
+// Texture Block Compression in D3D11 - https://docs.microsoft.com/en-us/windows/win32/direct3d11/texture-block-compression-in-direct3d-11
+// DDS Programming Guide - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide
+
+/// <summary>
+/// DDS header extension to handle resource arrays, DXGI pixel formats that don't map to the legacy Microsoft DirectDraw pixel format structures, and additional metadata.
+/// </summary>
+public struct DDS_HEADER_DXT10
 {
-    //DDS Docs - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-header
-    //DDS PIXEL FORMAT - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-pixelformat
-    //DDS DDS_HEADER_DXT10 - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-header-dxt10
-    //DDS File Layout https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-file-layout-for-textures
-    //Texutre Block Compression in D3D11 - https://docs.microsoft.com/en-us/windows/win32/direct3d11/texture-block-compression-in-direct3d-11
-    //DDS Programming Guide - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide
+    /// <summary>
+    /// [4 bytes] The surface pixel format.
+    /// </summary>
+    public DXGI_FORMAT dxgiFormat;
 
     /// <summary>
-    /// DDS header extension to handle resource arrays, DXGI pixel formats that don't map to the legacy Microsoft DirectDraw pixel format structures, and additional metadata.
+    /// [4 bytes] Identifies the type of resource.
     /// </summary>
-    public struct DDS_HEADER_DXT10
+    public D3D10_RESOURCE_DIMENSION resourceDimension;
+
+    /// <summary>
+    /// [4 bytes] Identifies other, less common options for resources.
+    /// </summary>
+    public uint miscFlag;
+
+    /// <summary>
+    /// [4 bytes] The number of elements in the array.
+    /// <para>For a 2D texture that is also a cube-map texture, this number represents the number of cubes.</para>
+    /// </summary>
+    public uint arraySize;
+
+    /// <summary>
+    /// [4 bytes] Contains additional metadata (formerly was reserved). 
+    /// </summary>
+    public uint miscFlags2;
+
+    public DDS_HEADER_DXT10(BinaryReader reader)
     {
-        /// <summary>
-        /// [4 bytes] The surface pixel format.
-        /// </summary>
-        public DXGI_FORMAT dxgiFormat;
+        dxgiFormat = (DXGI_FORMAT)reader.ReadUInt32();
+        resourceDimension = (D3D10_RESOURCE_DIMENSION)reader.ReadUInt32();
+        miscFlag = reader.ReadUInt32();
+        arraySize = reader.ReadUInt32();
+        miscFlags2 = reader.ReadUInt32();
+    }
 
-        /// <summary>
-        /// [4 bytes] Identifies the type of resource.
-        /// </summary>
-        public D3D10_RESOURCE_DIMENSION resourceDimension;
+    public void Write(BinaryWriter writer)
+    {
+        writer.Write((uint)dxgiFormat);
+        writer.Write((uint)resourceDimension);
+        writer.Write(miscFlag);
+        writer.Write(arraySize);
+        writer.Write(miscFlags2);
+    }
 
-        /// <summary>
-        /// [4 bytes] Identifies other, less common options for resources.
-        /// </summary>
-        public uint miscFlag;
+    public static DDS_HEADER_DXT10 GetHeaderFromBytes(byte[] byteArray)
+    {
+        using MemoryStream stream = new(byteArray);
+        using BinaryReader reader = new(stream);
 
-        /// <summary>
-        /// [4 bytes] The number of elements in the array.
-        /// <para>For a 2D texture that is also a cube-map texture, this number represents the number of cubes.</para>
-        /// </summary>
-        public uint arraySize;
+        return new DDS_HEADER_DXT10(reader);
+    }
 
-        /// <summary>
-        /// [4 bytes] Contains additional metadata (formerly was reserved). 
-        /// </summary>
-        public uint miscFlags2;
+    /// <summary>
+    /// Returns a preset DDS_Header_DXT10, when the compression format is DXT10. We modify it later when we need it.
+    /// </summary>
+    /// <returns></returns>
+    public static DDS_HEADER_DXT10 GetPresetDXT10Header() => new()
+    {
+        dxgiFormat = DXGI_FORMAT.R32G32B32A32_UINT,
+        resourceDimension = D3D10_RESOURCE_DIMENSION.TEXTURE2D,
+        arraySize = 1,
+    };
+
+    public void Print(){
+        Console.WriteLine("DDS_HEADER_DXT10");
+        Console.WriteLine($"\tdxgiFormat: {dxgiFormat}");
+        Console.WriteLine($"\tresourceDimension: {resourceDimension}");
+        Console.WriteLine($"\tmiscFlag: {miscFlag}");
+        Console.WriteLine($"\tarraySize: {arraySize}");
+        Console.WriteLine($"\tmiscFlags2: {miscFlags2}");
     }
 }

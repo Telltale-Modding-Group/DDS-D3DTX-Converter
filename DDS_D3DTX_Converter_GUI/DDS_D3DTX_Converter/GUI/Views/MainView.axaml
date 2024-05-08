@@ -1,0 +1,542 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:DDS_D3DTX_Converter.ViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="1000"
+             d:DesignHeight="550"
+             x:Class="DDS_D3DTX_Converter.Views.MainView"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             x:DataType="vm:MainViewModel">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainViewModel />
+    </Design.DataContext>
+    <Grid>
+        <!-- MAIN COLUMN DEFINITIONS -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"
+                              MinWidth="550" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="*"
+                              MinWidth="300" />
+        </Grid.ColumnDefinitions>
+        <GridSplitter Grid.Column="1"
+                      HorizontalAlignment="Stretch"
+                      ResizeDirection="Columns"
+                      Background="{DynamicResource PanelSplitterColor}" />
+        <Grid Grid.Column="0"
+              MinHeight="500"
+              MinWidth="500"
+              Background="{DynamicResource MainPanelColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70"
+                               MinHeight="70"
+                               MaxHeight="70" />
+                <RowDefinition Height="5"
+                               MinHeight="5"
+                               MaxHeight="5" />
+                <RowDefinition Height="600*" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0"
+                  Background="{DynamicResource MainPanelColor}">
+                <Button Name="MenuOpenFolder"
+                        HorizontalAlignment="Left"
+                        Margin="0,0,0,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Width="80"
+                        Height="70"
+                        Padding="0"
+                        Background="{DynamicResource ButtonColor}"
+                        ToolTip.Tip="Open Folder/File"
+                        Command="{Binding OpenDirectoryButton_Click}">
+                    <Button.Content>
+                        <StackPanel Orientation="Vertical"
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Center">
+                            <Image Source="{SvgImage /Assets/open_folder_icon.svg}"
+                                   Width="50"
+                                   Height="50" />
+                            <TextBlock Text="Open"
+                                       HorizontalAlignment="Center"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Name="MenuSaveFileButton"
+                        HorizontalAlignment="Left"
+                        Margin="80,0,0,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Width="80"
+                        Height="70"
+                        Padding="0"
+                        Background="{DynamicResource ButtonColor}"
+                        ToolTip.Tip="Save File"
+                        Command="{Binding SaveFileButton_Click}"
+                        IsEnabled="{Binding SaveButtonStatus}">
+                    <Button.Content>
+                        <StackPanel Orientation="Vertical"
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Center">
+                            <Image Source="{SvgImage /Assets/save_icon.svg}"
+                                   Width="50"
+                                   Height="50" />
+                            <TextBlock Text="Save"
+                                       HorizontalAlignment="Center"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Name="MenuAddButton"
+                        HorizontalAlignment="Left"
+                        Margin="160,0,0,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Width="80"
+                        Height="70"
+                        Padding="0"
+                        Background="{DynamicResource ButtonColor}"
+                        ToolTip.Tip="Add files to workspace"
+                        Command="{Binding AddFilesButton_Click}"
+                        IsEnabled="True">
+                    <Button.Content>
+                        <StackPanel Orientation="Vertical"
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Center">
+                            <Image Source="{SvgImage /Assets/add_icon.svg}"
+                                   Width="50"
+                                   Height="50" />
+                            <TextBlock Text="Add"
+                                       HorizontalAlignment="Center"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Name="MenuDeleteButton"
+                        HorizontalAlignment="Left"
+                        Margin="240,0,0,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Width="80"
+                        Height="70"
+                        Padding="0"
+                        Background="{DynamicResource ButtonColor}"
+                        ToolTip.Tip="Delete file"
+                        Command="{Binding DeleteFileButton_Click}"
+                        IsEnabled="{Binding DeleteButtonStatus}">
+                    <Button.Content>
+                        <StackPanel Orientation="Vertical"
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Center">
+                            <Image Source="{SvgImage /Assets/delete_icon.svg}"
+                                   Width="50"
+                                   Height="50" />
+                            <TextBlock Text="Delete"
+                                       HorizontalAlignment="Center"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <!-- Convert Menu button could be added? -->
+                <!--  -->
+                <!-- <Button Name="MenuConvertButton" -->
+                <!-- HorizontalAlignment="Left" -->
+                <!-- Margin="240,0,0,0" -->
+                <!-- VerticalAlignment="Top" -->
+                <!-- VerticalContentAlignment="Center" -->
+                <!-- Width="80" -->
+                <!-- Height="70" -->
+                <!-- Padding="0" -->
+                <!-- Background="{DynamicResource ButtonColor}" -->
+                <!-- ToolTip.Tip="Convert file to desired format"> -->
+                <!--  -->
+                <!-- <Button.Content> -->
+                <!-- <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center"> -->
+                <!-- <Image Source="{SvgImage /Assets/convert_icon.svg}" Width="50" Height="50" /> -->
+                <!-- <TextBlock Text="Convert to" HorizontalAlignment="Center" FontSize="12" /> -->
+                <!-- </StackPanel> -->
+                <!-- </Button.Content> -->
+                <!-- </Button> -->
+                <Button Name="MenuHelpButton"
+                        HorizontalAlignment="Left"
+                        Margin="320,0,0,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Width="80"
+                        Height="70"
+                        Padding="0"
+                        Background="{DynamicResource ButtonColor}"
+                        ToolTip.Tip="Help"
+                        Command="{Binding HelpButton_Click}">
+                    <Button.Content>
+                        <StackPanel Orientation="Vertical"
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Center">
+                            <Image Source="{SvgImage /Assets/help_icon.svg}"
+                                   Width="50"
+                                   Height="50" />
+                            <TextBlock Text="Help"
+                                       HorizontalAlignment="Center"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Name="MenuAboutButton"
+                        HorizontalAlignment="Left"
+                        Margin="400,0,0,0"
+                        VerticalAlignment="Top"
+                        VerticalContentAlignment="Center"
+                        Width="80"
+                        Height="70"
+                        Padding="0"
+                        Background="{DynamicResource ButtonColor}"
+                        ToolTip.Tip="Learn more about the app"
+                        Command="{Binding AboutButton_Click}">
+                    <Button.Content>
+                        <StackPanel Name="MenuAboutButtonPanel"
+                                    Orientation="Vertical"
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Center">
+                            <Image Source="{SvgImage /Assets/about_icon.svg}"
+                                   Width="50"
+                                   Height="50" />
+                            <TextBlock Text="About"
+                                       HorizontalAlignment="Center"
+                                       FontSize="12" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </Grid>
+            <GridSplitter Grid.Row="1"
+                          HorizontalAlignment="Stretch"
+                          ResizeDirection="Rows"
+                          Background="{DynamicResource PanelSplitterColor}" />
+            <!-- COLUMN 1 ROW 1 DEFINITIONS -->
+            <Grid Grid.Row="2"
+                  Margin="0,0,0,5"
+                  Background="{DynamicResource MainPanelColor}">
+                <Label Name="TextureDirectoryTitleLabel"
+                       Content="Textures Directory"
+                       Margin="10,0,0,0"
+                       Height="30"
+                       Width="150"
+                       VerticalAlignment="Top"
+                       VerticalContentAlignment="Bottom"
+                       HorizontalAlignment="Left" />
+                <TextBox Name="TextureDirectoryDirectorypathTextBox"
+                         Width="500"
+                         Height="35"
+                         HorizontalAlignment="Left"
+                         ToolTip.Tip="{Binding DirectoryPath}"
+                         Text="{Binding DirectoryPath}"
+                         IsReadOnly="True"
+                         Margin="10,30,75,0"
+                         VerticalAlignment="Top"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+                <Button Name="ReturnDirectory"
+                        HorizontalAlignment="Left"
+                        Margin="515,30,25,0"
+                        VerticalAlignment="Top"
+                        Width="35"
+                        Height="35"
+                        Padding="0"
+                        Background="{DynamicResource ButtonColor}"
+                        ToolTip.Tip="Return to parent directory"
+                        Command="{Binding ReturnDirectory_Click}"
+                        IsEnabled="{Binding ReturnDirectoryButtonStatus}">
+                    <Button.Content>
+                        <StackPanel Orientation="Vertical"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
+                            <Image Source="{SvgImage /Assets/folder_parent_icon.svg}"
+                                   VerticalAlignment="Center"
+                                   Width="28"
+                                   Height="28" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Name="RefreshDirectory"
+                        HorizontalAlignment="Left"
+                        Margin="555,30,25,0"
+                        VerticalAlignment="Top"
+                        Width="35"
+                        Height="35"
+                        Padding="0"
+                        Background="{DynamicResource ButtonColor}"
+                        ToolTip.Tip="Refresh the current directory"
+                        Command="{Binding RefreshDirectoryButton_Click}"
+                        IsEnabled="{Binding RefreshDirectoryButtonStatus}">
+                    <Button.Content>
+                        <StackPanel Orientation="Vertical"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
+                            <Image Source="{SvgImage /Assets/refresh_icon.svg}"
+                                   VerticalAlignment="Center"
+                                   Width="28"
+                                   Height="28" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <!-- FILE LIST -->
+                <DataGrid Name="TextureDirectoryFilesDataGrid"
+                          Margin="10,80,10,38"
+                          ItemsSource="{Binding WorkingDirectoryFiles}"
+                          SelectedItem="{Binding DataGrid_SelectedItem}"
+                          BorderThickness="1"
+                          BorderBrush="Black"
+                          CanUserResizeColumns="True"
+                          IsReadOnly="true"
+                          Background="{DynamicResource PanelSplitterColor}">
+                    <i:Interaction.Behaviors>
+                        <ia:EventTriggerBehavior EventName="DoubleTapped"
+                                                 SourceObject="TextureDirectoryFilesDataGrid">
+                            <ia:CallMethodAction TargetObject="{Binding}"
+                                                 MethodName="RowDoubleTappedCommand" />
+                        </ia:EventTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                    <DataGrid.Resources>
+                        <DataTemplate x:Key="HeaderTemplate">
+                            <TextBlock Text="{Binding}"
+                                       Foreground="White"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="File Name"
+                                            Binding="{Binding FileName}"
+                                            HeaderTemplate="{StaticResource HeaderTemplate}"
+                                            Width="250" />
+                        <DataGridTextColumn Header="File Type"
+                                            Binding="{Binding FileType}"
+                                            HeaderTemplate="{StaticResource HeaderTemplate}"
+                                            Width="120" />
+                        <DataGridTextColumn Header="Data Modified"
+                                            Binding="{Binding FileLastWrite}"
+                                            HeaderTemplate="{StaticResource HeaderTemplate}"
+                                            Width="200" />
+                    </DataGrid.Columns>
+                    <!-- CustomSortComparer="{Binding CustomDateSort}" -->
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Name="ContextMenuAddFiles"
+                                      Header="Add"
+                                      Icon="{SvgImage /Assets/add_icon.svg}"
+                                      Command="{Binding ContextMenuAddFilesCommand}" />
+                            <MenuItem Name="ContextMenuOpenFile"
+                                      Header="Open"
+                                      Command="{Binding ContextMenuOpenFileCommand}" />
+                            <MenuItem Name="ContextMenuOpenFolder"
+                                      Header="Open Folder"
+                                      Command="{Binding ContextMenuOpenFolderCommand}"
+                                      IsEnabled="{Binding ContextOpenFolderStatus}" />
+                            <MenuItem Name="ContextMenuOpenFileInFileExplorer"
+                                      Header="Open in Еxplorer"
+                                      Command="{Binding ContextMenuOpenFileExplorerCommand}" />
+                            <MenuItem Name="ContextMenuRefreshDirectory"
+                                      Header="Refresh Directory"
+                                      Icon="{SvgImage /Assets/refresh_icon.svg}"
+                                      Command="{Binding ContextMenuRefreshDirectoryCommand}" />
+                            <MenuItem Name="ContextMenuDeleteFile"
+                                      Header="Delete File"
+                                      Icon="{SvgImage /Assets/delete_icon.svg}"
+                                      Command="{Binding ContextDeleteFileCommand}" />
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                </DataGrid>
+            </Grid>
+        </Grid>
+        <Grid Grid.Column="2"
+              Background="{DynamicResource MainPanelColor}"
+              MinWidth="250">
+            <!-- ROW COLUMN 2 DEFINITIONS -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"
+                               MinHeight="200" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="80"
+                               MinHeight="80"
+                               MaxHeight="80" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="auto"
+                               MinHeight="300" />
+            </Grid.RowDefinitions>
+            <!-- IMAGE PREVIEW -->
+            <Grid Grid.Row="0"
+                  MinHeight="40"
+                  Background="{DynamicResource MainPanelColor}">
+                <Label Name="ImagepreviewImageNameLabel"
+                       Content="{Binding ImageNamePreview, StringFormat='File Name: {0}'}"
+                       ToolTip.Tip="{Binding ImageNamePreview}"
+                       Margin="10,10,10,0"
+                       VerticalAlignment="Top"
+                       Height="26" />
+                <Label Name="ImagepreviewLabel"
+                       Content="Image Preview"
+                       Margin="10,40,10,0"
+                       VerticalAlignment="Top" />
+                <Border Name="ImagepreviewImageBorder"
+                        BorderBrush="Black"
+                        BorderThickness="1"
+                        Margin="10,70,10,10">
+                    <Image Name="ImagepreviewImage"
+                           Source="{Binding ImagePreview}"
+                           Stretch="Uniform" />
+                </Border>
+            </Grid>
+            <Grid Grid.Row="1"
+                  Background="{DynamicResource PanelSplitterColor}" />
+            <Grid Grid.Row="3"
+                  Background="{DynamicResource PanelSplitterColor}" />
+            <!-- Image Properties -->
+            <Grid Grid.Row="4"
+                  Background="{DynamicResource MainPanelColor}">
+                <Label Name="ImagepropertiesTitleLabel"
+                       Content="Image Properties"
+                       Margin="9,9,8,0"
+                       VerticalAlignment="Top"
+                       Height="25" />
+                <Label Name="ImagepropertiesFilenameLabel"
+                       Content="Image Name:"
+                       Margin="10,50,10,0"
+                       FontSize="14"
+                       HorizontalAlignment="Left" />
+                <SelectableTextBlock Name="ImagepropertiesFilenameTextblock"
+                                     Text="{Binding ImageProperties.Name}"
+                                     ToolTip.Tip="{Binding ImageProperties.Name}"
+                                     Margin="135,53,10,0"
+                                     Width="350"
+                                     HorizontalAlignment="Left"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                     FontSize="14" />
+                <!-- Width -->
+                <Label Name="WidthLabel"
+                       Content="Pixel Width:"
+                       Margin="10,75,10,0"
+                       HorizontalAlignment="Left" />
+                <SelectableTextBlock Name="WidthTextblock"
+                                     Text="{Binding ImageProperties.Width}"
+                                     Margin="135,78,10,0" />
+                <!-- Height -->
+                <Label Name="UHeightLabel"
+                       Content="Pixel Height:"
+                       Margin="10,100,10,0"
+                       HorizontalAlignment="Left" />
+                <SelectableTextBlock Name="HeightTextblock"
+                                     Text="{Binding ImageProperties.Height}"
+                                     Margin="135,103,10,0" />
+                <!-- Compression Type -->
+                <Label Name="CompressionTypeLabel"
+                       Content="Surface Format:"
+                       Margin="10,125,10,0"
+                       HorizontalAlignment="Left" />
+                <SelectableTextBlock Name="CompressiontypeTextblock"
+                                     Text="{Binding ImageProperties.CompressionType}"
+                                     Margin="135,128,10,0"
+                                     Width="250"
+                                     HorizontalAlignment="Left" />
+                <!-- Has Alpha Count -->
+                <Label Name="HasAlphaLabel"
+                       Content="Transparency:"
+                       Margin="10,150,10,0"
+                       HorizontalAlignment="Left" />
+                <SelectableTextBlock Name="HasAlphaTextblock"
+                                     Text="{Binding ImageProperties.HasAlpha}"
+                                     Margin="135,153,10,0" />
+                <!-- Channel Count -->
+                <Label Name="ChannelCountLabel"
+                       Content="Channel Count:"
+                       Margin="10,175,10,0"
+                       HorizontalAlignment="Left" />
+                <SelectableTextBlock Name="ChannelcountTextblock"
+                                     Text="{Binding ImageProperties.ChannelCount}"
+                                     Margin="135,178,10,0" />
+                <!-- Mipmap Count -->
+                <Label Name="MipMapcountLabel"
+                       Content="Mip Map Count:"
+                       Margin="10,200,10,0"
+                       HorizontalAlignment="Left" />
+                <SelectableTextBlock Name="MipMapCountTextblock"
+                                     Text="{Binding ImageProperties.MipMapCount}"
+                                     Margin="135,203,10,0" />
+            </Grid>
+            <!-- Convert Panel -->
+            <Grid Grid.Row="2"
+                  Background="{DynamicResource MainPanelColor}">
+                <Label Name="ConvertOptionsLabel"
+                       Content="Convert Options:"
+                       Margin="10,5,0,5"
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Left"
+                       VerticalContentAlignment="Center"
+                       Height="30"
+                       Width="120" />
+                <ComboBox Name="ConvertOptionsComboBox"
+                          ItemsSource="{Binding FormatsList}"
+                          SelectedItem="{Binding SelectedFormat}"
+                          SelectedIndex="{Binding SelectedConvertOptionsComboBoxIndex}"
+                          HorizontalAlignment="Left"
+                          Margin="135,5,0,5"
+                          VerticalAlignment="Top"
+                          Width="155"
+                          Height="30"
+                          IsEnabled="{Binding ComboBoxStatus}"
+                          ToolTip.Tip="Available formats">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"
+                                       IsEnabled="{Binding ItemStatus}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Label Name="LegacyOptionsLabel"
+                       Content="Game Version:"
+                       Margin="10,5,0,5"
+                       VerticalAlignment="Bottom"
+                       HorizontalAlignment="Left"
+                       VerticalContentAlignment="Center"
+                       Height="30"
+                       Width="120" />
+                <ComboBox Name="VersionConvertComboBox"
+                          ItemsSource="{Binding VersionConvertOptionsList}"
+                          SelectedItem="{Binding SelectedVersionConvertOption}"
+                          HorizontalAlignment="Left"
+                          Margin="135,70,0,5"
+                          VerticalAlignment="Bottom"
+                          Width="155"
+                          Height="30"
+                          IsEnabled="{Binding VersionConvertComboBoxStatus}"
+                          ToolTip.Tip="Available formats">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <CheckBox Name="ChooseOutputDirectoryCheckBox"
+                          IsChecked="{Binding ChooseOutputDirectoryCheckBoxStatus}"
+                          Content="Choose Output Directory"
+                          Margin="295,5,0,5"
+                          VerticalAlignment="Top"
+                          HorizontalAlignment="Left"
+                          Width="200" />
+                <Button Name="ConvertButton"
+                        Content="Convert"
+                        Margin="500,5,0,5"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left"
+                        HorizontalContentAlignment="Center"
+                        Width="91"
+                        Command="{Binding ConvertButton_ClickAsync}"
+                        IsEnabled="{Binding ConvertButtonStatus}"
+                        ToolTip.Tip="Convert the file into the desired format." />
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

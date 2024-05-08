@@ -8,15 +8,13 @@ This page is meant to help inform and guide users as to how this application wor
 
 ![ui-guide0](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/blob/main/tutorial-screenshots/ui-guide0.png)
 
-Not much to see in the top bar of the application. 
-
 **On the top left of the application menu bar is**
-- **Icon** - the application icon (obviously)
-- **TEXTURE MOD TOOL** - The name of the application (obviously)
-
-**On the right of the application menu bar is**
-- **Version Number** - the application version number
-- **Help Button** - for getting help with the application. (Clicking this button will open your default web browser and will lead you to the main help pages for this application.)
+- **Open** - It opens a folder browser dialog where you can select the folder that contains your extracted D3DTX textures.
+- **Save** - save the selected file to a location
+- **Add** - add a file to the folder
+- **Delete** - delete a file 
+- **Help** - opens the wiki page
+- **About** - opens a window with information about the software with credits and a version number
 
 ## Textures Directory
 
@@ -24,24 +22,29 @@ Not much to see in the top bar of the application.
 
 This section contains a simple file browser for selecting and viewing all of your texture files.
 
-**On the top of this section**
+**On the top left of this section**
 - **Textures Directory** - The section title
 - **Directory Path** - tells you the path of the folder in which you selected
-- **Folder Button** - for browsing and changing the Texture Directory Path. It opens a folder browser dialog where you can select the folder that contains your extracted D3DTX textures.
+- **Return Folder Button** - goes up one level in the directory
+- **Refresh Directory Button** - simply refreshes the Listview in case there are any changes and the application doesn't update the interface.
 
 **In the middle of this section**
-- **File Browser** - a listview of the .dds, .header, .d3dtx files that are in your directory
+- **File Browser** - a datagridview of the all supported image file formats, including **.png, .jpg, .bmp, .tiff, .dds, .d3dtx and .json** 
 
 ![ui-guide5](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/blob/main/tutorial-screenshots/ui-guide5.png)
 
 **There is also a context menu for the middle section** (Right-click on this section in the application)
-- **Refresh** - simply refreshes the Listview in case there are any changes and the application doesn't update the interface.
+- **Refresh** - 
 - **Open Folder** - opens the directory you have open in File Explorer
 
-**On the bottom of this section**
-- **Convert to DDS** - Converts all .d3dtx files in your directory into .dds files. It also generates a .header file for converting back to .d3dtx later (This button is greyed out only when there is no directory path given, or if there are no D3DTX textures in the directory)
-- **Convert to D3DTX** - Converts all .dds and .header files in your directory back into .d3dtx files. (This button is greyed out only when there is no directory path given, or if there are no .dds and .header files in the directory)
-- **Refresh Button** - Refreshes the Listview in case there are any changes and the application doesn't update the interface.
+**There are also some double click actions** 
+- **Double clicking on a folder** - opens the folder in the current software
+- **Double clicking on a file** - opens the file in the preffered software
+
+**On the middle right of this section**
+- **Convert Options:** - a combo box containing all possible options of the selected image format
+- **Choose Output Directory Checkbox** - a checkbox if you want to specify the path when converting
+- **Convert Button** - Refreshes the Listview in case there are any changes and the application doesn't update the interface.
 
 ## Output Section
 
@@ -53,14 +56,15 @@ This section contains an Output in which information is written during the conve
 
 ![ui-guide3](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/blob/main/tutorial-screenshots/ui-guide3.png)
 
-This section contains an image viewer for viewing DDS textures. It's worth noting that this only displays .DDS images, not D3DTX images (hence the name DDS Image Preview).
+This section contains an image viewer for viewing textures. It displays **.png, .jpg, .bmp, .tiff, .dds and .d3dtx** files (if the game is supported).
 
 **On the top of this section contains**
-- **DDS Image Preview** - title of the section
-- **Image Name** - where the name of the image is displayed.
+- **File Name** - where the name of the image is displayed
+- **Image Preview** - title of the section
+
 
 **On the middle of this section contains**
-- **Image Window** - When an image is selected from the Textures Directory Listview it will be displayed here.
+- **Image Window** - when an image is selected from the Textures Directory DataGrid it will be displayed here
 
 ## Image Properties
 
@@ -72,8 +76,10 @@ This section contains and shows the properties of an image when it's selected fr
 - **Image Name** - the name of the image
 - **Pixel Width** - the image resolution in width. (of the largest mipmap, or also known as the main texture)
 - **Pixel Height**- the image resolution in height. (of the largest mipmap, or also known as the main texture)
-- **DDS Format** - the format of the DDS texture.
-- **Has Mip Maps** - displays true or false depending on if the DDS image has mipmaps.
-- **Mip Map Count** - how many mipmaps are in the image.
+- **Surface Format** - the surface format of the texture. Additional info can be found here.
+- **Transparency** - indicates if the texture has alpha
+- **Channel count** - shows the number of color channels of the surface format (at the moment it's broken)
+- **Mip Map Count** - how many mipmaps are in the texture
+- **Layout** - shows what type of texture layout it is - 2d, 3d or cube texture (to be added)
 
 And that is all there is to it!

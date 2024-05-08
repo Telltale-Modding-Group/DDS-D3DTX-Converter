@@ -130,11 +130,9 @@ namespace D3DTX_Converter.Utilities
                 };
 
                 // Open the dialog and cache the result
-
                 var result = await provider.OpenFolderPickerAsync(openFolderOptions);
 
                 // If the user selects a file, set the result
-
                 if (result != null && result.Any())
                 {
                     string systemPath = new Uri(result[0].Path.ToString()).LocalPath;
@@ -145,7 +143,6 @@ namespace D3DTX_Converter.Utilities
                     tcs.SetResult(null);
                 }
             });
-
 
             // Wait for the task to complete and return the result
             return await tcs.Task;

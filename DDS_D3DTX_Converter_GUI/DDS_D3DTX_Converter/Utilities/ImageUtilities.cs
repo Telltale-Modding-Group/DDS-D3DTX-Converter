@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using Avalonia;
+using Avalonia.Markup.Xaml.Templates;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using BitMiracle.LibTiff.Classic;
@@ -98,62 +99,7 @@ namespace D3DTX_Converter.Utilities
             //load the image
             using var image = Pfimage.FromFile(filePath);
 
-            //get the data
-            var newData = image.Data;
-            var newDataLen = image.DataLen;
-            var stride = image.Stride;
-
-            //get the color type
-            SKColorType colorType;
-            switch (image.Format)
-            {
-                case ImageFormat.Rgb8:
-                    colorType = SKColorType.Gray8;
-                    break;
-                case ImageFormat.R5g6b5:
-                    colorType = SKColorType.Rgb565;
-                    break;
-                case ImageFormat.Rgba16:
-                    colorType = SKColorType.Argb4444;
-                    break;
-                case ImageFormat.Rgb24:
-                    // Skia has no 24bit pixels, so we upscale to 32bit
-                    var pixels = image.DataLen / 3;
-                    newDataLen = pixels * 4;
-                    newData = new byte[newDataLen];
-                    for (var i = 0; i < pixels; i++)
-                    {
-                        newData[i * 4] = image.Data[i * 3];
-                        newData[i * 4 + 1] = image.Data[i * 3 + 1];
-                        newData[i * 4 + 2] = image.Data[i * 3 + 2];
-                        newData[i * 4 + 3] = 255;
-                    }
-
-                    stride = image.Width * 4;
-                    colorType = SKColorType.Bgra8888;
-                    break;
-                case ImageFormat.Rgba32:
-                    colorType = SKColorType.Bgra8888;
-                    break;
-                default:
-                    throw new ArgumentException($"Skia unable to interpret pfim format: {image.Format}");
-            }
-
-            //Converts the data into writeableBitmap. (TODO Insert a link to the code)
-            var imageInfo = new SKImageInfo(image.Width, image.Height, colorType);
-            var handle = GCHandle.Alloc(newData, GCHandleType.Pinned);
-            var ptr = Marshal.UnsafeAddrOfPinnedArrayElement(newData, 0);
-            using var data = SKData.Create(ptr, newDataLen, (_, _) => handle.Free());
-            using var skImage = SKImage.FromPixels(imageInfo, data, stride);
-            using var bitmap = SKBitmap.FromImage(skImage);
-            var writeableBitmap = new WriteableBitmap(new PixelSize(image.Width, image.Height), new Vector(96, 96),
-                PixelFormat.Bgra8888);
-
-            using var lockedBitmap = writeableBitmap.Lock();
-            // Copy the SKBitmap pixel data to the Avalonia WriteableBitmap
-            Marshal.Copy(bitmap.Bytes, 0, lockedBitmap.Address, bitmap.Bytes.Length);
-
-            return writeableBitmap;
+            return GetDDSBitmap(image);
         }
 
         /// <summary>
@@ -221,19 +167,110 @@ namespace D3DTX_Converter.Utilities
             var d3dtx = new D3DTX_Master();
             d3dtx.Read_D3DTX_File(filePath);
             DDS_Master ddsFile = new(d3dtx);
-            //implement get without header (to see)
+
             var array = ddsFile.GetData(d3dtx);
             Stream stream = new MemoryStream(array);
 
             var image = Pfimage.FromStream(stream);
-            WriteableBitmap writeableBitmap = new WriteableBitmap(
-                  new PixelSize(image.Width, image.Height),
-                  new Vector(96, 96),
-                  PixelFormat.Bgra8888,
-                  AlphaFormat.Premul);
+
+            // Can't display RGBA32F
+            return GetDDSBitmap(image);
+        }
+
+
+        public static WriteableBitmap GetDDSBitmap(IImage image)
+        {
+            //get the data
+            var newData = image.Data;
+            var newDataLen = image.DataLen;
+            var stride = image.Stride;
+            var pixels = image.DataLen;
+
+            //get the color type
+            SKColorType colorType;
+            switch (image.Format)
+            {
+                case ImageFormat.Rgb8:
+                    colorType = SKColorType.Gray8;
+                    break;
+                case ImageFormat.R5g5b5: // Pfim doesn't support L16 and L8A8 formats. Images with these formats will be incorrectly interpreted as R5G5B5.
+                    pixels /= 2;
+                    newDataLen = pixels * 2;
+                    newData = new byte[newDataLen];
+                    for (var i = 0; i < pixels; i++)
+                    {
+                        ushort pixelData = BitConverter.ToUInt16(image.Data, i * 2);
+                        byte r = (byte)((pixelData & 0x7C00) >> 10); // Red component
+                        byte g = (byte)((pixelData & 0x03E0) >> 5); // Green component
+                        byte b = (byte)(pixelData & 0x001F); // Blue component
+                        ushort rgb565 = (ushort)((r << 11) | (g << 5) | b); // Combine components into RGB565 format
+                        byte[] rgb565Bytes = BitConverter.GetBytes(rgb565);
+                        newData[i * 2] = rgb565Bytes[0];
+                        newData[i * 2 + 1] = rgb565Bytes[1];
+                    }
+                    stride = image.Width * 2;
+                    colorType = SKColorType.Rgb565;
+                    break;
+                case ImageFormat.R5g5b5a1:
+                    pixels /= 2; // Each pixel is 2 bytes in R5G5B5A1 format
+                    newDataLen = pixels * 4; // Each pixel will be 4 bytes in RGBA8888 format
+                    newData = new byte[newDataLen];
+                    for (var i = 0; i < pixels; i++)
+                    {
+                        ushort pixelData = BitConverter.ToUInt16(image.Data, i * 2);
+                        byte r = (byte)((pixelData & 0x7C00) >> 10); // Red component
+                        byte g = (byte)((pixelData & 0x03E0) >> 5); // Green component
+                        byte b = (byte)(pixelData & 0x001F); // Blue component
+                        newData[i * 4] = r;
+                        newData[i * 4 + 1] = g;
+                        newData[i * 4 + 2] = b;
+                        newData[i * 4 + 3] = 255; // Alpha channel set to 255 (fully opaque)
+                    }
+                    stride = image.Width * 4;
+                    colorType = SKColorType.Rgba8888;
+                    break;
+                case ImageFormat.R5g6b5:
+                    colorType = SKColorType.Rgb565;
+                    break;
+                case ImageFormat.Rgba16:
+                    colorType = SKColorType.Argb4444;
+                    break;
+                case ImageFormat.Rgb24:
+                    // Skia has no 24bit pixels, so we upscale to 32bit
+                    pixels = image.DataLen / 3;
+                    newDataLen = pixels * 4;
+                    newData = new byte[newDataLen];
+                    for (var i = 0; i < pixels; i++)
+                    {
+                        newData[i * 4] = image.Data[i * 3];
+                        newData[i * 4 + 1] = image.Data[i * 3 + 1];
+                        newData[i * 4 + 2] = image.Data[i * 3 + 2];
+                        newData[i * 4 + 3] = 255;
+                    }
+
+                    stride = image.Width * 4;
+                    colorType = SKColorType.Bgra8888;
+                    break;
+                case ImageFormat.Rgba32:
+                    colorType = SKColorType.Bgra8888;
+                    break;
+                default:
+                    throw new ArgumentException($"Skia unable to interpret pfim format: {image.Format}");
+            }
+
+            //Converts the data into writeableBitmap. (TODO Insert a link to the code)
+            var imageInfo = new SKImageInfo(image.Width, image.Height, colorType);
+            var handle = GCHandle.Alloc(newData, GCHandleType.Pinned);
+            var ptr = Marshal.UnsafeAddrOfPinnedArrayElement(newData, 0);
+            using var data = SKData.Create(ptr, newDataLen, (_, _) => handle.Free());
+            using var skImage = SKImage.FromPixels(imageInfo, data, stride);
+            using var bitmap = SKBitmap.FromImage(skImage);
+            var writeableBitmap = new WriteableBitmap(new PixelSize(image.Width, image.Height), new Vector(96, 96),
+                PixelFormat.Bgra8888);
 
             using var lockedBitmap = writeableBitmap.Lock();
-            Marshal.Copy(image.Data, 0, lockedBitmap.Address, image.DataLen);
+            // Copy the SKBitmap pixel data to the Avalonia WriteableBitmap
+            Marshal.Copy(bitmap.Bytes, 0, lockedBitmap.Address, bitmap.Bytes.Length);
 
             return writeableBitmap;
         }

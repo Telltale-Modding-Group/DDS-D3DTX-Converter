@@ -329,7 +329,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
 
             mStreamHeader = new StreamHeader()
             {
-                mRegionCount = (int)dds.header.dwMipMapCount,
+                mRegionCount = (int)sections.Length,
                 mAuxDataCount = mStreamHeader.mAuxDataCount,
                 mTotalDataSize = (int)ByteFunctions.Get2DByteArrayTotalSize(mPixelData) //this is correct
             };
@@ -356,7 +356,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
             mRegionHeaders = mRegionHeaders_Reversed.ToArray();
 
             UpdateArrayCapacities();
-            //PrintConsole();
+            PrintConsole();
         }
 
         public void UpdateArrayCapacities()

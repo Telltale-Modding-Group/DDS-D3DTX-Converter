@@ -324,7 +324,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
 
             mStreamHeader = new StreamHeader()
             {
-                mRegionCount = (int)dds.header.dwMipMapCount,
+                mRegionCount = sections.Length,
                 mAuxDataCount = mStreamHeader.mAuxDataCount,
                 mTotalDataSize = (int)ByteFunctions.Get2DByteArrayTotalSize(mPixelData) //this is correct
             };

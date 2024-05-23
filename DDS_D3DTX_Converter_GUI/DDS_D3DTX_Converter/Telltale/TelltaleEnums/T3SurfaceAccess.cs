@@ -1,9 +1,8 @@
-﻿namespace D3DTX_Converter.TelltaleEnums
+﻿namespace D3DTX_Converter.TelltaleEnums;
+
+public enum T3SurfaceAccess
 {
-    public enum T3SurfaceAccess
-    {
-        eSurface_ReadOnly,
-        eSurface_ReadWrite,
-        eSurface_WriteOnly
-    }
+    eSurface_ReadOnly,
+    eSurface_ReadWrite,
+    eSurface_WriteOnly
 }

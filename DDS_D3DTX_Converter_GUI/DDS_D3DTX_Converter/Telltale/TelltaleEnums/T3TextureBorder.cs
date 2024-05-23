@@ -1,9 +1,8 @@
-﻿namespace D3DTX_Converter.TelltaleEnums
+﻿namespace D3DTX_Converter.TelltaleEnums;
+
+public enum T3TextureBorder
 {
-    public enum T3TextureBorder
-    {
-        eTextureBorder_Black,
-        eTextureBorder_White,
-        eTextureBorder_Count
-    }
+    eTextureBorder_Black,
+    eTextureBorder_White,
+    eTextureBorder_Count
 }

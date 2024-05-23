@@ -1,24 +1,23 @@
 ﻿using System;
 
-namespace D3DTX_Converter.ProgramRelease
+namespace D3DTX_Converter.ProgramRelease;
+
+public class ArgumentMode
 {
-    public class ArgumentMode
+    public static string Keyword { get { return "-Mode"; } }
+
+    public ArgumentEnumModes Mode = ArgumentEnumModes.UNKNOWN;
+
+    public ArgumentMode(string[] arguments)
     {
-        public static string Keyword { get { return "-Mode"; } }
+        string argument_keyword = arguments[0];
+        string argument_modeEnum = arguments[1];
 
-        public ArgumentEnumModes Mode = ArgumentEnumModes.UNKNOWN;
-
-        public ArgumentMode(string[] arguments)
+        foreach (string modeName in Enum.GetNames(typeof(ArgumentEnumModes)))
         {
-            string argument_keyword = arguments[0];
-            string argument_modeEnum = arguments[1];
-
-            foreach (string modeName in Enum.GetNames(typeof(ArgumentEnumModes)))
+            if (modeName.Equals(argument_modeEnum))
             {
-                if (modeName.Equals(argument_modeEnum))
-                {
-                    Mode = (ArgumentEnumModes)Enum.Parse(typeof(ArgumentEnumModes), argument_modeEnum);
-                }
+                Mode = (ArgumentEnumModes)Enum.Parse(typeof(ArgumentEnumModes), argument_modeEnum);
             }
         }
     }

@@ -1,9 +1,7 @@
-﻿namespace D3DTX_Converter.TelltaleEnums
+﻿namespace D3DTX_Converter.TelltaleEnums;
+public enum WiiTextureFormat
 {
-    public enum WiiTextureFormat
-    {
-        eTxWiiFormatDefault,
-        eTxWiiFormatAlphaOnly,
-        eTxWiiFormatRGBA24
-    }
+    eTxWiiFormatDefault,
+    eTxWiiFormatAlphaOnly,
+    eTxWiiFormatRGBA24
 }

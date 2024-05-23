@@ -18,7 +18,7 @@ using DirectXTexNet;
  * Also, Telltale uses Hungarian Notation for variable naming.
 */
 
-/* - D3DTX Version 7 games
+/* --- D3DTX Version 7 games ---
  * The Walking Dead: Michonne (TESTED)
  * Tales from the Borderlands (Re-Release?) (TESTED)
 */

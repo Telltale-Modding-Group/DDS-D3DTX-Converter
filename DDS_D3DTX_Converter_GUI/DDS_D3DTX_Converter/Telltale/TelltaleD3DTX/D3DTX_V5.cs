@@ -18,7 +18,7 @@ using DirectXTexNet;
  * Also, Telltale uses Hungarian Notation for variable naming.
 */
 
-/* - D3DTX Version 5 games
+/* --- D3DTX Version 5 games ---
  * Tales from the Borderlands (TESTED)
  * Game of Thrones (TESTED)
  * Minecraft Story Mode: Season One (TESTED)

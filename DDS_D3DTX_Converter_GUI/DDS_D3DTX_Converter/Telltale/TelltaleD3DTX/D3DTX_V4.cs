@@ -17,7 +17,7 @@ using DirectXTexNet;
  * Also, Telltale uses Hungarian Notation for variable naming.
 */
 
-/* - D3DTX Version 4 games
+/* --- D3DTX Version 4 games ---
  * The Wolf Among Us (TESTED)
  * The Walking Dead: Season Two (TESTED)
 */

@@ -17,28 +17,9 @@ using DirectXTexNet;
  * Also, Telltale uses Hungarian Notation for variable naming.
 */
 
-/* - D3DTX Old Unknown Version games
- * Telltale Texas Hold'em  (UNTESTED)
- * Bone: Out from Boneville  (UNTESTED)
- * CSI: 3 Dimensions of Murder  (UNTESTED)
- * Bone: The Great Cow Race  (UNTESTED)
- * Sam & Max Save the World  (UNTESTED)
- * CSI: Hard Evidence  (UNTESTED)
- * Sam & Max Beyond Time and Space  (UNTESTED)
- * Strong Bad's Cool Game for Attractive People  (UNTESTED)
- * Wallace & Gromit's Grand Adventures  (UNTESTED)
- * Tales of Monkey Island  (UNTESTED)
- * CSI: Deadly Intent  (UNTESTED)
- * Sam & Max: The Devil's Playhouse  (UNTESTED)
- * Nelson Tethers: Puzzle Agent  (UNTESTED)
- * CSI: Fatal Conspiracy  (UNTESTED)
- * Poker Night at the Inventory  (UNTESTED)
- * Back to the Future: The Game  (UNTESTED)
- * Puzzle Agent 2 (UNTESTED)
-*/
-
 /* - D3DTX Legacy Version 2 game
- * Jurassic Park: The Game (UNTESTED)
+ * Puzzle Agent 2 (UNTESTED)
+ * Jurassic Park: The Game (TESTED)
 */
 
 namespace D3DTX_Converter.TelltaleD3DTX;

@@ -20,7 +20,7 @@ using DirectXTexNet;
  * Also, Telltale uses Hungarian Notation for variable naming.
 */
 
-/* - D3DTX Version 9 games
+/* --- D3DTX Version 9 games ---
  * Minecraft: Story Mode Season 2 (TESTED)
  * Batman - The Telltale Series (AFTER DECEMBER PATCH) (TESTED)
  * The Walking Dead: A New Frontier (TESTED)

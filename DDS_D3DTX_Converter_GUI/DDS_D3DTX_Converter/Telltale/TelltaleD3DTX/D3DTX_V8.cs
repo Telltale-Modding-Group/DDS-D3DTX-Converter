@@ -21,7 +21,7 @@ using DirectXTexNet;
  * Also, Telltale uses Hungarian Notation for variable naming.
  */
 
-/* - D3DTX Version 8 games
+/* --- D3DTX Version 8 games ---
  * Batman: The Telltale Series (PROBABLY BEFORE DECEMBER PATCH) (UNTESTED)
  */
 

@@ -17,7 +17,7 @@ using DirectXTexNet;
  * Also, Telltale uses Hungarian Notation for variable naming.
 */
 
-/* - D3DTX Version 3 games
+/* --- D3DTX Version 3 games ---
  * Poker Knight 2 (TESTED)
 */
 

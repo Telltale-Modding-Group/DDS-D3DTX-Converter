@@ -33,11 +33,10 @@ using DirectXTexNet;
  * Nelson Tethers: Puzzle Agent  (UNTESTED)
  * CSI: Fatal Conspiracy  (UNTESTED)
  * Poker Night at the Inventory  (UNTESTED)
- * Puzzle Agent 2 (UNTESTED)
 */
 
 /* - D3DTX Legacy Version 3 game
- * Back to the Future: The Game  (UNTESTED)
+ * Back to the Future: The Game  (TESTED)
 */
 
 namespace D3DTX_Converter.TelltaleD3DTX;

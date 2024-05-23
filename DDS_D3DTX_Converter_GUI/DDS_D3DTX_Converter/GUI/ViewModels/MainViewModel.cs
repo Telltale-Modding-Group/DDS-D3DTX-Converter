@@ -61,6 +61,7 @@ public partial class MainViewModel : ViewModelBase
         new FormatItemViewModel { Name = "Default", ItemStatus = true},
         new FormatItemViewModel { Name = "Legacy Version 1", ItemStatus = true},
         new FormatItemViewModel { Name = "Legacy Version 2", ItemStatus = true},
+        new FormatItemViewModel { Name = "Legacy Version 3", ItemStatus = true},
     ];
 
     private readonly List<string> _allTypes = [".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".d3dtx", ".dds"];
@@ -85,6 +86,7 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private bool _saveButtonStatus;
     [ObservableProperty] private bool _deleteButtonStatus;
     [ObservableProperty] private bool _convertButtonStatus;
+    [ObservableProperty] private bool _debugButtonStatus;
     [ObservableProperty] private bool _contextOpenFolderStatus;
 
     [ObservableProperty] private int _selectedComboboxIndex;
@@ -101,7 +103,7 @@ public partial class MainViewModel : ViewModelBase
 
     public class FormatItemViewModel
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public bool ItemStatus { get; set; }
     }
 
@@ -116,6 +118,10 @@ public partial class MainViewModel : ViewModelBase
                 PreviewImage();
                 SaveButtonStatus = true;
                 DeleteButtonStatus = true;
+                if (DataGrid_SelectedItem != null && (DataGrid_SelectedItem.FileType == ".d3dtx" || DataGrid_SelectedItem.FileType == ".dds"))
+                    DebugButtonStatus = true;
+                else
+                    DebugButtonStatus = false;
             }
         }
     }
@@ -130,6 +136,7 @@ public partial class MainViewModel : ViewModelBase
         };
         VersionConvertOptionsList = _versionConvertOptions;
         WorkingDirectoryFiles = new ObservableCollection<WorkingDirectoryFile>();
+        SelectedVersionConvertOption = VersionConvertOptionsList[0];
     }
 
     #region MAIN MENU BUTTONS ACTIONS
@@ -167,16 +174,16 @@ public partial class MainViewModel : ViewModelBase
                 var topLevel = GetMainWindow();
 
                 // Start async operation to open the dialog.
-                var filePath = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+                var storageFile = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
                 {
                     Title = "Save File",
                     SuggestedFileName = DataGrid_SelectedItem.FileName,
-                    DefaultExtension = DataGrid_SelectedItem.FileType?.Remove(0, 1)
+                    ShowOverwritePrompt = true
                 });
 
-                if (filePath is not null)
+                if (storageFile is not null)
                 {
-                    var destinationFilePath = filePath.Path.AbsolutePath;
+                    var destinationFilePath = storageFile.Path.AbsolutePath;
 
                     if (DataGrid_SelectedItem.FilePath is not null)
                         File.Copy(DataGrid_SelectedItem.FilePath, destinationFilePath, true);
@@ -187,13 +194,13 @@ public partial class MainViewModel : ViewModelBase
         {
             var mainWindow = GetMainWindow();
             var messageBox =
-                MessageBoxes.GetErrorBox("Error during previewing image.\nCheck if the image is valid.");
+                MessageBoxes.GetErrorBox("Error during saving the file. " + ex.Message);
 
             await MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
         }
         finally
         {
-            mainManager.RefreshWorkingDirectory();
+            await SafeRefreshDirectoryAsync();
             SaveButtonStatus = false;
             DeleteButtonStatus = false;
             UpdateUi();
@@ -235,7 +242,7 @@ public partial class MainViewModel : ViewModelBase
         {
             var mainWindow = GetMainWindow();
             var messageBox =
-                MessageBoxes.GetErrorBox("Error during adding files. Some files were not copied.");
+                MessageBoxes.GetErrorBox("Error during adding files. Some files were not copied. " + ex.Message);
 
             await MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
         }
@@ -245,7 +252,7 @@ public partial class MainViewModel : ViewModelBase
             DeleteButtonStatus = false;
         }
 
-        mainManager.RefreshWorkingDirectory();
+        await SafeRefreshDirectoryAsync();
         UpdateUi();
     }
 
@@ -279,7 +286,7 @@ public partial class MainViewModel : ViewModelBase
 
             else
             {
-                throw new Exception("Invalid file or directoy path.");
+                throw new Exception("Invalid file or directory path.");
             }
         }
         catch (Exception ex)
@@ -294,7 +301,7 @@ public partial class MainViewModel : ViewModelBase
         {
             SaveButtonStatus = false;
             DeleteButtonStatus = false;
-            mainManager.RefreshWorkingDirectory();
+            await SafeRefreshDirectoryAsync();
             UpdateUi();
         }
     }
@@ -366,7 +373,7 @@ public partial class MainViewModel : ViewModelBase
             DeleteButtonStatus = false;
         }
 
-        mainManager.RefreshWorkingDirectory();
+        await SafeRefreshDirectoryAsync();
         UpdateUi();
     }
 
@@ -404,7 +411,7 @@ public partial class MainViewModel : ViewModelBase
             if (DataGrid_SelectedItem == null)
                 return;
 
-            //get our selected file object from the working directory
+            // get our selected file object from the working directory
             var workingDirectoryFile = DataGrid_SelectedItem;
             if (!Directory.Exists(workingDirectoryFile.FilePath))
                 throw new DirectoryNotFoundException("Directory not found.");
@@ -432,8 +439,18 @@ public partial class MainViewModel : ViewModelBase
         {
             if (DirectoryPath == null) return;
 
-            if (Directory.Exists(DirectoryPath))
-                await OpenFileExplorer(DirectoryPath);
+            if (DataGrid_SelectedItem == null)
+            {
+                if (Directory.Exists(DirectoryPath))
+                    await OpenFileExplorer(DirectoryPath);
+            }
+            else
+            {
+                if (File.Exists(DataGrid_SelectedItem.FilePath))
+                    await OpenFileExplorer(DataGrid_SelectedItem.FilePath);
+                else if (Directory.Exists(DataGrid_SelectedItem.FilePath))
+                    await OpenFileExplorer(DataGrid_SelectedItem.FilePath);
+            }
         }
         catch (Exception ex)
         {
@@ -441,14 +458,31 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public void RefreshDirectoryButton_Click()
+    [RelayCommand]
+    public async Task RefreshDirectoryButton_Click()
     {
-        RefreshUi();
+        await RefreshUiAsync();
     }
 
     public void ContextDeleteFileCommand()
     {
-        RefreshUi();
+        DeleteFileButton_Click();
+    }
+
+    public async Task SafeRefreshDirectoryAsync()
+    {
+        try
+        {
+            mainManager.RefreshWorkingDirectory();
+        }
+        catch (Exception ex)
+        {
+            var mainWindow = GetMainWindow();
+            var messageBox =
+                MessageBoxes.GetErrorBox(ex.Message);
+
+            await MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+        }
     }
 
     #endregion
@@ -497,18 +531,13 @@ public partial class MainViewModel : ViewModelBase
 
             D3DTXConversionType conversionType = D3DTXConversionType.DEFAULT;
 
-            switch (SelectedVersionConvertOption.Name)
+            conversionType = SelectedVersionConvertOption.Name switch
             {
-                case "Legacy Version 1":
-                    conversionType = D3DTXConversionType.LV1;
-                    break;
-                case "Legacy Version 2":
-                    conversionType = D3DTXConversionType.LV2;
-                    break;
-                default:
-                    conversionType = D3DTXConversionType.DEFAULT;
-                    break;
-            }
+                "Legacy Version 1" => D3DTXConversionType.LV1,
+                "Legacy Version 2" => D3DTXConversionType.LV2,
+                "Legacy Version 3" => D3DTXConversionType.LV3,
+                _ => D3DTXConversionType.DEFAULT,
+            };
 
             // Select the correct convert function from the combobox.
             switch (SelectedFormat.Name)
@@ -521,25 +550,30 @@ public partial class MainViewModel : ViewModelBase
                         Converter.ConvertTextureFromD3DtxToDds(textureFilePath,
                             outputDirectoryPath, conversionType);
                     else
-                        Converter.ConvertTextureFileFromOthersToDds(textureFilePath,
-                            outputDirectoryPath, true);
+                        await Converter.ConvertTextureFileFromOthersToDdsAsync(textureFilePath,
+                              outputDirectoryPath, true);
                     break;
                 case "png":
-                    Converter.ConvertTextureFromDdsToOthers(textureFilePath, outputDirectoryPath,
-                        SelectedFormat.Name, true);
+                    await Converter.ConvertTextureFromDdsToOthersAsync(textureFilePath, outputDirectoryPath,
+                         SelectedFormat.Name, true);
                     break;
                 case "jpg":
-                    Converter.ConvertTextureFromDdsToOthers(textureFilePath, outputDirectoryPath,
-                        SelectedFormat.Name, true);
+                    await Converter.ConvertTextureFromDdsToOthersAsync(textureFilePath, outputDirectoryPath,
+                         SelectedFormat.Name, true);
                     break;
                 case "tif":
-                    Converter.ConvertTextureFromDdsToOthers(textureFilePath, outputDirectoryPath,
-                        SelectedFormat.Name, true);
+                    await Converter.ConvertTextureFromDdsToOthersAsync(textureFilePath, outputDirectoryPath,
+                         SelectedFormat.Name, true);
                     break;
                 case "bmp":
-                    Converter.ConvertTextureFromDdsToOthers(textureFilePath, outputDirectoryPath,
-                        SelectedFormat.Name, true);
+                    await Converter.ConvertTextureFromDdsToOthersAsync(textureFilePath, outputDirectoryPath,
+                         SelectedFormat.Name, true);
                     break;
+            }
+
+            if (!ChooseOutputDirectoryCheckboxStatus)
+            {
+                outputDirectoryPath = textureFilePath;
             }
 
             // Folder options
@@ -591,16 +625,69 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.StackTrace);
             var mainWindow = GetMainWindow();
             var messageBox =
                 MessageBoxes.GetErrorBox(ex.Message);
-            MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+            await MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
             Logger.Instance().Log(ex);
         }
         finally
         {
             mainManager.RefreshWorkingDirectory();
             UpdateUi();
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    [RelayCommand]
+    public async Task DebugButton_ClickAsync()
+    {
+        try
+        {
+            if (DataGrid_SelectedItem == null) return;
+
+            var workingDirectoryFile =
+                DataGrid_SelectedItem;
+
+            string? textureFilePath = workingDirectoryFile.FilePath;
+
+            if (!File.Exists(textureFilePath))
+                throw new DirectoryNotFoundException("File was not found.");
+
+
+
+            D3DTXConversionType conversionType = D3DTXConversionType.DEFAULT;
+
+            conversionType = SelectedVersionConvertOption.Name switch
+            {
+                "Legacy Version 1" => D3DTXConversionType.LV1,
+                "Legacy Version 2" => D3DTXConversionType.LV2,
+                "Legacy Version 3" => D3DTXConversionType.LV3,
+                _ => D3DTXConversionType.DEFAULT,
+            };
+
+            var d3dtx = new D3DTX_Master();
+
+            d3dtx.Read_D3DTX_File(textureFilePath, conversionType);
+
+            var mainWindow = GetMainWindow();
+            var messageBox = MessageBoxes.GetDebugInformationBox(d3dtx.GetD3DTXDebugInfo());
+
+            var result = await MessageBoxManager.GetMessageBoxStandard(messageBox)
+                    .ShowWindowDialogAsync(mainWindow);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.StackTrace);
+            var mainWindow = GetMainWindow();
+            var messageBox =
+                MessageBoxes.GetErrorBox(ex.Message);
+            MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+            Logger.Instance().Log(ex);
         }
     }
 
@@ -614,10 +701,15 @@ public partial class MainViewModel : ViewModelBase
         //update our texture directory UI
         try
         {
+            DataGrid_SelectedItem = null;
+            ImagePreview = new SvgImage()
+            {
+                Source = SvgSource.Load(ErrorSvgFilename, _assetsUri)
+            };
+
             DirectoryPath = mainManager.GetWorkingDirectoryPath();
             var workingDirectoryFiles = mainManager.GetWorkingDirectoryFiles();
 
-            //  DataGrid_SelectedItem = null;
             for (int i = WorkingDirectoryFiles.Count - 1; i >= 0; i--)
             {
                 if (!workingDirectoryFiles.Contains(WorkingDirectoryFiles[i]))
@@ -634,12 +726,12 @@ public partial class MainViewModel : ViewModelBase
                     WorkingDirectoryFiles.Add(item);
                 }
             }
-            DataGrid_SelectedItem = null;
             // WorkingDirectoryFiles =
             //     new ObservableCollection<WorkingDirectoryFile>(mainManager.GetWorkingDirectoryFiles());
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.StackTrace);
             HandleException("Error during updating ui. " + ex.Message);
         }
     }
@@ -670,7 +762,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    public void ContextMenuRefreshDirectoryCommand()
+    public void ContextMenuRefreshDirectoryCommandAsync()
     {
         RefreshDirectoryButton_Click();
     }
@@ -724,7 +816,6 @@ public partial class MainViewModel : ViewModelBase
             //Github issue: https://github.com/AvaloniaUI/Avalonia/issues/13736
             //When fixed, the line below can be removed.
             SelectedFormat = selectedItems[0];
-            SelectedVersionConvertOption = VersionConvertOptionsList[0];
         }
         else
         {
@@ -742,6 +833,7 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             var source = args.Source;
+            if (source is null) return;
             if (source is Border)
             {
                 if (DataGrid_SelectedItem == null)
@@ -779,7 +871,6 @@ public partial class MainViewModel : ViewModelBase
             ContextOpenFolderStatus = false;
         }
     }
-
 
     private void PreviewImage()
     {
@@ -823,15 +914,15 @@ public partial class MainViewModel : ViewModelBase
 
     private Task OpenFileExplorer(string path)
     {
-        mainManager.OpenFileExplorerDirectory(path);
+        mainManager.OpenFileExplorer(path);
         return Task.CompletedTask;
     }
 
-    private void RefreshUi()
+    private async Task RefreshUiAsync()
     {
         SaveButtonStatus = false;
         DeleteButtonStatus = false;
-        mainManager.RefreshWorkingDirectory();
+        await SafeRefreshDirectoryAsync();
         UpdateUi();
     }
 
@@ -841,7 +932,7 @@ public partial class MainViewModel : ViewModelBase
         {
             ".d3dtx" => ImageUtilities.ConvertD3dtxToBitmap(filePath),
             ".dds" => ImageUtilities.ConvertFileFromDdsToBitmap(filePath),
-            ".tga" => ImageUtilities.ConvertFileFromDdsToBitmap(filePath),
+            ".tga" => ImageUtilities.ConvertFileFromTgaToBitmap(filePath),
             ".tiff" => ImageUtilities.ConvertTiffToBitmap(filePath),
             ".tif" => ImageUtilities.ConvertTiffToBitmap(filePath),
             ".png" => new Bitmap(filePath),
@@ -876,7 +967,7 @@ public partial class MainViewModel : ViewModelBase
 
     private void HandleImagePreviewError(Exception ex)
     {
-        HandleException("Error during previewing image.\nCheck if the image is valid.\nError message:" + ex.Message);
+        HandleException("Error during previewing image.\nError message: " + ex.Message);
 
         ImagePreview = new SvgImage { Source = SvgSource.Load(ErrorSvgFilename, _assetsUri) };
         //TODO FIX THIS

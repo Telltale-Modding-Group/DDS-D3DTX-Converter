@@ -1,12 +1,17 @@
-﻿namespace D3DTX_Converter.TelltaleTypes
+﻿namespace D3DTX_Converter.TelltaleTypes;
+
+public class RegionStreamHeader
 {
-    public class RegionStreamHeader
-    {
-        public int mFaceIndex { get; set; }
-        public int mMipIndex { get; set; }
-        public int mMipCount { get; set; }
-        public uint mDataSize { get; set; }
-        public int mPitch { get; set; }
-        public int mSlicePitch { get; set; }
-    }
+    // Exists from mVersion 5
+    public int mFaceIndex { get; set; }
+    // Exists from mVersion 3
+    public int mMipIndex { get; set; }
+    // Exists from mVersion 4
+    public int mMipCount { get; set; }
+    // Exists from mVersion 3
+    public uint mDataSize { get; set; }
+    // Exists from mVersion 3
+    public int mPitch { get; set; }
+    // Exists from mVersion 9
+    public int mSlicePitch { get; set; }
 }

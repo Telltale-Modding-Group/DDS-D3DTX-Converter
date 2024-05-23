@@ -9,6 +9,8 @@ namespace D3DTX_Converter.DirectX;
 // DDS File Layout https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-file-layout-for-textures
 // Texture Block Compression in D3D11 - https://docs.microsoft.com/en-us/windows/win32/direct3d11/texture-block-compression-in-direct3d-11
 // DDS Programming Guide - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide
+// D3DFORMAT - https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat
+// Map Direct3D 9 Formats to Direct3D 10 - https://learn.microsoft.com/en-gb/windows/win32/direct3d10/d3d10-graphics-programming-guide-resources-legacy-formats?redirectedfrom=MSDN
 
 /// <summary>
 /// Surface pixel format.
@@ -30,7 +32,7 @@ public struct DDS_PIXELFORMAT
     /// <summary>
     /// [4 bytes] Four-character codes for specifying compressed or custom formats.
     /// <para>Possible values include: DXT1, DXT2, DXT3, DXT4, or DXT5.</para>
-    /// <para>A FourCC of DX10 indicates the prescense of the DDS_HEADER_DXT10 extended header, and the dxgiFormat member of that structure indicates the true format.</para>
+    /// <para>A FourCC of DX10 indicates the presence of the DDS_HEADER_DXT10 extended header, and the dxgiFormat member of that structure indicates the true format.</para>
     /// <para>When using a four-character code, dwFlags must include DDPF_FOURCC.</para>
     /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
     /// </summary>
@@ -44,7 +46,7 @@ public struct DDS_PIXELFORMAT
     public uint dwRGBBitCount;
 
     /// <summary>
-    /// [4 bytes] Red (or lumiannce or Y) mask for reading color data.
+    /// [4 bytes] Red (or luminance or Y) mask for reading color data.
     /// <para>For instance, given the A8R8G8B8 format, the red mask would be 0x00ff0000.</para>
     /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
     /// </summary>
@@ -108,11 +110,6 @@ public struct DDS_PIXELFORMAT
         Console.WriteLine($"\tdwABitMask: {dwABitMask}");
     }
 
-    public bool IsBitMask(uint r, uint g, uint b, uint a)
-    {
-        return dwRBitMask == r && dwGBitMask == g && dwBBitMask == b && dwABitMask == a;
-    }
-
     public static DDS_PIXELFORMAT Of(uint dwSize, uint dwFlags, uint dwFourCC, uint dwRGBBitCount, uint dwRBitMask, uint dwGBitMask, uint dwBBitMask, uint dwABitMask)
     {
         return new DDS_PIXELFORMAT()
@@ -126,5 +123,18 @@ public struct DDS_PIXELFORMAT
             dwBBitMask = dwBBitMask,
             dwABitMask = dwABitMask
         };
+    }
+
+    public override string ToString()
+    {
+        return $"DDS_PIXELFORMAT" +
+            $"{Environment.NewLine}\tdwSize: {dwSize}" +
+            $"{Environment.NewLine}\tdwFlags: {dwFlags}" +
+            $"{Environment.NewLine}\tdwFourCC: {dwFourCC}" +
+            $"{Environment.NewLine}\tdwRGBBitCount: {dwRGBBitCount}" +
+            $"{Environment.NewLine}\tdwRBitMask: {dwRBitMask}" +
+            $"{Environment.NewLine}\tdwGBitMask: {dwGBitMask}" +
+            $"{Environment.NewLine}\tdwBBitMask: {dwBBitMask}" +
+            $"{Environment.NewLine}\tdwABitMask: {dwABitMask}" + Environment.NewLine;
     }
 }

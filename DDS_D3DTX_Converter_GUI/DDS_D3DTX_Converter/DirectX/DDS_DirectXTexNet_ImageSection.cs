@@ -12,4 +12,5 @@ public struct DDS_DirectXTexNet_ImageSection
     public DXGI_FORMAT Format;
     public long SlicePitch;
     public long RowPitch;
+    public byte[] Pixels;
 };

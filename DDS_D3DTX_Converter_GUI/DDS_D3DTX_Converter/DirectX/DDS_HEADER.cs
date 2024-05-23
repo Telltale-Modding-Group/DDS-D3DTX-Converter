@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using D3DTX_Converter.Utilities;
 
 namespace D3DTX_Converter.DirectX;
 
@@ -26,7 +25,7 @@ public struct DDS_HEADER
     /// [4 bytes] Flags to indicate which members contain valid data.
     /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
     /// </summary>
-    public uint dwFlags;
+    public DDSD dwFlags;
 
     /// <summary>
     /// [4 bytes] Surface height (in pixels).
@@ -134,13 +133,13 @@ public struct DDS_HEADER
     /// [4 bytes] Specifies the complexity of the surfaces stored.
     /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
     /// </summary>
-    public uint dwCaps;
+    public DDSCAPS dwCaps;
 
     /// <summary>
     /// [4 bytes] Additional detail about the surfaces stored.
     /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
     /// </summary>
-    public uint dwCaps2;
+    public DDSCAPS2 dwCaps2;
 
     /// <summary>
     /// [4 bytes] Unused according to DDS docs.
@@ -163,7 +162,7 @@ public struct DDS_HEADER
     public DDS_HEADER(BinaryReader reader)
     {
         dwSize = reader.ReadUInt32();
-        dwFlags = reader.ReadUInt32();
+        dwFlags = (DDSD)reader.ReadUInt32();
         dwHeight = reader.ReadUInt32();
         dwWidth = reader.ReadUInt32();
         dwPitchOrLinearSize = reader.ReadUInt32();
@@ -181,8 +180,8 @@ public struct DDS_HEADER
         dwReserved10 = reader.ReadUInt32();
         dwReserved11 = reader.ReadUInt32();
         ddspf = new DDS_PIXELFORMAT(reader);
-        dwCaps = reader.ReadUInt32();
-        dwCaps2 = reader.ReadUInt32();
+        dwCaps = (DDSCAPS)reader.ReadUInt32();
+        dwCaps2 = (DDSCAPS2)reader.ReadUInt32();
         dwCaps3 = reader.ReadUInt32();
         dwCaps4 = reader.ReadUInt32();
         dwReserved12 = reader.ReadUInt32();
@@ -191,7 +190,7 @@ public struct DDS_HEADER
     public void Write(BinaryWriter writer)
     {
         writer.Write(dwSize);
-        writer.Write(dwFlags);
+        writer.Write((uint)dwFlags);
         writer.Write(dwHeight);
         writer.Write(dwWidth);
         writer.Write(dwPitchOrLinearSize);
@@ -209,8 +208,8 @@ public struct DDS_HEADER
         writer.Write(dwReserved10);
         writer.Write(dwReserved11);
         ddspf.Write(writer);
-        writer.Write(dwCaps);
-        writer.Write(dwCaps2);
+        writer.Write((uint)dwCaps);
+        writer.Write((uint)dwCaps2);
         writer.Write(dwCaps3);
         writer.Write(dwCaps4);
         writer.Write(dwReserved12);
@@ -231,7 +230,7 @@ public struct DDS_HEADER
     public static DDS_HEADER GetPresetHeader() => new()
     {
         dwSize = 124,
-        dwFlags = (uint)DDSD.CAPS | (uint)DDSD.HEIGHT | (uint)DDSD.WIDTH | (uint)DDSD.PIXELFORMAT | (uint)DDSD.MIPMAPCOUNT,
+        dwFlags = DDSD.CAPS | DDSD.HEIGHT | DDSD.WIDTH | DDSD.PIXELFORMAT | DDSD.MIPMAPCOUNT,
         dwHeight = 1024,
         dwWidth = 1024,
         dwPitchOrLinearSize = 8192,
@@ -244,7 +243,7 @@ public struct DDS_HEADER
             dwFourCC = (uint)D3DFORMAT.DXT1,
             dwRGBBitCount = 0,
         },
-        dwCaps = 4096,
+        dwCaps = DDSCAPS.TEXTURE,
         dwCaps2 = 0,
         dwCaps3 = 0,
         dwCaps4 = 0,
@@ -277,5 +276,36 @@ public struct DDS_HEADER
         Console.WriteLine($"dwCaps3: {dwCaps3}");
         Console.WriteLine($"dwCaps4: {dwCaps4}");
         Console.WriteLine($"dwReserved12: {dwReserved12}");
+    }
+
+    public override string ToString()
+    {
+        string result = $"DDS Header:" + Environment.NewLine;
+        result += $"dwSize: {dwSize}" + Environment.NewLine;
+        result += $"dwFlags: {dwFlags}" + Environment.NewLine;
+        result += $"dwHeight: {dwHeight}" + Environment.NewLine;
+        result += $"dwWidth: {dwWidth}" + Environment.NewLine;
+        result += $"dwPitchOrLinearSize: {dwPitchOrLinearSize}" + Environment.NewLine;
+        result += $"dwDepth: {dwDepth}" + Environment.NewLine;
+        result += $"dwMipMapCount: {dwMipMapCount}" + Environment.NewLine;
+        result += $"dwReserved1: {dwReserved1}" + Environment.NewLine;
+        result += $"dwReserved2: {dwReserved2}" + Environment.NewLine;
+        result += $"dwReserved3: {dwReserved3}" + Environment.NewLine;
+        result += $"dwReserved4: {dwReserved4}" + Environment.NewLine;
+        result += $"dwReserved5: {dwReserved5}" + Environment.NewLine;
+        result += $"dwReserved6: {dwReserved6}" + Environment.NewLine;
+        result += $"dwReserved7: {dwReserved7}" + Environment.NewLine;
+        result += $"dwReserved8: {dwReserved8}" + Environment.NewLine;
+        result += $"dwReserved9: {dwReserved9}" + Environment.NewLine;
+        result += $"dwReserved10: {dwReserved10}" + Environment.NewLine;
+        result += $"dwReserved11: {dwReserved11}" + Environment.NewLine;
+        result += ddspf.ToString();
+        result += $"dwCaps: {dwCaps}" + Environment.NewLine;
+        result += $"dwCaps2: {dwCaps2}" + Environment.NewLine;
+        result += $"dwCaps3: {dwCaps3}" + Environment.NewLine;
+        result += $"dwCaps4: {dwCaps4}" + Environment.NewLine;
+        result += $"dwReserved12: {dwReserved12}" + Environment.NewLine;
+
+        return result;
     }
 }

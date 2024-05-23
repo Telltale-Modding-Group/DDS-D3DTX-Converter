@@ -14,7 +14,7 @@ namespace D3DTX_Converter.DirectX;
 /// <para>The DDS_HEADER_FLAGS_TEXTURE flag, which is defined in Dds.h, is a bitwise-OR combination of the DDSD_CAPS, DDSD_HEIGHT, DDSD_WIDTH, and DDSD_PIXELFORMAT flags.</para>
 /// </summary>
 [Flags]
-public enum DDSD
+public enum DDSD : uint
 {
     /// <summary>
     /// Required in every .dds file.

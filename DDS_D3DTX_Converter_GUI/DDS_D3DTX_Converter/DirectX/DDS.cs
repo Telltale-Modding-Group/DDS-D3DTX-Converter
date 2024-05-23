@@ -19,12 +19,12 @@ public partial class DDS
     /// <summary>
     /// [4 bytes] The magic number for DDS files.
     /// </summary>
-    public static string MAGIC_WORD = "DDS ";
+    public const string MAGIC_WORD = "DDS ";
 
     /// <summary>
     /// The FourCC code for DX10 extended header.
     /// </summary>
-    public static string DX10_FOURCC = "DX10";
+    public const string DX10_FOURCC = "DX10";
 
     /// <summary>
     /// [124 bytes] Describes a DDS file header.
@@ -59,6 +59,7 @@ public partial class DDS
 
     public void Write(BinaryWriter writer)
     {
+        writer.Write(MAGIC_WORD);
         header.Write(writer);
 
         if (header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32(DX10_FOURCC))

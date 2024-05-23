@@ -14,7 +14,7 @@ namespace D3DTX_Converter.DirectX;
 /// <para>The DDS_SURFACE_FLAGS_MIPMAP flag, which is defined in Dds.h, is a bitwise-OR combination of the DDSCAPS_COMPLEX and DDSCAPS_MIPMAP flags.</para>
 /// </summary>
 [Flags]
-public enum DDSCAPS
+public enum DDSCAPS : uint
 {
     /// <summary>
     /// Optional; must be used on any file that contains more than one surface (a mipmap, a cubic environment map, or mipmapped volume texture).

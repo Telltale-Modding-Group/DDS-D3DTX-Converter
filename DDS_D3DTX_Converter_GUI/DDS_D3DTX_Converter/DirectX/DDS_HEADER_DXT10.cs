@@ -29,7 +29,7 @@ public struct DDS_HEADER_DXT10
     /// <summary>
     /// [4 bytes] Identifies other, less common options for resources.
     /// </summary>
-    public uint miscFlag;
+    public DDS_RESOURCE miscFlag;
 
     /// <summary>
     /// [4 bytes] The number of elements in the array.
@@ -46,7 +46,7 @@ public struct DDS_HEADER_DXT10
     {
         dxgiFormat = (DXGI_FORMAT)reader.ReadUInt32();
         resourceDimension = (D3D10_RESOURCE_DIMENSION)reader.ReadUInt32();
-        miscFlag = reader.ReadUInt32();
+        miscFlag = (DDS_RESOURCE)reader.ReadUInt32();
         arraySize = reader.ReadUInt32();
         miscFlags2 = reader.ReadUInt32();
     }
@@ -55,7 +55,7 @@ public struct DDS_HEADER_DXT10
     {
         writer.Write((uint)dxgiFormat);
         writer.Write((uint)resourceDimension);
-        writer.Write(miscFlag);
+        writer.Write((uint)miscFlag);
         writer.Write(arraySize);
         writer.Write(miscFlags2);
     }
@@ -74,7 +74,7 @@ public struct DDS_HEADER_DXT10
     /// <returns></returns>
     public static DDS_HEADER_DXT10 GetPresetDXT10Header() => new()
     {
-        dxgiFormat = DXGI_FORMAT.R32G32B32A32_UINT,
+        dxgiFormat = DXGI_FORMAT.R8G8B8A8_UNORM,
         resourceDimension = D3D10_RESOURCE_DIMENSION.TEXTURE2D,
         arraySize = 1,
     };

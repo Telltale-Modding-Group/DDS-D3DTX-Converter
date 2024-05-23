@@ -1,24 +1,22 @@
 using System;
 using System.IO;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
-using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
 using D3DTX_Converter.Utilities;
 using DDS_D3DTX_Converter_GUI.Utilities;
+using DirectXTexNet;
 using MsBox.Avalonia;
-using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace DDS_D3DTX_Converter;
 
 public class ImageProperties : ObservableObject
 {
-    //<summary>
-    //Image properties that are displayed on the panel.
-    //</summary>
+    /// <summary>
+    /// Image properties that are displayed on the panel.
+    /// </summary>
     public string? Name { get; set; }
     public string? Extension { get; set; }
     public string? Width { get; set; }
@@ -34,6 +32,11 @@ public class ImageProperties : ObservableObject
     {
         var master = new D3DTX_Master();
         master.Read_D3DTX_File(filePath);
+
+        if (master.GetD3DTXObject() == null)
+        {
+            return new ImageProperties();
+        }
 
         return new ImageProperties()
         {
@@ -53,52 +56,25 @@ public class ImageProperties : ObservableObject
     /// <param name="ddsFilePath"></param>
     public static ImageProperties GetDdsProperties(string ddsFilePath)
     {
-        var sourceFileData = File.ReadAllBytes(ddsFilePath);
+        var ddsImage = TexHelper.Instance.LoadFromDDSFile(ddsFilePath, DDS_FLAGS.NONE);
+        var ddsMetadata = ddsImage.GetMetadata();
 
-        byte[] headerBytes = ByteFunctions.AllocateBytes(124, sourceFileData, 4);
+        DXGI_FORMAT dxgiFormat = ddsMetadata.Format;
 
-        //TODO: CHECK ALPHA IF IT'S CORRECT
+        uint channelCount = (uint)Math.Ceiling((double)TexHelper.Instance.BitsPerPixel(dxgiFormat) / Math.Max(1, TexHelper.Instance.BitsPerColor(dxgiFormat)));
 
-        var header = DDS_HEADER.GetHeaderFromBytes(headerBytes);
-        uint fourCC = header.ddspf.dwFourCC;
+        string hasAlpha = TexHelper.Instance.HasAlpha(dxgiFormat) ? "True" : "False";
 
-        byte[] bytes = BitConverter.GetBytes(header.ddspf.dwFourCC);
-        string result = System.Text.Encoding.UTF8.GetString(bytes);
-
-        uint bitsPerPixel = 0;
-        result.Reverse();
-
-        if (result == "DX10")
-        {
-            byte[] dx10_headerBytes = ByteFunctions.AllocateBytes(20, sourceFileData, 128);
-            var dx10_header = DDS_HEADER_DXT10.GetHeaderFromBytes(dx10_headerBytes);
-            result += " (" + Enum.GetName(dx10_header.dxgiFormat) + ")";
-            bitsPerPixel = DDS_HELPER.GetDXGIBitsPerPixel(dx10_header.dxgiFormat);
-        }
-        else
-        {
-            D3DFORMAT format = (D3DFORMAT)fourCC;
-            result = Enum.GetName(format);
-            bitsPerPixel = DDS_HELPER.GetD3D9FORMATBitsPerPifxel(format);
-        }
-
-        string hasAlpha = "False";
-        if (header.ddspf.dwABitMask > 0)
-        {
-            hasAlpha = "True";
-        }
-
-        //TODO FIX BPP AND CHANNEL COUNT
         return new ImageProperties
         {
             Name = Path.GetFileNameWithoutExtension(ddsFilePath),
             Extension = ".dds",
-            Height = header.dwHeight.ToString(),
-            Width = header.dwWidth.ToString(),
-            CompressionType = result,
+            Height = ddsMetadata.Height.ToString(),
+            Width = ddsMetadata.Width.ToString(),
+            CompressionType = dxgiFormat.ToString(),
             HasAlpha = hasAlpha,
-            ChannelCount = bitsPerPixel.ToString(),
-            MipMapCount = header.dwMipMapCount.ToString()
+            ChannelCount = channelCount.ToString(),
+            MipMapCount = ddsMetadata.MipLevels.ToString()
         };
     }
 
@@ -111,14 +87,13 @@ public class ImageProperties : ObservableObject
     {
         try
         {
-            var imageInfo = Image.Identify(filePath);
+            var imageInfo = SixLabors.ImageSharp.Image.Identify(filePath);
 
-            var image = Image.Load<Rgba32>(filePath);
+            var image = SixLabors.ImageSharp.Image.Load<Rgba32>(filePath);
 
             bool hasAlpha = ImageUtilities.IsImageOpaque(image);
 
-            string hasAlphaString = "N/A";
-            hasAlphaString = hasAlpha ? "True" : "False";
+            string hasAlphaString = hasAlpha ? "True" : "False";
 
             return new ImageProperties()
             {

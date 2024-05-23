@@ -14,7 +14,7 @@ namespace D3DTX_Converter.DirectX;
 /// <para>The DDS_CUBEMAP_ALLFACES flag, which is defined in Dds.h, is a bitwise-OR combination of the DDS_CUBEMAP_POSITIVEX, DDS_CUBEMAP_NEGATIVEX, DDS_CUBEMAP_POSITIVEY, DDS_CUBEMAP_NEGATIVEY, DDS_CUBEMAP_POSITIVEZ, and DDSCAPS2_CUBEMAP_NEGATIVEZ flags.</para>
 /// </summary>
 [Flags]
-public enum DDSCAPS2
+public enum DDSCAPS2 : uint
 {
     /// <summary>
     /// Required for a cube map.

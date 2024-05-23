@@ -483,7 +483,7 @@
                           HorizontalAlignment="Left"
                           Margin="135,5,0,5"
                           VerticalAlignment="Top"
-                          Width="155"
+                          Width="160"
                           Height="30"
                           IsEnabled="{Binding ComboBoxStatus}"
                           ToolTip.Tip="Available formats">
@@ -518,7 +518,7 @@
                           HorizontalAlignment="Left"
                           Margin="135,70,0,5"
                           VerticalAlignment="Bottom"
-                          Width="155"
+                          Width="160"
                           Height="30"
                           IsEnabled="{Binding VersionConvertComboBoxStatus}"
                           ToolTip.Tip="Choose the conversion option. Use the default option unless you want to edit legacy titles.">
@@ -531,7 +531,7 @@
                 <CheckBox Name="ChooseOutputDirectoryCheckBox"
                           IsChecked="{Binding ChooseOutputDirectoryCheckBoxStatus}"
                           Content="Choose Output Directory"
-                          Margin="295,5,0,5"
+                          Margin="300,5,0,5"
                           VerticalAlignment="Top"
                           HorizontalAlignment="Left"
                           Width="200" />

@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 /*
  * This is a meta stream header.
  * These objects are often at the top of every telltale file.
- * They also contain info regarding the byte size of certain data chunks, along with the classes that are used (which are CRC64'd sadly)
+ * They also contain info regarding the byte size of certain data chunks, along with the classes that are used (which are CRC64'd sadly).
  * Also, Telltale uses Hungarian Notation for variable naming.
 */
 
@@ -132,7 +132,7 @@ namespace D3DTX_Converter.TelltaleMeta
         }
         public string GetMSV5Info()
         {
-            string metaInfo = "";
+            string metaInfo = "||||||||||| Meta Header |||||||||||" + Environment.NewLine;
             
             metaInfo += "Meta Stream Keyword = " + mMetaStreamVersion + Environment.NewLine;
             metaInfo += "Meta Default Section Chunk Size = " + mDefaultSectionChunkSize + Environment.NewLine;

@@ -61,7 +61,7 @@ public static class ByteFunctions
             case '0':
                 return false;
             default:
-                throw new Exception("Invalid mToolProps data.");
+                throw new Exception("Invalid Telltale Boolean data.");
         }
     }
 
@@ -347,7 +347,7 @@ public static class ByteFunctions
             return resultBytes;
         }
 
-        throw new Exception("Byte pattern not found.");
+        return null;
     }
 
     public static int SearchBytePattern(byte[] pattern, byte[] bytes)

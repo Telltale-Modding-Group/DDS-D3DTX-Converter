@@ -7,7 +7,7 @@
              d:DesignWidth="500"
              d:DesignHeight="500"
              Width="450"
-             Height="450"
+             Height="400"
              x:Class="D3DTX_Converter.Views.AboutView">
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -34,30 +34,35 @@
             <TextBlock FontWeight="Bold"
                        FontSize="18"
                        Margin="0,10,0,0"
-                       HorizontalAlignment="Center">DDS-D3DTX Texture Converter 2.3.0</TextBlock>
-            <TextBlock Margin="0,10,0,0"
+                       HorizontalAlignment="Center">Telltale Texture Mod Tool v2.4.0</TextBlock>
+            <TextBlock Margin="0,5,0,0"
                        TextWrapping="Wrap"
+                       Width="360"
                        HorizontalAlignment="Center"
-                       TextAlignment="Center"
-                       Text="DDS-D3DTX Texture Converter is software developed to convert .d3dtx texture files to more accessible image formats and vice versa." />
-            <TextBlock Margin="0,25,0,0"
+                       TextAlignment="Center">                
+                This tool is designed to convert
+            <Bold>Telltale textures</Bold> (files with the <Bold>.d3dtx</Bold>
+                extension) into more accessible formats like
+            <Bold>.dds (Direct Draw Surface)</Bold>, <Bold>.png</Bold>
+                and others, and vice versa.
+            </TextBlock>
+            <TextBlock FontWeight="Bold"
+                       Margin="0,20,0,0"
+                       FontSize="18"
+                       HorizontalAlignment="Center">Developed by the Telltale Modding Group</TextBlock>
+            <!-- <TextBlock Margin="0,20,0,0"
                        HorizontalAlignment="Center"
                        FontSize="18">Credits:</TextBlock>
-            <TextBlock FontWeight="Bold"
-                       Margin="0,0,0,0"
-                       HorizontalAlignment="Center">Developed by Telltale Modding Group</TextBlock>
             <TextBlock Margin="0,5,0,0"
                        TextWrapping="Wrap"
                        HorizontalAlignment="Center"
-                       TextAlignment="Center">
-                <Run Text="Special thanks to" />
-                <Run FontWeight="Bold"
-                     Text="David Matos (frostbone25)" />
-                <Run Text="for the original project and guiding me throughout the development, &#xA; and" />
-                <Run FontWeight="Bold"
-                     Text="Lucas Saragosa" />
-                <Run Text="for figuring out the D3DTX file format." />
-            </TextBlock>
+                       TextAlignment="Center">                
+                Special thanks to
+            <Bold>David Matos</Bold> (frostbone25) for the original project and guiding me throughout the development, <LineBreak />
+                and
+            <Bold>Lucas Saragosa</Bold>
+                for figuring out the D3DTX file format.
+            </TextBlock> -->
         </StackPanel>
     </Panel>
 </UserControl>

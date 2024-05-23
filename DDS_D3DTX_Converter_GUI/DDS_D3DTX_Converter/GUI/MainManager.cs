@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
-using DDS_D3DTX_Converter.Views;
 using System;
+using System.Runtime.InteropServices;
 
 
 namespace DDS_D3DTX_Converter
@@ -106,21 +106,27 @@ namespace DDS_D3DTX_Converter
         /// (TODO Currently only Windows is supported)
         /// </summary>
         /// <param name="directoryPath"></param>
-        public void OpenFileExplorerDirectory(string? directoryPath)
+        public void OpenFileExplorer(string? filePath)
         {
-            if (string.IsNullOrEmpty(directoryPath))
+            if (string.IsNullOrEmpty(filePath))
                 return;
 
-            //create a windows explorer processInfo to be executed
-            ProcessStartInfo processStartInfo = new ProcessStartInfo
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                FileName = directoryPath,
-                UseShellExecute = true,
-                Verb = "open"
-            };
-
-            //start the process
-            Process.Start(processStartInfo);
+                Process.Start("explorer.exe", $"/select,\"{filePath}\"");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                Process.Start("open", $"-R \"{filePath}\"");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start("xdg-open", $"\"{Path.GetDirectoryName(filePath)}\"");
+            }
+            else
+            {
+                throw new NotSupportedException("Unknown operating system");
+            }
         }
 
         /// <summary>

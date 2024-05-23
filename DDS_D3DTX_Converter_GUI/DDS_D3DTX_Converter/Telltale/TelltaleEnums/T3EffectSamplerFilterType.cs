@@ -1,9 +1,8 @@
-﻿namespace D3DTX_Converter.TelltaleEnums
+﻿namespace D3DTX_Converter.TelltaleEnums;
+
+public enum T3EffectSamplerFilterType
 {
-    public enum T3EffectSamplerFilterType
-    {
-        eEffectSamplerFilter_Unknown = -1,
-        eEffectSamplerFilter_Linear = 0,
-        eEffectSamplerFilter_Anisotropic = 1
-    }
+    eEffectSamplerFilter_Unknown = -1,
+    eEffectSamplerFilter_Linear = 0,
+    eEffectSamplerFilter_Anisotropic = 1
 }

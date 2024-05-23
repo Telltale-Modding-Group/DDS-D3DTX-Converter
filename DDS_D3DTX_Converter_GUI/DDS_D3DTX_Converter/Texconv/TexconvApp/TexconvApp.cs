@@ -3,6 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using D3DTX_Converter.TexconvOptions;
+using System.Threading.Tasks;
 
 namespace D3DTX_Converter.Texconv;
 /*
@@ -11,13 +12,15 @@ namespace D3DTX_Converter.Texconv;
 
 public static class TexconvApp
 {
-    public static void RunTexconv(string inputFilePath, MasterOptions options)
+    public static async Task<bool> RunTexconvAsync(string inputFilePath, MasterOptions options)
     {
         string solutionDir = AppDomain.CurrentDomain.BaseDirectory;
         string texconvApplicationDirectoryPath = Path.Combine(solutionDir, "ExternalDependencies", "texconv.exe");
 
-        ProcessStartInfo textconvProcessStartInfo = new();
-        textconvProcessStartInfo.CreateNoWindow = true;
+        ProcessStartInfo textconvProcessStartInfo = new()
+        {
+            CreateNoWindow = true
+        };
 
         // Determine what OS we are running on
         // Check if the current OS is Windows
@@ -41,6 +44,8 @@ public static class TexconvApp
         texconvProcess.Start();
 
         // normally i'd let it run async but I like to work synchronously, just makes things easier.
-        texconvProcess.WaitForExit();
+        await texconvProcess.WaitForExitAsync();
+
+        return true;
     }
 }

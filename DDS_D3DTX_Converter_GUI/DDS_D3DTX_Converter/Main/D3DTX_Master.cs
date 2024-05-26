@@ -30,15 +30,15 @@ namespace D3DTX_Converter.Main
 
         // D3DTX versions
         // Legacy D3DTX versions
-        public D3DTX_LV1 d3dtxL1;
-        public D3DTX_LV2 d3dtxL2;
-        public D3DTX_LV3 d3dtxL3;
+        public D3DTX_LV1? d3dtxL1;
+        public D3DTX_LV2? d3dtxL2;
+        public D3DTX_LV3? d3dtxL3;
 
         // Newer D3DTX versions. They are used from Poker Night 2 and later games.
         public D3DTX_V3? d3dtx3;
         public D3DTX_V4? d3dtx4;
         public D3DTX_V5? d3dtx5;
-        public D3DTX_V7? d3dtx6; // bad practice, but i don't want to remove the variable from everywhere
+        public D3DTX_V6? d3dtx6;
         public D3DTX_V7? d3dtx7;
         public D3DTX_V8? d3dtx8;
         public D3DTX_V9? d3dtx9;
@@ -104,7 +104,7 @@ namespace D3DTX_Converter.Main
             d3dtxConversionType = setD3DTXVersion;
             // D3DTX version 6 and 8 are not fully tested, because no texture samples were found in Telltale game files
             // Presumably they were used during development or existed in earlier versions of the games, but were replaced with newer versions
-            if (d3dtxVersion == 6 || d3dtxVersion == 8)
+            if (d3dtxVersion == 8)
             {
                 Console.WriteLine(
                     "Warning! '{0}' version is not fully complete/tested! There may be some issues with converting.",

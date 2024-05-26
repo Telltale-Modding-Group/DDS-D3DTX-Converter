@@ -150,9 +150,14 @@ public class D3DTX_V6
     public float mToonGradientCutoff { get; set; }
 
     /// <summary>
-    /// [16 bytes] A bitmask value representing the color mode of the texture.
+    /// [4 bytes] An enum, defines what kind of alpha the texture will have.
     /// </summary>
-    public ColorMask mColor {get; set;}
+    public eTxAlpha mAlphaMode { get; set; }
+
+    /// <summary>
+    /// [4 bytes] An enum, defines the color range of the texture.
+    /// </summary>
+    public eTxColor mColorMode { get; set; }
 
     /// <summary>
     /// [8 bytes] A vector, defines the UV offset values when the shader on a material samples the texture.
@@ -233,7 +238,9 @@ public class D3DTX_V6
         mSpecularGlossExponent = reader.ReadSingle(); //mSpecularGlossExponent [4 bytes]
         mHDRLightmapScale = reader.ReadSingle(); //mHDRLightmapScale [4 bytes]
         mToonGradientCutoff = reader.ReadSingle(); //mToonGradientCutoff [4 bytes]
-        mColor = new ColorMask(reader); //mColor [16 bytes]
+        mAlphaMode = (eTxAlpha)reader.ReadInt32(); //mAlphaMode [4 bytes]
+        mColorMode = (eTxColor)reader.ReadInt32(); //mColorMode [4 bytes]
+        
         mUVOffset = new Vector2() //mUVOffset [8 bytes]
         {
             x = reader.ReadSingle(), //[4 bytes]
@@ -410,7 +417,8 @@ public class D3DTX_V6
         writer.Write(mSpecularGlossExponent); //mSpecularGlossExponent [4 bytes]
         writer.Write(mHDRLightmapScale); //mHDRLightmapScale [4 bytes]
         writer.Write(mToonGradientCutoff); //mToonGradientCutoff [4 bytes]
-        mColor.WriteBinaryData(writer); //mColor [16 bytes]
+        writer.Write((int)mAlphaMode); //mAlphaMode [4 bytes]
+        writer.Write((int)mColorMode); //mColorMode [4 bytes]
         writer.Write(mUVOffset.x); //mUVOffset X [4 bytes]
         writer.Write(mUVOffset.y); //mUVOffset Y [4 bytes]
         writer.Write(mUVScale.x); //mUVScale X [4 bytes]
@@ -476,7 +484,8 @@ public class D3DTX_V6
         totalSize += (uint)Marshal.SizeOf(mSpecularGlossExponent); //mSpecularGlossExponent [4 bytes]
         totalSize += (uint)Marshal.SizeOf(mHDRLightmapScale); //mHDRLightmapScale [4 bytes]
         totalSize += (uint)Marshal.SizeOf(mToonGradientCutoff); //mToonGradientCutoff [4 bytes]
-        totalSize += (uint)Marshal.SizeOf(mColor); //mAlphaMode [4 bytes]
+        totalSize += (uint)Marshal.SizeOf((int)mAlphaMode); //mAlphaMode [4 bytes]
+        totalSize += (uint)Marshal.SizeOf((int)mColorMode); //mColorMode [4 bytes]
         totalSize += mUVOffset.GetByteSize(); //[4 bytes]
         totalSize += mUVScale.GetByteSize(); //[4 bytes]
 
@@ -536,7 +545,8 @@ public class D3DTX_V6
         d3dtxInfo += "mSpecularGlossExponent = " + mSpecularGlossExponent + Environment.NewLine;
         d3dtxInfo += "mHDRLightmapScale = " + mHDRLightmapScale + Environment.NewLine;
         d3dtxInfo += "mToonGradientCutoff = " + mToonGradientCutoff + Environment.NewLine;
-        d3dtxInfo += "mColor = " + mColor + Environment.NewLine;
+        d3dtxInfo += "mAlphaMode = " + Enum.GetName(typeof(eTxAlpha), mAlphaMode) + " (" + (int)mAlphaMode + ")" + Environment.NewLine;
+        d3dtxInfo += "mColorMode = " + Enum.GetName(typeof(eTxColor), mColorMode) + " (" + (int)mColorMode + ")" + Environment.NewLine;
         d3dtxInfo += "mUVOffset = " + mUVOffset + Environment.NewLine;
         d3dtxInfo += "mUVScale = " + mUVScale + Environment.NewLine;
 

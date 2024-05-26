@@ -21,7 +21,7 @@ using DirectXTexNet;
 /* --- D3DTX Version 5 games ---
  * Tales from the Borderlands (TESTED)
  * Game of Thrones (TESTED)
- * Minecraft Story Mode: Season One (TESTED)
+ * Minecraft Story Mode: Season One (TESTED) (Note: This excludes the Xbox One version. For more information, check out D3DTX_V6.cs.)
 */
 
 namespace D3DTX_Converter.TelltaleD3DTX;
@@ -117,12 +117,12 @@ public class D3DTX_V5
     public T3TextureLayout mTextureLayout { get; set; }
 
     /// <summary>
-    /// [4 bytes] Unknown Value 1 in d3dtx.
+    /// [4 bytes] An enum, defines the gamma of the texture.
     /// </summary>
     public T3SurfaceGamma mSurfaceGamma { get; set; }
 
     /// <summary>
-    /// [4 bytes] Unknown Value 2 in d3dtx.
+    /// [4 bytes] An enum, defines the resource type of the texture.
     /// </summary>
     public T3ResourceUsage mResourceUsage { get; set; }
 
@@ -411,7 +411,7 @@ public class D3DTX_V5
         writer.Write((int)mSurfaceGamma); //mSurfaceGamma [4 bytes]
         writer.Write((int)mResourceUsage); //mResourceUsage [4 bytes]
         writer.Write((int)mType); //mType [4 bytes]
-        writer.Write(mNormalMapFormat); //Unknown4 [4 bytes]
+        writer.Write(mNormalMapFormat); //mNormalMapFormat [4 bytes]
         writer.Write(mSpecularGlossExponent); //mSpecularGlossExponent [4 bytes]
         writer.Write(mHDRLightmapScale); //mHDRLightmapScale [4 bytes]
         writer.Write(mToonGradientCutoff); //mToonGradientCutoff [4 bytes]

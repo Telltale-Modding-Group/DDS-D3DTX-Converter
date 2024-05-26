@@ -12,18 +12,18 @@
     - Puzzle Agent 2 (Untested)
     - Law & Order: Legacies (Untested)
 - Added array texture support (Thanks [Knollad Knolladious](https://www.youtube.com/channel/UCegvS4IJnO926qnuIEfQfJw)!).
-- Added cubemap texture support. Previously they were split into 6 separate .dds images.
+- Added cubemap texture support. Previously they were split into 6 separate DDS images.
 - Added cubemap array texture support (They usually do not exist. Please report if you find any).
 - Added volumemap texture support (They usually do not exist. Please report if you find any).
-- Added support to export a DDS image even if the version is not recognized (it will not generate a .json). This is a feature parity with Telltale Explorer and should work for any Telltale title.
+- Added support to export a DDS image even if the version is not recognized (it will not generate a JSON file). This is a feature parity with Telltale Explorer and should work for any Telltale title.
 - Reworked the JSON file - it now has an additional field class that includes the conversion type used. The app is still compatible with older versions.
 - Added the Debug CLI back. It will act as the main CLI for now. In the future I may add a proper CLI.
 - Improved the bulk conversion performance, it now converts more textures per thread.
 
 #### GUI: 
 - Added a Conversion Type combobox. 
-- Added support for previewing older d3dtx files. It should be almost up-to-par to that of Telltale Explorer. 
-- Added a Debug info button. When clicked on, it will display in a dialog the information about DDS images and .d3dtx files.
+- Added support for previewing older D3DTX files. It should be almost up-to-par to that of Telltale Explorer. 
+- Added a Debug info button. When clicked on, it will display in a dialog the information about DDS images and D3DTX files.
 - The new exporting without knowing the version is used when the "Default" option is used.
 - Changed the names of some Telltale surface formats. They are now shown a little bit more consistent with their more known DXGI counterparts.
     - DXT1  now shows as BC1
@@ -46,16 +46,16 @@ The converter is now more robust than before.
     - Fixed an inconvenience where if the texture had no mips it still had it enabled in the header.
 - Fixed incorrect Telltale surface formats enum values.
 - Fixed writing non-existing compression formats.
-- Fixed a lot of .dds reading bugs.
-- Fixed region indexing when writing to .d3dtx.
+- Fixed a lot of DDS reading bugs.
+- Fixed region indexing when writing to D3DTX.
 - Fixed channel count displaying wrong values in image properties (partially).
-- Fixed transparency issue dds images. Previously transparent pixels appeared white. Now, a side effect is slower load time (but worth it).
+- Fixed transparency issue DDS images. Previously transparent pixels appeared white. Now, a side effect is slower load time (but worth it).
 - Fixed displaying rare surface formats which include but are not limited to A8, L8, A8L8, L16, R16, RGBA16, ARGB16 and more.
 - Fixed SamplerState not having correct values.
 - Fixed bulk conversion when the output directory was not set.
 - Fixed "Delete File" from context menu not working.
 - Fixed error message notification when converting from dds to other file formats, even tho it is created.
-- Fixed error message notification that when converting from other file formats to .dds the .json was not found.
+- Fixed error message notification that when converting from other file formats to DDS the JSON was not found.
 - Fixed GUI resizing of some elements
 - Fixed many other minor bugfixes.
 

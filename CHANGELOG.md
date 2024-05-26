@@ -2,8 +2,9 @@
 ### Version 2.4.0 Pre-release
 
 #### Converter:
-- Added TWD: Michonne (2016) support (mVersion 7 games). 
 - Added Poker Knight 2 (2013) support (mVersion 3 games).
+- Added Minecraft Story Mode: Season One support (mVersion 6 games). (Thanks [Knollad Knolladious](https://www.youtube.com/channel/UCegvS4IJnO926qnuIEfQfJw)!)
+- Added TWD: Michonne (2016) support (mVersion 7 games). 
 - Added support for some legacy Telltale games (pre-Poker Knight 2). These include:
     - The Walking Dead (2012) (Thanks [Lucas Saragosa](https://github.com/LucasSaragosa)!)
     - Jurassic Park (2011)
@@ -64,7 +65,6 @@ Technical Improvements
 - Refactored a lot of classes and functions.
 - Removed or archived a lot of unused code and files. The project should be a lot cleaner with less code. 
 - Reduced tool size
-- Removed D3DTX_V6. 
 - Deprecated D3DTX_V8.
 - Bumped DirectXTexNet to v1.0.7 (it now uses DirectXTex March 2024 version).
 - Bumped Avalonia.Xaml.Behaviors to v11.0.10.9.

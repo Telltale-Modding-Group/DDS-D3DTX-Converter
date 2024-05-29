@@ -356,7 +356,7 @@ public class D3DTX_V5
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 mRegionHeaders[i].mFaceIndex = i % 6;
-                mRegionHeaders[i].mMipIndex = i / interval;
+                mRegionHeaders[i].mMipIndex = mStreamHeader.mRegionCount - i - 1 / interval;
             }
         }
         else if (metadata.IsVolumemap())
@@ -375,7 +375,7 @@ public class D3DTX_V5
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 mRegionHeaders[i].mFaceIndex = 0;
-                mRegionHeaders[i].mMipIndex = i;
+                mRegionHeaders[i].mMipIndex = mStreamHeader.mRegionCount - i - 1;
             }
         }
 

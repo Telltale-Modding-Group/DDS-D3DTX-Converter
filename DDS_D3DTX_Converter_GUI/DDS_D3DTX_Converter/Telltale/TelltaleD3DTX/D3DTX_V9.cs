@@ -380,7 +380,7 @@ public class D3DTX_V9
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 mRegionHeaders[i].mFaceIndex = i % (6 * mArraySize); //Unknown guess, it could be 6 or 6 * mArraySize
-                mRegionHeaders[i].mMipIndex = i / interval;
+                mRegionHeaders[i].mMipIndex = mStreamHeader.mRegionCount - i - 1 / interval;
             }
         }
 
@@ -398,7 +398,7 @@ public class D3DTX_V9
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 mRegionHeaders[mStreamHeader.mRegionCount - currDepth + depthIndex++].mFaceIndex = faceIndex++; //NOTE: This could be different for 3D textures. I don't have information at the moment.
-                mRegionHeaders[mStreamHeader.mRegionCount - i - 1].mMipIndex = currentMipIndex;
+                mRegionHeaders[i].mMipIndex = currentMipIndex;
 
                 if (depthIndex == copyOfDepth)
                 {
@@ -421,7 +421,7 @@ public class D3DTX_V9
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 mRegionHeaders[i].mFaceIndex = i % mArraySize;
-                mRegionHeaders[i].mMipIndex = i / interval;
+                mRegionHeaders[i].mMipIndex = mStreamHeader.mRegionCount - i - 1 / interval;
             }
         }
 

@@ -330,7 +330,7 @@ public class D3DTX_V4
 
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
-                mRegionHeaders[i].mMipIndex = i;
+                mRegionHeaders[i].mMipIndex = mStreamHeader.mRegionCount - i - 1;
             }
         }
 

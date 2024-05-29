@@ -241,6 +241,7 @@ public class D3DTX_V7
         mToonGradientCutoff = reader.ReadSingle(); //mToonGradientCutoff [4 bytes]
         mAlphaMode = (eTxAlpha)reader.ReadInt32(); //mAlphaMode [4 bytes]
         mColorMode = (eTxColor)reader.ReadInt32(); //mColorMode [4 bytes]
+        
         mUVOffset = new Vector2() //mUVOffset [8 bytes]
         {
             x = reader.ReadSingle(), //[4 bytes]
@@ -355,7 +356,7 @@ public class D3DTX_V7
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 mRegionHeaders[i].mFaceIndex = i % 6;
-                mRegionHeaders[i].mMipIndex = i / interval;
+                mRegionHeaders[i].mMipIndex = mStreamHeader.mRegionCount - i - 1 / interval;
             }
         }
         else if (metadata.IsVolumemap())
@@ -374,7 +375,7 @@ public class D3DTX_V7
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 mRegionHeaders[i].mFaceIndex = 0;
-                mRegionHeaders[i].mMipIndex = i;
+                mRegionHeaders[i].mMipIndex = mStreamHeader.mRegionCount - i - 1;
             }
         }
 

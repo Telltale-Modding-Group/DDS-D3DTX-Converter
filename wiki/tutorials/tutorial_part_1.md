@@ -2,7 +2,7 @@
 
 **Welcome to the first part of the tutorial on how to make a texture mod for Telltale's games. In this section we focus on how to find and extract the textures needed for your mods!**
 
-## [Make sure you read the prelude before beginning. It contains important information.](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BTutorial%5D-How-to-make-a-Texture-Mod-(Prelude))
+## [Make sure you read the prelude before beginning. It contains important information.](/wiki/tutorials/tutorial_prelude.md)
 
 **Now with that out of the way let's begin.**
 We use Telltale Explorer for this part of the tutorial. Make sure to download it.

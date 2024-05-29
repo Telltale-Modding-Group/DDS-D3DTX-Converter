@@ -1,10 +1,10 @@
-Welcome to the DDS-D3DTX-Converter wiki!
+Welcome to the Telltale Texture Mod Tool wiki!
 
-This is the home page containing all the pages and information about the Texture Mod Tool. If you have trouble understanding, please use an in-built Google Translate.
+This is the home page containing all the pages and information about the Texture Mod Tool. If you have trouble understanding in English, please use an in-built Google Translate.
 
 ### Table of Contents
-1. **[Application Guide](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BHelp%5D-Application-Guide)**
-2. **[Reporting issues/bugs](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BHelp%5D---Reporting-an-Issue-or-Bug)**
+1. **[Application Guide](/wiki/application_guide.md)**
+2. **[Reporting issues/bugs](/wiki/issue.md)**
 
 ### Tutorials
 1. **[How to make a Texture Mod (Prelude)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BTutorial%5D--How-to-make-a-Texture-Mod-(Part-1))**

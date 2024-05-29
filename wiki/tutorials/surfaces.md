@@ -1,5 +1,5 @@
 
-[Home](/wiki/home.md)
+## [Home](/wiki/home.md)
 
 Telltale surface formats have their equivalent DXGI format. If you are not sure in which format to save, this is a table containing useful information.
 
@@ -19,7 +19,7 @@ Telltale surface formats have their equivalent DXGI format. If you are not sure 
 | R32 | R32_FLOAT| 
 | RG32 | R32G32_FLOAT |
 | RGBA32 | R32G32B32A32 |
-| R8 | R8_UNORM |- Use R8 in Paint.Net or L8 in GIMP
+| R8 | R8_UNORM | Use R8 in Paint.Net or L8 in GIMP
 | RGBA8S | R8G8B8A8_SNORM |
 | A8 | A8_UNORM | Used in detail textures.
 | L8 | R8_UNORM | 

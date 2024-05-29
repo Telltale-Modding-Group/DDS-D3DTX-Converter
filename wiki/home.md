@@ -1,11 +1,19 @@
-Welcome to the Telltale Texture Mod Tool wiki!
+# Welcome to the Telltale Texture Mod Tool wiki!
 
-This is the home page containing all the pages and information about the Texture Mod Tool. If you have trouble understanding in English, please use an in-built Google Translate.
+This is the home page containing all sections with information regarding the Texture Mod Tool. If you have trouble understanding in English, please use an in-built Google Translate.
 
 ### Table of Contents
 1. **[Application Guide](/wiki/application_guide.md)**
 2. **[Reporting issues/bugs](/wiki/issue.md)**
 
+
+### Tutorials
+1. **[How to make a Texture Mod (Prelude)](/wiki/tutorials/tutorial_prelude.md)**
+2. **[How to make a Texture Mod (Part 1)](/wiki/tutorials/tutorial_part_1.md)**
+3. **[How to make a Texture Mod (Part 2)](/wiki/tutorials/tutorial_part_2.md)**
+
+
+(Old Wiki)
 ### Tutorials
 1. **[How to make a Texture Mod (Prelude)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BTutorial%5D--How-to-make-a-Texture-Mod-(Part-1))**
 2. **[How to make a Texture Mod (Part 1)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BTutorial%5D--How-to-make-a-Texture-Mod-(Part-1))**

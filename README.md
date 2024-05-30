@@ -19,15 +19,13 @@ This is an application designed to preview and convert **Telltale textures** (fi
 
 ## Getting started
 
-##### This [video](https://www.youtube.com/watch?v=pjRhuKe72Qo) serves as a quick general guide on how to use the tool.
+#### [Quick Video Tutorial](https://www.youtube.com/watch?v=pjRhuKe72Qo)
 
-The following links are **not yet** updated, but they follow similar practice. They still contain useful articles and tutorials.
+#### [Wiki (WIP)](wiki/home.md)
 
-##### [This is the link to the new wiki. (WIP)](wiki/home.md)
+#### [Outdated wiki, but it still has some relevant information.](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki)
 
-##### [Outdated wiki, but it still has relevant information.](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki)
-
-If you have issues or questions, redirect them to the [discord server](https://discord.com/invite/HqpnTenqwp).
+##### If you have issues or questions, redirect them to the [discord server](https://discord.com/invite/HqpnTenqwp).
 
 ## Supported Games
 
@@ -87,7 +85,7 @@ If you want to use the console applications, you can open their relative solutio
 ## Credits
 - Thanks to [David Matos](https://github.com/frostbone25) for his original work on the old converter and its wikipedia. 
 - Thanks to [Ivan Panayotov](https://github.com/iMrShadow) for creating the new GUI, adding support for more games and possibly all textures from **Back to the Future: The Game (2010)** and onwards. 
-- Thanks to [Mawrak](https://github.com/Mawrak) for their work on the original GUI application, testing the software and providing critical feedback.
+- Thanks to [Mawrak](https://github.com/Mawrak) for their work on the original GUI application and its wiki, testing the software and providing critical feedback.
 - Thanks to [Lucas Saragosa](https://github.com/LucasSaragosa) for figuring out the Telltale formats and for his help for parsing the D3DTX correctly for all supported games. His [TelltaleToolLib](https://github.com/LucasSaragosa/TelltaleToolLib) project served as a reference, which had a lot of influence in the conversion process.
 - Thanks to [Arrizble](https://www.youtube.com/@arizzble2005) for creating a tutorial, testing the software on **Minecraft: Story mode** series and providing critical feedback.
 - Thanks to [Knollad Knolladious](https://github.com/LBPHaxMods) for testing the software on **Minecraft: Story mode** series. Array textures support was added due to his discoveries.

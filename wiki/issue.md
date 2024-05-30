@@ -1,13 +1,15 @@
+## [Home](/wiki/home.md)
+
 ## Reporting an Issue/Bug
 
 Welcome to the Issue/Bug Reporting page for the Texture Mod Tool. This is meant to help guide you on how to report an issue to us. If you happen to come across a bug, or an issue with the Mod Launcher. **Please report the issue here.**
 
 **Reporting issues allow you to help us improve the application through increased stability and/or more features.**
-### What to write when putting an issue
+### What should I write when reporting an issue?
 
 **PLEASE write in a detailed and concise manner, explaining what the issue/bug is.**
 
-More importantly, you also need to be able to ***reproduce the error***. You need to be able to reproduce the error that occurs, otherwise, it will be very difficult for us to track down the case in which the error you are receiving happens. If you're able to reproduce it, then be sure to write the clear and concise steps needed to be taken in order for us to recreate the error ourselves and patch it.
+You need to be able to ***reproduce the error***, otherwise, it will be very difficult for us to track down the case in which the error you are receiving happens. If you're able to reproduce it, then be sure to write the clear and concise steps needed to be taken in order for us to recreate the error ourselves and patch it.
 
 **If this is an issue related to a file, be sure to also upload/attach the file to your issue report.**
 

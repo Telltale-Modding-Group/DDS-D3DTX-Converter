@@ -106,7 +106,7 @@ namespace DDS_D3DTX_Converter
         /// (TODO Currently only Windows is supported)
         /// </summary>
         /// <param name="directoryPath"></param>
-        public void OpenFileExplorer(string? filePath)
+        public static void OpenFileExplorer(string? filePath)
         {
             if (string.IsNullOrEmpty(filePath))
                 return;

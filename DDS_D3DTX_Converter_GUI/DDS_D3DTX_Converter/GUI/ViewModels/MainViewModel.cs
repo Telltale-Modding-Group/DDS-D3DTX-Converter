@@ -68,11 +68,12 @@ public partial class MainViewModel : ViewModelBase
     private readonly MainManager mainManager = MainManager.GetInstance();
     private readonly Uri _assetsUri = new("avares://DDS_D3DTX_Converter/Assets/");
     private static readonly string ErrorSvgFilename = "error.svg";
-    private WorkingDirectoryFile? _dataGridSelectedItem;
 
     #endregion
 
     #region UI PROPERTIES
+
+    [ObservableProperty] private WorkingDirectoryFile? _dataGridSelectedItem;
 
     [ObservableProperty] private ImageProperties _imageProperties;
     [ObservableProperty] private FormatItemViewModel _selectedFormat;
@@ -88,6 +89,7 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty] private bool _convertButtonStatus;
     [ObservableProperty] private bool _debugButtonStatus;
     [ObservableProperty] private bool _contextOpenFolderStatus;
+    [ObservableProperty] private bool _chooseOutputDirectoryCheckBoxEnabledStatus;
 
     [ObservableProperty] private int _selectedComboboxIndex;
     [ObservableProperty] private int _selectedLegacyTitleIndex;
@@ -116,12 +118,6 @@ public partial class MainViewModel : ViewModelBase
             {
                 _dataGridSelectedItem = value;
                 PreviewImage();
-                SaveButtonStatus = true;
-                DeleteButtonStatus = true;
-                if (DataGrid_SelectedItem != null && (DataGrid_SelectedItem.FileType == ".d3dtx" || DataGrid_SelectedItem.FileType == ".dds"))
-                    DebugButtonStatus = true;
-                else
-                    DebugButtonStatus = false;
             }
         }
     }
@@ -142,8 +138,7 @@ public partial class MainViewModel : ViewModelBase
     #region MAIN MENU BUTTONS ACTIONS
 
     //Open Directory Command
-    [RelayCommand]
-    public async void OpenDirectoryButton_Click()
+    public async Task OpenDirectoryButton_Click()
     {
         try
         {
@@ -152,16 +147,19 @@ public partial class MainViewModel : ViewModelBase
                 throw new NullReferenceException("Missing StorageProvider instance.");
 
             await mainManager.SetWorkingDirectoryPath(provider);
+
+            if (mainManager.GetWorkingDirectoryPath() != string.Empty)
+            {
+                ReturnDirectoryButtonStatus = true;
+                RefreshDirectoryButtonStatus = true;
+                DataGrid_SelectedItem = null;
+
+                await UpdateUiAsync();
+            }
         }
         catch (Exception e)
         {
-            throw new Exception(e.Message);
-        }
-        finally
-        {
-            ReturnDirectoryButtonStatus = true;
-            RefreshDirectoryButtonStatus = true;
-            UpdateUi();
+            await HandleExceptionAsync(e.Message);
         }
     }
 
@@ -173,37 +171,37 @@ public partial class MainViewModel : ViewModelBase
             {
                 var topLevel = GetMainWindow();
 
+                if (Directory.Exists(DataGrid_SelectedItem.FilePath))
+                {
+                    throw new Exception("Cannot save a directory.");
+                }
+
                 // Start async operation to open the dialog.
                 var storageFile = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
                 {
                     Title = "Save File",
                     SuggestedFileName = DataGrid_SelectedItem.FileName,
-                    ShowOverwritePrompt = true
+                    ShowOverwritePrompt = true,
+                    DefaultExtension = DataGrid_SelectedItem.FileType is null ? "bin" : DataGrid_SelectedItem.FileType.Substring(1)
                 });
 
                 if (storageFile is not null)
                 {
                     var destinationFilePath = storageFile.Path.AbsolutePath;
 
-                    if (DataGrid_SelectedItem.FilePath is not null)
+                    if (File.Exists(DataGrid_SelectedItem.FilePath))
                         File.Copy(DataGrid_SelectedItem.FilePath, destinationFilePath, true);
                 }
             }
         }
         catch (Exception ex)
         {
-            var mainWindow = GetMainWindow();
-            var messageBox =
-                MessageBoxes.GetErrorBox("Error during saving the file. " + ex.Message);
-
-            await MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+            await HandleExceptionAsync("Error during saving the file. " + ex.Message);
         }
         finally
         {
             await SafeRefreshDirectoryAsync();
-            SaveButtonStatus = false;
-            DeleteButtonStatus = false;
-            UpdateUi();
+            await UpdateUiAsync();
         }
     }
 
@@ -240,24 +238,19 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            var mainWindow = GetMainWindow();
-            var messageBox =
-                MessageBoxes.GetErrorBox("Error during adding files. Some files were not copied. " + ex.Message);
-
-            await MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+            await HandleExceptionAsync("Error during adding files. Some files were not copied. " + ex.Message);
         }
         finally
         {
-            SaveButtonStatus = false;
-            DeleteButtonStatus = false;
+
         }
 
         await SafeRefreshDirectoryAsync();
-        UpdateUi();
+        await UpdateUiAsync();
     }
 
-    //Delete Command
-    public async void DeleteFileButton_Click()
+    // Delete Command
+    public async Task DeleteFileButton_Click()
     {
         var workingDirectoryFile =
             DataGrid_SelectedItem;
@@ -283,7 +276,6 @@ public partial class MainViewModel : ViewModelBase
 
                 Directory.Delete(textureFilePath);
             }
-
             else
             {
                 throw new Exception("Invalid file or directory path.");
@@ -291,18 +283,13 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            var mainWindow = GetMainWindow();
-            var messageBox =
-                MessageBoxes.GetErrorBox(ex.Message);
-
-            await MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+            await HandleExceptionAsync(ex.Message);
         }
         finally
         {
-            SaveButtonStatus = false;
-            DeleteButtonStatus = false;
+            DataGrid_SelectedItem = null;
             await SafeRefreshDirectoryAsync();
-            UpdateUi();
+            await UpdateUiAsync();
         }
     }
 
@@ -361,23 +348,18 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            var mainWindow = GetMainWindow();
-            var messageBox =
-                MessageBoxes.GetErrorBox("Error during adding files. Some files were not copied.");
-
-            await MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+            await HandleExceptionAsync("Error during adding files. Some files were not copied." + ex.Message);
         }
         finally
         {
-            SaveButtonStatus = false;
-            DeleteButtonStatus = false;
+
         }
 
         await SafeRefreshDirectoryAsync();
-        UpdateUi();
+        await UpdateUiAsync();
     }
 
-    public void ContextMenuOpenFileCommand()
+    public async void ContextMenuOpenFileCommand()
     {
         try
         {
@@ -396,10 +378,7 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            var mainWindow = GetMainWindow();
-            var messageBox = MessageBoxes.GetErrorBox(ex.Message);
-
-            MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+            await HandleExceptionAsync(ex.Message);
         }
     }
 
@@ -420,20 +399,17 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            var mainWindow = GetMainWindow();
-            var messageBox =
-                MessageBoxes.GetErrorBox(ex.Message);
-
-            await MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+            await HandleExceptionAsync(ex.Message);
         }
         finally
         {
             ContextOpenFolderStatus = false;
-            UpdateUi();
+            await UpdateUiAsync();
         }
     }
 
-    public async void ContextMenuOpenFileExplorerCommand()
+    [RelayCommand]
+    public async Task ContextMenuOpenFileExplorerCommand()
     {
         try
         {
@@ -454,19 +430,23 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            HandleException(ex.Message);
+            await HandleExceptionAsync(ex.Message);
         }
     }
 
     [RelayCommand]
     public async Task RefreshDirectoryButton_Click()
     {
-        await RefreshUiAsync();
+        if (DirectoryPath != null && DirectoryPath != string.Empty)
+        {
+            await RefreshUiAsync();
+        }
     }
 
-    public void ContextDeleteFileCommand()
+    [RelayCommand]
+    public async Task ContextDeleteFileCommand()
     {
-        DeleteFileButton_Click();
+        await DeleteFileButton_Click();
     }
 
     public async Task SafeRefreshDirectoryAsync()
@@ -477,11 +457,7 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            var mainWindow = GetMainWindow();
-            var messageBox =
-                MessageBoxes.GetErrorBox(ex.Message);
-
-            await MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+            await HandleExceptionAsync(ex.Message);
         }
     }
 
@@ -494,7 +470,7 @@ public partial class MainViewModel : ViewModelBase
     /// Error dialogs appear when something goes wrong with the conversion process.
     /// </summary>
     [RelayCommand]
-    public async Task ConvertButton_ClickAsync()
+    public async Task ConvertButton_Click()
     {
         try
         {
@@ -635,7 +611,7 @@ public partial class MainViewModel : ViewModelBase
         finally
         {
             mainManager.RefreshWorkingDirectory();
-            UpdateUi();
+            await UpdateUiAsync();
         }
     }
 
@@ -644,7 +620,7 @@ public partial class MainViewModel : ViewModelBase
     /// </summary>
     /// <returns></returns>
     [RelayCommand]
-    public async Task DebugButton_ClickAsync()
+    public async Task DebugButton_Click()
     {
         try
         {
@@ -657,8 +633,6 @@ public partial class MainViewModel : ViewModelBase
 
             if (!File.Exists(textureFilePath))
                 throw new DirectoryNotFoundException("File was not found.");
-
-
 
             D3DTXConversionType conversionType = D3DTXConversionType.DEFAULT;
 
@@ -683,31 +657,22 @@ public partial class MainViewModel : ViewModelBase
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            var mainWindow = GetMainWindow();
-            var messageBox =
-                MessageBoxes.GetErrorBox(ex.Message);
-            MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
-            Logger.Instance().Log(ex);
+            await HandleExceptionAsync(ex.Message);
         }
     }
 
     #endregion
 
     ///<summary>
-    ///Updates our application UI, mainly the data grid.
+    /// Updates our application UI, mainly the data grid.
     ///</summary>
-    private void UpdateUi()
+    private async Task UpdateUiAsync()
     {
-        //update our texture directory UI
+        // update our texture directory UI
         try
         {
-            DataGrid_SelectedItem = null;
-            ImagePreview = new SvgImage()
-            {
-                Source = SvgSource.Load(ErrorSvgFilename, _assetsUri)
-            };
-
             DirectoryPath = mainManager.GetWorkingDirectoryPath();
+            mainManager.RefreshWorkingDirectory();
             var workingDirectoryFiles = mainManager.GetWorkingDirectoryFiles();
 
             for (int i = WorkingDirectoryFiles.Count - 1; i >= 0; i--)
@@ -726,19 +691,18 @@ public partial class MainViewModel : ViewModelBase
                     WorkingDirectoryFiles.Add(item);
                 }
             }
-            // WorkingDirectoryFiles =
-            //     new ObservableCollection<WorkingDirectoryFile>(mainManager.GetWorkingDirectoryFiles());
+
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            HandleException("Error during updating ui. " + ex.Message);
+            await HandleExceptionAsync("Error during updating ui. " + ex.Message);
         }
     }
 
     #region SMALL MENU BUTTON ACTIONS
 
-    public async void ReturnDirectory_Click()
+    public async Task ReturnDirectory_Click()
     {
         try
         {
@@ -748,23 +712,18 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            var mainWindow = GetMainWindow();
-            var messageBox =
-                MessageBoxes.GetErrorBox(ex.Message);
-
-            await MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+            await HandleExceptionAsync(ex.Message);
         }
         finally
         {
-            SaveButtonStatus = false;
-            DeleteButtonStatus = false;
-            UpdateUi();
+            PreviewImage();
+            await UpdateUiAsync();
         }
     }
 
-    public void ContextMenuRefreshDirectoryCommandAsync()
+    public async Task ContextMenuRefreshDirectoryCommand()
     {
-        RefreshDirectoryButton_Click();
+        await RefreshDirectoryButton_Click();
     }
 
     #endregion
@@ -855,7 +814,7 @@ public partial class MainViewModel : ViewModelBase
                 {
                     await mainManager.SetWorkingDirectoryPath(workingDirectoryFile.FilePath);
                     WorkingDirectoryFiles.Clear();
-                    UpdateUi();
+                    await UpdateUiAsync();
                 }
             }
         }
@@ -872,58 +831,94 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    private void PreviewImage()
+    private void UpdateUIElementsAsync()
     {
-        if (DataGrid_SelectedItem == null)
-            return;
-
-        var workingDirectoryFile = DataGrid_SelectedItem;
-        ContextOpenFolderStatus = Directory.Exists(workingDirectoryFile.FilePath);
-
-        var extension = Path.GetExtension(workingDirectoryFile.FilePath).ToLowerInvariant();
-        Console.WriteLine(extension);
-        if (extension == string.Empty && !Directory.Exists(workingDirectoryFile.FilePath))
+        if (DataGrid_SelectedItem != null)
         {
-            ChangeComboBoxItemsByItemExtension(null);
+            var workingDirectoryFile = DataGrid_SelectedItem;
+            var path = workingDirectoryFile.FilePath;
+            var extension = Path.GetExtension(path).ToLowerInvariant();
+
+            if (!File.Exists(path) && !Directory.Exists(path))
+            {
+                ResetUIElements();
+                mainManager.RefreshWorkingDirectory();
+                UpdateUiAsync().Wait();
+                throw new Exception("File or directory do not exist anymore! Refreshing the directory.");
+            }
+
+            DebugButtonStatus = extension == ".d3dtx" || extension == ".dds";
+            SaveButtonStatus = File.Exists(path);
+            DeleteButtonStatus = true;
+            ContextOpenFolderStatus = Directory.Exists(path);
+            ChooseOutputDirectoryCheckBoxEnabledStatus = true;
+            if (extension == string.Empty && !Directory.Exists(path))
+            {
+                ChangeComboBoxItemsByItemExtension(null);
+            }
+            else
+            {
+                ChangeComboBoxItemsByItemExtension(extension);
+            }
         }
         else
         {
-            ChangeComboBoxItemsByItemExtension(extension);
+            ResetUIElements();
         }
-        ImageNamePreview = workingDirectoryFile.FileName + workingDirectoryFile.FileType;
+    }
 
-        var filePath = workingDirectoryFile.FilePath;
-
-        if (!File.Exists(filePath) && !Directory.Exists(filePath))
+    private void ResetUIElements()
+    {
+        SaveButtonStatus = false;
+        DeleteButtonStatus = false;
+        DebugButtonStatus = false;
+        ConvertButtonStatus = false;
+        ComboBoxStatus = false;
+        VersionConvertComboBoxStatus = false;
+        ChooseOutputDirectoryCheckBoxEnabledStatus = false;
+        DebugButtonStatus = false;
+        ChooseOutputDirectoryCheckboxStatus = false;
+        ImageProperties = ImageProperties.GetImagePropertiesFromInvalid();
+        ImagePreview = new SvgImage()
         {
-            //TODO
-            return;
-        }
+            Source = SvgSource.Load(ErrorSvgFilename, _assetsUri)
+        };
+    }
 
+    private void PreviewImage()
+    {
         try
         {
+            UpdateUIElementsAsync();
+
+            if (DataGrid_SelectedItem == null)
+                return;
+
+            var workingDirectoryFile = DataGrid_SelectedItem;
+            var filePath = workingDirectoryFile.FilePath;
+            var extension = Path.GetExtension(filePath).ToLowerInvariant();
+
+            ImageNamePreview = workingDirectoryFile.FileName + workingDirectoryFile.FileType;
             ImageProperties = GetImageProperties(filePath, extension);
             ImagePreview = GetImagePreview(filePath, extension);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            HandleImagePreviewError(ex);
+            HandleImagePreviewErrorAsync(ex);
         }
     }
 
     private Task OpenFileExplorer(string path)
     {
-        mainManager.OpenFileExplorer(path);
+        MainManager.OpenFileExplorer(path);
         return Task.CompletedTask;
     }
 
     private async Task RefreshUiAsync()
     {
-        SaveButtonStatus = false;
-        DeleteButtonStatus = false;
         await SafeRefreshDirectoryAsync();
-        UpdateUi();
+        await UpdateUiAsync();
     }
 
     private IImage GetImagePreview(string filePath, string extension)
@@ -949,15 +944,12 @@ public partial class MainViewModel : ViewModelBase
 
         if (supportedExtensions.Contains(extension.ToLower()))
         {
-            switch (extension.ToLower())
+            return extension.ToLower() switch
             {
-                case ".d3dtx":
-                    return ImageProperties.GetImagePropertiesFromD3DTX(filePath);
-                case ".dds":
-                    return ImageProperties.GetDdsProperties(filePath);
-                default:
-                    return ImageProperties.GetImagePropertiesFromOthers(filePath);
-            }
+                ".d3dtx" => ImageProperties.GetImagePropertiesFromD3DTX(filePath),
+                ".dds" => ImageProperties.GetDdsProperties(filePath),
+                _ => ImageProperties.GetImagePropertiesFromOthers(filePath),
+            };
         }
 
         // Return empty properties for unsupported formats
@@ -965,19 +957,17 @@ public partial class MainViewModel : ViewModelBase
     }
 
 
-    private void HandleImagePreviewError(Exception ex)
+    private async Task HandleImagePreviewErrorAsync(Exception ex)
     {
-        HandleException("Error during previewing image.\nError message: " + ex.Message);
-
+        await HandleExceptionAsync("Error during previewing image.\nError message: " + ex.Message);
+        ImageProperties = ImageProperties.GetImagePropertiesFromInvalid();
         ImagePreview = new SvgImage { Source = SvgSource.Load(ErrorSvgFilename, _assetsUri) };
-        //TODO FIX THIS
-        //  ImageProperties = ImageProperties.GetImagePropertiesFromInvalid();
     }
 
-    private void HandleException(string message)
+    private async Task HandleExceptionAsync(string message)
     {
         var mainWindow = GetMainWindow();
         var messageBox = MessageBoxes.GetErrorBox(message);
-        MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
+        await MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
     }
 }

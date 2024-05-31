@@ -458,7 +458,7 @@
                                      Margin="135,178,10,0" />
                 <!-- Mipmap Count -->
                 <Label Name="MipMapcountLabel"
-                       Content="Mip Map Count:"
+                       Content="Mipmap Count:"
                        Margin="10,200,10,0"
                        HorizontalAlignment="Left" />
                 <SelectableTextBlock Name="MipMapCountTextblock"
@@ -501,7 +501,7 @@
                         HorizontalAlignment="Right"
                         HorizontalContentAlignment="Center"
                         Width="120"
-                        Command="{Binding DebugButton_ClickAsync}"
+                        Command="{Binding DebugButton_Click}"
                         IsEnabled="{Binding DebugButtonStatus}"
                         ToolTip.Tip="Show the image information. Supports only DDS and D3DTX files." />
                 <Label Name="LegacyOptionsLabel"
@@ -530,6 +530,7 @@
                 </ComboBox>
                 <CheckBox Name="ChooseOutputDirectoryCheckBox"
                           IsChecked="{Binding ChooseOutputDirectoryCheckBoxStatus}"
+                          IsEnabled="{Binding ChooseOutputDirectoryCheckBoxEnabledStatus}"
                           Content="Choose Output Directory"
                           Margin="300,5,0,5"
                           VerticalAlignment="Top"
@@ -542,7 +543,7 @@
                         HorizontalAlignment="Right"
                         HorizontalContentAlignment="Center"
                         Width="91"
-                        Command="{Binding ConvertButton_ClickAsync}"
+                        Command="{Binding ConvertButton_Click}"
                         IsEnabled="{Binding ConvertButtonStatus}"
                         ToolTip.Tip="Convert the file into the desired format." />
             </Grid>

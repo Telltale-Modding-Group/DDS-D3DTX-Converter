@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace DDS_D3DTX_Converter;
 
@@ -25,7 +26,7 @@ public class WorkingDirectory
     public List<WorkingDirectoryFile> WorkingDirectoryFiles = [];
 
     //hardcoded filters
-    public List<string> filterFileExtensions = [".d3dtx", ".dds", ".png", ".jpg", ".jpeg", ".tiff", ".tif", ".bmp", ".json"];
+    public List<string> filterFileExtensions = [".d3dtx", ".dds", ".png", ".jpg", ".jpeg", ".tiff", ".tif", ".bmp", ".json", ""];
 
     /// <summary>
     /// Gets the files from the provided directory path.
@@ -44,22 +45,35 @@ public class WorkingDirectory
             WorkingDirectoryFiles.Clear();
         }
 
+        var deletedFiles = new List<WorkingDirectoryFile>();
+
+        foreach (var file in WorkingDirectoryFiles)
+        {
+            if (!File.Exists(file.FilePath) && !Directory.Exists(file.FilePath))
+            {
+                deletedFiles.Add(file);
+            }
+            else if (File.Exists(file.FilePath) && file.FileType == "")
+            {
+                deletedFiles.Add(file);
+            }
+        }
+
         WorkingDirectoryPath = directoryPath;
 
-        List<string> directoryFiles = new List<string>(Directory.GetFiles(WorkingDirectoryPath));
-        List<string> directories = new List<string>(Directory.GetDirectories(WorkingDirectoryPath));
+        List<string> directoryItems = new(Directory.GetFiles(WorkingDirectoryPath).Concat(Directory.GetDirectories(WorkingDirectoryPath)));
 
-        foreach (string file in directoryFiles)
+        foreach (string file in directoryItems)
         {
             string fileName = Path.GetFileNameWithoutExtension(file);
-            string fileExt = Path.GetExtension(file);
+            string fileExt = Path.GetExtension(file).ToLower();
 
             if (!filterFileExtensions.Contains(fileExt))
             {
                 continue;
             }
 
-            WorkingDirectoryFile workingDirectoryFile = new WorkingDirectoryFile
+            WorkingDirectoryFile workingDirectoryFile = new()
             {
                 FileName = fileName,
                 FileType = fileExt,
@@ -78,27 +92,7 @@ public class WorkingDirectory
             }
         }
 
-        foreach (string file in directories)
-        {
-            string fileName = Path.GetFileNameWithoutExtension(file);
-
-            WorkingDirectoryFile workingDirectoryFile = new WorkingDirectoryFile
-            {
-                FileName = fileName,
-                FileType = string.Empty,
-                FilePath = file,
-                FileLastWrite = File.GetLastWriteTime(file)
-            };
-
-            if (!WorkingDirectoryFiles.Contains(workingDirectoryFile))
-            {
-                WorkingDirectoryFiles.Add(workingDirectoryFile);
-            }
-            else
-            {
-                WorkingDirectoryFiles[WorkingDirectoryFiles.IndexOf(workingDirectoryFile)].FileLastWrite = File.GetLastWriteTime(file);
-            }
-        }
+        WorkingDirectoryFiles = WorkingDirectoryFiles.Except(deletedFiles).ToList();
     }
 
     public string GetWorkingDirectoryPath() => WorkingDirectoryPath;

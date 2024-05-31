@@ -19,7 +19,7 @@ namespace DDS_D3DTX_Converter
         //note to self - move the converter script and functionality to a background worker to do 'work' on a different thread so we don't freeze the UI thread
 
         //app version (not used at the moment)
-        public readonly string AppVersion = "v2.0.0";
+        public readonly string AppVersion = "v2.4.0";
 
         //web link for getting help with the application
         private const string AppHelpLink = "https://github.com/iMrShadow/DDS-D3DTX-Converter/blob/main/wiki/home.md";
@@ -152,10 +152,6 @@ namespace DDS_D3DTX_Converter
         }
 
         public bool WorkingDirectory_Path_Exists() => Directory.Exists(_workingDirectory.WorkingDirectoryPath);
-
-        // public bool CanConvertTo_DDS() => IOManagement.GetFilesPathsByExtension(_workingDirectory.workingDirectoryPath, ".d3dtx").Count > 0;
-
-        //public bool CanConvertTo_D3DTX() => IOManagement.GetFilesPathsByExtension(_workingDirectory.workingDirectoryPath, ".dds").Count > 0 && IOManagement.GetFilesPathsByExtension(_workingDirectory.workingDirectoryPath, ".header").Count > 0;
 
         public string GetWorkingDirectoryPath() => _workingDirectory.WorkingDirectoryPath;
 

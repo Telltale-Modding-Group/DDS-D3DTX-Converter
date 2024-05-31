@@ -883,6 +883,7 @@ public partial class MainViewModel : ViewModelBase
         {
             Source = SvgSource.Load(ErrorSvgFilename, _assetsUri)
         };
+        ImageNamePreview = string.Empty;
     }
 
     private void PreviewImage()

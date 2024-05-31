@@ -282,7 +282,7 @@
                 </Button>
                 <!-- FILE LIST -->
                 <DataGrid Name="TextureDirectoryFilesDataGrid"
-                          Margin="10,80,10,38"
+                          Margin="10,80,10,5"
                           ItemsSource="{Binding WorkingDirectoryFiles}"
                           SelectedItem="{Binding DataGrid_SelectedItem}"
                           BorderThickness="1"

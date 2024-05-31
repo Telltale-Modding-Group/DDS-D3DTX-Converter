@@ -22,7 +22,7 @@ namespace DDS_D3DTX_Converter
         public readonly string AppVersion = "v2.0.0";
 
         //web link for getting help with the application
-        private const string AppHelpLink = "https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki";
+        private const string AppHelpLink = "https://github.com/iMrShadow/DDS-D3DTX-Converter/blob/main/wiki/home.md";
 
         //our private objects
         private WorkingDirectory _workingDirectory;

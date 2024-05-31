@@ -6,7 +6,7 @@
 #### [Make sure you read the prelude before we begin!](/wiki/articles/tutorial_prelude.md)
 
 #### We use **Telltale Explorer** for this part of the tutorial, so make sure to download it.
-----
+---
 
 ### Step 1/4 - Locating the textures
 Telltale store their files in **TTARCH/TTARCH2** files also know as **Telltale archives**, which we can open with Telltale Explorer. Now the question remains - which? Luckily, Telltale has good naming conventions. 
@@ -14,6 +14,7 @@ Check [this](/wiki/articles/textures.md#where-are-the-textures-stored) article t
 
 Here is an example of how TWD:TTDS directory looks like. 
 ![p1_1](/wiki/tutorial_part1/p1_1.png)
+
 ----
 
 ## Step 2/4 Opening the archives
@@ -28,6 +29,7 @@ Select your desired archive and open it. In this example we are opening **WDC_pc
 
 Click on **Open** or **double click**.
 
+---
 ## Step 3/4 - Finding the right textures
 After you opened the archive, it should look like this. 
 > Check [this](/wiki/articles/textures.md#how-to-recognize-the-type-of-the-texture-and-where-its-used) section to know how to recognize the files. 

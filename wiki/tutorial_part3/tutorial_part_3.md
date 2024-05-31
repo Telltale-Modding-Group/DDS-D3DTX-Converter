@@ -61,7 +61,7 @@ Let's see the **D3DTX**.
 ![p3_4](/wiki/tutorial_part3/p3_4.png)
 
 ###
-Perfect! It looks like it was saved correctly! Let's try to put it in-game.
+Perfect! It looks like it was saved correctly! Let's put it in the game!
 
 ---
 ## Step 4/4 Putting the texture in-game 

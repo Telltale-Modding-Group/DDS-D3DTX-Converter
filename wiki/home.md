@@ -13,8 +13,8 @@ This is the home page containing all sections with information regarding the Tex
 4. **[How to make a Texture Mod (Part 3/3)](/wiki/tutorial_part3/tutorial_part_3.md)**
 
 ### Articles
-1. **[TTARCH Guide](/wiki/tutorial_part3/tutorial_part_3.md)**
-2. **[Textures Guide](/wiki/tutorial_part3/tutorial_part_3.md)**
+1. **[TTARCH Guide](/wiki/articles/ttarch.md)**
+2. **[Textures Guide](/wiki/articles/textures.md)**
 3. **[Surface Format Lookup Table](/wiki/articles/surfaces.md)**
 
 ### Old Tutorials

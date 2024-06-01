@@ -4,10 +4,14 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
 	<AssemblyName>DDS_D3DTX_Converter</AssemblyName>
+	<Version>2.4.0</Version>
+	<AssemblyVersion>2.4.0.0</AssemblyVersion>
     <OutputType>WinExe</OutputType>
     <StartupObject>DDS_D3DTX_Converter.Program</StartupObject>
     <RootNamespace>D3DTX Converter Avalonia GUI</RootNamespace>
     <ApplicationIcon>Assets\main_icon.ico</ApplicationIcon>
+	<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+	<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -18,7 +22,6 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
-  
   <ItemGroup>
     <None Remove="Assets\Capture.PNG" />
     <None Remove="Assets\main_icon.ico" />

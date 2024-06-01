@@ -135,7 +135,8 @@ public class ImageProperties : ObservableObject
             ChannelCount = "",
             Height = "",
             Width = "",
-            MipMapCount = ""
+            MipMapCount = "",
+            HasAlpha = ""
         };
     }
 }

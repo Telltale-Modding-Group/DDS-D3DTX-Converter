@@ -1,9 +1,14 @@
 
-### Version 2.4.0 Pre-release
+### Version 2.4.0
+
+#### Wiki (WIP):
+- Initial commit for the wiki. It is serviceable, but not yet fully completed.
+- Contains a basic tutorial applicable to other games.
+- Contains additional articles for textures, archives and surface formats.
 
 #### Converter:
-- Added Poker Knight 2 (2013) support (mVersion 3 games).
-- Added Minecraft Story Mode: Season One support (mVersion 6 games). (Thanks [Knollad Knolladious](https://www.youtube.com/channel/UCegvS4IJnO926qnuIEfQfJw)!)
+- Added Poker Night 2 (2013) support (mVersion 3 games).
+- Added Minecraft Story Mode: Season One - Xbox One support (mVersion 6 games). (Thanks [Knollad Knolladious](https://www.youtube.com/channel/UCegvS4IJnO926qnuIEfQfJw)!)
 - Added TWD: Michonne (2016) support (mVersion 7 games). 
 - Added support for some legacy Telltale games (pre-Poker Knight 2). These include:
     - The Walking Dead (2012) (Thanks [Lucas Saragosa](https://github.com/LucasSaragosa)!)
@@ -15,28 +20,35 @@
 - Added cubemap texture support. Previously they were split into 6 separate DDS images.
 - Added cubemap array texture support (They usually do not exist. Please report if you find any).
 - Added volumemap texture support (They usually do not exist. Please report if you find any).
-- Added support to export a DDS image even if the version is not recognized (it will not generate a JSON file). This is a feature parity with Telltale Explorer and should work for any Telltale title.
+- Added support to export a DDS image even if the version is not recognized (it will not generate a JSON file). This is a feature parity with Telltale Explorer and should work for any Telltale game.
 - Reworked the JSON file - it now has an additional field class that includes the conversion type used. The app is still compatible with older versions.
-- Added the Debug CLI back. It will act as the main CLI for now. In the future I may add a proper CLI.
+- Added the Debug CLI back, which will act as the main one for now. In the future I may add a proper one.
 - Improved the bulk conversion performance, it now converts more textures per thread.
 
 #### GUI: 
 - Added a Conversion Type combobox. 
 - Added support for previewing older D3DTX files. It should be almost up-to-par to that of Telltale Explorer. 
 - Added a Debug info button. When clicked on, it will display in a dialog the information about DDS images and D3DTX files.
-- The new exporting without knowing the version is used when the "Default" option is used.
+- Added a new exporting feature, when the mVersion is unknown. It is used when the "Default" option is used.
 - Changed the names of some Telltale surface formats. They are now shown a little bit more consistent with their more known DXGI counterparts.
     - DXT1  now shows as BC1
     - DXT3  now shows as BC2
     - DXT5  now shows as BC3
     - DXT5a now shows as BC4
     - DXN   now shows as BC5
-- Reorganized some elements. Image preview should be a little bigger than before.
+- Reorganized some elements. 
+    - Image preview should be a little bigger than before.
+    - Image properties take the whole panel space.
+    - The data grid is now expanded to the bottom.
+- Improved "Add Files" button.
+- Renamed the app title to "Telltale Texture Mod Tool".
+- Updated the Help button link.
+- Updated the About window.
 - Enhanced some functions.
-- The tool can be resized into smaller size.
+- Improved window and column resizing.
 
-#### Bug Fixes:
-The converter is now more robust than before.
+#### Bugfixes:
+The converter is now more robust than before, which fixes a lot of bugs.
 - Fixed a lot of bugs regarding DDS header writing including flags, mips and pixel formats. 
     - Fixed Telltale A8 surface format conversion.
     - Fixed potentially ARGB2101010.
@@ -47,33 +59,34 @@ The converter is now more robust than before.
 - Fixed incorrect Telltale surface formats enum values.
 - Fixed writing non-existing compression formats.
 - Fixed a lot of DDS reading bugs.
-- Fixed region indexing when writing to D3DTX.
+- Fixed all region indexing when writing to D3DTX.
+- Fixed SurfaceGamma not changing depending on the DDS format.
 - Fixed channel count displaying wrong values in image properties (partially).
 - Fixed transparency issue DDS images. Previously transparent pixels appeared white. Now, a side effect is slower load time (but worth it).
 - Fixed displaying rare surface formats which include but are not limited to A8, L8, A8L8, L16, R16, RGBA16, ARGB16 and more.
 - Fixed SamplerState not having correct values.
+- Fixed not reading images with uppercase extensions.
 - Fixed bulk conversion when the output directory was not set.
 - Fixed "Delete File" from context menu not working.
-- Fixed error message notification when converting from dds to other file formats, even tho it is created.
+- Fixed error message notification when converting from DDS to other file formats, even thought it is created.
 - Fixed error message notification that when converting from other file formats to DDS the JSON was not found.
-- Fixed GUI resizing of some elements
-- Fixed many other minor bugfixes.
+- Fixed GUI resizing of some elements.
+- Fixed GUI window resizing not working properly.
+- Fixed "Refresh Button" not working properly.
+- Fixed the context menu "Refresh" command not working properly.
+- Fixed many other minor bugs.
 
-Technical Improvements
+#### Technical Improvements:
 - The project now fully utilizes the DirectXTex .NET wrapper. This brings a lot of bug fixes, overall improvements and readability to the codespace.
 - Reorganized the whole project for better readability.
 - Refactored a lot of classes and functions.
 - Removed or archived a lot of unused code and files. The project should be a lot cleaner with less code. 
-- Reduced tool size
+- Reduced tool size (with around 15MBs).
 - Deprecated D3DTX_V8.
 - Bumped DirectXTexNet to v1.0.7 (it now uses DirectXTex March 2024 version).
 - Bumped Avalonia.Xaml.Behaviors to v11.0.10.9.
 - Bumped Avalonia.Svg.Skia to v11.0.0.18.
 - Bumped ImageSharp to v3.1.4.
-
-Known issues: 
-- Refresh button does not work.
-- The selected datagrid item fails to unfocus when it att
 
 ### Version 2.3.0
 

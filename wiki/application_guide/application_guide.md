@@ -1,6 +1,6 @@
 # Application Guide
 
-This page is meant to help inform and guide users as to how this application works and what are the different UI elements to it. The application window is also resizable, and each section can be scaled as well to suit your viewing needs.
+This page is meant to introduce users to the Mod Tool's UI. The application window is also resizable, and each section can be scaled as well to suit your viewing needs.
 
 ![Main Thumb](/wiki/tutorial-screenshots/mainThumb.png)
 

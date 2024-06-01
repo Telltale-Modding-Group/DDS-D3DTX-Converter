@@ -8,13 +8,14 @@
 
 ### PLEASE READ THE Q/A FULLY BEFORE YOU BEGIN
 
-- **[The first part](/wiki/tutorial_part1/tutorial_part_1.md)** of the tutorial is for locating and extracting the textures using Telltale Explorer. 
+#### Tutorial contents:
+- **[The first part](/wiki/tutorial_part1/tutorial_part_1.md)**  is about locating and extracting the textures using Telltale Explorer. 
 
-- **[The second part](/wiki/tutorial_part2/tutorial_part_2.md)** of the tutorial is for using the application converting the textures. 
+- **[The second part](/wiki/tutorial_part2/tutorial_part_2.md)** is about using the application converting the textures. 
 
-- **[The third part](/wiki/tutorial_part3/tutorial_part_3.md)** of this tutorial is editing these textures and putting them in-game.
+- **[The third part](/wiki/tutorial_part3/tutorial_part_3.md)** is about editing these textures and putting them in-game.
 
-- **[The fourth part](/wiki/tutorial_part4/tutorial_part_4.md)** of the tutorial is for how to debug in case of problems.
+- **[The bonus part](/wiki/tutorial_part4/tutorial_part_4.md)** is about debugging in case of problems (WIP).
 
 ---
 
@@ -47,8 +48,13 @@ Since **D3DTX** files store additional information that other files cannot store
 - For advanced editing (super rare cases) use the **[NVIDIA Texture Tools Exporter](https://developer.nvidia.com/texture-tools-exporter)** or the legacy **[DirectX Texture Tool](https://www.microsoft.com/en-us/download/details.aspx?id=8109)**.
 - For debugging purposes use Lucas's **[Telltale Inspector](https://github.com/LucasSaragosa/TelltaleInspector)**.
 
-#### I have heard that Telltale Explorer can export the texture files as DDS. What is wrong with it and why can I not use it?
-Importing the edited textures would be impossible. Furthermore, some surface formats are exported incorrectly.
+#### What is the difference between Telltale Explorer and Telltale Texture Mod Tool regarding textures?
+Telltale Explorer can open TTARCH and can only export DDS images.
+However, the Telltale Explorer does not support all textures and they appear broken, but in reality - they are not.
+
+Telltale Texture Mod Tool cannot open TTARCH files, but it can preview the D3DTX files more accurately and it exports their DDS counterparts with precise.
+Most importantly, importing the edited textures would be impossible without this tool.
+TL:DR Telltale Explorer - use to export files. Telltale Texture Mod Tool - use to edit D3DTX files.
 
 #### Which image editor should I choose?
 Usually the answer to that question is - the one you are most comfortable with. If you do not have experience with any of them, I recommend Paint.NET on Windows or GIMP on Linux. Both will cover 99.9% of the cases. 

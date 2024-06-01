@@ -4,7 +4,7 @@
 
 ## Welcome to the tutorial on how to make a texture mod for ***any*** Telltale Game!
 
-**This is the prelude to the tutorial before we begin. This includes information regarding what software you will use and answers the most common questions. It's a lot to read but it's not hard, trust me. The information in here is in detail to answer any common questions one might have.**
+**This is the prelude to the tutorial before we begin. This includes information regarding what software you will use and answers the most commonly asked questions. It's a lot to read but it's not hard, trust me. The information in here is in detail to answer any common questions one might have.**
 
 ### PLEASE READ THE Q/A FULLY BEFORE YOU BEGIN
 
@@ -49,12 +49,12 @@ Since **D3DTX** files store additional information that other files cannot store
 - For debugging purposes use Lucas's **[Telltale Inspector](https://github.com/LucasSaragosa/TelltaleInspector)**.
 
 #### What is the difference between Telltale Explorer and Telltale Texture Mod Tool regarding textures?
-Telltale Explorer can open TTARCH and can only export DDS images.
-However, the Telltale Explorer does not support all textures and they appear broken, but in reality - they are not.
+Telltale Explorer can open **TTARCH** and can only export DDS images.
+However, Telltale Explorer **does not** support all textures and they will appear broken.
 
-Telltale Texture Mod Tool cannot open TTARCH files, but it can preview the D3DTX files more accurately and it exports their DDS counterparts with precise.
+Telltale Texture Mod Tool **cannot** open **TTARCH** files, but it can preview the D3DTX files more accurately and it exports their DDS counterparts with precise.
 Most importantly, importing the edited textures would be impossible without this tool.
-TL:DR Telltale Explorer - use to export files. Telltale Texture Mod Tool - use to edit D3DTX files.
+TL:DR Telltale Explorer - use it to export files. Telltale Texture Mod Tool - use it to edit D3DTX files.
 
 #### Which image editor should I choose?
 Usually the answer to that question is - the one you are most comfortable with. If you do not have experience with any of them, I recommend Paint.NET on Windows or GIMP on Linux. Both will cover 99.9% of the cases. 

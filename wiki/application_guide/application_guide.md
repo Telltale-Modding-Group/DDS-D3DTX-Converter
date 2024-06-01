@@ -64,7 +64,7 @@ This section contains an image viewer. It displays **PNG, JPEG, BMP, TIFF, DDS a
 - **Choose Output Directory Checkbox** - A checkbox if you want to specify the path when converting.
 - **Conversion Type** - A combo box containing all possible conversion options. Users should stick to the **Default** option for all games **after The Walking Dead (2012)**.
 - **Convert Button** - Converts the texture into the chosen format.
-- **Debug Info** - Shows all information regarding the texture in a new window. Works **only** on **D3DTX** and **DDS** files.
+- **[Debug Info](/wiki/application_guide/application_guide.md#debug-window)** - Shows all information regarding the texture in a new window. Works **only** on **D3DTX** and **DDS** files.
 
 #### Image Properties
 ![ui-guide7](/wiki/application_guide/ui_7.png)
@@ -81,9 +81,10 @@ This section contains and shows the properties of an image when it is selected f
 
 ---
 ## Debug Window
-![ui-guide8](/wiki/application_guide/ui_8.png)
-
 When you click on **Debug Info**, a new window will appear, containing all debug texture data.
 
-> Here is an example of the same texture, but it its DDS variant:
+> Example: The D3DTX variant of the  texture:
+![ui-guide8](/wiki/application_guide/ui_8.png)
+
+> Example: The DDS variant of the same texture:
 ![ui-guide9](/wiki/application_guide/ui_9.png)

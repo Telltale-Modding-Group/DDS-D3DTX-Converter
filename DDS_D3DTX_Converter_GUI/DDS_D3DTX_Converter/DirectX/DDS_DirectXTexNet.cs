@@ -1,8 +1,8 @@
-﻿using System;
+﻿using DirectXTexNet;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using DirectXTexNet;
 
 namespace D3DTX_Converter.DirectX;
 

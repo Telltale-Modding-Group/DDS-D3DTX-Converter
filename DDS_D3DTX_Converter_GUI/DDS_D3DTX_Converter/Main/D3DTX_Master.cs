@@ -45,7 +45,6 @@ namespace D3DTX_Converter.Main
 
         // Generic DDS object if the D3DTX version is not found. This is used for legacy D3DTX versions only since they use DDS headers in the pixel data.
         public ScratchImage? ddsImage;
-        public TexMetadata? metadata;
 
         public D3DTXConversionType d3dtxConversionType;
 
@@ -86,7 +85,7 @@ namespace D3DTX_Converter.Main
                     {
                         byte[] ddsData = ByteFunctions.GetBytesAfterBytePattern(DDS.MAGIC_WORD, reader.ReadBytes((int)reader.BaseStream.Length));
                         ddsImage = DDS_DirectXTexNet.GetDDSImage(ddsData);
-                        metadata = ddsImage.GetMetadata();
+                    //    metadata = ddsImage.GetMetadata();
                     }
                     catch (Exception e)
                     {
@@ -153,7 +152,6 @@ namespace D3DTX_Converter.Main
                         {
                             byte[] ddsData = ByteFunctions.GetBytesAfterBytePattern(DDS.MAGIC_WORD, reader.ReadBytes((int)reader.BaseStream.Length));
                             ddsImage = DDS_DirectXTexNet.GetDDSImage(ddsData);
-                            metadata = ddsImage.GetMetadata();
                         }
                         catch (Exception e)
                         {
@@ -248,7 +246,7 @@ namespace D3DTX_Converter.Main
             else if (d3dtx7 != null) allInfo += d3dtx7.GetD3DTXInfo();
             //else if (d3dtx8 != null) allInfo += d3dtx8.GetD3DTXInfo();
             else if (d3dtx9 != null) allInfo += d3dtx9.GetD3DTXInfo();
-            else if (metadata != null) allInfo += DDS_DirectXTexNet.GetDDSDebugInfo(metadata);
+            else if (ddsImage.GetMetadata() != null) allInfo += DDS_DirectXTexNet.GetDDSDebugInfo(ddsImage.GetMetadata());
             else allInfo += "Error! Data not found!";
 
             return allInfo;
@@ -657,8 +655,8 @@ namespace D3DTX_Converter.Main
                 return d3dtx8.mHeight;
             else if (d3dtx9 != null)
                 return d3dtx9.mHeight;
-            else if (metadata != null)
-                return metadata.Height;
+            else if (ddsImage.GetMetadata() != null)
+                return ddsImage.GetMetadata().Height;
             else
                 return 0;
         }
@@ -685,8 +683,8 @@ namespace D3DTX_Converter.Main
                 return d3dtx8.mWidth;
             else if (d3dtx9 != null)
                 return d3dtx9.mWidth;
-            else if (metadata != null)
-                return metadata.Width;
+            else if (ddsImage.GetMetadata() != null)
+                return ddsImage.GetMetadata().Width;
             else
                 return 0;
         }
@@ -724,7 +722,7 @@ namespace D3DTX_Converter.Main
             else if (d3dtx9 != null)
                 return Enum.GetName(d3dtx9.mSurfaceFormat).Remove(0, 9);
             else if (ddsImage != null)
-                return metadata.Format.ToString();
+                return ddsImage.GetMetadata().Format.ToString();
             else
                 return null;
         }
@@ -817,7 +815,7 @@ namespace D3DTX_Converter.Main
                 return d3dtx9.mAlphaMode > 0 ? "True" : "False";
             else if (ddsImage != null)
             {
-                return metadata.GetAlphaMode().ToString();
+                return ddsImage.GetMetadata().GetAlphaMode().ToString();
             }
             else
                 return "Unknown";
@@ -884,8 +882,8 @@ namespace D3DTX_Converter.Main
                 return d3dtx8.mNumMipLevels;
             else if (d3dtx9 != null)
                 return d3dtx9.mNumMipLevels;
-            else if (metadata != null)
-                return metadata.MipLevels;
+            else if (ddsImage.GetMetadata() != null)
+                return ddsImage.GetMetadata().MipLevels;
             else
                 return 0;
         }
@@ -927,24 +925,7 @@ namespace D3DTX_Converter.Main
 
         public bool IsTextureCompressed()
         {
-            T3SurfaceFormat format = T3SurfaceFormat.eSurface_Unknown;
-
-            if (d3dtx3 != null)
-                format = d3dtx3.mSurfaceFormat;
-            else if (d3dtx4 != null)
-                format = d3dtx4.mSurfaceFormat;
-            else if (d3dtx5 != null)
-                format = d3dtx5.mSurfaceFormat;
-            else if (d3dtx6 != null)
-                format = d3dtx6.mSurfaceFormat;
-            else if (d3dtx7 != null)
-                format = d3dtx7.mSurfaceFormat;
-            else if (d3dtx8 != null)
-                format = d3dtx8.mSurfaceFormat;
-            else if (d3dtx9 != null)
-                format = d3dtx9.mSurfaceFormat;
-
-            return IsTextureCompressed(format);
+            return IsTextureCompressed(GetCompressionType());
         }
 
         public static bool IsTextureCompressed(T3SurfaceFormat format)

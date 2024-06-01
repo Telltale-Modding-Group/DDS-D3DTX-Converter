@@ -380,7 +380,7 @@ public class D3DTX_V9
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 mRegionHeaders[i].mFaceIndex = i % (6 * mArraySize); //Unknown guess, it could be 6 or 6 * mArraySize
-                mRegionHeaders[i].mMipIndex = mStreamHeader.mRegionCount - i - 1 / interval;
+                mRegionHeaders[i].mMipIndex = (mStreamHeader.mRegionCount - i - 1) / interval;
             }
         }
 
@@ -421,7 +421,7 @@ public class D3DTX_V9
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 mRegionHeaders[i].mFaceIndex = i % mArraySize;
-                mRegionHeaders[i].mMipIndex = mStreamHeader.mRegionCount - i - 1 / interval;
+                mRegionHeaders[i].mMipIndex = (mStreamHeader.mRegionCount - i - 1 ) / interval;
             }
         }
 

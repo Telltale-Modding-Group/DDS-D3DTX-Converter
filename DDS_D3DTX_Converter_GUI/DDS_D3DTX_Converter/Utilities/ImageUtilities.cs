@@ -61,7 +61,6 @@ public static class ImageUtilities
     /// <returns></returns>
     public static bool IsImageOpaque(Image<Rgba32> image)
     {
-
         bool hasAlpha = false;
 
         image.ProcessPixelRows(pixelAccessor =>
@@ -112,23 +111,20 @@ public static class ImageUtilities
         var ddsMainImage = ddsImage.GetImage(0);
         bool isCompressed = TexHelper.Instance.IsCompressed(ddsMainImage.Format);
 
-        // Convert the image to RGBA32 format. 
         UnmanagedMemoryStream stream;
         // If the image is compressed, decompress it to RGBA32. Otherwise, convert it to RGBA32.
         if (isCompressed)
         {
-            var newImage = ddsImage.Decompress(0, DXGI_FORMAT.R8G8B8A8_UNORM);
-            stream = newImage.SaveToDDSMemory(DDS_FLAGS.NONE);
+            stream = ddsImage.SaveToDDSMemory(0, DDS_FLAGS.NONE);
         }
         else
         {
-            var newImage = ddsImage;
-
+            // Convert the image to RGBA32 format. 
             //  (TODO Insert a link to the code)
             if (ddsMainImage.Format != DXGI_FORMAT.R8G8B8A8_UNORM)
-                newImage = ddsImage.Convert(0, DXGI_FORMAT.R8G8B8A8_UNORM, TEX_FILTER_FLAGS.SRGB, 0.5f);
+                ddsImage = ddsImage.Convert(0, DXGI_FORMAT.R8G8B8A8_UNORM, TEX_FILTER_FLAGS.SRGB, 0.5f);
 
-            stream = newImage.SaveToDDSMemory(DDS_FLAGS.NONE);
+            stream = ddsImage.SaveToDDSMemory(0, DDS_FLAGS.NONE);
         }
 
         using var image = Pfimage.FromStream(stream);
@@ -234,88 +230,87 @@ public static class ImageUtilities
 
     public static Bitmap GetDDSBitmap(IImage image)
     {
-        // var pixels = image.DataLen;
-
-        //get the color type
-        // SKColorType colorType;
-        // switch (image.Format)
-        // {
-        //     case ImageFormat.Rgb8:
-        //         colorType = SKColorType.Gray8;
-        //         break;
-        //     case ImageFormat.R5g5b5: // Pfim doesn't support L16 and L8A8 formats. Images with these formats will be incorrectly interpreted as R5G5B5.
-        //         pixels /= 2;
-        //         newDataLen = pixels * 2;
-        //         newData = new byte[newDataLen];
-        //         for (var i = 0; i < pixels; i++)
-        //         {
-        //             ushort pixelData = BitConverter.ToUInt16(image.Data, i * 2);
-        //             byte r = (byte)((pixelData & 0x7C00) >> 10); // Red component
-        //             byte g = (byte)((pixelData & 0x03E0) >> 5); // Green component
-        //             byte b = (byte)(pixelData & 0x001F); // Blue component
-        //             ushort rgb565 = (ushort)((r << 11) | (g << 5) | b); // Combine components into RGB565 format
-        //             byte[] rgb565Bytes = BitConverter.GetBytes(rgb565);
-        //             newData[i * 2] = rgb565Bytes[0];
-        //             newData[i * 2 + 1] = rgb565Bytes[1];
-        //         }
-        //         stride = image.Width * 2;
-        //         colorType = SKColorType.Rgb565;
-        //         break;
-        //     case ImageFormat.R5g5b5a1:
-        //         pixels /= 2; // Each pixel is 2 bytes in R5G5B5A1 format
-        //         newDataLen = pixels * 4; // Each pixel will be 4 bytes in RGBA8888 format
-        //         newData = new byte[newDataLen];
-        //         for (var i = 0; i < pixels; i++)
-        //         {
-        //             ushort pixelData = BitConverter.ToUInt16(image.Data, i * 2);
-        //             byte r = (byte)((pixelData & 0x7C00) >> 10); // Red component
-        //             byte g = (byte)((pixelData & 0x03E0) >> 5); // Green component
-        //             byte b = (byte)(pixelData & 0x001F); // Blue component
-        //             newData[i * 4] = r;
-        //             newData[i * 4 + 1] = g;
-        //             newData[i * 4 + 2] = b;
-        //             newData[i * 4 + 3] = 255; // Alpha channel set to 255 (fully opaque)
-        //         }
-        //         stride = image.Width * 4;
-        //         colorType = SKColorType.Rgba8888;
-        //         break;
-        //     case ImageFormat.R5g6b5:
-        //         colorType = SKColorType.Rgb565;
-        //         break;
-        //     case ImageFormat.Rgba16:
-        //         colorType = SKColorType.Argb4444;
-        //         break;
-        //     case ImageFormat.Rgb24:
-        //         // Skia has no 24bit pixels, so we upscale to 32bit
-        //         pixels = image.DataLen / 3;
-        //         newDataLen = pixels * 4;
-        //         newData = new byte[newDataLen];
-        //         for (var i = 0; i < pixels; i++)
-        //         {
-        //             newData[i * 4] = image.Data[i * 3];
-        //             newData[i * 4 + 1] = image.Data[i * 3 + 1];
-        //             newData[i * 4 + 2] = image.Data[i * 3 + 2];
-        //             newData[i * 4 + 3] = 255;
-        //         }
-
-        //         stride = image.Width * 4;
-        //         colorType = SKColorType.Bgra8888;
-        //         break;
-        //     case ImageFormat.Rgba32:
-        //         colorType = SKColorType.Bgra8888;
-        //         break;
-        //     default:
-        //         throw new ArgumentException($"Skia unable to interpret pfim format: {image.Format}");
-        // }
-
+        var pixels = image.DataLen;
         //get the data
         var newData = image.Data;
         var newDataLen = image.DataLen;
         var stride = image.Stride;
 
+        // Get the color type
+        SKColorType colorType;
+        switch (image.Format)
+        {
+            case ImageFormat.Rgb8:
+                colorType = SKColorType.Gray8;
+                break;
+            case ImageFormat.R5g5b5: // Pfim doesn't support L16 and L8A8 formats. Images with these formats will be incorrectly interpreted as R5G5B5.
+                pixels /= 2;
+                newDataLen = pixels * 2;
+                newData = new byte[newDataLen];
+                for (var i = 0; i < pixels; i++)
+                {
+                    ushort pixelData = BitConverter.ToUInt16(image.Data, i * 2);
+                    byte r = (byte)((pixelData & 0x7C00) >> 10); // Red component
+                    byte g = (byte)((pixelData & 0x03E0) >> 5); // Green component
+                    byte b = (byte)(pixelData & 0x001F); // Blue component
+                    ushort rgb565 = (ushort)((r << 11) | (g << 5) | b); // Combine components into RGB565 format
+                    byte[] rgb565Bytes = BitConverter.GetBytes(rgb565);
+                    newData[i * 2] = rgb565Bytes[0];
+                    newData[i * 2 + 1] = rgb565Bytes[1];
+                }
+                stride = image.Width * 2;
+                colorType = SKColorType.Rgb565;
+                break;
+            case ImageFormat.R5g5b5a1:
+                pixels /= 2; // Each pixel is 2 bytes in R5G5B5A1 format
+                newDataLen = pixels * 4; // Each pixel will be 4 bytes in RGBA8888 format
+                newData = new byte[newDataLen];
+                for (var i = 0; i < pixels; i++)
+                {
+                    ushort pixelData = BitConverter.ToUInt16(image.Data, i * 2);
+                    byte r = (byte)((pixelData & 0x7C00) >> 10); // Red component
+                    byte g = (byte)((pixelData & 0x03E0) >> 5); // Green component
+                    byte b = (byte)(pixelData & 0x001F); // Blue component
+                    newData[i * 4] = r;
+                    newData[i * 4 + 1] = g;
+                    newData[i * 4 + 2] = b;
+                    newData[i * 4 + 3] = 255; // Alpha channel set to 255 (fully opaque)
+                }
+                stride = image.Width * 4;
+                colorType = SKColorType.Rgba8888;
+                break;
+            case ImageFormat.R5g6b5:
+                colorType = SKColorType.Rgb565;
+                break;
+            case ImageFormat.Rgba16:
+                colorType = SKColorType.Argb4444;
+                break;
+            case ImageFormat.Rgb24:
+                // Skia has no 24bit pixels, so we upscale to 32bit
+                pixels = image.DataLen / 3;
+                newDataLen = pixels * 4;
+                newData = new byte[newDataLen];
+                for (var i = 0; i < pixels; i++)
+                {
+                    newData[i * 4] = image.Data[i * 3];
+                    newData[i * 4 + 1] = image.Data[i * 3 + 1];
+                    newData[i * 4 + 2] = image.Data[i * 3 + 2];
+                    newData[i * 4 + 3] = 255;
+                }
+
+                stride = image.Width * 4;
+                colorType = SKColorType.Bgra8888;
+                break;
+            case ImageFormat.Rgba32:
+                colorType = SKColorType.Bgra8888;
+                break;
+            default:
+                throw new ArgumentException($"Skia unable to interpret pfim format: {image.Format}");
+        }
+
 
         // Converts the data into writeableBitmap. (TODO Insert a link to the code)
-        var imageInfo = new SKImageInfo(image.Width, image.Height, SKColorType.Bgra8888);
+        var imageInfo = new SKImageInfo(image.Width, image.Height, colorType);
         var handle = GCHandle.Alloc(newData, GCHandleType.Pinned);
         var ptr = Marshal.UnsafeAddrOfPinnedArrayElement(newData, 0);
         using var data = SKData.Create(ptr, newDataLen, (_, _) => handle.Free());

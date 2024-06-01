@@ -77,11 +77,8 @@ It should look something like this.
 
 # Let's test it!
 
-![alt text](/wiki/tutorial_part3/ingame_sh1.png)
-
-![alt text](/wiki/tutorial_part3/ingame_sh2.png)
-
-![alt text](/wiki/tutorial_part3/ingame_sh3.png)
+[<img src="/wiki/tutorial_part3/ingame_sh1.png" width=800>](/wiki/tutorial_part3/ingame_sh1.png) [<img src="/wiki/tutorial_part3/ingame_sh2.png" width=800>](/wiki/tutorial_part3/ingame_sh2.png)
+[<img src="/wiki/tutorial_part3/ingame_sh3.png" width=800>](/wiki/tutorial_part3/ingame_sh3.png)
 
 It works! You may notice that the 'D' outline is still present on the hat. That is because there is another texture called **sk56_clementine200_hair_detail.d3dtx** containing that outline. If you want to get rid of the 'D', you have to edit that texture as well.
 > ##### Read [here](/wiki/articles/textures.md#navigation) about all texture files.
@@ -97,6 +94,4 @@ It works! You may notice that the 'D' outline is still present on the hat. That 
 ![fr1](/wiki/tutorial_part3/final_result1.png) |  ![fr2](/wiki/tutorial_part3/final_result2.png)
 
 ### Final result:
-[<img src="/wiki/tutorial_part3/final_result3.png" width=600>](/wiki/tutorial_part3/final_result3.png)
-
-[<img src="/wiki/tutorial_part3/final_result4.png" width=600>](/wiki/tutorial_part3/final_result4.png)
+[<img src="/wiki/tutorial_part3/final_result3.png" width=800>](/wiki/tutorial_part3/final_result3.png) [<img src="/wiki/tutorial_part3/final_result4.png" width=800>](/wiki/tutorial_part3/final_result4.png)

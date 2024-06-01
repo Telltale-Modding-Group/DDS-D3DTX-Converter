@@ -31,6 +31,7 @@ This section contains a simple file browser for selecting and viewing all of you
 
 #### File Browser
 ![ui-guide3](/wiki/application_guide/ui_3.png)
+
 This section contains a simple file browser for selecting and viewing all of your texture files.
 - **File Browser** - A viewer of the all supported image file formats, including **PNG, JPEG, NMP, TIFF, DDS, D3DTX and JSON**. It also supports folders. 
 
@@ -54,6 +55,7 @@ This section contains a simple file browser for selecting and viewing all of you
 
 #### Image Preview
 ![ui-guide5](/wiki/application_guide/ui_5.png)
+
 This section contains an image viewer. It displays **PNG, JPEG, BMP, TIFF, DDS and D3DTX** files and their names.
 
 #### Conversion Section
@@ -80,6 +82,7 @@ This section contains and shows the properties of an image when it is selected f
 ---
 ## Debug Window
 ![ui-guide8](/wiki/application_guide/ui_8.png)
+
 When you click on **Debug Info**, a new window will appear, containing all debug texture data.
 
 > Here is an example of the same texture, but it its DDS variant:

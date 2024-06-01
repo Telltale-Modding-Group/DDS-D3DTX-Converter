@@ -90,14 +90,13 @@ It works! You may notice that the 'D' outline is still present on the hat. That 
 # Happy Modding!
 ----
 
-## If you want to practice, find the detail file that I mentioned above. Try to apply all the used steps from the whole tutorial. Here are my results:
+## If you want to practice, find the detail texture that I mentioned above. Try to apply all the used steps from the whole tutorial. Here are my results:
 
-### Original texture:
-![fr1](/wiki/tutorial_part3/final_result1.png)
+| Original Detail Texture             |  Edited Detail Texture
+:-------------------------:|:-------------------------:
+![fr1](/wiki/tutorial_part3/final_result1.png) |  ![fr2](/wiki/tutorial_part3/final_result2.png)
 
-### Edited texture:
-![fr2](/wiki/tutorial_part3/final_result2.png)
+### Final result:
+[<img src="/wiki/tutorial_part3/final_result3.png" width=600>](/wiki/tutorial_part3/final_result3.png)
 
-![fr3](/wiki/tutorial_part3/final_result3.png)
-
-![fr4](/wiki/tutorial_part3/final_result4.png)
+[<img src="/wiki/tutorial_part3/final_result4.png" width=600>](/wiki/tutorial_part3/final_result4.png)

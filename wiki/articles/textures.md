@@ -66,6 +66,7 @@ These suffixes indicate and deal with other material properties.
 | glow | Glow map. |
 | spec | [Specular texture.]((https://www.modding-forum.com/guide/17-diffuse-specular-and-normal-maps/)) |
 | ink | Black lines of the material. |
+| sss |
 
 > Example: sk54_lee_head.d3dtx is a diffuse texture, while sk54_lee_head_spec.d3dtx is a specular texture.
 

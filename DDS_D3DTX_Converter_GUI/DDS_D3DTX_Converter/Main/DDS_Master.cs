@@ -347,9 +347,9 @@ namespace D3DTX_Converter.Main
 
             // Loop through the regions array size by the offset. 
             // Example 1: A normal 2D texture with 10 mips only has 10 regions. The array size is 1 and the offset is 1. It will loop 1 time.
-            // Example 2: A 2D array texture with 3 textures and 4 mips each, it will have 12 regions. The array size is 3 and the offset is 1. It will loop 3 times.
+            // Example 2: A 2D array texture with 3 textures and 4 mips each will have 12 (3*4) regions. The array size is 3 and the offset is 1. It will loop 3 times.
             // Example 3: A Cubemap texture with 7 mips will have 42 (6*7) regions. The array size is 1 and the offset is 6. It will loop 6 times.
-            // Example 4: A Cubemap array texture with 3 cubemaps and 3 mips will have 3*6*3 (54) regions. The array size is 3 and the offset is 6. It will loop 18 times.
+            // Example 4: A Cubemap array texture with 3 cubemaps and 3 mips will have 54 (3*6*3) regions. The array size is 3 and the offset is 6. It will loop 18 times.
             for (int i = 0; i < arraySize * sizeOffset; i++)
             {
                 // The first index of the face.

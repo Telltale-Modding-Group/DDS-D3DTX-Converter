@@ -61,6 +61,67 @@ More information about different types of textures can be found [here](/wiki/art
 
 ### Reading Debug Information
 
+#### D3DTX
+
+A typical D3DTX debug window will look like this. It has 2 parts:
+- **[Meta Header](/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/Telltale/TelltaleMeta/)** which contains information which the engine reads which has 3 versions.
+- **[D3DTX Header](/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/Telltale/TelltaleD3DTX/)** which contains texture information.
+
+There are many [enums](/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/Telltale/TelltaleEnums/) and [structures](/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/Telltale/TelltaleTypes/), which are displayed on the window.
+
+A single game will use **only 1 meta header version** and **only 1 D3DTX version**. They can never mix.
+Legacy Versions **do not** have mVersions. You have to use the combobox to select the correct version for the specific game.
+
+I would recommend checking out the different headers and their classes in the code - they are written in detail.
+
+For simple debugging purposes we will focus only on few things:
+We will verify the following fields which are the most important ones:
+- mWidth
+- mHeight
+- mDepth
+- mArraySize 
+- mSurfaceFormat
+- mNumMipLevels
+- mGammaSurface 
+- mTextureLayout 
+- mType ([the texture type](/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/Telltale/TelltaleEnums/T3TextureType.cs))
+- mRegionCount
+
+For advanced users, verify these ones:
+- Meta Default Section Chunk Size
+- Meta Async Section Chunk Size
+- mSamplerState
+- mNormalMapFormat
+- mHDRLightmapScale
+- mSwizzle
+- mAlphaMode
+- mColorMode
+- mRegionHeaders
+- mAuxDataCount (if you encounter any textures with AUX data, **please open an issue**).
+
+> mRegionHeaders are basically each section of the image - mipmaps, faces, slices. I have few examples [here](/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/Main/DDS_Master.cs#L348).
+
+![debug1](/wiki/application_guide/ui_8.png)
+
+
+#### DDS
+The debug information of a DDS image is very simple. The most important fields are written in **bold**.
+- **Width** - The width of the base image.
+- **Height** - The height of the base image.
+- Depth - 
+- **Format** - The DXGI format of the image.
+- **Mips** - The number of mipmaps of per image.
+- **Dimension** - The texture layout of the image.
+- Array Elements - The number of distinct images.
+- Volumemap - If the Dimension is TEXTURE3D or the Depth is higher than 1, it is considered volumemap.
+- Cubemap - If the texture is cubemap.
+- Alpha mode - ignore.
+- Premultiplied alpha - only valid for DXT2 or DXT4 compressions (BC2 and BC3 respectively).
+- Misc Flags - ignore.
+- Misc Flags2 - ignore. 
+
+![debug1](/wiki/application_guide/ui_9.png)
+
 [^1]: The output depends on the D3DTX's surface gamma value. 
 [^2]: BC means Block Compression, which are basically image compression algorithms. They are **lossy**.
 

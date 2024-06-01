@@ -65,6 +65,15 @@ public partial class MainViewModel : ViewModelBase
     ];
 
     private readonly List<string> _allTypes = [".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".d3dtx", ".dds"];
+
+    // No idea if this is correct
+    public static FilePickerFileType AllowedTypes { get; } = new("All Supported Types")
+    {
+        Patterns = ["*.png", "*.jpg", "*.jpeg", "*.bmp", "*.tif", "*.tiff", "*.d3dtx", "*.dds", "*.json"],
+        AppleUniformTypeIdentifiers = ["public.image"],
+        MimeTypes = ["image/png", "image/jpeg", "image/bmp", "image/tiff", "image/vnd.ms-dds", "image/vnd.ms-d3dtx"]
+    };
+
     private readonly MainManager mainManager = MainManager.GetInstance();
     private readonly Uri _assetsUri = new("avares://DDS_D3DTX_Converter/Assets/");
     private static readonly string ErrorSvgFilename = "error.svg";
@@ -217,7 +226,9 @@ public partial class MainViewModel : ViewModelBase
             var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
             {
                 Title = "Open Files",
-                AllowMultiple = true
+                AllowMultiple = true,
+                SuggestedStartLocation = await topLevel.StorageProvider.TryGetFolderFromPathAsync(DirectoryPath),
+                FileTypeFilter = [AllowedTypes]
             });
 
             foreach (var file in files)
@@ -233,16 +244,12 @@ public partial class MainViewModel : ViewModelBase
                         $"{fileNameWithoutExtension}({i++}){extension}");
                 }
 
-                File.Copy(file.Path.AbsolutePath, destinationFilePath);
+                File.Copy(new Uri(file.Path.ToString()).LocalPath, destinationFilePath);
             }
         }
         catch (Exception ex)
         {
             await HandleExceptionAsync("Error during adding files. Some files were not copied. " + ex.Message);
-        }
-        finally
-        {
-
         }
 
         await SafeRefreshDirectoryAsync();

@@ -3,11 +3,9 @@ using System.IO;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
-using Avalonia.Logging;
 using Avalonia.Markup.Xaml;
 using DDS_D3DTX_Converter.ViewModels;
 using DDS_D3DTX_Converter.Views;
-
 
 namespace DDS_D3DTX_Converter;
 

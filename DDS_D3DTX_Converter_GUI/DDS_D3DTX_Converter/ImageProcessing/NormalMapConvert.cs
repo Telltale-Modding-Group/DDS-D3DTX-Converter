@@ -57,7 +57,7 @@ namespace D3DTX_Converter.ImageProcessing
         private static void SaveImage(IImage image, ImageFormat format, byte[] newData, string extension,
             string ddsSourceFilePath)
         {
-            //Get the required image encoder.
+            // Get the required image encoder.
             IImageEncoder encoder = GetEncoder(extension);
 
             switch (format)
@@ -117,7 +117,7 @@ namespace D3DTX_Converter.ImageProcessing
                 ".tif" => new TiffEncoder(),
                 ".tiff" => new TiffEncoder(),
                 ".bmp" => new BmpEncoder(),
-                ".tga" => new TgaEncoder(), //for the future
+                ".tga" => new TgaEncoder(), // For the future
                 _ => throw new ArgumentException("File type is not valid!")
             };
         }

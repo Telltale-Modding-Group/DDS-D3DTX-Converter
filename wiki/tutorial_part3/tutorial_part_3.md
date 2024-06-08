@@ -50,13 +50,12 @@ In this case I will choose **BC1 (Linear, DXT1)**, also known as simply **BC1** 
 
 > Warning: Verify that the preview image looks like the one you saved in the Telltale Texture Mod Tool.
 
-Cool, it looks like the **DDS** was saved correctly. 
-Now select **d3dtx** from the **Convert Options** and convert.
+Let's go back to the Telltale Texture Mod Tool and reselect the DDS. 
 
 ![p3_3](/wiki/tutorial_part3/p3_3.png)
 
 ##
-Let's see the **D3DTX**.
+Cool, it looks like the **DDS** was saved correctly. Now select **d3dtx** from the **Convert Options** and convert. Let's see the **D3DTX**.
 ###
 ![p3_4](/wiki/tutorial_part3/p3_4.png)
 
@@ -66,8 +65,7 @@ Perfect! It looks like it was saved correctly! Let's put it in the game!
 ---
 ## Step 4/4 Putting the texture in-game 
 
-Copy the **modified D3DTX** file. 
-Find the game's directory and put it inside. 
+Copy the **modified D3DTX** file and put it inside the game's directory. 
 > Note: The game will prioritize loading the new files rather than the ones in the game archives. 
 > Optional: If you want to put the texture inside a TTARCH, check out this somewhat-outdated [wiki](/wiki/articles/embed_ttarch.md).
 

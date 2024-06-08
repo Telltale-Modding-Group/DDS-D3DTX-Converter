@@ -4,7 +4,7 @@
 
 ## Welcome to the tutorial on how to make a texture mod for ***any*** Telltale Game!
 
-**This is the prelude to the tutorial before we begin. This includes information regarding what software you will use and answers the most commonly asked questions. It's a lot to read but it's not hard, trust me. The information in here is in detail to answer any common questions one might have.**
+**This is the prelude to the tutorial before we begin. This includes detailed information regarding what software you will use and answers the most commonly asked questions.**
 
 ### PLEASE READ THE Q/A FULLY BEFORE YOU BEGIN
 

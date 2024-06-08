@@ -10,20 +10,17 @@ using DirectXTexNet;
 
 /*
  * NOTE:
- *
- * This version of D3DTX is INCOMPLETE.
- *
- * This version may not exist or have existed in previous patches, which are not available now.
- * INCOMPLETE meaning that all of the data isn't known and getting identified correctly. We still parse, identify, and modify if needed but it's just named as "Unknown".
- * The reason being we don't have "full knowledge" of it, given that games that shipped with this version haven't shipped with a PDB.
- * So the only source is looking through the strings in the game exe through a hex editor to identify what variables might be in the file.
- * This D3DTX version derives from version 9 and has been 'stripped' or adjusted to suit this version of D3DTX.
+ * 
+ * This version of D3DTX is COMPLETE.
+ * 
+ * COMPLETE meaning that all of the data is known and getting identified.
+ * Just like the versions before and after, this D3DTX version derives from version 9 and has been 'stripped' or adjusted to suit this version of D3DTX.
  * Also, Telltale uses Hungarian Notation for variable naming.
- */
+*/
 
 /* --- D3DTX Version 8 games ---
- * Batman: The Telltale Series (PROBABLY BEFORE DECEMBER PATCH) (UNTESTED)
- */
+ * Batman: The Telltale Series (Pre-December PC Patch / PS4 Ep. 1) (TESTED) 
+*/
 
 namespace D3DTX_Converter.TelltaleD3DTX;
 
@@ -200,7 +197,7 @@ public class D3DTX_V8
     /// <summary>
     /// [8 bytes for each element] An array containing frame names. (Usually unused)
     /// </summary>
-    public List<Symbol> mArrayFrameNames { get; set; }
+    public Symbol[] mArrayFrameNames { get; set; }
 
     /// <summary>
     /// [4 bytes] The size in bytes of the mToonRegions block.
@@ -246,16 +243,12 @@ public class D3DTX_V8
     {
         mVersion = reader.ReadInt32(); //mVersion [4 bytes]
         mSamplerState_BlockSize = reader.ReadInt32(); //mSamplerState Block Size [4 bytes]
-        mSamplerState = new T3SamplerStateBlock() //mSamplerState [4 bytes]
-        {
-            mData = reader.ReadUInt32()
-        };
+        mSamplerState = new T3SamplerStateBlock(reader); //mSamplerState [4 bytes]
         mPlatform_BlockSize = reader.ReadInt32(); //mPlatform Block Size [4 bytes]
         mPlatform = (PlatformType)reader.ReadInt32(); //mPlatform [4 bytes]
         mName_BlockSize = reader.ReadInt32(); //mName Block Size [4 bytes] //mName block size (size + string len)
         mName = ByteFunctions.ReadString(reader); //mName [x bytes]
-        mImportName_BlockSize =
-            reader.ReadInt32(); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
+        mImportName_BlockSize = reader.ReadInt32(); //mImportName Block Size [4 bytes] //mImportName block size (size + string len)
         mImportName = ByteFunctions.ReadString(reader); //mImportName [x bytes] (this is always 0)
         mImportScale = reader.ReadSingle(); //mImportScale [4 bytes]
         mToolProps = new ToolProps(reader); //mToolProps [1 byte]
@@ -271,66 +264,73 @@ public class D3DTX_V8
         mResourceUsage = (T3ResourceUsage)reader.ReadInt32(); //mResourceUsage [4 bytes]
         mType = (T3TextureType)reader.ReadInt32(); //mType [4 bytes]
         mSwizzleSize = reader.ReadInt32(); //mSwizzleSize [4 bytes]
-        mSwizzle = new(reader); //mSwizzle [4 bytes]
+        mSwizzle = new RenderSwizzleParams(reader); //mSwizzle [4 bytes]
         mSpecularGlossExponent = reader.ReadSingle(); //mSpecularGlossExponent [4 bytes]
         mHDRLightmapScale = reader.ReadSingle(); //mHDRLightmapScale [4 bytes]
         mToonGradientCutoff = reader.ReadSingle(); //mToonGradientCutoff [4 bytes]
         mAlphaMode = (eTxAlpha)reader.ReadInt32(); //mAlphaMode [4 bytes]
         mColorMode = (eTxColor)reader.ReadInt32(); //mColorMode [4 bytes]
-        mUVOffset = new Vector2() //mUVOffset [8 bytes]
-        {
-            x = reader.ReadSingle(), //[4 bytes]
-            y = reader.ReadSingle() //[4 bytes]
-        };
-        mUVScale = new Vector2() //mUVScale [8 bytes]
-        {
-            x = reader.ReadSingle(), //[4 bytes]
-            y = reader.ReadSingle() //[4 bytes]
-        };
+        mUVOffset = new Vector2(reader); //mUVOffset [8 bytes]
+        mUVScale = new Vector2(reader); //mUVScale [8 bytes]
 
+
+
+        Console.WriteLine("mVersion: " + mVersion);
+        Console.WriteLine("mSamplerState_BlockSize: " + mSamplerState_BlockSize);
+        Console.WriteLine("mSamplerState: " + mSamplerState.ToString());
+        Console.WriteLine("mPlatform_BlockSize: " + mPlatform_BlockSize);
+        Console.WriteLine("mPlatform: " + mPlatform);
+        Console.WriteLine("mName_BlockSize: " + mName_BlockSize);
+        Console.WriteLine("mName: " + mName);
+        Console.WriteLine("mImportName_BlockSize: " + mImportName_BlockSize);
+
+        Console.WriteLine("mImportName: " + mImportName);
+        Console.WriteLine("mImportScale: " + mImportScale);
+        Console.WriteLine("mToolProps: " + mToolProps.mbHasProps);
+        Console.WriteLine("mNumMipLevels: " + mNumMipLevels);
+        Console.WriteLine("mWidth: " + mWidth);
+        Console.WriteLine("mHeight: " + mHeight);
+        Console.WriteLine("mDepth: " + mDepth);
+        Console.WriteLine("mArraySize: " + mArraySize);
+        Console.WriteLine("mSurfaceFormat: " + mSurfaceFormat);
+        Console.WriteLine("mTextureLayout: " + mTextureLayout);
+        Console.WriteLine("mSurfaceGamma: " + mSurfaceGamma);
+        Console.WriteLine("mSurfaceMultisample: " + mSurfaceMultisample);
+        Console.WriteLine("mResourceUsage: " + mResourceUsage);
+        Console.WriteLine("mType: " + mType);
+        Console.WriteLine("mSwizzleSize: " + mSwizzleSize);
+        Console.WriteLine("mSwizzle: " + mSwizzle.ToString());
+        Console.WriteLine("mSpecularGlossExponent: " + mSpecularGlossExponent);
+        Console.WriteLine("mHDRLightmapScale: " + mHDRLightmapScale);
+        Console.WriteLine("mToonGradientCutoff: " + mToonGradientCutoff);
+        Console.WriteLine("mAlphaMode: " + mAlphaMode);
+        Console.WriteLine("mColorMode: " + mColorMode);
+        Console.WriteLine("mUVOffset: " + mUVOffset.ToString());
+        Console.WriteLine("mUVScale: " + mUVScale.ToString());
+        
         //--------------------------mArrayFrameNames--------------------------
-        mArrayFrameNames_ArrayCapacity = reader.ReadUInt32(); //mArrayFrameNames DCArray Capacity [4 bytes]
-        mArrayFrameNames_ArrayLength =
-            reader.ReadInt32(); //mArrayFrameNames DCArray Length [4 bytes] //ADD 1 BECAUSE COUNTING STARTS AT 0
-        mArrayFrameNames = new List<Symbol>();
+        mArrayFrameNames_ArrayCapacity = reader.ReadUInt32();  //mArrayFrameNames DCArray Capacity [4 bytes]
+        mArrayFrameNames_ArrayLength = reader.ReadInt32(); //mArrayFrameNames DCArray Length [4 bytes] //ADD 1 BECAUSE COUNTING STARTS AT 0
+        mArrayFrameNames = new Symbol[mArrayFrameNames_ArrayLength];
+
         for (int i = 0; i < mArrayFrameNames_ArrayLength; i++)
         {
-            Symbol newSymbol = new Symbol()
-            {
-                mCrc64 = reader.ReadUInt64()
-            };
-
-            mArrayFrameNames.Add(newSymbol);
+            mArrayFrameNames[i] = new Symbol(reader);
         }
 
         //--------------------------mToonRegions--------------------------
         mToonRegions_ArrayCapacity = reader.ReadUInt32(); //mToonRegions DCArray Capacity [4 bytes]
         mToonRegions_ArrayLength = reader.ReadInt32(); //mToonRegions DCArray Length [4 bytes]
+        Console.WriteLine("ToonRegions Length: " + mToonRegions_ArrayLength);
         mToonRegions = new T3ToonGradientRegion[mToonRegions_ArrayLength];
 
         for (int i = 0; i < mToonRegions_ArrayLength; i++)
         {
-            mToonRegions[i] = new T3ToonGradientRegion()
-            {
-                mColor = new Color()
-                {
-                    r = reader.ReadSingle(), //[4 bytes]
-                    g = reader.ReadSingle(), //[4 bytes]
-                    b = reader.ReadSingle(), //[4 bytes]
-                    a = reader.ReadSingle() //[4 bytes]
-                },
-
-                mSize = reader.ReadSingle() //[4 bytes]
-            };
+            mToonRegions[i] = new T3ToonGradientRegion(reader);
         }
 
         //--------------------------StreamHeader--------------------------
-        mStreamHeader = new StreamHeader()
-        {
-            mRegionCount = reader.ReadInt32(), //[4 bytes]
-            mAuxDataCount = reader.ReadInt32(), //[4 bytes]
-            mTotalDataSize = reader.ReadInt32() //[4 bytes]
-        };
+        mStreamHeader = new StreamHeader(reader);
 
         //--------------------------mRegionHeaders--------------------------
         mRegionHeaders = new RegionStreamHeader[mStreamHeader.mRegionCount];
@@ -346,7 +346,6 @@ public class D3DTX_V8
                 mSlicePitch = reader.ReadInt32() //[4 bytes]
             };
         }
-
         //-----------------------------------------D3DTX HEADER END-----------------------------------------
         //--------------------------STORING D3DTX IMAGE DATA--------------------------
         mPixelData = [];
@@ -408,7 +407,7 @@ public class D3DTX_V8
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 mRegionHeaders[i].mFaceIndex = i % (6 * mArraySize); //Unknown guess, it could be 6 or 6 * mArraySize
-                mRegionHeaders[i].mMipIndex = (mStreamHeader.mRegionCount - i - 1 )/ interval;
+                mRegionHeaders[i].mMipIndex = (mStreamHeader.mRegionCount - i - 1) / interval;
             }
         }
 
@@ -605,77 +604,78 @@ public class D3DTX_V8
 
     public void PrintConsole()
     {
-        Console.WriteLine("||||||||||| D3DTX Header |||||||||||");
-        Console.WriteLine("D3DTX mVersion = {0}", mVersion);
-        Console.WriteLine("D3DTX mSamplerState_BlockSize = {0}", mSamplerState_BlockSize);
-        Console.WriteLine("D3DTX mSamplerState = {0}", mSamplerState.ToString());
-        Console.WriteLine("D3DTX mPlatform_BlockSize = {0}", mPlatform_BlockSize);
-        Console.WriteLine("D3DTX mPlatform = {0} ({1})", Enum.GetName(typeof(PlatformType), (int)mPlatform),
-            mPlatform);
-        Console.WriteLine("D3DTX mName Block Size = {0}", mName_BlockSize);
-        Console.WriteLine("D3DTX mName = {0}", mName);
-        Console.WriteLine("D3DTX mImportName Block Size = {0}", mImportName_BlockSize);
-        Console.WriteLine("D3DTX mImportName = {0}", mImportName);
-        Console.WriteLine("D3DTX mImportScale = {0}", mImportScale);
-        Console.WriteLine("D3DTX mToolProps = {0}", mToolProps);
-        Console.WriteLine("D3DTX mNumMipLevels = {0}", mNumMipLevels);
-        Console.WriteLine("D3DTX mWidth = {0}", mWidth);
-        Console.WriteLine("D3DTX mHeight = {0}", mHeight);
-        Console.WriteLine("D3DTX mDepth = {0}", mDepth);
-        Console.WriteLine("D3DTX mArraySize = {0}", mArraySize);
-        Console.WriteLine("D3DTX mSurfaceFormat = {0} ({1})", Enum.GetName(typeof(T3SurfaceFormat), mSurfaceFormat),
-            (int)mSurfaceFormat);
-        Console.WriteLine("D3DTX mTextureLayout = {0} ({1})", Enum.GetName(typeof(T3TextureLayout), mTextureLayout),
-            (int)mTextureLayout);
-        Console.WriteLine("D3DTX mSurfaceGamma = {0} ({1})", Enum.GetName(typeof(T3SurfaceGamma), mSurfaceGamma),
-            (int)mSurfaceGamma);
-        Console.WriteLine("D3DTX mSurfaceMultisample = {0} ({1})",
-            Enum.GetName(typeof(T3SurfaceMultisample), mSurfaceMultisample), (int)mSurfaceMultisample);
-        Console.WriteLine("D3DTX mResourceUsage = {0} ({1})", Enum.GetName(typeof(T3ResourceUsage), mResourceUsage),
-            (int)mResourceUsage);
-        Console.WriteLine("D3DTX mType = {0} ({1})", Enum.GetName(typeof(T3TextureType), mType), (int)mType);
-        Console.WriteLine("D3DTX mSwizzleSize = {0}", mSwizzleSize);
-        Console.WriteLine("D3DTX mSwizzle = {0}", mSwizzle);
-        Console.WriteLine("D3DTX mSpecularGlossExponent = {0}", mSpecularGlossExponent);
-        Console.WriteLine("D3DTX mHDRLightmapScale = {0}", mHDRLightmapScale);
-        Console.WriteLine("D3DTX mToonGradientCutoff = {0}", mToonGradientCutoff);
-        Console.WriteLine("D3DTX mAlphaMode = {0} ({1})", Enum.GetName(typeof(eTxAlpha), mAlphaMode),
-            (int)mAlphaMode);
-        Console.WriteLine("D3DTX mColorMode = {0} ({1})", Enum.GetName(typeof(eTxColor), mColorMode),
-            (int)mColorMode);
-        Console.WriteLine("D3DTX mUVOffset = {0}", mUVOffset);
-        Console.WriteLine("D3DTX mUVScale = {0}", mUVScale);
+        Console.WriteLine(GetD3DTXInfo());
+    }
+    public string GetD3DTXInfo()
+    {
+        string d3dtxInfo = "";
 
-        Console.WriteLine("----------- mArrayFrameNames -----------");
-        Console.WriteLine("D3DTX mArrayFrameNames_ArrayCapacity = {0}", mArrayFrameNames_ArrayCapacity);
-        Console.WriteLine("D3DTX mArrayFrameNames_ArrayLength = {0}", mArrayFrameNames_ArrayLength);
+        d3dtxInfo += "||||||||||| D3DTX Version 8 Header |||||||||||" + Environment.NewLine;
+        d3dtxInfo += "mVersion = " + mVersion + Environment.NewLine;
+        d3dtxInfo += "mSamplerState_BlockSize = " + mSamplerState_BlockSize + Environment.NewLine;
+        d3dtxInfo += "mSamplerState = " + mSamplerState.ToString() + Environment.NewLine;
+        d3dtxInfo += "mPlatform_BlockSize = " + mPlatform_BlockSize + Environment.NewLine;
+        d3dtxInfo += "mPlatform = " + Enum.GetName(typeof(PlatformType), (int)mPlatform) + " (" + (int)mPlatform + ")" + Environment.NewLine;
+        d3dtxInfo += "mName Block Size = " + mName_BlockSize + Environment.NewLine;
+        d3dtxInfo += "mName = " + mName + Environment.NewLine;
+        d3dtxInfo += "mImportName Block Size = " + mImportName_BlockSize + Environment.NewLine;
+        d3dtxInfo += "mImportName = " + mImportName + Environment.NewLine;
+        d3dtxInfo += "mImportScale = " + mImportScale + Environment.NewLine;
+        d3dtxInfo += "mToolProps = " + mToolProps + Environment.NewLine;
+        d3dtxInfo += "mNumMipLevels = " + mNumMipLevels + Environment.NewLine;
+        d3dtxInfo += "mWidth = " + mWidth + Environment.NewLine;
+        d3dtxInfo += "mHeight = " + mHeight + Environment.NewLine;
+        d3dtxInfo += "mDepth = " + mDepth + Environment.NewLine;
+        d3dtxInfo += "mArraySize = " + mArraySize + Environment.NewLine;
+        d3dtxInfo += "mSurfaceFormat = " + Enum.GetName(typeof(T3SurfaceFormat), mSurfaceFormat) + " (" + (int)mSurfaceFormat + ")" + Environment.NewLine;
+        d3dtxInfo += "mTextureLayout = " + Enum.GetName(typeof(T3TextureLayout), mTextureLayout) + " (" + (int)mTextureLayout + ")" + Environment.NewLine;
+        d3dtxInfo += "mSurfaceGamma = " + Enum.GetName(typeof(T3SurfaceGamma), mSurfaceGamma) + " (" + (int)mSurfaceGamma + ")" + Environment.NewLine;
+        d3dtxInfo += "mSurfaceMultisample = " + Enum.GetName(typeof(T3SurfaceMultisample), mSurfaceMultisample) + " (" + (int)mSurfaceMultisample + ")" + Environment.NewLine;
+        d3dtxInfo += "mResourceUsage = " + Enum.GetName(typeof(T3ResourceUsage), mResourceUsage) + " (" + (int)mResourceUsage + ")" + Environment.NewLine;
+        d3dtxInfo += "mType = " + Enum.GetName(typeof(T3TextureType), mType) + " (" + (int)mType + ")" + Environment.NewLine;
+        d3dtxInfo += "mSwizzleSize = " + mSwizzleSize + Environment.NewLine;
+        d3dtxInfo += "mSwizzle = " + mSwizzle + Environment.NewLine;
+        d3dtxInfo += "mSpecularGlossExponent = " + mSpecularGlossExponent + Environment.NewLine;
+        d3dtxInfo += "mHDRLightmapScale = " + mHDRLightmapScale + Environment.NewLine;
+        d3dtxInfo += "mToonGradientCutoff = " + mToonGradientCutoff + Environment.NewLine;
+        d3dtxInfo += "mAlphaMode = " + Enum.GetName(typeof(eTxAlpha), mAlphaMode) + " (" + (int)mAlphaMode + ")" + Environment.NewLine;
+        d3dtxInfo += "mColorMode = " + Enum.GetName(typeof(eTxColor), mColorMode) + " (" + (int)mColorMode + ")" + Environment.NewLine;
+        d3dtxInfo += "mUVOffset = " + mUVOffset + Environment.NewLine;
+        d3dtxInfo += "mUVScale = " + mUVScale + Environment.NewLine;
+
+        d3dtxInfo += "----------- mArrayFrameNames -----------" + Environment.NewLine;
+        d3dtxInfo += "mArrayFrameNames_ArrayCapacity = " + mArrayFrameNames_ArrayCapacity + Environment.NewLine;
+        d3dtxInfo += "mArrayFrameNames_ArrayLength = " + mArrayFrameNames_ArrayLength + Environment.NewLine;
         for (int i = 0; i < mArrayFrameNames_ArrayLength; i++)
         {
-            Console.WriteLine("D3DTX mArrayFrameName {0} = {1}", i, mArrayFrameNames[i]);
+            d3dtxInfo += "mArrayFrameName " + i + " = " + mArrayFrameNames[i] + Environment.NewLine;
         }
 
-        Console.WriteLine("----------- mToonRegions -----------");
-        Console.WriteLine("D3DTX mToonRegions_ArrayCapacity = {0}", mToonRegions_ArrayCapacity);
-        Console.WriteLine("D3DTX mToonRegions_ArrayLength = {0}", mToonRegions_ArrayLength);
+        d3dtxInfo += "----------- mToonRegions -----------" + Environment.NewLine;
+        d3dtxInfo += "mToonRegions_ArrayCapacity = " + mToonRegions_ArrayCapacity + Environment.NewLine;
+        d3dtxInfo += "mToonRegions_ArrayLength = " + mToonRegions_ArrayLength + Environment.NewLine;
         for (int i = 0; i < mToonRegions_ArrayLength; i++)
         {
-            Console.WriteLine("D3DTX mToonRegion {0} = {1}", i, mToonRegions[i]);
+            d3dtxInfo += "mToonRegion " + i + " = " + mToonRegions[i] + Environment.NewLine;
         }
 
-        Console.WriteLine("D3DTX mRegionCount = {0}", mStreamHeader.mRegionCount);
-        Console.WriteLine("D3DTX mAuxDataCount = {0}", mStreamHeader.mAuxDataCount);
-        Console.WriteLine("D3DTX mTotalDataSize = {0}", mStreamHeader.mTotalDataSize);
+        d3dtxInfo += "mRegionCount = " + mStreamHeader.mRegionCount + Environment.NewLine;
+        d3dtxInfo += "mAuxDataCount = " + mStreamHeader.mAuxDataCount + Environment.NewLine;
+        d3dtxInfo += "mTotalDataSize = " + mStreamHeader.mTotalDataSize + Environment.NewLine;
 
-        Console.WriteLine("----------- mRegionHeaders -----------");
+        d3dtxInfo += "----------- mStreamHeader -----------" + Environment.NewLine;
         for (int i = 0; i < mStreamHeader.mRegionCount; i++)
         {
-            Console.WriteLine("[mRegionHeader {0}]", i);
-            Console.WriteLine("D3DTX mFaceIndex = {0}", mRegionHeaders[i].mFaceIndex);
-            Console.WriteLine("D3DTX mMipIndex = {0}", mRegionHeaders[i].mMipIndex);
-            Console.WriteLine("D3DTX mMipCount = {0}", mRegionHeaders[i].mMipCount);
-            Console.WriteLine("D3DTX mDataSize = {0}", mRegionHeaders[i].mDataSize);
-            Console.WriteLine("D3DTX mPitch = {0}", mRegionHeaders[i].mPitch);
-            Console.WriteLine("D3DTX mSlicePitch = {0}", mRegionHeaders[i].mSlicePitch);
+            d3dtxInfo += "[mRegionHeader " + i + "]" + Environment.NewLine;
+            d3dtxInfo += "mFaceIndex = " + mRegionHeaders[i].mFaceIndex + Environment.NewLine;
+            d3dtxInfo += "mMipIndex = " + mRegionHeaders[i].mMipIndex + Environment.NewLine;
+            d3dtxInfo += "mMipCount = " + mRegionHeaders[i].mMipCount + Environment.NewLine;
+            d3dtxInfo += "mDataSize = " + mRegionHeaders[i].mDataSize + Environment.NewLine;
+            d3dtxInfo += "mPitch = " + mRegionHeaders[i].mPitch + Environment.NewLine;
+            d3dtxInfo += "mSlicePitch = " + mRegionHeaders[i].mSlicePitch + Environment.NewLine;
         }
+        d3dtxInfo += "|||||||||||||||||||||||||||||||||||||||";
+
+        return d3dtxInfo;
     }
 }

@@ -85,7 +85,7 @@ namespace D3DTX_Converter.Main
                     {
                         byte[] ddsData = ByteFunctions.GetBytesAfterBytePattern(DDS.MAGIC_WORD, reader.ReadBytes((int)reader.BaseStream.Length));
                         ddsImage = DDS_DirectXTexNet.GetDDSImage(ddsData);
-                    //    metadata = ddsImage.GetMetadata();
+                        //    metadata = ddsImage.GetMetadata();
                     }
                     catch (Exception e)
                     {
@@ -244,7 +244,7 @@ namespace D3DTX_Converter.Main
             else if (d3dtx5 != null) allInfo += d3dtx5.GetD3DTXInfo();
             else if (d3dtx6 != null) allInfo += d3dtx6.GetD3DTXInfo();
             else if (d3dtx7 != null) allInfo += d3dtx7.GetD3DTXInfo();
-            //else if (d3dtx8 != null) allInfo += d3dtx8.GetD3DTXInfo();
+            else if (d3dtx8 != null) allInfo += d3dtx8.GetD3DTXInfo();
             else if (d3dtx9 != null) allInfo += d3dtx9.GetD3DTXInfo();
             else if (ddsImage.GetMetadata() != null) allInfo += DDS_DirectXTexNet.GetDDSDebugInfo(ddsImage.GetMetadata());
             else allInfo += "Error! Data not found!";
@@ -888,6 +888,24 @@ namespace D3DTX_Converter.Main
                 return 0;
         }
 
+        public PlatformType GetPlatformType()
+        {
+            if (d3dtx4 != null)
+                return d3dtx4.mPlatform;
+            else if (d3dtx5 != null)
+                return d3dtx5.mPlatform;
+            else if (d3dtx6 != null)
+                return d3dtx6.mPlatform;
+            else if (d3dtx7 != null)
+                return d3dtx7.mPlatform;
+            else if (d3dtx8 != null)
+                return d3dtx8.mPlatform;
+            else if (d3dtx9 != null)
+                return d3dtx9.mPlatform;
+            else
+                return PlatformType.ePlatform_All;
+        }
+
         public bool HasMipMaps()
         {
             return GetMipMapCount() > 1;
@@ -940,6 +958,10 @@ namespace D3DTX_Converter.Main
                 T3SurfaceFormat.eSurface_BC6 => true,
                 T3SurfaceFormat.eSurface_BC7 => true,
                 T3SurfaceFormat.eSurface_CTX1 => true,
+                T3SurfaceFormat.eSurface_ATC_RGB => true,
+                T3SurfaceFormat.eSurface_ATC_RGBA=> true,
+                T3SurfaceFormat.eSurface_ATC_RGB1A => true,
+
                 _ => false,
             };
         }

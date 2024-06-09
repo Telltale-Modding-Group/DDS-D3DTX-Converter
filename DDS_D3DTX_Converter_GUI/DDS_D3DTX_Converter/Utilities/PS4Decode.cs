@@ -17,56 +17,43 @@ public static class PS4TextureDecoder
 
         long length = width * height * TexHelper.Instance.BitsPerPixel(format) / 8; //CORRECT
 
-        byte[] buffer = new byte[length * 2]; //CORRECT
-        byte[] buffer2 = new byte[16]; //CORRECT
-        int num7 = width / blockSize; //CORRECT
-        int num8 = height / blockSize; //CORRECT
+
+        byte[] destinationArray = new byte[length * 2L];
+        byte[] buffer = new byte[0x10];
+        int num7 = height / blockSize;
+        int num8 = width / blockSize;
+
 
         int num10 = 0; //CORRECT
 
         long offset = 0;
-        while (true)
+
+        for (int i = 0; i < ((num7 + 7) / 8); i++)
         {
-            if (num10 >= ((num7 + 7) / 8))
+            for (int j = 0; j < ((num8 + 7) / 8); j++)
             {
-                return buffer;
-            }
-            int num11 = 0;
-            while (true)
-            {
-                if (num11 >= ((num8 + 7) / 8))
+                for (int k = 0; k < 64; k++)
                 {
-                    num10++;
-                    break;
-                }
-                int t = 0;
-                while (true)
-                {
-                    if (t >= 64)
-                    {
-                        num11++;
-                        break;
-                    }
-                    int num13 = morton(t, 8, 8);
+                    int num13 = morton(k, 8, 8);
                     int num14 = num13 / 8;
                     int num15 = num13 % 8;
 
-                    for (int i = 0; i < count; i++)
+                    for (int f = 0; f < count; f++)
                     {
-                        buffer2[i] = pixelData[offset + i];
+                        buffer[f] = pixelData[offset + f];
                     }
 
                     offset += count;
 
-                    if ((((num11 * 8) + num15) < num8) && (((num10 * 8) + num14) < num7))
+                    if ((((j * 8) + num15) < num8) && (((i * 8) + num14) < num7))
                     {
-                        Array.Copy(buffer2, 0, buffer, count * ((((num10 * 8) + num14) * num8) + (num11 * 8) + num15), count);
+                        int destinationIndex = count * (((((i * 8) + num14) * num8) + (j * 8)) + num15);
+                        Array.Copy(buffer, 0, destinationArray, destinationIndex, count);
                     }
-                    t++;
                 }
             }
         }
-
+        return destinationArray;
     }
 
     private static int morton(int t, int sx, int sy)

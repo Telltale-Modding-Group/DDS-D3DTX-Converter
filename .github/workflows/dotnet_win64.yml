@@ -1,0 +1,43 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    
+env:
+  GUI_PROJECT_PATH : 'DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/DDS_D3DTX_Converter.csproj'
+  OUTPUT_PROJECT_PATH : 'Builds'
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore ${{env.GUI_PROJECT_PATH}}
+    - name: Build
+      run: dotnet build ${{env.GUI_PROJECT_PATH}} --configuration Release --no-restore
+    - name: Test
+      run: dotnet test ${{env.GUI_PROJECT_PATH}} --no-build --verbosity normal
+    - name: Publish
+      run: dotnet publish ${{env.GUI_PROJECT_PATH}} --configuration Release --no-build -r win-x64
+    - name: Zip
+      run: |
+        cd ./DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/bin/Release/net8.0/win-x64/publish/
+        zip -r ../../../DDS_D3DTX_Converter.zip ./
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: DDS_D3DTX_Converter
+        path: ./DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/bin/Release/net8.0/win-x64/publish/

@@ -18,7 +18,8 @@ using DirectXTexNet;
 */
 
 /* - D3DTX Legacy Version 2 game
- * Puzzle Agent 2 (UNTESTED)
+ * Law & Order: Legacies  (UNTESTED)
+ * Puzzle Agent 2 (TESTED)
  * Jurassic Park: The Game (TESTED)
 */
 
@@ -330,6 +331,7 @@ public class D3DTX_LV2
         writer.Write((int)mD3DFormat); //mD3DFormat [4 bytes]
         writer.Write(mWidth); //mWidth [4 bytes]
         writer.Write(mHeight); //mHeight [4 bytes]
+        writer.Write(mFlags); //mFlags [4 bytes]
         writer.Write(mWiiForceWidth); //mWiiForceWidth [4 bytes]
         writer.Write(mWiiForceHeight); //mWiiForceHeight [4 bytes]
         ByteFunctions.WriteBoolean(writer, mbWiiForceUncompressed.mbTelltaleBoolean); //mbWiiForceUncompressed [1 byte]
@@ -339,6 +341,8 @@ public class D3DTX_LV2
         writer.Write(mTplAlphaDataSize); //mTplAlphaDataSize [4 bytes]
         writer.Write(mJPEGTextureDataSize); //mJPEGTextureDataSize [4 bytes]
         writer.Write((int)mAlphaMode); //mAlphaMode [4 bytes]
+        writer.Write((int)mExactAlphaMode); //mExactAlphaMode [4 bytes]
+        writer.Write((int)mColorMode); //mColorMode [4 bytes]
         writer.Write((int)mWiiTextureFormat); //mWiiTextureFormat [4 bytes]
         ByteFunctions.WriteBoolean(writer, mbAlphaHDR.mbTelltaleBoolean); //mbAlphaHDR [1 byte]
         ByteFunctions.WriteBoolean(writer, mbEncrypted.mbTelltaleBoolean); //mbEncrypted [1 byte]
@@ -435,9 +439,9 @@ public class D3DTX_LV2
         d3dtxInfo += "mbEncrypted = " + mbEncrypted + Environment.NewLine;
         d3dtxInfo += "mDetailMapBrightness = " + mDetailMapBrightness + Environment.NewLine;
         d3dtxInfo += "mNormalMapFmt = " + mNormalMapFmt + Environment.NewLine;
-        d3dtxInfo += "mTextureDataSize = " + mTextureDataSize + Environment.NewLine;
         d3dtxInfo += "mUVOffset = " + mUVOffset + Environment.NewLine;
         d3dtxInfo += "mUVScale = " + mUVScale + Environment.NewLine;
+        d3dtxInfo += "mTextureDataSize = " + mTextureDataSize + Environment.NewLine;
 
         if (mbHasTextureData.mbTelltaleBoolean)
         {

@@ -374,8 +374,8 @@ public class D3DTX_V9
             mTextureLayout = mArraySize > 1 ? T3TextureLayout.eTextureLayout_CubeArray : T3TextureLayout.eTextureLayout_Cube;
 
             int interval = mStreamHeader.mRegionCount / mNumMipLevels;
-            // Example a cube array textures with 5 mips will have 30 regions (6 faces * 5 mip)
-            // If the array is 2 element there will be 60 regions (6 faces * 5 mip * 2 elements)
+            // Example a cube array textures with 5 mips will have 30 regions (6 faces * 5 mips)
+            // If the array is 2 element there will be 60 regions (6 faces * 5 mips * 2 elements)
             // The mip index will be the region index % interval
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {

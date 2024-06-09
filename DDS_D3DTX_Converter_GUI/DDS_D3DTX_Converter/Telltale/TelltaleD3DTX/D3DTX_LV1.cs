@@ -18,7 +18,6 @@ using DirectXTexNet;
 */
 
 /* - D3DTX Legacy Version 1 games
- * Law & Order: Legacies  (UNTESTED)
  * The Walking Dead Season 1 (TESTED)
 */
 

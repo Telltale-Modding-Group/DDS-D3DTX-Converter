@@ -273,41 +273,6 @@ public class D3DTX_V8
         mUVOffset = new Vector2(reader); //mUVOffset [8 bytes]
         mUVScale = new Vector2(reader); //mUVScale [8 bytes]
 
-
-
-        Console.WriteLine("mVersion: " + mVersion);
-        Console.WriteLine("mSamplerState_BlockSize: " + mSamplerState_BlockSize);
-        Console.WriteLine("mSamplerState: " + mSamplerState.ToString());
-        Console.WriteLine("mPlatform_BlockSize: " + mPlatform_BlockSize);
-        Console.WriteLine("mPlatform: " + mPlatform);
-        Console.WriteLine("mName_BlockSize: " + mName_BlockSize);
-        Console.WriteLine("mName: " + mName);
-        Console.WriteLine("mImportName_BlockSize: " + mImportName_BlockSize);
-
-        Console.WriteLine("mImportName: " + mImportName);
-        Console.WriteLine("mImportScale: " + mImportScale);
-        Console.WriteLine("mToolProps: " + mToolProps.mbHasProps);
-        Console.WriteLine("mNumMipLevels: " + mNumMipLevels);
-        Console.WriteLine("mWidth: " + mWidth);
-        Console.WriteLine("mHeight: " + mHeight);
-        Console.WriteLine("mDepth: " + mDepth);
-        Console.WriteLine("mArraySize: " + mArraySize);
-        Console.WriteLine("mSurfaceFormat: " + mSurfaceFormat);
-        Console.WriteLine("mTextureLayout: " + mTextureLayout);
-        Console.WriteLine("mSurfaceGamma: " + mSurfaceGamma);
-        Console.WriteLine("mSurfaceMultisample: " + mSurfaceMultisample);
-        Console.WriteLine("mResourceUsage: " + mResourceUsage);
-        Console.WriteLine("mType: " + mType);
-        Console.WriteLine("mSwizzleSize: " + mSwizzleSize);
-        Console.WriteLine("mSwizzle: " + mSwizzle.ToString());
-        Console.WriteLine("mSpecularGlossExponent: " + mSpecularGlossExponent);
-        Console.WriteLine("mHDRLightmapScale: " + mHDRLightmapScale);
-        Console.WriteLine("mToonGradientCutoff: " + mToonGradientCutoff);
-        Console.WriteLine("mAlphaMode: " + mAlphaMode);
-        Console.WriteLine("mColorMode: " + mColorMode);
-        Console.WriteLine("mUVOffset: " + mUVOffset.ToString());
-        Console.WriteLine("mUVScale: " + mUVScale.ToString());
-        
         //--------------------------mArrayFrameNames--------------------------
         mArrayFrameNames_ArrayCapacity = reader.ReadUInt32();  //mArrayFrameNames DCArray Capacity [4 bytes]
         mArrayFrameNames_ArrayLength = reader.ReadInt32(); //mArrayFrameNames DCArray Length [4 bytes] //ADD 1 BECAUSE COUNTING STARTS AT 0
@@ -425,7 +390,7 @@ public class D3DTX_V8
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
                 mRegionHeaders[mStreamHeader.mRegionCount - currDepth + depthIndex++].mFaceIndex = faceIndex++; //NOTE: This could be different for 3D textures. I don't have information at the moment.
-                mRegionHeaders[mStreamHeader.mRegionCount - i - 1].mMipIndex = currentMipIndex;
+                mRegionHeaders[i].mMipIndex = currentMipIndex;
 
                 if (depthIndex == copyOfDepth)
                 {
@@ -453,6 +418,7 @@ public class D3DTX_V8
         }
 
         UpdateArrayCapacities();
+        PrintConsole();
     }
 
     public void UpdateArrayCapacities()

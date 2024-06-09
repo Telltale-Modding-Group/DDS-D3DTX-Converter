@@ -101,14 +101,6 @@ namespace D3DTX_Converter.Main
             // Attempt to read the d3dtx version of the file
             int d3dtxVersion = ReadD3DTXFileD3DTXVersionOnly(filePath);
             d3dtxConversionType = setD3DTXVersion;
-            // D3DTX version 6 and 8 are not fully tested, because no texture samples were found in Telltale game files
-            // Presumably they were used during development or existed in earlier versions of the games, but were replaced with newer versions
-            if (d3dtxVersion == 8)
-            {
-                Console.WriteLine(
-                    "Warning! '{0}' version is not fully complete/tested! There may be some issues with converting.",
-                    d3dtxVersion);
-            }
 
             switch (d3dtxVersion)
             {

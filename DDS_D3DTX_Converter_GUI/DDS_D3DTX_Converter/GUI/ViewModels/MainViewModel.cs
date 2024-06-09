@@ -146,7 +146,7 @@ public partial class MainViewModel : ViewModelBase
 
     #region MAIN MENU BUTTONS ACTIONS
 
-    //Open Directory Command
+    // Open Directory Command
     public async Task OpenDirectoryButton_Click()
     {
         try

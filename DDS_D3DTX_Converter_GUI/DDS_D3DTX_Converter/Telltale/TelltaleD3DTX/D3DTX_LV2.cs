@@ -17,10 +17,10 @@ using DirectXTexNet;
  * Also, Telltale uses Hungarian Notation for variable naming.
 */
 
-/* - D3DTX Legacy Version 2 game
- * Law & Order: Legacies  (UNTESTED)
+/* - D3DTX Legacy Version 2 games
  * Puzzle Agent 2 (TESTED)
  * Jurassic Park: The Game (TESTED)
+ * Law & Order: Legacies (TESTED)
 */
 
 namespace D3DTX_Converter.TelltaleD3DTX;

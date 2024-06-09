@@ -35,7 +35,7 @@ using DirectXTexNet;
  * Poker Night at the Inventory  (UNTESTED)
 */
 
-/* - D3DTX Legacy Version 3 game
+/* - D3DTX Legacy Version 3 games
  * Back to the Future: The Game  (TESTED)
 */
 

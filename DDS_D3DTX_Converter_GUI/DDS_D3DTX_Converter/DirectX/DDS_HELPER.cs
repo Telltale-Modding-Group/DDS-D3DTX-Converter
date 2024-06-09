@@ -361,6 +361,18 @@ public static partial class DDS_HELPER
                 else
                     return DXGI_FORMAT.BC7_UNORM;
 
+            //--------------------ATC--------------------
+            case T3SurfaceFormat.eSurface_ATC_RGB:
+                return DXGI_FORMAT.UNKNOWN;
+
+            //--------------------ATCA--------------------
+            case T3SurfaceFormat.eSurface_ATC_RGB1A:
+                return DXGI_FORMAT.UNKNOWN;
+
+            //--------------------ATCI--------------------
+            case T3SurfaceFormat.eSurface_ATC_RGBA:
+                return DXGI_FORMAT.UNKNOWN;
+
             //--------------------UNKNOWN--------------------
             case T3SurfaceFormat.eSurface_Unknown:
                 return DXGI_FORMAT.UNKNOWN;

@@ -6,6 +6,7 @@ using D3DTX_Converter.DirectX;
 using D3DTX_Converter.TelltaleEnums;
 using System.Linq;
 using D3DTX_Converter.TelltaleTypes;
+using Decoders;
 
 namespace D3DTX_Converter.Main
 {
@@ -65,6 +66,12 @@ namespace D3DTX_Converter.Main
             if (d3dtx.GetMipMapCount() > 1)
                 dds.header.dwMipMapCount = (uint)d3dtx.GetMipMapCount();
             else dds.header.dwMipMapCount = 0;
+
+            if (surfaceFormat == T3SurfaceFormat.eSurface_ATC_RGB || surfaceFormat == T3SurfaceFormat.eSurface_ATC_RGBA || surfaceFormat == T3SurfaceFormat.eSurface_ATC_RGB1A)
+            {
+                dds.header.dwMipMapCount = (uint)d3dtx.GetMipMapCount();
+                dds.header.dwPitchOrLinearSize = 0;
+            }
 
             // Set the DDS pixel format info
             dds.header.ddspf = GetPixelFormatHeaderFromT3Surface(surfaceFormat);
@@ -140,6 +147,33 @@ namespace D3DTX_Converter.Main
                 {
                     data = ConvertD3DFMT_A2R10G10B10ToDXGI_FORMAT_R10G10B10A2_UNORM(data);
                 }
+                // else if (surfaceFormat == T3SurfaceFormat.eSurface_ATC_RGB)
+                // {
+                //     AtcDecoder atcDecoder = new AtcDecoder();
+                //     if (i == 0)
+                //     {
+                //         data = UTEX.readATC(data, 0, new byte[(int)dds.header.dwWidth * (int)dds.header.dwHeight * 4], (int)dds.header.dwWidth, (int)dds.header.dwHeight);
+                //         // data = atcDecoder.DecompressAtcRgb4(data, (int)dds.header.dwWidth, (int)dds.header.dwHeight);
+                //     }
+                //     else
+                //     {
+                //         // data = atcDecoder.DecompressAtcRgb4(data, (int)dds.header.dwWidth / (i * 2), (int)dds.header.dwHeight / (i * 2));
+                //     }
+
+                // }
+                // else if (surfaceFormat == T3SurfaceFormat.eSurface_ATC_RGBA || surfaceFormat == T3SurfaceFormat.eSurface_ATC_RGB1A)
+                // {
+                //     AtcDecoder atcDecoder = new AtcDecoder();
+                //     if (i == 0)
+                //     {
+                //         data = UTEX.readATA(data, 0, new byte[(int)dds.header.dwWidth * (int)dds.header.dwHeight * 4], (int)dds.header.dwWidth, (int)dds.header.dwHeight);
+                //         // data = atcDecoder.DecompressAtcRgba8(data, (int)dds.header.dwWidth, (int)dds.header.dwHeight);
+                //     }
+                //     else
+                //     {
+                //         // data = atcDecoder.DecompressAtcRgba8(data, (int)dds.header.dwWidth / (i * 2), (int)dds.header.dwHeight / (i * 2));
+                //     }
+                // }
 
                 // Add the region pixel data to the list
                 textureData.Add(data);
@@ -149,6 +183,31 @@ namespace D3DTX_Converter.Main
             }
 
             textureData = textureData.OrderByDescending(section => section.Length).ToList();
+
+            int divideBy = 1;
+            int arraySize = d3dtx.GetArraySize();
+            if (d3dtx.IsCubeTexture())
+            {
+                arraySize *= 6;
+            }
+
+            for (int i = 0; i < textureData.Count; i++)
+            {
+                if (d3dtx.GetPlatformType() == PlatformType.ePlatform_PS4)
+                {
+                    textureData[i] = PS4TextureDecoder.UnswizzlePS4(textureData[i], DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat), (int)dds.header.dwWidth / divideBy, (int)dds.header.dwHeight / divideBy);
+                }
+
+                if (d3dtx.GetPlatformType() == PlatformType.ePlatform_PS3 || d3dtx.GetPlatformType() == PlatformType.ePlatform_WiiU)
+                {
+
+                }
+
+                if (i % arraySize == 0 && i != 0)
+                {
+                    divideBy *= 2;
+                }
+            }
         }
 
         public byte[] ConvertD3DFMT_A2R10G10B10ToDXGI_FORMAT_R10G10B10A2_UNORM(byte[] d3dPixels)
@@ -242,6 +301,15 @@ namespace D3DTX_Converter.Main
                 T3SurfaceFormat.eSurface_Depth32F => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'Depth32F'
                 T3SurfaceFormat.eSurface_Depth32F_Stencil8 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'Depth32F_Stencil8'
                 T3SurfaceFormat.eSurface_Depth24F_Stencil8 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), 83, 32, 0x00, 0x00, 0x00, 0x00),// 'Depth24F_Stencil8'
+
+                // ATC
+                T3SurfaceFormat.eSurface_ATC_RGB => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("ATC "), 0x00, 0x00, 0x00, 0x00, 0x00),// 'ATC_RGB'
+
+                // ATCI
+                T3SurfaceFormat.eSurface_ATC_RGBA => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("ATCI"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'ATC_RGBA'
+
+                // ATCA
+                T3SurfaceFormat.eSurface_ATC_RGB1A => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("ATCA"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'ATC_RGB1A'
 
                 // Default to DXT1 Compression
                 _ => DDS_PIXELFORMAT.Of(32, 0x04, ByteFunctions.Convert_String_To_UInt32("DXT1"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXT1'

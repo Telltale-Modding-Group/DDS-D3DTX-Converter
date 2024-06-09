@@ -6,80 +6,99 @@ public static class PS4TextureDecoder
 
     public static byte[] UnswizzlePS4(byte[] pixelData, DXGI_FORMAT format, int width, int height)
     {
-        int blockSize = TexHelper.Instance.IsCompressed(format) ? 4 : 1;
+        int blockSize = TexHelper.Instance.IsCompressed(format) ? 4 : 1; //CORRECT
 
-        int num5 = TexHelper.Instance.BitsPerPixel(format) * 2;
+        int count = TexHelper.Instance.BitsPerPixel(format) * 2; //CORRECT
 
-        if (blockSize == 1)
+        if (blockSize == 1) //CORRECT
         {
-            num5 = TexHelper.Instance.BitsPerPixel(format) / 8;
+            count = TexHelper.Instance.BitsPerPixel(format) / 8;
         }
 
-        int length = width * height * TexHelper.Instance.BitsPerPixel(format) / 8;
+        long length = width * height * TexHelper.Instance.BitsPerPixel(format) / 8; //CORRECT
 
-        byte[] destArr = new byte[length * 2];
-        byte[] array2 = new byte[16];
-        int num6 = width / blockSize;
-        int num7 = height / blockSize;
+        byte[] buffer = new byte[length * 2]; //CORRECT
+        byte[] buffer2 = new byte[16]; //CORRECT
+        int num7 = width / blockSize; //CORRECT
+        int num8 = height / blockSize; //CORRECT
 
-        int offset = 0;
+        int num10 = 0; //CORRECT
 
-        for (int i = 0; i < (num6 + 7) / 8; i++)
+        long offset = 0;
+        while (true)
         {
-            for (int j = 0; j < (num7 + 7) / 8; j++)
+            if (num10 >= ((num7 + 7) / 8))
             {
-                for (int k = 0; k < 64; k++)
+                return buffer;
+            }
+            int num11 = 0;
+            while (true)
+            {
+                if (num11 >= ((num8 + 7) / 8))
                 {
-                    int num8 = morton(k, 8, 8);
-                    int num9 = num8 / 8;
-                    int num10 = num8 % 8;
-
-                    for (int h = 0; h < num5; h++)
+                    num10++;
+                    break;
+                }
+                int t = 0;
+                while (true)
+                {
+                    if (t >= 64)
                     {
-                        array2[h] = pixelData[offset + h];
+                        num11++;
+                        break;
+                    }
+                    int num13 = morton(t, 8, 8);
+                    int num14 = num13 / 8;
+                    int num15 = num13 % 8;
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        buffer2[i] = pixelData[offset + i];
                     }
 
-                    offset += num5;
+                    offset += count;
 
-                    if (j * 8 + num10 < num7 && i * 8 + num9 < num6)
+                    if ((((num11 * 8) + num15) < num8) && (((num10 * 8) + num14) < num7))
                     {
-                        int destinationIndex = num5 * ((i * 8 + num9) * num7 + j * 8 + num10);
-                        Array.Copy(array2, 0, destArr, destinationIndex, num5);
+                        Array.Copy(buffer2, 0, buffer, count * ((((num10 * 8) + num14) * num8) + (num11 * 8) + num15), count);
                     }
+                    t++;
                 }
             }
         }
 
-        return destArr;
     }
 
     private static int morton(int t, int sx, int sy)
     {
-        int num3;
-        int num4 = num3 = 1;
-        int num5 = t;
-        int num6 = sx;
-        int num7 = sy;
+        int num4;
         int num = 0;
         int num2 = 0;
-        while (num6 > 1 || num7 > 1)
+        int num3 = num4 = 1;
+        int num7 = t;
+        int num5 = sx;
+        int num6 = sy;
+        num = 0;
+        num2 = 0;
+        while ((num5 > 1) || (num6 > 1))
         {
+            if (num5 > 1)
+            {
+                num += num3 * (num7 & 1);
+                num7 = num7 >> 1;
+                num3 *= 2;
+                num5 = num5 >> 1;
+            }
             if (num6 > 1)
             {
-                num += num4 * (num5 & 1);
-                num5 >>= 1;
+                num2 += num4 * (num7 & 1);
+                num7 = num7 >> 1;
                 num4 *= 2;
-                num6 >>= 1;
-            }
-            if (num7 > 1)
-            {
-                num2 += num3 * (num5 & 1);
-                num5 >>= 1;
-                num3 *= 2;
-                num7 >>= 1;
+                num6 = num6 >> 1;
             }
         }
-        return num2 * sx + num;
+        return ((num2 * sx) + num);
+
     }
 
     // public static byte[] UnswizzlePS3(byte[] pixelData, DXGI_FORMAT format, int width, int height)

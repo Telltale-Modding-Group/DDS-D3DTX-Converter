@@ -320,6 +320,9 @@ namespace D3DTX_Converter.Main
                 case 5:
                     d3dtx5 = d3dtxObject.ToObject<D3DTX_V5>();
                     break;
+                case 6:
+                    d3dtx6 = d3dtxObject.ToObject<D3DTX_V6>();
+                    break;
                 case 7:
                     d3dtx7 = d3dtxObject.ToObject<D3DTX_V7>();
                     break;
@@ -533,6 +536,8 @@ namespace D3DTX_Converter.Main
         {
             if (d3dtx5 != null)
                 return d3dtx5.mTextureLayout == T3TextureLayout.eTextureLayout_3D;
+            else if (d3dtx6 != null)
+                return d3dtx6.mTextureLayout == T3TextureLayout.eTextureLayout_3D;
             else if (d3dtx7 != null)
                 return d3dtx7.mTextureLayout == T3TextureLayout.eTextureLayout_3D;
             else if (d3dtx8 != null)
@@ -548,7 +553,10 @@ namespace D3DTX_Converter.Main
             if (d3dtx5 != null)
                 return d3dtx5.mTextureLayout == T3TextureLayout.eTextureLayout_Cube ||
                        d3dtx5.mTextureLayout == T3TextureLayout.eTextureLayout_CubeArray;
-            if (d3dtx7 != null)
+            else if (d3dtx6 != null)
+                return d3dtx6.mTextureLayout == T3TextureLayout.eTextureLayout_Cube ||
+                       d3dtx6.mTextureLayout == T3TextureLayout.eTextureLayout_CubeArray;
+            else if (d3dtx7 != null)
                 return d3dtx7.mTextureLayout == T3TextureLayout.eTextureLayout_Cube ||
                        d3dtx7.mTextureLayout == T3TextureLayout.eTextureLayout_CubeArray;
             else if (d3dtx8 != null)
@@ -566,6 +574,9 @@ namespace D3DTX_Converter.Main
             if (d3dtx5 != null)
                 return d3dtx5.mTextureLayout == T3TextureLayout.eTextureLayout_2DArray ||
                        d3dtx5.mTextureLayout == T3TextureLayout.eTextureLayout_CubeArray;
+            if (d3dtx6 != null)
+                return d3dtx6.mTextureLayout == T3TextureLayout.eTextureLayout_2DArray ||
+                       d3dtx6.mTextureLayout == T3TextureLayout.eTextureLayout_CubeArray;
             if (d3dtx7 != null)
                 return d3dtx7.mTextureLayout == T3TextureLayout.eTextureLayout_2DArray ||
                        d3dtx7.mTextureLayout == T3TextureLayout.eTextureLayout_CubeArray;
@@ -860,7 +871,9 @@ namespace D3DTX_Converter.Main
                 return d3dtxL1.mNumMipLevels;
             else if (d3dtxL2 != null)
                 return d3dtxL2.mNumMipLevels;
-            if (d3dtx3 != null)
+            else if (d3dtxL3 != null)
+                return d3dtxL3.mNumMipLevels;
+            else if (d3dtx3 != null)
                 return d3dtx3.mNumMipLevels;
             else if (d3dtx4 != null)
                 return d3dtx4.mNumMipLevels;
@@ -909,6 +922,8 @@ namespace D3DTX_Converter.Main
                 return d3dtxL1.mPixelData;
             else if (d3dtxL2 != null)
                 return d3dtxL2.mPixelData;
+            else if (d3dtxL3 != null)
+                return d3dtxL3.mPixelData;
             else
                 return null;
         }
@@ -951,7 +966,7 @@ namespace D3DTX_Converter.Main
                 T3SurfaceFormat.eSurface_BC7 => true,
                 T3SurfaceFormat.eSurface_CTX1 => true,
                 T3SurfaceFormat.eSurface_ATC_RGB => true,
-                T3SurfaceFormat.eSurface_ATC_RGBA=> true,
+                T3SurfaceFormat.eSurface_ATC_RGBA => true,
                 T3SurfaceFormat.eSurface_ATC_RGB1A => true,
 
                 _ => false,

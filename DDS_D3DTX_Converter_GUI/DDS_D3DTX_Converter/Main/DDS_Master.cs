@@ -195,6 +195,8 @@ namespace D3DTX_Converter.Main
             {
                 if (d3dtx.GetPlatformType() == PlatformType.ePlatform_PS4)
                 {
+                    Console.WriteLine("Unswizzling PS4 texture data..." + i);
+
                     textureData[i] = PS4TextureDecoder.UnswizzlePS4(textureData[i], DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat), (int)dds.header.dwWidth / divideBy, (int)dds.header.dwHeight / divideBy);
                 }
 
@@ -203,9 +205,13 @@ namespace D3DTX_Converter.Main
 
                 }
 
-                if (i % arraySize == 0 && i != 0)
+                if ((i + 1) % arraySize == 0)
                 {
+                    Console.WriteLine("Array size: " + arraySize);
+
                     divideBy *= 2;
+
+                    Console.WriteLine("Divide by: " + divideBy);
                 }
             }
         }

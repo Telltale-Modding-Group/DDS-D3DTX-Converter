@@ -6,7 +6,6 @@ using D3DTX_Converter.DirectX;
 using D3DTX_Converter.TelltaleEnums;
 using System.Linq;
 using D3DTX_Converter.TelltaleTypes;
-using Decoders;
 
 namespace D3DTX_Converter.Main
 {
@@ -35,7 +34,7 @@ namespace D3DTX_Converter.Main
             };
 
             // If the D3DTX is a legacy D3DTX and we don't know from which game it is, we can just get the DDS header the file. This is only for extraction purposes
-            if (d3dtx.ddsImage != null)
+            if (!d3dtx.ddsImage.IsNull)
             {
                 //dds = d3dtx.genericDDS;
                 return;
@@ -59,7 +58,7 @@ namespace D3DTX_Converter.Main
             // Initialize DDS width, height, depth, pitch, mip level count
             dds.header.dwWidth = (uint)d3dtx.GetWidth();
             dds.header.dwHeight = (uint)d3dtx.GetHeight();
-            dds.header.dwPitchOrLinearSize = DDS_DirectXTexNet.ComputePitch(DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat), (int)dds.header.dwWidth, (int)dds.header.dwHeight);
+            dds.header.dwPitchOrLinearSize = DDS_DirectXTexNet.ComputePitch(DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat), dds.header.dwWidth, dds.header.dwHeight);
             dds.header.dwDepth = (uint)d3dtx.GetDepth();
 
             // If the texture has more than 1 mip level, set the mip level count
@@ -185,7 +184,7 @@ namespace D3DTX_Converter.Main
             textureData = textureData.OrderByDescending(section => section.Length).ToList();
 
             int divideBy = 1;
-            int arraySize = d3dtx.GetArraySize();
+            int arraySize = (int)d3dtx.GetArraySize();
             if (d3dtx.IsCubeTexture())
             {
                 arraySize *= 6;
@@ -202,7 +201,9 @@ namespace D3DTX_Converter.Main
 
                 if (d3dtx.GetPlatformType() == PlatformType.ePlatform_PS3 || d3dtx.GetPlatformType() == PlatformType.ePlatform_WiiU)
                 {
+                    Console.WriteLine("Unswizzling PS3 texture data..." + i);
 
+                    textureData[i] = PS4TextureDecoder.UnswizzlePS3(textureData[i], DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat), (int)dds.header.dwWidth / divideBy, (int)dds.header.dwHeight / divideBy);
                 }
 
                 if ((i + 1) % arraySize == 0)
@@ -371,9 +372,9 @@ namespace D3DTX_Converter.Main
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
             // If the image is an unknown d3dtx version
-            if (d3dtx.ddsImage != null)
+            if (!d3dtx.ddsImage.IsNull)
             {
-                return DDS_DirectXTexNet.GetDDSByteArray(d3dtx.ddsImage);
+                return d3dtx.ddsData;
             }
 
             if (d3dtx.GetD3DTXObject() == null)
@@ -431,14 +432,14 @@ namespace D3DTX_Converter.Main
                 List<byte[]> faceData = [];
 
                 //Make sure we loop at least once
-                uint mipCount = dds.header.dwMipMapCount > 1 ? dds.header.dwMipMapCount : 1;
+                nuint mipCount = dds.header.dwMipMapCount > 1 ? dds.header.dwMipMapCount : 1;
 
                 // Each loop here collects only 1 face of the texture. Let's use the examples from earlier.
                 // Example 1: The mips are 10 - the texture is 1 (1 face). We iterate 10 times while incrementing the index by 1.
                 // Example 2: The mips are 4 - the textures are 3 (3 faces). We iterate 4 times while incrementing the index by 3.
                 // Example 3: The mips are 7 - the textures are 6 (6 faces). We iterate 7 times while incrementing the index by 6.
                 // Example 4: The mips are 3 - the textures are 6*3 (18 faces). We iterate 3 times while incrementing the index by 18.
-                for (int j = 0; j < mipCount; j++)
+                for (nuint j = 0; j < mipCount; j++)
                 {
                     faceData.Add(textureData[faceIndex]);
 

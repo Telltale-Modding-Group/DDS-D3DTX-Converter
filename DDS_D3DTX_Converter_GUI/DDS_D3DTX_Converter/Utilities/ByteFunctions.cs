@@ -307,6 +307,8 @@ public static class ByteFunctions
 
     }
 
+    public static byte[] LoadTexture(string path) => File.ReadAllBytes(path);
+
     /// <summary>
     /// Checks if we have reached a specific offset in the file.
     /// </summary>

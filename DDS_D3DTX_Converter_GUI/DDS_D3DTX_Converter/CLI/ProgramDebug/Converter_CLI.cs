@@ -10,7 +10,7 @@ using D3DTX_Converter.Main;
 using D3DTX_Converter.Texconv;
 using D3DTX_Converter.TexconvOptions;
 using D3DTX_Converter.Utilities;
-using DirectXTexNet;
+using HexaEngine.DirectXTex;
 
 namespace D3DTX_Converter.ProgramDebug;
 
@@ -242,7 +242,7 @@ public class Converter_CLI
             d3dtxMaster.ReadD3DTXJSON(textureFilePathJson);
 
             // If the d3dtx is a legacy D3DTX, force the use of the DX9 legacy flag
-            DDS_FLAGS flags = d3dtxMaster.isLegacyD3DTX() ? DDS_FLAGS.FORCE_DX9_LEGACY : DDS_FLAGS.NONE;
+            DDSFlags flags = d3dtxMaster.isLegacyD3DTX() ? DDSFlags.ForceDx9Legacy : DDSFlags.None;
 
             // Get the image
             var image = DDS_DirectXTexNet.GetDDSImage(sourceFilePath, flags);
@@ -305,14 +305,14 @@ public class Converter_CLI
             switch (d3dtxFile.GetTextureType())
             {
                 case D3DTX_Converter.TelltaleEnums.T3TextureType.eTxSingleChannelSDFDetailMap:
-                    options.outputFormat = new() { format = DXGI_FORMAT.BC3_UNORM };
+                    options.outputFormat = new() { format = DXGIFormat.BC3_UNORM };
 
                     await TexconvApp.RunTexconvAsync(sourceFilePath, options);
                     break;
                 case D3DTX_Converter.TelltaleEnums.T3TextureType.eTxBumpmap:
                 case D3DTX_Converter.TelltaleEnums.T3TextureType.eTxNormalMap:
 
-                    options.outputFormat = new() { format = DXGI_FORMAT.BC3_UNORM };
+                    options.outputFormat = new() { format = DXGIFormat.BC3_UNORM };
                     options.outputTreatTypelessAsUNORM = new();
 
                     if (fixes_generic_to_dds)
@@ -322,7 +322,7 @@ public class Converter_CLI
                     break;
                 case D3DTX_Converter.TelltaleEnums.T3TextureType.eTxNormalXYMap:
 
-                    options.outputFormat = new() { format = DXGI_FORMAT.BC5_UNORM };
+                    options.outputFormat = new() { format = DXGIFormat.BC5_UNORM };
                     //options.outputSRGB = new() { srgbMode = TexconvEnums.TexconvEnumSrgb.srgbo };
                     options.outputTreatTypelessAsUNORM = new();
 
@@ -333,9 +333,9 @@ public class Converter_CLI
                     break;
                 default:
                     if (ImageUtilities.IsImageOpaque(sourceFilePath))
-                        options.outputFormat = new() { format = DXGI_FORMAT.BC1_UNORM };
+                        options.outputFormat = new() { format = DXGIFormat.BC1_UNORM };
                     else
-                        options.outputFormat = new() { format = DXGI_FORMAT.BC3_UNORM };
+                        options.outputFormat = new() { format = DXGIFormat.BC3_UNORM };
 
                     await TexconvApp.RunTexconvAsync(sourceFilePath, options);
                     break;

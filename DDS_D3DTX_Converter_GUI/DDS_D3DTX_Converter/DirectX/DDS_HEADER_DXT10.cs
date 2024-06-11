@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using DirectXTexNet;
+using Pfim;
 
 namespace D3DTX_Converter.DirectX;
 
@@ -19,7 +19,7 @@ public struct DDS_HEADER_DXT10
     /// <summary>
     /// [4 bytes] The surface pixel format.
     /// </summary>
-    public DXGI_FORMAT dxgiFormat;
+    public DXGIFormat dxgiFormat;
 
     /// <summary>
     /// [4 bytes] Identifies the type of resource.
@@ -44,7 +44,7 @@ public struct DDS_HEADER_DXT10
 
     public DDS_HEADER_DXT10(BinaryReader reader)
     {
-        dxgiFormat = (DXGI_FORMAT)reader.ReadUInt32();
+        dxgiFormat = (DXGIFormat)reader.ReadUInt32();
         resourceDimension = (D3D10_RESOURCE_DIMENSION)reader.ReadUInt32();
         miscFlag = (DDS_RESOURCE)reader.ReadUInt32();
         arraySize = reader.ReadUInt32();
@@ -74,7 +74,7 @@ public struct DDS_HEADER_DXT10
     /// <returns></returns>
     public static DDS_HEADER_DXT10 GetPresetDXT10Header() => new()
     {
-        dxgiFormat = DXGI_FORMAT.R8G8B8A8_UNORM,
+        dxgiFormat = DXGIFormat.R8G8B8A8_UNORM,
         resourceDimension = D3D10_RESOURCE_DIMENSION.TEXTURE2D,
         arraySize = 1,
     };

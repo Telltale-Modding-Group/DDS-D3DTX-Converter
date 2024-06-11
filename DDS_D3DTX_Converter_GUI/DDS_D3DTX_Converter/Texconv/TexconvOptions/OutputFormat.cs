@@ -1,5 +1,5 @@
 ﻿using System;
-using DirectXTexNet;
+using D3DTX_Converter.DirectX;
 
 namespace D3DTX_Converter.TexconvOptions;
 
@@ -14,9 +14,9 @@ namespace D3DTX_Converter.TexconvOptions;
 /// </summary>
 public class OutputFormat
 {
-    public DXGI_FORMAT format;
+    public DXGIFormat format;
     //public string GetFormat() => "DXGI_FORMAT_" + Enum.GetName(typeof(DXGI_FORMAT), format);
-    public string GetFormat() => Enum.GetName(typeof(DXGI_FORMAT), format);
+    public string GetFormat() => Enum.GetName(typeof(DXGIFormat), format);
 
     public string GetArgumentOutput() => string.Format("-f {0}", GetFormat());
 }

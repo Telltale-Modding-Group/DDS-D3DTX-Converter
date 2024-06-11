@@ -5,7 +5,7 @@ using D3DTX_Converter.TelltaleEnums;
 using D3DTX_Converter.TelltaleTypes;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
-using DirectXTexNet;
+using HexaEngine.DirectXTex;
 
 /*
  * NOTE:
@@ -27,15 +27,16 @@ using DirectXTexNet;
  * Sam & Max Beyond Time and Space  (UNTESTED)
  * Strong Bad's Cool Game for Attractive People  (UNTESTED)
  * Wallace & Gromit's Grand Adventures  (UNTESTED)
- * Tales of Monkey Island  (UNTESTED)
- * CSI: Deadly Intent  (UNTESTED)
- * Sam & Max: The Devil's Playhouse  (UNTESTED)
- * Nelson Tethers: Puzzle Agent  (UNTESTED)
- * CSI: Fatal Conspiracy  (UNTESTED)
- * Poker Night at the Inventory  (UNTESTED)
 */
 
 /* - D3DTX Legacy Version 3 games
+ * Wallace & Gromit's Grand Adventures Ep. 4 (UNTESTED)
+ * Tales of Monkey Island (UNTESTED)
+ * CSI: Deadly Intent (UNTESTED)
+ * Sam & Max: The Devil's Playhouse (UNTESTED)
+ * Nelson Tethers: Puzzle Agent (UNTESTED)
+ * CSI: Fatal Conspiracy (TESTED)
+ * Poker Night at the Inventory  (UNTESTED)
  * Back to the Future: The Game  (TESTED)
 */
 
@@ -99,7 +100,7 @@ public class D3DTX_LV3
     /// <summary>
     /// [4 bytes] Number of mips in the texture.
     /// </summary>
-    public int mNumMipLevels { get; set; }
+    public nuint mNumMipLevels { get; set; }
 
     /// <summary>
     /// [4 bytes] The old T3SurfaceFormat. Makes use of FourCC but it can be an integer as well. Enums could not be found.
@@ -109,12 +110,12 @@ public class D3DTX_LV3
     /// <summary>
     /// [4 bytes] The pixel width of the texture.
     /// </summary>
-    public int mWidth { get; set; }
+    public uint mWidth { get; set; }
 
     /// <summary>
     /// [4 bytes] The pixel height of the texture.
     /// </summary>
-    public int mHeight { get; set; }
+    public uint mHeight { get; set; }
 
     /// <summary>
     /// [4 bytes] The pixel width of the texture when loaded on Wii platform.
@@ -230,10 +231,10 @@ public class D3DTX_LV3
             mbIsMipMapped = new TelltaleBoolean(reader);
             mbEmbedMipMaps = new TelltaleBoolean(reader);
 
-            mNumMipLevels = reader.ReadInt32();
+            mNumMipLevels = reader.ReadUInt32();
             mD3DFormat = (D3DFORMAT)reader.ReadUInt32();
-            mWidth = reader.ReadInt32();
-            mHeight = reader.ReadInt32();
+            mWidth = reader.ReadUInt32();
+            mHeight = reader.ReadUInt32();
             mWiiForceWidth = reader.ReadUInt32();
             mWiiForceHeight = reader.ReadUInt32();
             mbWiiForceUncompressed = new TelltaleBoolean(reader);
@@ -286,9 +287,9 @@ public class D3DTX_LV3
 
     public void ModifyD3DTX(TexMetadata metadata, byte[] ddsData)
     {
-        mWidth = metadata.Width;
-        mHeight = metadata.Height;
-        mD3DFormat = DDS_HELPER.GetD3DFORMATFromDXGIFormat(metadata.Format, metadata);
+        mWidth = (uint)metadata.Width;
+        mHeight = (uint)metadata.Height;
+        mD3DFormat = DDS_HELPER.GetD3DFORMATFromDXGIFormat((DXGIFormat)metadata.Format, metadata);
         mNumMipLevels = metadata.MipLevels;
         mbHasTextureData = new TelltaleBoolean(true);
         mbIsMipMapped = new TelltaleBoolean(metadata.MipLevels > 1);

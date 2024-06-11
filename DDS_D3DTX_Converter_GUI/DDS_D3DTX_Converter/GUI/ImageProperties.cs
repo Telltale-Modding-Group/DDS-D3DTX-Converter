@@ -3,10 +3,11 @@ using System.IO;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
+using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
 using D3DTX_Converter.Utilities;
 using DDS_D3DTX_Converter_GUI.Utilities;
-using DirectXTexNet;
+using HexaEngine.DirectXTex;
 using MsBox.Avalonia;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -56,14 +57,15 @@ public class ImageProperties : ObservableObject
     /// <param name="ddsFilePath"></param>
     public static ImageProperties GetDdsProperties(string ddsFilePath)
     {
-        var ddsImage = TexHelper.Instance.LoadFromDDSFile(ddsFilePath, DDS_FLAGS.NONE);
+        var ddsImage = DDS_DirectXTexNet.GetDDSImage(ddsFilePath);
+        
         var ddsMetadata = ddsImage.GetMetadata();
 
-        DXGI_FORMAT dxgiFormat = ddsMetadata.Format;
+        DXGIFormat dxgiFormat = (DXGIFormat)ddsMetadata.Format;
 
-        uint channelCount = (uint)Math.Ceiling((double)TexHelper.Instance.BitsPerPixel(dxgiFormat) / Math.Max(1, TexHelper.Instance.BitsPerColor(dxgiFormat)));
+        uint channelCount = (uint)Math.Ceiling((double)DirectXTex.BitsPerPixel((int)dxgiFormat) / Math.Max(1, DirectXTex.BitsPerColor((int)dxgiFormat)));
 
-        string hasAlpha = TexHelper.Instance.HasAlpha(dxgiFormat) ? "True" : "False";
+        string hasAlpha = DirectXTex.HasAlpha((int)dxgiFormat) ? "True" : "False";
 
         return new ImageProperties
         {

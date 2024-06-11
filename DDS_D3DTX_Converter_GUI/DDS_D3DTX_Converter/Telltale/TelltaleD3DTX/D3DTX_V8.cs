@@ -6,7 +6,7 @@ using D3DTX_Converter.TelltaleTypes;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
 using System.Runtime.InteropServices;
-using DirectXTexNet;
+using HexaEngine.DirectXTex;
 
 /*
  * NOTE:
@@ -87,27 +87,27 @@ public class D3DTX_V8
     /// <summary>
     /// [4 bytes] The number of mip maps in the texture.
     /// </summary>
-    public int mNumMipLevels { get; set; }
+    public uint mNumMipLevels { get; set; }
 
     /// <summary>
     /// [4 bytes] The pixel width of the texture.
     /// </summary>
-    public int mWidth { get; set; }
+    public uint mWidth { get; set; }
 
     /// <summary>
     /// [4 bytes] The pixel height of the texture.
     /// </summary>
-    public int mHeight { get; set; }
+    public uint mHeight { get; set; }
 
     /// <summary>
     /// [4 bytes] The depth of a volume texture in pixels.
     /// </summary>
-    public int mDepth { get; set; }
+    public uint mDepth { get; set; }
 
     /// <summary>
     /// [4 bytes] mArraySize, not sure what this is for yet.
     /// </summary>
-    public int mArraySize { get; set; }
+    public uint mArraySize { get; set; }
 
     /// <summary>
     /// [4 bytes] An enum, defines the compression used for the texture.
@@ -252,11 +252,11 @@ public class D3DTX_V8
         mImportName = ByteFunctions.ReadString(reader); //mImportName [x bytes] (this is always 0)
         mImportScale = reader.ReadSingle(); //mImportScale [4 bytes]
         mToolProps = new ToolProps(reader); //mToolProps [1 byte]
-        mNumMipLevels = reader.ReadInt32(); //mNumMipLevels [4 bytes]
-        mWidth = reader.ReadInt32(); //mWidth [4 bytes]
-        mHeight = reader.ReadInt32(); //mHeight [4 bytes]
-        mDepth = reader.ReadInt32(); //mDepth [4 bytes]
-        mArraySize = reader.ReadInt32(); //mArraySize [4 bytes]
+        mNumMipLevels = reader.ReadUInt32(); //mNumMipLevels [4 bytes]
+        mWidth = reader.ReadUInt32(); //mWidth [4 bytes]
+        mHeight = reader.ReadUInt32(); //mHeight [4 bytes]
+        mDepth = reader.ReadUInt32(); //mDepth [4 bytes]
+        mArraySize = reader.ReadUInt32(); //mArraySize [4 bytes]
         mSurfaceFormat = (T3SurfaceFormat)reader.ReadInt32(); //mSurfaceFormat [4 bytes]
         mTextureLayout = (T3TextureLayout)reader.ReadInt32(); //mTextureLayout [4 bytes]
         mSurfaceGamma = (T3SurfaceGamma)reader.ReadInt32(); //mSurfaceGamma [4 bytes]
@@ -329,13 +329,13 @@ public class D3DTX_V8
 
     public void ModifyD3DTX(TexMetadata metadata, DDS_DirectXTexNet_ImageSection[] sections)
     {
-        mWidth = metadata.Width;
-        mHeight = metadata.Height;
-        mSurfaceFormat = DDS_HELPER.GetTelltaleSurfaceFormatFromDXGI(metadata.Format, mSurfaceFormat);
-        mNumMipLevels = metadata.MipLevels > 0 ? metadata.MipLevels : 1;
-        mDepth = metadata.Depth;
-        mArraySize = metadata.ArraySize;
-        mSurfaceGamma = DDS_DirectXTexNet.IsSRGB(metadata.Format) ? T3SurfaceGamma.eSurfaceGamma_sRGB : T3SurfaceGamma.eSurfaceGamma_Linear;
+        mWidth =(uint) metadata.Width;
+        mHeight = (uint)metadata.Height;
+        mSurfaceFormat = DDS_HELPER.GetTelltaleSurfaceFormatFromDXGI((DXGIFormat)metadata.Format, mSurfaceFormat);
+        mNumMipLevels = (uint)metadata.MipLevels > 0 ? (uint)metadata.MipLevels : 1;
+        mDepth = (uint)metadata.Depth;
+        mArraySize = (uint)metadata.ArraySize;
+        mSurfaceGamma = DDS_DirectXTexNet.IsSRGB((DXGIFormat)metadata.Format) ? T3SurfaceGamma.eSurfaceGamma_sRGB : T3SurfaceGamma.eSurfaceGamma_Linear;
 
         mPixelData.Clear();
         mPixelData = DDS_DirectXTexNet.GetPixelDataFromSections(sections);
@@ -365,13 +365,13 @@ public class D3DTX_V8
             mArraySize /= 6;
             mTextureLayout = mArraySize > 1 ? T3TextureLayout.eTextureLayout_CubeArray : T3TextureLayout.eTextureLayout_Cube;
 
-            int interval = mStreamHeader.mRegionCount / mNumMipLevels;
+            int interval = mStreamHeader.mRegionCount / (int)mNumMipLevels;
             // Example a cube array textures with 5 mips will have 30 regions (6 faces * 5 mips)
             // If the array is 2 element there will be 60 regions (6 faces * 5 mips * 2 elements)
             // The mip index will be the region index % interval
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
-                mRegionHeaders[i].mFaceIndex = i % (6 * mArraySize); //Unknown guess, it could be 6 or 6 * mArraySize
+                mRegionHeaders[i].mFaceIndex = i % (6 * (int)mArraySize); //Unknown guess, it could be 6 or 6 * mArraySize
                 mRegionHeaders[i].mMipIndex = (mStreamHeader.mRegionCount - i - 1) / interval;
             }
         }
@@ -380,8 +380,8 @@ public class D3DTX_V8
         {
             mTextureLayout = T3TextureLayout.eTextureLayout_3D;
 
-            int currDepth = metadata.Depth;
-            int currentMipIndex = mNumMipLevels - 1;
+            int currDepth = (int)metadata.Depth;
+            int currentMipIndex = (int)mNumMipLevels - 1;
             int copyOfDepth = currDepth;
 
             int depthIndex = 0;
@@ -408,11 +408,11 @@ public class D3DTX_V8
         {
             mTextureLayout = mArraySize > 1 ? T3TextureLayout.eTextureLayout_2DArray : T3TextureLayout.eTextureLayout_2D;
 
-            int interval = mStreamHeader.mRegionCount / mNumMipLevels;
+            int interval = mStreamHeader.mRegionCount / (int)mNumMipLevels;
 
             for (int i = 0; i < mStreamHeader.mRegionCount; i++)
             {
-                mRegionHeaders[i].mFaceIndex = i % mArraySize;
+                mRegionHeaders[i].mFaceIndex = i % (int)mArraySize;
                 mRegionHeaders[i].mMipIndex = (mStreamHeader.mRegionCount - i - 1) / interval;
             }
         }

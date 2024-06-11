@@ -5,7 +5,7 @@ using D3DTX_Converter.TelltaleEnums;
 using D3DTX_Converter.TelltaleTypes;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
-using DirectXTexNet;
+using HexaEngine.DirectXTex;
 
 /*
  * NOTE:
@@ -86,17 +86,17 @@ public class D3DTX_V3
   /// <summary>
   /// [4 bytes] Number of mips in the texture.
   /// </summary>
-  public int mNumMipLevels { get; set; }
+  public uint mNumMipLevels { get; set; }
 
   /// <summary>
   /// [4 bytes] The pixel width of the texture.
   /// </summary>
-  public int mWidth { get; set; }
+  public uint mWidth { get; set; }
 
   /// <summary>
   /// [4 bytes] The pixel height of the texture.
   /// </summary>
-  public int mHeight { get; set; }
+  public uint mHeight { get; set; }
 
   /// <summary>
   /// [4 bytes] An enum, defines the compression used for the texture.
@@ -144,11 +144,6 @@ public class D3DTX_V3
   public Vector2 mUVScale { get; set; }
 
   /// <summary>
-  /// [4 bytes] The mToonRegions block size in bytes. Note: the parsed value is always 8. Or it could be a bitflag, needs further testing
-  /// </summary>
-  public uint mToonRegions_BlockSize { get; set; }
-
-  /// <summary>
   /// [4 bytes] The size in bytes of the mToonRegions block.
   /// </summary>
   public uint mToonRegions_ArrayCapacity { get; set; }
@@ -181,6 +176,11 @@ public class D3DTX_V3
   /// <summary>
   /// D3DTX V3 Header (empty constructor, only used for json deserialization)
   /// </summary>
+  public D3DTX_V3() { }
+
+  /// <summary>
+  /// D3DTX V3 Header (empty constructor, only used for json deserialization)
+  /// </summary>
   /// 
   public D3DTX_V3(BinaryReader reader, bool showConsole = false)
   {
@@ -198,9 +198,9 @@ public class D3DTX_V3
     mImportName = ByteFunctions.ReadString(reader); //mImportName [x bytes] (this is always 0)
     mImportScale = reader.ReadSingle(); //mImportScale [4 bytes]
     mToolProps = new ToolProps(reader); //mToolProps [1 byte]
-    mNumMipLevels = reader.ReadInt32(); //mNumMipLevels [4 bytes]
-    mWidth = reader.ReadInt32(); //mWidth [4 bytes]
-    mHeight = reader.ReadInt32(); //mHeight [4 bytes]
+    mNumMipLevels = reader.ReadUInt32(); //mNumMipLevels [4 bytes]
+    mWidth = reader.ReadUInt32(); //mWidth [4 bytes]
+    mHeight = reader.ReadUInt32(); //mHeight [4 bytes]
     mSurfaceFormat = (T3SurfaceFormat)reader.ReadInt32(); //mSurfaceFormat [4 bytes]
     mResourceUsage = (T3ResourceUsage)reader.ReadInt32(); //mResourceUsage [4 bytes]
     mType = (T3TextureType)reader.ReadInt32(); //mType [4 bytes]
@@ -290,10 +290,10 @@ public class D3DTX_V3
 
   public void ModifyD3DTX(TexMetadata metadata, DDS_DirectXTexNet_ImageSection[] sections)
   {
-    mWidth = metadata.Width;
-    mHeight = metadata.Height;
-    mSurfaceFormat = DDS_HELPER.GetTelltaleSurfaceFormatFromDXGI(metadata.Format, mSurfaceFormat);
-    mNumMipLevels = metadata.MipLevels > 0 ? metadata.MipLevels : 1;
+    mWidth = (uint)metadata.Width;
+    mHeight = (uint)metadata.Height;
+    mSurfaceFormat = DDS_HELPER.GetTelltaleSurfaceFormatFromDXGI((DXGIFormat)metadata.Format, mSurfaceFormat);
+    mNumMipLevels = (uint)(metadata.MipLevels > 0 ? metadata.MipLevels : 1);
 
     mPixelData.Clear();
     mPixelData = DDS_DirectXTexNet.GetPixelDataFromSections(sections);
@@ -375,7 +375,6 @@ public class D3DTX_V3
     writer.Write(mUVScale.x); //mUVScale X [4 bytes]
     writer.Write(mUVScale.y); //mUVScale Y [4 bytes]
 
-    writer.Write(mToonRegions_BlockSize); //mToonRegions DCArray Capacity [4 bytes]
     writer.Write(mToonRegions_ArrayCapacity); //mToonRegions DCArray Capacity [4 bytes]
     writer.Write(mToonRegions_ArrayLength); //mToonRegions DCArray Length [4 bytes]
     for (int i = 0; i < mToonRegions_ArrayLength; i++)
@@ -436,7 +435,6 @@ public class D3DTX_V3
     totalSize += 4; //mUVScale X [4 bytes]
     totalSize += 4; //mUVScale Y [4 bytes]
 
-    totalSize += 4; //mToonRegions Block Size [4 bytes]
     totalSize += 4; //mToonRegions DCArray Capacity [4 bytes]
     totalSize += 4; //mToonRegions DCArray Length [4 bytes]
     for (int i = 0; i < mToonRegions_ArrayLength; i++)
@@ -497,7 +495,6 @@ public class D3DTX_V3
     d3dtxInfo += "mUVScale = " + mUVScale + Environment.NewLine;
 
     d3dtxInfo += "----------- mToonRegions -----------" + Environment.NewLine;
-    d3dtxInfo += "mToonRegions_BlockSize = " + mToonRegions_BlockSize + Environment.NewLine;
     d3dtxInfo += "mToonRegions_ArrayCapacity = " + mToonRegions_ArrayCapacity + Environment.NewLine;
     d3dtxInfo += "mToonRegions_ArrayLength = " + mToonRegions_ArrayLength + Environment.NewLine;
     for (int i = 0; i < mToonRegions_ArrayLength; i++)

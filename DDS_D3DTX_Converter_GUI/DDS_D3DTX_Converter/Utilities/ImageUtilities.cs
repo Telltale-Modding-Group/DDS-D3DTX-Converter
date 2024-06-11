@@ -7,7 +7,7 @@ using Avalonia.Platform;
 using BitMiracle.LibTiff.Classic;
 using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
-using DirectXTexNet;
+using HexaEngine.DirectXTex;
 using Pfim;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -86,50 +86,6 @@ public static class ImageUtilities
         });
 
         return hasAlpha;
-    }
-
-    /// <summary>
-    /// Converts .dds (and .tga) files to a bitmap. This is only used in the image preview.
-    /// </summary>
-    /// <param name="filePath"></param>
-    /// <returns></returns>
-    public static Bitmap ConvertFileFromDdsToBitmap(string filePath)
-    {
-        ScratchImage ddsImage = DDS_DirectXTexNet.GetDDSImage(filePath, DDS_FLAGS.NONE);
-        return ConvertDdsImageToBitmap(ddsImage);
-    }
-
-    /// <summary>
-    /// Converts .dds files to a bitmap. This is only used in the image preview.
-    /// </summary>
-    /// <param name="ddsImage">The dds image from DirectXTexNet.</param>
-    /// <returns>The png bitmap from .dds.</returns>
-    /// <exception cref="ArgumentException"></exception>
-    public static Bitmap ConvertDdsImageToBitmap(ScratchImage ddsImage)
-    {
-        // Get the first mip level of the image
-        var ddsMainImage = ddsImage.GetImage(0);
-        bool isCompressed = TexHelper.Instance.IsCompressed(ddsMainImage.Format);
-
-        UnmanagedMemoryStream stream;
-        // If the image is compressed, decompress it to RGBA32. Otherwise, convert it to RGBA32.
-        if (isCompressed)
-        {
-            stream = ddsImage.SaveToDDSMemory(0, DDS_FLAGS.NONE);
-        }
-        else
-        {
-            // Convert the image to RGBA32 format. 
-            //  (TODO Insert a link to the code)
-            if (ddsMainImage.Format != DXGI_FORMAT.R8G8B8A8_UNORM)
-                ddsImage = ddsImage.Convert(0, DXGI_FORMAT.R8G8B8A8_UNORM, TEX_FILTER_FLAGS.SRGB, 0.5f);
-
-            stream = ddsImage.SaveToDDSMemory(0, DDS_FLAGS.NONE);
-        }
-
-        using var image = Pfimage.FromStream(stream);
-
-        return GetDDSBitmap(image);
     }
 
     /// <summary>
@@ -213,19 +169,36 @@ public static class ImageUtilities
 
         var array = ddsFile.GetData(d3dtx);
 
-        if (d3dtx.ddsImage != null)
-        {
-            return ConvertDdsImageToBitmap(d3dtx.ddsImage);
-        }
-        else if (d3dtx.GetD3DTXObject() == null)
+        if (d3dtx.GetD3DTXObject() == null)
         {
             return null;
         }
-        else
-        {
-            ScratchImage ddsImage = DDS_DirectXTexNet.GetDDSImage(array, DDS_FLAGS.NONE);
-            return ConvertDdsImageToBitmap(ddsImage);
-        }
+
+        return ConvertDdsToBitmap(array);
+    }
+
+    /// <summary>
+    /// Converts .dds files to a bitmap. This is only used in the image preview.
+    /// </summary>
+    /// <param name="ddsImage">The dds image from DirectXTexNet.</param>
+    /// <returns>The png bitmap from .dds.</returns>
+    /// <exception cref="ArgumentException"></exception>
+    public static Bitmap ConvertFileFromDdsToBitmap(string filePath)
+    {
+        return ConvertDdsToBitmap(ByteFunctions.LoadTexture(filePath));
+    }
+
+    /// <summary>
+    /// Converts .dds files to a bitmap. This is only used in the image preview.
+    /// </summary>
+    /// <param name="ddsImage">The dds image from DirectXTexNet.</param>
+    /// <returns>The png bitmap from .dds.</returns>
+    /// <exception cref="ArgumentException"></exception>
+    public static Bitmap ConvertDdsToBitmap(byte[] ddsData)
+    {
+        using var image = Pfimage.FromStream(DDS_DirectXTexNet.GetUnmanagedMemoryStreamFromMemory(ddsData));
+
+        return GetDDSBitmap(image);
     }
 
     public static Bitmap GetDDSBitmap(IImage image)

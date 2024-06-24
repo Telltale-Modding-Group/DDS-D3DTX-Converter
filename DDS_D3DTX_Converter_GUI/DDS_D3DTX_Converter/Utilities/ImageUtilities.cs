@@ -7,7 +7,6 @@ using Avalonia.Platform;
 using BitMiracle.LibTiff.Classic;
 using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
-using HexaEngine.DirectXTex;
 using Pfim;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -161,10 +160,10 @@ public static class ImageUtilities
     /// </summary>
     /// <param name="filePath"></param>
     /// <returns></returns>
-    public static Bitmap ConvertD3dtxToBitmap(string filePath)
+    public static Bitmap ConvertD3dtxToBitmap(string filePath, D3DTXConversionType D3DTXConversionType = D3DTXConversionType.DEFAULT)
     {
         var d3dtx = new D3DTX_Master();
-        d3dtx.Read_D3DTX_File(filePath);
+        d3dtx.Read_D3DTX_File(filePath, D3DTXConversionType);
         DDS_Master ddsFile = new(d3dtx);
 
         var array = ddsFile.GetData(d3dtx);

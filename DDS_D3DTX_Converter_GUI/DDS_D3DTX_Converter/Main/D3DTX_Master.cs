@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 using D3DTX_Converter.DirectX;
 using D3DTX_Converter.TelltaleTypes;
 using System.Linq;
-using HexaEngine.DirectXTex;
+using Hexa.NET.DirectXTex;
 
 namespace D3DTX_Converter.Main
 {
@@ -27,12 +27,23 @@ namespace D3DTX_Converter.Main
         public MSV6? msv6;
         public MSV5? msv5;
         public MTRE? mtre;
+        public MBIN? mbin;
+
+        public MetaVersion meta;
 
         // D3DTX versions
         // Legacy D3DTX versions
         public D3DTX_LV1? d3dtxL1;
         public D3DTX_LV2? d3dtxL2;
         public D3DTX_LV3? d3dtxL3;
+        public D3DTX_LV4? d3dtxL4;
+        public D3DTX_LV5? d3dtxL5;
+        public D3DTX_LV6? d3dtxL6;
+        public D3DTX_LV7? d3dtxL7;
+        public D3DTX_LV8? d3dtxL8;
+        public D3DTX_LV9? d3dtxL9;
+        public D3DTX_LV10? d3dtxL10;
+        public D3DTX_LV11? d3dtxL11;
 
         // Newer D3DTX versions. They are used from Poker Night 2 and later games.
         public D3DTX_V3? d3dtx3;
@@ -74,12 +85,22 @@ namespace D3DTX_Converter.Main
             {
                 case "6VSM":
                     msv6 = new(reader);
+                    meta = MetaVersion.MSV6;
                     break;
                 case "5VSM":
+                case "4VSM":
                     msv5 = new(reader);
+                    meta = MetaVersion.MSV5;
                     break;
                 case "ERTM":
+                case "MOCM":
                     mtre = new(reader);
+                    meta = MetaVersion.MTRE;
+                    break;
+                case "NIBM":
+                case "SEBM":
+                    mbin = new(reader);
+                    meta = MetaVersion.MBIN;
                     break;
                 case "DDS ":
                     // Find DDS in the the file (this try-catch is bad practice);
@@ -129,34 +150,65 @@ namespace D3DTX_Converter.Main
                     d3dtx9 = new(reader, true);
                     break;
                 case -1:
-                    if (setD3DTXVersion == D3DTXConversionType.LV1)
-                    {
-                        d3dtxL1 = new D3DTX_LV1(reader, true);
-                    }
-                    else if (setD3DTXVersion == D3DTXConversionType.LV2)
-                    {
-                        d3dtxL2 = new D3DTX_LV2(reader, true);
-                    }
-                    else if (setD3DTXVersion == D3DTXConversionType.LV3)
-                    {
-                        d3dtxL3 = new D3DTX_LV3(reader, true);
-                    }
-                    else if (setD3DTXVersion == D3DTXConversionType.DEFAULT)
-                    {
-                        try
-                        {
-                            ddsData = ByteFunctions.GetBytesAfterBytePattern(DDS.MAGIC_WORD, reader.ReadBytes((int)reader.BaseStream.Length));
-                            ddsImage = DDS_DirectXTexNet.GetDDSImage(ddsData);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("No DDS Header found");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("ERROR! '{0}' d3dtx version is not supported!", d3dtxVersion);
-                    }
+                    // if (setD3DTXVersion == D3DTXConversionType.LV1)
+                    // {
+                    //     d3dtxL1 = new D3DTX_LV1(reader, true);
+                    // }
+                    // else if (setD3DTXVersion == D3DTXConversionType.LV2)
+                    // {
+                    //     d3dtxL2 = new D3DTX_LV2(reader, true);
+                    // }
+                    // else if (setD3DTXVersion == D3DTXConversionType.LV3)
+                    // {
+                    //     d3dtxL3 = new D3DTX_LV3(reader, true);
+                    // }
+                    // else if (setD3DTXVersion == D3DTXConversionType.LV4)
+                    // {
+                    //     d3dtxL4 = new D3DTX_LV4(reader, true);
+                    // }
+                    // else if (setD3DTXVersion == D3DTXConversionType.LV5)
+                    // {
+                    //     d3dtxL5 = new D3DTX_LV5(reader, true);
+                    // }
+                    // else if (setD3DTXVersion == D3DTXConversionType.LV6)
+                    // {
+                    //     d3dtxL6 = new D3DTX_LV6(reader, true);
+                    // }
+                    // else if (setD3DTXVersion == D3DTXConversionType.LV7)
+                    // {
+                    //     d3dtxL7 = new D3DTX_LV7(reader, true);
+                    // }
+                    // else if (setD3DTXVersion == D3DTXConversionType.LV8)
+                    // {
+                    //     d3dtxL8 = new D3DTX_LV8(reader, true);
+                    // }
+                    // else 
+
+                    D3DTXConversionType t = TryToInitializeLegacyD3DTX(reader);
+                    Console.WriteLine(t);
+
+                    // if (setD3DTXVersion == D3DTXConversionType.DEFAULT)
+                    // {
+                    //     try
+                    //     {
+                    //         if (mbin != null)
+                    //         {
+                    //             throw new IOException("No DDS Header are found in MBIN meta files. Please use a different conversion option.");
+                    //         }
+
+                    //         ddsData = ByteFunctions.GetBytesAfterBytePattern(DDS.MAGIC_WORD, reader.ReadBytes((int)reader.BaseStream.Length));
+                    //         ddsImage = DDS_DirectXTexNet.GetDDSImage(ddsData);
+                    //     }
+                    //     catch (Exception e)
+                    //     {
+                    //         Console.WriteLine("No DDS Header found");
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     Console.WriteLine("ERROR! '{0}' d3dtx version is not supported!", d3dtxVersion);
+                    // }
+                    // break;
                     break;
                 default:
                     Console.WriteLine("ERROR! '{0}' d3dtx version is not supported!", d3dtxVersion);
@@ -169,7 +221,92 @@ namespace D3DTX_Converter.Main
             if (msv6 != null) return msv6;
             else if (msv5 != null) return msv5;
             else if (mtre != null) return mtre;
+            else if (mbin != null) return mbin;
             else return null;
+        }
+
+        public D3DTXConversionType TryToInitializeLegacyD3DTX(BinaryReader reader)
+        {
+            var startPos = reader.BaseStream.Position;
+
+            try
+            {
+                d3dtxL1 = new D3DTX_LV1(reader, true);
+                return D3DTXConversionType.LV1;
+            }
+            catch { reader.BaseStream.Position = startPos; }
+
+            try
+            {
+                d3dtxL2 = new D3DTX_LV2(reader, true);
+                return D3DTXConversionType.LV2;
+            }
+            catch { reader.BaseStream.Position = startPos; }
+
+            try
+            {
+                d3dtxL3 = new D3DTX_LV3(reader, true);
+                return D3DTXConversionType.LV3;
+            }
+            catch { reader.BaseStream.Position = startPos; }
+
+            try
+            {
+                d3dtxL4 = new D3DTX_LV4(reader, true);
+                return D3DTXConversionType.LV4;
+            }
+            catch { reader.BaseStream.Position = startPos; }
+
+            try
+            {
+                d3dtxL5 = new D3DTX_LV5(reader, true);
+                return D3DTXConversionType.LV5;
+            }
+            catch { reader.BaseStream.Position = startPos; }
+
+            try
+            {
+                d3dtxL6 = new D3DTX_LV6(reader, true);
+                return D3DTXConversionType.LV6;
+            }
+            catch { reader.BaseStream.Position = startPos; }
+
+            try
+            {
+                d3dtxL7 = new D3DTX_LV7(reader, true);
+                return D3DTXConversionType.LV7;
+            }
+            catch { reader.BaseStream.Position = startPos; }
+
+            try
+            {
+                d3dtxL8 = new D3DTX_LV8(reader, true);
+                return D3DTXConversionType.LV8;
+            }
+            catch { reader.BaseStream.Position = startPos; }
+
+            try
+            {
+                d3dtxL9 = new D3DTX_LV9(reader, true);
+                return D3DTXConversionType.LV9;
+            }
+            catch { reader.BaseStream.Position = startPos; }
+
+            try
+            {
+                d3dtxL10 = new D3DTX_LV10(reader, true);
+                return D3DTXConversionType.LV10;
+            }
+            catch { reader.BaseStream.Position = startPos; }
+
+            try
+            {
+                d3dtxL11 = new D3DTX_LV11(reader, true);
+                return D3DTXConversionType.LV11;
+            }
+            catch { reader.BaseStream.Position = startPos; }
+
+            return D3DTXConversionType.DEFAULT;
         }
 
         public object GetD3DTXObject()
@@ -177,6 +314,14 @@ namespace D3DTX_Converter.Main
             if (d3dtxL1 != null) return d3dtxL1;
             else if (d3dtxL2 != null) return d3dtxL2;
             else if (d3dtxL3 != null) return d3dtxL3;
+            else if (d3dtxL4 != null) return d3dtxL4;
+            else if (d3dtxL5 != null) return d3dtxL5;
+            else if (d3dtxL6 != null) return d3dtxL6;
+            else if (d3dtxL7 != null) return d3dtxL7;
+            else if (d3dtxL8 != null) return d3dtxL8;
+            else if (d3dtxL9 != null) return d3dtxL9;
+            else if (d3dtxL10 != null) return d3dtxL10;
+            else if (d3dtxL11 != null) return d3dtxL11;
             else if (d3dtx3 != null) return d3dtx3;
             else if (d3dtx4 != null) return d3dtx4;
             else if (d3dtx5 != null) return d3dtx5;
@@ -186,16 +331,6 @@ namespace D3DTX_Converter.Main
             else if (d3dtx9 != null) return d3dtx9;
             else if (!ddsImage.IsNull) return ddsData;
             else return null;
-        }
-
-        public DDS_HEADER GetDDSHeaderFromLegacyD3DTX()
-        {
-            // if (metadata != null) return genericDDS.header;
-            // else 
-            if (d3dtxL1 != null) return d3dtxL1.mDDSHeader;
-            else if (d3dtxL2 != null) return d3dtxL2.mDDSHeader;
-            else if (d3dtxL3 != null) return d3dtxL3.mDDSHeader;
-            else return new DDS_HEADER();
         }
 
         /// <summary>
@@ -209,10 +344,20 @@ namespace D3DTX_Converter.Main
             if (msv6 != null) msv6.WriteBinaryData(writer);
             else if (msv5 != null) msv5.WriteBinaryData(writer);
             else if (mtre != null) mtre.WriteBinaryData(writer);
+            else if (mbin != null) mbin.WriteBinaryData(writer);
+            else { Console.WriteLine("Error! No Meta object found!"); }
 
             if (d3dtxL1 != null) d3dtxL1.WriteBinaryData(writer);
             else if (d3dtxL2 != null) d3dtxL2.WriteBinaryData(writer);
             else if (d3dtxL3 != null) d3dtxL3.WriteBinaryData(writer);
+            else if (d3dtxL4 != null) d3dtxL4.WriteBinaryData(writer);
+            else if (d3dtxL5 != null) d3dtxL5.WriteBinaryData(writer);
+            else if (d3dtxL6 != null) d3dtxL6.WriteBinaryData(writer);
+            else if (d3dtxL7 != null) d3dtxL7.WriteBinaryData(writer);
+            else if (d3dtxL8 != null) d3dtxL8.WriteBinaryData(writer);
+            else if (d3dtxL9 != null) d3dtxL9.WriteBinaryData(writer);
+            else if (d3dtxL10 != null) d3dtxL10.WriteBinaryData(writer);
+            else if (d3dtxL11 != null) d3dtxL11.WriteBinaryData(writer);
             else if (d3dtx3 != null) d3dtx3.WriteBinaryData(writer);
             else if (d3dtx4 != null) d3dtx4.WriteBinaryData(writer);
             else if (d3dtx5 != null) d3dtx5.WriteBinaryData(writer);
@@ -230,10 +375,20 @@ namespace D3DTX_Converter.Main
             if (msv6 != null) allInfo += msv6.GetMSV6Info();
             else if (msv5 != null) allInfo += msv5.GetMSV5Info();
             else if (mtre != null) allInfo += mtre.GetMTREInfo();
+            else if (mbin != null) allInfo += mbin.GetMBINInfo();
+            else allInfo += "Error! Meta data not found!";
 
-            if (d3dtxL1 != null) allInfo += d3dtxL1.GetD3DTXInfo();
+            if (d3dtxL1 != null) allInfo += d3dtxL1.GetD3DTXInfo(meta);
             else if (d3dtxL2 != null) allInfo += d3dtxL2.GetD3DTXInfo();
             else if (d3dtxL3 != null) allInfo += d3dtxL3.GetD3DTXInfo();
+            else if (d3dtxL4 != null) allInfo += d3dtxL4.GetD3DTXInfo();
+            else if (d3dtxL5 != null) allInfo += d3dtxL5.GetD3DTXInfo();
+            else if (d3dtxL6 != null) allInfo += d3dtxL6.GetD3DTXInfo();
+            else if (d3dtxL7 != null) allInfo += d3dtxL7.GetD3DTXInfo();
+            else if (d3dtxL8 != null) allInfo += d3dtxL8.GetD3DTXInfo();
+            else if (d3dtxL9 != null) allInfo += d3dtxL9.GetD3DTXInfo();
+            else if (d3dtxL10 != null) allInfo += d3dtxL10.GetD3DTXInfo();
+            else if (d3dtxL11 != null) allInfo += d3dtxL11.GetD3DTXInfo();
             else if (d3dtx3 != null) allInfo += d3dtx3.GetD3DTXInfo();
             else if (d3dtx4 != null) allInfo += d3dtx4.GetD3DTXInfo();
             else if (d3dtx5 != null) allInfo += d3dtx5.GetD3DTXInfo();
@@ -298,6 +453,38 @@ namespace D3DTX_Converter.Main
             {
                 d3dtxL3 = d3dtxObject.ToObject<D3DTX_LV3>();
             }
+            else if (d3dtxConversionType == D3DTXConversionType.LV4)
+            {
+                d3dtxL4 = d3dtxObject.ToObject<D3DTX_LV4>();
+            }
+            else if (d3dtxConversionType == D3DTXConversionType.LV5)
+            {
+                d3dtxL5 = d3dtxObject.ToObject<D3DTX_LV5>();
+            }
+            else if (d3dtxConversionType == D3DTXConversionType.LV6)
+            {
+                d3dtxL6 = d3dtxObject.ToObject<D3DTX_LV6>();
+            }
+            else if (d3dtxConversionType == D3DTXConversionType.LV7)
+            {
+                d3dtxL7 = d3dtxObject.ToObject<D3DTX_LV7>();
+            }
+            else if (d3dtxConversionType == D3DTXConversionType.LV8)
+            {
+                d3dtxL8 = d3dtxObject.ToObject<D3DTX_LV8>();
+            }
+            else if (d3dtxConversionType == D3DTXConversionType.LV9)
+            {
+                d3dtxL9 = d3dtxObject.ToObject<D3DTX_LV9>();
+            }
+            else if (d3dtxConversionType == D3DTXConversionType.LV10)
+            {
+                d3dtxL10 = d3dtxObject.ToObject<D3DTX_LV10>();
+            }
+            else if (d3dtxConversionType == D3DTXConversionType.LV11)
+            {
+                d3dtxL11 = d3dtxObject.ToObject<D3DTX_LV11>();
+            }
         }
 
         public void ConvertJSONObjectToD3dtx(JObject d3dtxObject)
@@ -356,6 +543,7 @@ namespace D3DTX_Converter.Main
             if (metaStreamVersion.Equals("6VSM")) msv6 = metaObject.ToObject<MSV6>();
             else if (metaStreamVersion.Equals("5VSM")) msv5 = metaObject.ToObject<MSV5>();
             else if (metaStreamVersion.Equals("ERTM")) mtre = metaObject.ToObject<MTRE>();
+            else if (metaStreamVersion.Equals("NIBM")) mbin = metaObject.ToObject<MBIN>();
         }
 
         public void WriteD3DTXJSON(string fileName, string destinationDirectory)
@@ -385,11 +573,6 @@ namespace D3DTX_Converter.Main
 
         public void SetMetaChunkSizes(uint mDefaultSectionChunkSize, uint mAsyncSectionChunkSize)
         {
-            if (mtre != null)
-            {
-                //
-            }
-
             if (msv5 != null)
             {
                 msv5.mDefaultSectionChunkSize = mDefaultSectionChunkSize;
@@ -419,6 +602,46 @@ namespace D3DTX_Converter.Main
             {
                 var dataArray = DDS_DirectXTexNet.GetDDSByteArray(image, DDSFlags.ForceDx9Legacy);
                 d3dtxL3.ModifyD3DTX(meta, dataArray);
+            }
+            else if (d3dtxL4 != null)
+            {
+                var dataArray = DDS_DirectXTexNet.GetDDSByteArray(image, DDSFlags.ForceDx9Legacy);
+                d3dtxL4.ModifyD3DTX(meta, dataArray);
+            }
+            else if (d3dtxL5 != null)
+            {
+                var dataArray = DDS_DirectXTexNet.GetDDSByteArray(image, DDSFlags.ForceDx9Legacy);
+                d3dtxL5.ModifyD3DTX(meta, dataArray);
+            }
+            else if (d3dtxL6 != null)
+            {
+                var dataArray = DDS_DirectXTexNet.GetDDSByteArray(image, DDSFlags.ForceDx9Legacy);
+                d3dtxL6.ModifyD3DTX(meta, dataArray);
+            }
+            else if (d3dtxL7 != null)
+            {
+                var dataArray = DDS_DirectXTexNet.GetDDSByteArray(image, DDSFlags.ForceDx9Legacy);
+                d3dtxL7.ModifyD3DTX(meta, dataArray);
+            }
+            else if (d3dtxL8 != null)
+            {
+                var dataArray = DDS_DirectXTexNet.GetDDSByteArray(image, DDSFlags.ForceDx9Legacy);
+                d3dtxL8.ModifyD3DTX(meta, dataArray);
+            }
+            else if (d3dtxL9 != null)
+            {
+                var dataArray = DDS_DirectXTexNet.GetDDSByteArray(image, DDSFlags.ForceDx9Legacy);
+                d3dtxL9.ModifyD3DTX(meta, dataArray);
+            }
+            else if (d3dtxL10 != null)
+            {
+                var dataArray = DDS_DirectXTexNet.GetDDSByteArray(image, DDSFlags.ForceDx9Legacy);
+                d3dtxL10.ModifyD3DTX(meta, dataArray);
+            }
+            else if (d3dtxL11 != null)
+            {
+                var dataArray = DDS_DirectXTexNet.GetDDSByteArray(image, DDSFlags.ForceDx9Legacy);
+                d3dtxL11.ModifyD3DTX(meta, dataArray);
             }
 
             // If they are not legacy version, stable sort the image sections by size. (Smallest to Largest)
@@ -501,20 +724,26 @@ namespace D3DTX_Converter.Main
             MSV6 meta6VSM;
             MSV5 meta5VSM;
             MTRE metaERTM = null;
+            MBIN metaMBIN = null;
             if (metaVersion.Equals("6VSM")) meta6VSM = new(reader, false);
             else if (metaVersion.Equals("5VSM")) meta5VSM = new(reader, false);
+            else if (metaVersion.Equals("4VSM")) meta5VSM = new(reader, false);
             else if (metaVersion.Equals("ERTM")) metaERTM = new(reader, false);
+            else if (metaVersion.Equals("MOCM")) metaERTM = new(reader, false);
+            else if (metaVersion.Equals("NIBM")) metaMBIN = new(reader, false);
+            else if (metaVersion.Equals("SEBM")) metaMBIN = new(reader, false);
 
             //read the first int (which is an mVersion d3dtx value)
             if (metaERTM != null)
             {
                 return reader.ReadInt32() == 3 ? 3 : -1; //return -1 because d3dtx versions older than 3 don't have an mVersion variable (not that I know of atleast)
             }
+            else if (metaMBIN != null) return -1;
             else
                 return reader.ReadInt32();
         }
 
-        public bool isLegacyD3DTX()
+        public bool IsLegacyD3DTX()
         {
             if (d3dtx3 != null)
                 return false;
@@ -534,6 +763,10 @@ namespace D3DTX_Converter.Main
             return true;
         }
 
+        public bool IsMbin()
+        {
+            return mbin != null;
+        }
 
         public bool IsVolumeTexture()
         {
@@ -621,6 +854,22 @@ namespace D3DTX_Converter.Main
                 return d3dtxL2.mName;
             else if (d3dtxL3 != null)
                 return d3dtxL3.mName;
+            else if (d3dtxL4 != null)
+                return d3dtxL4.mName;
+            else if (d3dtxL5 != null)
+                return d3dtxL5.mName;
+            else if (d3dtxL6 != null)
+                return d3dtxL6.mName;
+            else if (d3dtxL7 != null)
+                return d3dtxL7.mName;
+            else if (d3dtxL8 != null)
+                return d3dtxL8.mName;
+            else if (d3dtxL9 != null)
+                return d3dtxL9.mName;
+            else if (d3dtxL10 != null)
+                return d3dtxL10.mName;
+            else if (d3dtxL11 != null)
+                return d3dtxL11.mName;
             else if (d3dtx3 != null)
                 return d3dtx3.mName;
             else if (d3dtx4 != null)
@@ -647,6 +896,22 @@ namespace D3DTX_Converter.Main
                 return d3dtxL2.mHeight;
             else if (d3dtxL3 != null)
                 return d3dtxL3.mHeight;
+            else if (d3dtxL4 != null)
+                return d3dtxL4.mHeight;
+            else if (d3dtxL5 != null)
+                return d3dtxL5.mHeight;
+            else if (d3dtxL6 != null)
+                return d3dtxL6.mHeight;
+            else if (d3dtxL7 != null)
+                return d3dtxL7.mHeight;
+            else if (d3dtxL8 != null)
+                return d3dtxL8.mHeight;
+            else if (d3dtxL9 != null)
+                return d3dtxL9.mHeight;
+            else if (d3dtxL10 != null)
+                return d3dtxL10.mHeight;
+            else if (d3dtxL11 != null)
+                return d3dtxL11.mHeight;
             else if (d3dtx3 != null)
                 return d3dtx3.mHeight;
             else if (d3dtx4 != null)
@@ -662,7 +927,7 @@ namespace D3DTX_Converter.Main
             else if (d3dtx9 != null)
                 return d3dtx9.mHeight;
             else if (!ddsImage.IsNull)
-                return DirectXTex.GetMetadata(ddsImage).Height;
+                return (nuint)DirectXTex.GetMetadata(ddsImage).Height;
             else
                 return 0;
         }
@@ -675,6 +940,22 @@ namespace D3DTX_Converter.Main
                 return d3dtxL2.mWidth;
             else if (d3dtxL3 != null)
                 return d3dtxL3.mWidth;
+            else if (d3dtxL4 != null)
+                return d3dtxL4.mWidth;
+            else if (d3dtxL5 != null)
+                return d3dtxL5.mWidth;
+            else if (d3dtxL6 != null)
+                return d3dtxL6.mWidth;
+            else if (d3dtxL7 != null)
+                return d3dtxL7.mWidth;
+            else if (d3dtxL8 != null)
+                return d3dtxL8.mWidth;
+            else if (d3dtxL9 != null)
+                return d3dtxL9.mWidth;
+            else if (d3dtxL10 != null)
+                return d3dtxL10.mWidth;
+            else if (d3dtxL11 != null)
+                return d3dtxL11.mWidth;
             else if (d3dtx3 != null)
                 return d3dtx3.mWidth;
             else if (d3dtx4 != null)
@@ -690,7 +971,7 @@ namespace D3DTX_Converter.Main
             else if (d3dtx9 != null)
                 return d3dtx9.mWidth;
             else if (!ddsImage.IsNull)
-                return DirectXTex.GetMetadata(ddsImage).Width;
+                return (nuint)DirectXTex.GetMetadata(ddsImage).Width;
             else
                 return 0;
         }
@@ -713,6 +994,22 @@ namespace D3DTX_Converter.Main
                 return d3dtxL2.mD3DFormat.ToString();
             else if (d3dtxL3 != null)
                 return d3dtxL3.mD3DFormat.ToString();
+            else if (d3dtxL4 != null)
+                return d3dtxL4.mD3DFormat.ToString();
+            else if (d3dtxL5 != null)
+                return d3dtxL5.mD3DFormat.ToString();
+            else if (d3dtxL6 != null)
+                return d3dtxL6.mD3DFormat.ToString();
+            else if (d3dtxL7 != null)
+                return d3dtxL7.mD3DFormat.ToString();
+            else if (d3dtxL8 != null)
+                return d3dtxL8.mD3DFormat.ToString();
+            else if (d3dtxL9 != null)
+                return d3dtxL9.mD3DFormat.ToString();
+            else if (d3dtxL10 != null)
+                return d3dtxL10.mD3DFormat.ToString();
+            else if (d3dtxL11 != null)
+                return d3dtxL11.mD3DFormat.ToString();
             else if (d3dtx3 != null)
                 return Enum.GetName(d3dtx3.mSurfaceFormat).Remove(0, 9);
             else if (d3dtx4 != null)
@@ -730,7 +1027,7 @@ namespace D3DTX_Converter.Main
             else if (!ddsImage.IsNull)
                 return Enum.GetName((DXGIFormat)DirectXTex.GetMetadata(ddsImage).Format);
             else
-                return null;
+                return "UNKNOWN COMPRESSION";
         }
 
         public T3SurfaceFormat GetCompressionType()
@@ -783,7 +1080,7 @@ namespace D3DTX_Converter.Main
                 return 1;
         }
 
-        public RegionStreamHeader[]? GetRegionStreamHeaders()
+        public RegionStreamHeader[] GetRegionStreamHeaders()
         {
             if (d3dtx3 != null)
                 return d3dtx3.mRegionHeaders;
@@ -800,7 +1097,49 @@ namespace D3DTX_Converter.Main
             else if (d3dtx9 != null)
                 return d3dtx9.mRegionHeaders;
             else
-                return null;
+                return [];
+        }
+
+        public eTxAlpha GetAlpha()
+        {
+            if (d3dtxL1 != null)
+                return d3dtxL1.mAlphaMode;
+            else if (d3dtxL2 != null)
+                return d3dtxL2.mAlphaMode;
+            else if (d3dtxL3 != null)
+                return d3dtxL3.mAlphaMode;
+            else if (d3dtxL4 != null)
+                return d3dtxL4.mAlphaMode;
+            else if (d3dtxL5 != null)
+                return d3dtxL5.mAlphaMode;
+            else if (d3dtxL6 != null)
+                return d3dtxL6.mAlphaMode;
+            else if (d3dtxL7 != null)
+                return d3dtxL7.mAlphaMode;
+            else if (d3dtxL8 != null)
+                return d3dtxL8.mAlphaMode;
+            else if (d3dtxL9 != null)
+                return d3dtxL9.mAlphaMode;
+            else if (d3dtxL10 != null)
+                return d3dtxL10.mAlphaMode;
+            else if (d3dtxL11 != null)
+                return d3dtxL11.mAlphaMode;
+            else if (d3dtx3 != null)
+                return d3dtx3.mAlphaMode;
+            else if (d3dtx4 != null)
+                return d3dtx4.mAlphaMode;
+            else if (d3dtx5 != null)
+                return d3dtx5.mAlphaMode;
+            else if (d3dtx6 != null)
+                return d3dtx6.mAlphaMode;
+            else if (d3dtx7 != null)
+                return d3dtx7.mAlphaMode;
+            else if (d3dtx8 != null)
+                return d3dtx8.mAlphaMode;
+            else if (d3dtx9 != null)
+                return d3dtx9.mAlphaMode;
+            else
+                return eTxAlpha.eTxAlphaUnknown;
         }
 
         public string GetHasAlpha()
@@ -821,7 +1160,7 @@ namespace D3DTX_Converter.Main
                 return d3dtx9.mAlphaMode > 0 ? "True" : "False";
             else if (!ddsImage.IsNull)
             {
-                return DirectXTex.GetMetadata(ddsImage).GetAlphaMode().ToString();
+                return DirectXTex.HasAlpha(DirectXTex.GetMetadata(ddsImage).Format).ToString();
             }
             else
                 return "Unknown";
@@ -876,6 +1215,22 @@ namespace D3DTX_Converter.Main
                 return d3dtxL2.mNumMipLevels;
             else if (d3dtxL3 != null)
                 return d3dtxL3.mNumMipLevels;
+            else if (d3dtxL4 != null)
+                return d3dtxL4.mNumMipLevels;
+            else if (d3dtxL5 != null)
+                return d3dtxL5.mNumMipLevels;
+            else if (d3dtxL6 != null)
+                return d3dtxL6.mNumMipLevels;
+            else if (d3dtxL7 != null)
+                return d3dtxL7.mNumMipLevels;
+            else if (d3dtxL8 != null)
+                return d3dtxL8.mNumMipLevels;
+            else if (d3dtxL9 != null)
+                return d3dtxL9.mNumMipLevels;
+            else if (d3dtxL10 != null)
+                return d3dtxL10.mNumMipLevels;
+            else if (d3dtxL11 != null)
+                return d3dtxL11.mNumMipLevels;
             else if (d3dtx3 != null)
                 return d3dtx3.mNumMipLevels;
             else if (d3dtx4 != null)
@@ -891,7 +1246,7 @@ namespace D3DTX_Converter.Main
             else if (d3dtx9 != null)
                 return d3dtx9.mNumMipLevels;
             else if (!ddsImage.IsNull)
-                return DirectXTex.GetMetadata(ddsImage).MipLevels;
+                return (nuint)DirectXTex.GetMetadata(ddsImage).MipLevels;
             else
                 return 0;
         }
@@ -914,12 +1269,40 @@ namespace D3DTX_Converter.Main
                 return PlatformType.ePlatform_All;
         }
 
+        public D3DFORMAT GetD3DFORMAT()
+        {
+            if (d3dtxL1 != null)
+                return d3dtxL1.mD3DFormat;
+            else if (d3dtxL2 != null)
+                return d3dtxL2.mD3DFormat;
+            else if (d3dtxL3 != null)
+                return d3dtxL3.mD3DFormat;
+            else if (d3dtxL4 != null)
+                return d3dtxL4.mD3DFormat;
+            else if (d3dtxL5 != null)
+                return d3dtxL5.mD3DFormat;
+            else if (d3dtxL6 != null)
+                return d3dtxL6.mD3DFormat;
+            else if (d3dtxL7 != null)
+                return d3dtxL7.mD3DFormat;
+            else if (d3dtxL8 != null)
+                return d3dtxL8.mD3DFormat;
+            else if (d3dtxL9 != null)
+                return d3dtxL9.mD3DFormat;
+            else if (d3dtxL10 != null)
+                return d3dtxL10.mD3DFormat;
+            else if (d3dtxL11 != null)
+                return d3dtxL11.mD3DFormat;
+            else
+                return D3DFORMAT.UNKNOWN;
+        }
+
         public bool HasMipMaps()
         {
             return GetMipMapCount() > 1;
         }
 
-        public List<byte[]>? GetLegacyPixelData()
+        public List<byte[]> GetLegacyPixelData()
         {
             if (d3dtxL1 != null)
                 return d3dtxL1.mPixelData;
@@ -927,11 +1310,27 @@ namespace D3DTX_Converter.Main
                 return d3dtxL2.mPixelData;
             else if (d3dtxL3 != null)
                 return d3dtxL3.mPixelData;
+            else if (d3dtxL4 != null)
+                return d3dtxL4.mPixelData;
+            else if (d3dtxL5 != null)
+                return d3dtxL5.mPixelData;
+            else if (d3dtxL6 != null)
+                return d3dtxL6.mPixelData;
+            else if (d3dtxL7 != null)
+                return d3dtxL7.mPixelData;
+            else if (d3dtxL8 != null)
+                return d3dtxL8.mPixelData;
+            else if (d3dtxL9 != null)
+                return d3dtxL9.mPixelData;
+            else if (d3dtxL10 != null)
+                return d3dtxL10.mPixelData;
+            else if (d3dtxL11 != null)
+                return d3dtxL11.mPixelData;
             else
-                return null;
+                return [];
         }
 
-        public List<byte[]>? GetPixelData()
+        public List<byte[]> GetPixelData()
         {
             if (d3dtx3 != null)
                 return d3dtx3.mPixelData;
@@ -948,7 +1347,99 @@ namespace D3DTX_Converter.Main
             else if (d3dtx9 != null)
                 return d3dtx9.mPixelData;
             else
-                return null;
+                return [];
+        }
+
+        public byte[] GetPixelDataByFaceIndex(int faceIndex, T3SurfaceFormat surfaceFormat, int width, int height, PlatformType platformType)
+        {
+            List<byte[]> newPixelData = [];
+
+            RegionStreamHeader[] regionHeaders = GetRegionStreamHeaders();
+
+            int divideBy = 1;
+
+            for (int i = 0; i < regionHeaders.Length; i++)
+            {
+                if (regionHeaders[i].mFaceIndex == faceIndex)
+                {
+                    if (regionHeaders[i].mMipCount > 1)
+                    {
+                        newPixelData.Add(GetPixelData()[i]); continue;
+                    }
+
+                    if (platformType == PlatformType.ePlatform_PS4)
+                    {
+                        Console.WriteLine("Unswizzling PS4 texture data..." + i);
+
+                        GetPixelData()[i] = PS4TextureDecoder.UnswizzlePS4(GetPixelData()[i], DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat), width / divideBy, height / divideBy);
+                    }
+
+                    else if (platformType == PlatformType.ePlatform_PS3 || platformType == PlatformType.ePlatform_WiiU)
+                    {
+                        Console.WriteLine("Unswizzling PS3 texture data..." + i);
+
+                        GetPixelData()[i] = PS4TextureDecoder.UnswizzlePS3(GetPixelData()[i], DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat), width / divideBy, height / divideBy);
+                    }
+                    else if (platformType == PlatformType.ePlatform_Xbox || platformType == PlatformType.ePlatform_XBOne)
+                    {
+                        Console.WriteLine("Unswizzling Xbox texture data..." + i);
+
+                        GetPixelData()[i] = Xbox360Texture.DecodeXbox360(GetPixelData()[i], surfaceFormat, width / divideBy, height / divideBy);
+                    }
+
+                    divideBy *= 2;
+
+                    newPixelData.Add(GetPixelData()[i]);
+                }
+            }
+
+            // Reverse the elements in the list to get the correct order.
+            newPixelData.Reverse();
+
+            return newPixelData.SelectMany(b => b).ToArray();
+        }
+
+        public byte[] GetPixelDataByMipmapIndex(int mipmapIndex, T3SurfaceFormat surfaceFormat, int width, int height, PlatformType platformType)
+        {
+            List<byte[]> newPixelData = [];
+
+            RegionStreamHeader[] regionHeaders = GetRegionStreamHeaders();
+
+            for (int i = 0; i < regionHeaders.Length; i++)
+            {
+                if (regionHeaders[i].mMipIndex == mipmapIndex)
+                {
+                    if (regionHeaders[i].mMipCount > 1)
+                    {
+                        newPixelData.Add(GetPixelData()[i]); continue;
+                    }
+
+                    if (platformType == PlatformType.ePlatform_PS4)
+                    {
+                        Console.WriteLine("Unswizzling PS4 texture data..." + i);
+
+                        GetPixelData()[i] = PS4TextureDecoder.UnswizzlePS4(GetPixelData()[i], DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat), width, height);
+                    }
+
+                    else if (platformType == PlatformType.ePlatform_PS3 || platformType == PlatformType.ePlatform_WiiU)
+                    {
+                        Console.WriteLine("Unswizzling PS3 texture data..." + i);
+
+                        GetPixelData()[i] = PS4TextureDecoder.UnswizzlePS3(GetPixelData()[i], DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat), width, height);
+                    }
+
+                    else if (platformType == PlatformType.ePlatform_Xbox || platformType == PlatformType.ePlatform_XBOne)
+                    {
+                        Console.WriteLine("Unswizzling Xbox texture data..." + i);
+
+                        GetPixelData()[i] = Xbox360Texture.DecodeXbox360(GetPixelData()[i], surfaceFormat, width, height);
+                    }
+
+                    newPixelData.Add(GetPixelData()[i]);
+                }
+            }
+
+            return newPixelData.SelectMany(b => b).ToArray();
         }
 
         public bool IsTextureCompressed()
@@ -971,7 +1462,17 @@ namespace D3DTX_Converter.Main
                 T3SurfaceFormat.eSurface_ATC_RGB => true,
                 T3SurfaceFormat.eSurface_ATC_RGBA => true,
                 T3SurfaceFormat.eSurface_ATC_RGB1A => true,
-
+                T3SurfaceFormat.eSurface_ETC1_RGB => true,
+                T3SurfaceFormat.eSurface_ETC2_RGB => true,
+                T3SurfaceFormat.eSurface_ETC2_RGBA => true,
+                T3SurfaceFormat.eSurface_ETC2_RGB1A => true,
+                T3SurfaceFormat.eSurface_ETC2_R => true,
+                T3SurfaceFormat.eSurface_ETC2_RG => true,
+                T3SurfaceFormat.eSurface_ATSC_RGBA_4x4 => true,
+                T3SurfaceFormat.eSurface_PVRTC2 => true,
+                T3SurfaceFormat.eSurface_PVRTC4 => true,
+                T3SurfaceFormat.eSurface_PVRTC2a => true,
+                T3SurfaceFormat.eSurface_PVRTC4a => true,
                 _ => false,
             };
         }

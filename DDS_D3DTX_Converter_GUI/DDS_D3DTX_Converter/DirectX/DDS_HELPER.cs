@@ -1,5 +1,6 @@
 ﻿using D3DTX_Converter.TelltaleEnums;
-using HexaEngine.DirectXTex;
+using Hexa.NET.DirectXTex;
+using Pfim;
 using System;
 using System.Runtime.InteropServices;
 
@@ -179,6 +180,7 @@ public static partial class DDS_HELPER
                 return DXGIFormat.B5G5R5A1_UNORM;
 
             //--------------------ARGB4--------------------
+            //ACTUALLY IT'S RGBA4 - IT NEEDS TO BE UPDATED
             case T3SurfaceFormat.eSurface_ARGB4:
                 return DXGIFormat.B4G4R4A4_UNORM;
 
@@ -429,6 +431,81 @@ public static partial class DDS_HELPER
             DXGIFormat.R32G32B32A32_FLOAT => D3DFORMAT.A32B32G32R32F,
 
             _ => D3DFORMAT.UNKNOWN
+        };
+    }
+
+    /// <summary>
+    /// Returns the corresponding Direct3D9 surface format from a Direct3D10/DXGI format.
+    /// This is used for the conversion process from .d3dtx to .dds. (Legacy .d3dtx)
+    /// </summary>
+    /// <param name="dxgiFormat">The DXGI format.</param>
+    /// <param name="metadata">The metadata of our .dds file. It is used in determining if the alpha is premultiplied.</param>
+    /// <returns>The corresponding Direct3D9 format.</returns>
+    public static DxgiFormat GetDXGIFormatFromD3DFormat(D3DFORMAT format)
+    {
+        return format switch
+        {
+            D3DFORMAT.A8R8G8B8 => DxgiFormat.B8G8R8A8_UNORM,
+            D3DFORMAT.X8R8G8B8 => DxgiFormat.B8G8R8X8_UNORM,
+            D3DFORMAT.X8L8V8U8 => DxgiFormat.B8G8R8A8_UNORM,
+            D3DFORMAT.R5G6B5 => DxgiFormat.B5G6R5_UNORM,
+            D3DFORMAT.X1R5G5B5 => DxgiFormat.B5G5R5A1_UNORM,
+            D3DFORMAT.A1R5G5B5 => DxgiFormat.B5G5R5A1_UNORM,
+            D3DFORMAT.A4R4G4B4 => DxgiFormat.B4G4R4A4_UNORM,
+            D3DFORMAT.A8 => DxgiFormat.A8_UNORM,
+            D3DFORMAT.A2B10G10R10 => DxgiFormat.R10G10B10A2_UNORM,
+            D3DFORMAT.A8B8G8R8 => DxgiFormat.R8G8B8A8_UNORM,
+            D3DFORMAT.X8B8G8R8 => DxgiFormat.R8G8B8A8_UNORM,
+            D3DFORMAT.G16R16 => DxgiFormat.R16G16_UNORM,
+            D3DFORMAT.A16B16G16R16 => DxgiFormat.R16G16B16A16_UNORM,
+            D3DFORMAT.L8 => DxgiFormat.R8_UNORM,
+            D3DFORMAT.A8L8 => DxgiFormat.R8G8_UNORM,
+            D3DFORMAT.V8U8 => DxgiFormat.R8G8_SNORM,
+            D3DFORMAT.Q8W8V8U8 => DxgiFormat.R8G8B8A8_SNORM,
+            D3DFORMAT.V16U16 => DxgiFormat.R16G16_SNORM,
+            D3DFORMAT.R8G8_B8G8 => DxgiFormat.G8R8_G8B8_UNORM,
+            D3DFORMAT.YUY2 => DxgiFormat.YUY2,
+            D3DFORMAT.G8R8_G8B8 => DxgiFormat.R8G8_B8G8_UNORM,
+            D3DFORMAT.DXT1 => DxgiFormat.BC1_UNORM,
+            D3DFORMAT.DXT2 => DxgiFormat.BC2_UNORM,
+            D3DFORMAT.DXT3 => DxgiFormat.BC2_UNORM,
+            D3DFORMAT.DXT4 => DxgiFormat.BC3_UNORM,
+            D3DFORMAT.DXT5 => DxgiFormat.BC3_UNORM,
+            D3DFORMAT.ATI1 => DxgiFormat.BC4_UNORM,
+            D3DFORMAT.BC4S => DxgiFormat.BC4_SNORM,
+            D3DFORMAT.ATI2 => DxgiFormat.BC5_UNORM,
+            D3DFORMAT.BC5S => DxgiFormat.BC5_SNORM,
+            D3DFORMAT.D16 => DxgiFormat.D16_UNORM,
+            D3DFORMAT.D32F_LOCKABLE => DxgiFormat.D32_FLOAT,
+            D3DFORMAT.D24S8 => DxgiFormat.D24_UNORM_S8_UINT,
+            D3DFORMAT.L16 => DxgiFormat.R16_UNORM,
+            D3DFORMAT.Q16W16V16U16 => DxgiFormat.R16G16B16A16_SNORM,
+            D3DFORMAT.R16F => DxgiFormat.R16_FLOAT,
+            D3DFORMAT.G16R16F => DxgiFormat.R16G16_FLOAT,
+            D3DFORMAT.A16B16G16R16F => DxgiFormat.R16G16B16A16_FLOAT,
+            D3DFORMAT.R32F => DxgiFormat.R32_FLOAT,
+            D3DFORMAT.G32R32F => DxgiFormat.R32G32_FLOAT,
+            D3DFORMAT.A32B32G32R32F => DxgiFormat.R32G32B32A32_FLOAT,
+
+            _ => DxgiFormat.UNKNOWN
+        };
+    }
+
+    /// <summary>
+    /// Returns the corresponding Direct3D9 surface format from a Direct3D10/DXGI format.
+    /// This is used for the conversion process from .d3dtx to .dds. (Legacy .d3dtx)
+    /// </summary>
+    /// <param name="dxgiFormat">The DXGI format.</param>
+    /// <param name="metadata">The metadata of our .dds file. It is used in determining if the alpha is premultiplied.</param>
+    /// <returns>The corresponding Direct3D9 format.</returns>
+    public static bool IsPremultipliedAlpha(D3DFORMAT format)
+    {
+        return format switch
+        {
+            D3DFORMAT.DXT2 => true,
+            D3DFORMAT.DXT4 => true,
+
+            _ => false
         };
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using D3DTX_Converter.Utilities;
 
 namespace D3DTX_Converter.DirectX;
 
@@ -159,8 +160,18 @@ public struct DDS_HEADER
     /// </summary>
     public uint dwReserved12;
 
-    public DDS_HEADER(BinaryReader reader)
+    public DDS_HEADER(BinaryReader reader, bool skipDWORD = false)
     {
+        if (skipDWORD)
+        {
+            uint word = reader.ReadUInt32();
+
+            if (ByteFunctions.Convert_String_To_UInt32("DDS ") != word)
+            {
+                throw new Exception("Invalid DDS Header");
+            }
+        }
+
         dwSize = reader.ReadUInt32();
         dwFlags = (DDSD)reader.ReadUInt32();
         dwHeight = reader.ReadUInt32();
@@ -215,12 +226,12 @@ public struct DDS_HEADER
         writer.Write(dwReserved12);
     }
 
-    public static DDS_HEADER GetHeaderFromBytes(byte[] byteArray)
+    public static DDS_HEADER GetHeaderFromBytes(byte[] byteArray, bool skipDWORD = false)
     {
         using MemoryStream stream = new(byteArray);
         using BinaryReader reader = new(stream);
 
-        return new DDS_HEADER(reader);
+        return new DDS_HEADER(reader, skipDWORD);
     }
 
     /// <summary>
@@ -304,7 +315,7 @@ public struct DDS_HEADER
         result += $"dwCaps2: {dwCaps2}" + Environment.NewLine;
         result += $"dwCaps3: {dwCaps3}" + Environment.NewLine;
         result += $"dwCaps4: {dwCaps4}" + Environment.NewLine;
-        result += $"dwReserved12: {dwReserved12}" + Environment.NewLine;
+        result += $"dwReserved12: {dwReserved12}";
 
         return result;
     }

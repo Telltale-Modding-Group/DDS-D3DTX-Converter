@@ -6,6 +6,7 @@ using D3DTX_Converter.DirectX;
 using D3DTX_Converter.TelltaleEnums;
 using System.Linq;
 using D3DTX_Converter.TelltaleTypes;
+using Hexa.NET.DirectXTex;
 
 namespace D3DTX_Converter.Main
 {
@@ -40,10 +41,17 @@ namespace D3DTX_Converter.Main
                 return;
             }
 
-            // If the D3DTX is a legacy D3DTX (before mVersions exist), we can just get the DDS header from the file
-            if (d3dtx.isLegacyD3DTX())
+            if (d3dtx.IsMbin())
             {
-                dds.header = d3dtx.GetDDSHeaderFromLegacyD3DTX();
+                InitializeDDSHeaderForMBIN(d3dtx);
+                return;
+            }
+
+            // If the D3DTX is a legacy D3DTX (before mVersions exist), we can just get the DDS header from the file
+            if (d3dtx.IsLegacyD3DTX())
+            {
+                var pixelData = d3dtx.GetLegacyPixelData();
+                dds.header = DDS_HEADER.GetHeaderFromBytes(pixelData[pixelData.Count - 1], true);
                 return;
             }
 
@@ -130,120 +138,101 @@ namespace D3DTX_Converter.Main
 
             textureData = [];
 
-            // Extract all pixel data from the stream headers and then convert all arrays to a single array
+            // Get all pixel data from the D3DTX
             var d3dtxTextureData = d3dtx.GetPixelData();
-            byte[] d3dtxTextureDataArray = d3dtxTextureData.SelectMany(b => b).ToArray();
 
-            long offset = 0;
-
-            for (int i = 0; i < streamHeaders.Length; i++)
+            if (d3dtx.IsVolumeTexture())
             {
-                // Get the pixel data from the stream header
-                byte[] data = new byte[streamHeaders[i].mDataSize];
-                Array.Copy(d3dtxTextureDataArray, offset, data, 0, streamHeaders[i].mDataSize);
-
-                if (surfaceFormat == T3SurfaceFormat.eSurface_ARGB2101010)
+                int divideBy = 1;
+                for (int i = 0; i < dds.header.dwMipMapCount; i++)
                 {
-                    data = ConvertD3DFMT_A2R10G10B10ToDXGI_FORMAT_R10G10B10A2_UNORM(data);
-                }
-                // else if (surfaceFormat == T3SurfaceFormat.eSurface_ATC_RGB)
-                // {
-                //     AtcDecoder atcDecoder = new AtcDecoder();
-                //     if (i == 0)
-                //     {
-                //         data = UTEX.readATC(data, 0, new byte[(int)dds.header.dwWidth * (int)dds.header.dwHeight * 4], (int)dds.header.dwWidth, (int)dds.header.dwHeight);
-                //         // data = atcDecoder.DecompressAtcRgb4(data, (int)dds.header.dwWidth, (int)dds.header.dwHeight);
-                //     }
-                //     else
-                //     {
-                //         // data = atcDecoder.DecompressAtcRgb4(data, (int)dds.header.dwWidth / (i * 2), (int)dds.header.dwHeight / (i * 2));
-                //     }
-
-                // }
-                // else if (surfaceFormat == T3SurfaceFormat.eSurface_ATC_RGBA || surfaceFormat == T3SurfaceFormat.eSurface_ATC_RGB1A)
-                // {
-                //     AtcDecoder atcDecoder = new AtcDecoder();
-                //     if (i == 0)
-                //     {
-                //         data = UTEX.readATA(data, 0, new byte[(int)dds.header.dwWidth * (int)dds.header.dwHeight * 4], (int)dds.header.dwWidth, (int)dds.header.dwHeight);
-                //         // data = atcDecoder.DecompressAtcRgba8(data, (int)dds.header.dwWidth, (int)dds.header.dwHeight);
-                //     }
-                //     else
-                //     {
-                //         // data = atcDecoder.DecompressAtcRgba8(data, (int)dds.header.dwWidth / (i * 2), (int)dds.header.dwHeight / (i * 2));
-                //     }
-                // }
-
-                // Add the region pixel data to the list
-                textureData.Add(data);
-
-                // Increment the offset
-                offset += streamHeaders[i].mDataSize;
-            }
-
-            textureData = textureData.OrderByDescending(section => section.Length).ToList();
-
-            int divideBy = 1;
-            int arraySize = (int)d3dtx.GetArraySize();
-            if (d3dtx.IsCubeTexture())
-            {
-                arraySize *= 6;
-            }
-
-            for (int i = 0; i < textureData.Count; i++)
-            {
-                if (d3dtx.GetPlatformType() == PlatformType.ePlatform_PS4)
-                {
-                    Console.WriteLine("Unswizzling PS4 texture data..." + i);
-
-                    textureData[i] = PS4TextureDecoder.UnswizzlePS4(textureData[i], DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat), (int)dds.header.dwWidth / divideBy, (int)dds.header.dwHeight / divideBy);
-                }
-
-                if (d3dtx.GetPlatformType() == PlatformType.ePlatform_PS3 || d3dtx.GetPlatformType() == PlatformType.ePlatform_WiiU)
-                {
-                    Console.WriteLine("Unswizzling PS3 texture data..." + i);
-
-                    textureData[i] = PS4TextureDecoder.UnswizzlePS3(textureData[i], DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat), (int)dds.header.dwWidth / divideBy, (int)dds.header.dwHeight / divideBy);
-                }
-
-                if ((i + 1) % arraySize == 0)
-                {
-                    Console.WriteLine("Array size: " + arraySize);
-
+                    textureData.Add(d3dtx.GetPixelDataByMipmapIndex(i, d3dtx.GetCompressionType(), (int)d3dtx.GetWidth() / divideBy, (int)d3dtx.GetHeight() / divideBy, d3dtx.GetPlatformType()));
                     divideBy *= 2;
+                }
+            }
+            else
+            {
+                int totalFaces = (int)(d3dtx.IsCubeTexture() ? d3dtx.GetArraySize() * 6 : d3dtx.GetArraySize());
 
-                    Console.WriteLine("Divide by: " + divideBy);
+                // Get each face of the 2D texture
+                for (int i = 0; i < totalFaces; i++)
+                {
+                    textureData.Add(d3dtx.GetPixelDataByFaceIndex(i, d3dtx.GetCompressionType(), (int)d3dtx.GetWidth(), (int)d3dtx.GetHeight(), d3dtx.GetPlatformType()));
+                }
+
+                byte[] d3dtxTextureDataArray = textureData.SelectMany(b => b).ToArray();
+
+                for (int i = 0; i < streamHeaders.Length; i++)
+                {
+                    // else if (surfaceFormat == T3SurfaceFormat.eSurface_ATC_RGB)
+                    // {
+                    //     AtcDecoder atcDecoder = new AtcDecoder();
+                    //     if (i == 0)
+                    //     {
+                    //         data = UTEX.readATC(data, 0, new byte[(int)dds.header.dwWidth * (int)dds.header.dwHeight * 4], (int)dds.header.dwWidth, (int)dds.header.dwHeight);
+                    //         // data = atcDecoder.DecompressAtcRgb4(data, (int)dds.header.dwWidth, (int)dds.header.dwHeight);
+                    //     }
+                    //     else
+                    //     {
+                    //         // data = atcDecoder.DecompressAtcRgb4(data, (int)dds.header.dwWidth / (i * 2), (int)dds.header.dwHeight / (i * 2));
+                    //     }
+
+                    // }
+                    // else if (surfaceFormat == T3SurfaceFormat.eSurface_ATC_RGBA || surfaceFormat == T3SurfaceFormat.eSurface_ATC_RGB1A)
+                    // {
+                    //     AtcDecoder atcDecoder = new AtcDecoder();
+                    //     if (i == 0)
+                    //     {
+                    //         data = UTEX.readATA(data, 0, new byte[(int)dds.header.dwWidth * (int)dds.header.dwHeight * 4], (int)dds.header.dwWidth, (int)dds.header.dwHeight);
+                    //         // data = atcDecoder.DecompressAtcRgba8(data, (int)dds.header.dwWidth, (int)dds.header.dwHeight);
+                    //     }
+                    //     else
+                    //     {
+                    //         // data = atcDecoder.DecompressAtcRgba8(data, (int)dds.header.dwWidth / (i * 2), (int)dds.header.dwHeight / (i * 2));
+                    //     }
+                    // }
                 }
             }
         }
 
-        public byte[] ConvertD3DFMT_A2R10G10B10ToDXGI_FORMAT_R10G10B10A2_UNORM(byte[] d3dPixels)
+        public void InitializeDDSHeaderForMBIN(D3DTX_Master d3dtx)
         {
-            if (d3dPixels.Length % 4 != 0)
-                throw new ArgumentException("Input byte array length must be a multiple of 4.");
+            ScratchImage image = DirectXTex.CreateScratchImage();
+            Console.WriteLine("D3dtx width: " + d3dtx.GetWidth());
+            Console.WriteLine("D3dtx height: " + d3dtx.GetHeight());
+            Console.WriteLine("D3dtx mip map count: " + d3dtx.GetMipMapCount());
+            Console.WriteLine("D3dtx d3d format: " + d3dtx.GetD3DFORMAT());
 
-            byte[] dxgiPixels = new byte[d3dPixels.Length];
-
-            for (int i = 0; i < d3dPixels.Length; i += 4)
+            TexMetadata metadata = new()
             {
-                // Read 4 bytes for a single pixel in D3DFMT_A2R10G10B10 format
-                uint d3dPixel = BitConverter.ToUInt32(d3dPixels, i);
+                ArraySize = 1,
+                Depth = 1,
+                Dimension = TexDimension.Texture2D,
+                Format = (int)DDS_HELPER.GetDXGIFormatFromD3DFormat(d3dtx.GetD3DFORMAT()),
+                Height = d3dtx.GetWidth(),
+                Width = d3dtx.GetHeight(),
+                MipLevels = d3dtx.GetMipMapCount(),
+                MiscFlags = 0,
+                MiscFlags2 = 0,
+            };
 
-                // Extract channels from D3DFMT_A2R10G10B10
-                uint a = (d3dPixel & 0xC0000000) >> 30; // 2 bits for alpha
-                uint r = (d3dPixel & 0x3FF00000) >> 20; // 10 bits for red
-                uint g = (d3dPixel & 0x000FFC00) >> 10; // 10 bits for green
-                uint b = d3dPixel & 0x000003FF;       // 10 bits for blue
+            image.Initialize(metadata, CPFlags.None);
+            Console.WriteLine("DDS Metadata:");
 
-                // Rearrange channels to DXGI_FORMAT_R10G10B10A2_UNORM
-                uint dxgiPixel = (r << 20) | (g << 10) | b | (a << 30);
+            Console.WriteLine("Width: " + image.GetMetadata().Width);
+            Console.WriteLine("Width: " + image.GetMetadata().Width);
+            Console.WriteLine("Height: " + image.GetMetadata().Height);
+            Console.WriteLine("Depth: " + image.GetMetadata().Depth);
+            Console.WriteLine("Array Size: " + image.GetMetadata().ArraySize);
+            Console.WriteLine("Mip Levels: " + image.GetMetadata().MipLevels);
 
-                // Write the new pixel to the destination array
-                byte[] dxgiBytes = BitConverter.GetBytes(dxgiPixel);
-                Array.Copy(dxgiBytes, 0, dxgiPixels, i, 4);
-            }
 
-            return dxgiPixels;
+            dds.header = DDS_HEADER.GetHeaderFromBytes(DDS_DirectXTexNet.GetDDSByteArray(image, DDSFlags.ForceDx9Legacy), true);
+
+            Console.WriteLine("DDS Header:");
+            dds.header.Print();
+
+            image.Release();
         }
 
         /// <summary>
@@ -321,8 +310,8 @@ namespace D3DTX_Converter.Main
                 // Default to DXT1 Compression
                 _ => DDS_PIXELFORMAT.Of(32, 0x04, ByteFunctions.Convert_String_To_UInt32("DXT1"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXT1'
             };
-
         }
+
 
         /// <summary>
         /// Set the DDS Pixel Format flags with a bitwise-OR operation.
@@ -385,76 +374,88 @@ namespace D3DTX_Converter.Main
             // Turn the dds header into bytes
             byte[] dds_header = ByteFunctions.Combine(ByteFunctions.GetBytes(DDS.MAGIC_WORD), DDS_HELPER.GetObjectBytes(dds.header));
 
-            // Always initialize the array size. It is used in gathering texture data.
-            int arraySize = 1;
+            if (d3dtx.IsLegacyD3DTX())
+            {
+                if (d3dtx.IsMbin())
+                {
+                    var legacyPixelData = d3dtx.GetLegacyPixelData();
+
+                    return ByteFunctions.Combine(dds_header, legacyPixelData[legacyPixelData.Count - 1]);
+                }
+                else
+                {
+                    var legacyPixelData = d3dtx.GetLegacyPixelData();
+
+                    return legacyPixelData[legacyPixelData.Count - 1];
+                }
+            }
 
             if (dds.header.ddspf.dwFourCC == ByteFunctions.Convert_String_To_UInt32(DDS.DX10_FOURCC))
             {
                 dds_header = ByteFunctions.Combine(dds_header, DDS_HELPER.GetObjectBytes(dds.dxt10Header));
-                arraySize = (int)dds.dxt10Header.arraySize;
             }
 
-            byte[] finalData = [];
-            finalData = ByteFunctions.Combine(finalData, dds_header);
+            return ByteFunctions.Combine(dds_header, textureData.SelectMany(b => b).ToArray());
 
-            if (d3dtx.isLegacyD3DTX())
-            {
-                var legacyByteArray = d3dtx.GetLegacyPixelData()[0].ToArray();
-                finalData = ByteFunctions.Combine(finalData, legacyByteArray);
+            // int arraySize = 1; arraySize = (int)dds.dxt10Header.arraySize;
+            // if (d3dtx.IsLegacyD3DTX())
+            // {
+            //     var legacyByteArray = d3dtx.GetLegacyPixelData()[0].ToArray();
+            //     finalData = ByteFunctions.Combine(finalData, legacyByteArray);
 
-                return finalData;
-            }
+            //     return finalData;
+            // }
 
-            // If the texture is Volumemap, just use the texture data we already have. We stable sorted the data earlier.
-            if (d3dtx.IsVolumeTexture())
-            {
-                byte[] volumeTextureData = textureData.SelectMany(b => b).ToArray();
+            // // If the texture is Volumemap, just use the texture data we already have. We stable sorted the data earlier.
+            // if (d3dtx.IsVolumeTexture())
+            // {
+            //     byte[] volumeTextureData = textureData.SelectMany(b => b).ToArray();
 
-                finalData = ByteFunctions.Combine(finalData, volumeTextureData);
-                return finalData;
-            }
+            //     finalData = ByteFunctions.Combine(finalData, volumeTextureData);
+            //     return finalData;
+            // }
 
-            // If the texture is anything else, but a Volumemap, use this sorting algorithm
-            // It supports Cubemap array textures as well (Cubemap array textures are like 2D array textures * 6)
+            // // If the texture is anything else, but a Volumemap, use this sorting algorithm
+            // // It supports Cubemap array textures as well (Cubemap array textures are like 2D array textures * 6)
 
-            // This is the initial offset from the texture data. Currently it only skips through 1 region header at a time.
-            int sizeOffset = d3dtx.IsCubeTexture() ? 6 : 1;
+            // // This is the initial offset from the texture data. Currently it only skips through 1 region header at a time.
+            // int sizeOffset = d3dtx.IsCubeTexture() ? 6 : 1;
 
-            // Loop through the regions array size by the offset. 
-            // Example 1: A normal 2D texture with 10 mips only has 10 regions. The array size is 1 and the offset is 1. It will loop 1 time.
-            // Example 2: A 2D array texture with 3 textures and 4 mips each will have 12 (3*4) regions. The array size is 3 and the offset is 1. It will loop 3 times.
-            // Example 3: A Cubemap texture with 7 mips will have 42 (6*7) regions. The array size is 1 and the offset is 6. It will loop 6 times.
-            // Example 4: A Cubemap array texture with 3 cubemaps and 3 mips will have 54 (3*6*3) regions. The array size is 3 and the offset is 6. It will loop 18 times.
-            for (int i = 0; i < arraySize * sizeOffset; i++)
-            {
-                // The first index of the face.
-                int faceIndex = i;
-                List<byte[]> faceData = [];
+            // // Loop through the regions array size by the offset. 
+            // // Example 1: A normal 2D texture with 10 mips only has 10 regions. The array size is 1 and the offset is 1. It will loop 1 time.
+            // // Example 2: A 2D array texture with 3 textures and 4 mips each will have 12 (3*4) regions. The array size is 3 and the offset is 1. It will loop 3 times.
+            // // Example 3: A Cubemap texture with 7 mips will have 42 (6*7) regions. The array size is 1 and the offset is 6. It will loop 6 times.
+            // // Example 4: A Cubemap array texture with 3 cubemaps and 3 mips will have 54 (3*6*3) regions. The array size is 3 and the offset is 6. It will loop 18 times.
+            // for (int i = 0; i < arraySize * sizeOffset; i++)
+            // {
+            //     // The first index of the face.
+            //     int faceIndex = i;
+            //     List<byte[]> faceData = [];
 
-                //Make sure we loop at least once
-                nuint mipCount = dds.header.dwMipMapCount > 1 ? dds.header.dwMipMapCount : 1;
+            //     //Make sure we loop at least once
+            //     nuint mipCount = dds.header.dwMipMapCount > 1 ? dds.header.dwMipMapCount : 1;
 
-                // Each loop here collects only 1 face of the texture. Let's use the examples from earlier.
-                // Example 1: The mips are 10 - the texture is 1 (1 face). We iterate 10 times while incrementing the index by 1.
-                // Example 2: The mips are 4 - the textures are 3 (3 faces). We iterate 4 times while incrementing the index by 3.
-                // Example 3: The mips are 7 - the textures are 6 (6 faces). We iterate 7 times while incrementing the index by 6.
-                // Example 4: The mips are 3 - the textures are 6*3 (18 faces). We iterate 3 times while incrementing the index by 18.
-                for (nuint j = 0; j < mipCount; j++)
-                {
-                    faceData.Add(textureData[faceIndex]);
+            //     // Each loop here collects only 1 face of the texture. Let's use the examples from earlier.
+            //     // Example 1: The mips are 10 - the texture is 1 (1 face). We iterate 10 times while incrementing the index by 1.
+            //     // Example 2: The mips are 4 - the textures are 3 (3 faces). We iterate 4 times while incrementing the index by 3.
+            //     // Example 3: The mips are 7 - the textures are 6 (6 faces). We iterate 7 times while incrementing the index by 6.
+            //     // Example 4: The mips are 3 - the textures are 6*3 (18 faces). We iterate 3 times while incrementing the index by 18.
+            //     for (nuint j = 0; j < mipCount; j++)
+            //     {
+            //         faceData.Add(textureData[faceIndex]);
 
-                    faceIndex += arraySize * sizeOffset;
-                }
+            //         faceIndex += arraySize * sizeOffset;
+            //     }
 
-                byte[] faceDataArray = faceData.SelectMany(b => b).ToArray();
+            //     byte[] faceDataArray = faceData.SelectMany(b => b).ToArray();
 
-                finalData = ByteFunctions.Combine(finalData, faceDataArray);
-            }
+            //     finalData = ByteFunctions.Combine(finalData, faceDataArray);
+            // }
 
-            watch.Stop();
-            var elapsedMs = watch.ElapsedMilliseconds;
-            Console.WriteLine("Time to get data: {0}", elapsedMs);
-            return finalData;
+            // watch.Stop();
+            // var elapsedMs = watch.ElapsedMilliseconds;
+            // Console.WriteLine("Time to get data: {0}", elapsedMs);
+            // return finalData;
         }
     }
 }

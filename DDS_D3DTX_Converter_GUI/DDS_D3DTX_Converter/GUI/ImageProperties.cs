@@ -7,9 +7,11 @@ using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
 using D3DTX_Converter.Utilities;
 using DDS_D3DTX_Converter_GUI.Utilities;
-using HexaEngine.DirectXTex;
+using Hexa.NET.DirectXTex;
+using Ktx;
 using MsBox.Avalonia;
 using SixLabors.ImageSharp.PixelFormats;
+using static Ktx.Ktx2;
 
 namespace DDS_D3DTX_Converter;
 
@@ -29,15 +31,10 @@ public class ImageProperties : ObservableObject
     public string? ChannelCount { get; set; }
     public string? MipMapCount { get; set; }
 
-    public static ImageProperties GetImagePropertiesFromD3DTX(string filePath)
+    public static ImageProperties GetImagePropertiesFromD3DTX(string filePath, D3DTXConversionType d3DTXConversionType = D3DTXConversionType.DEFAULT)
     {
         var master = new D3DTX_Master();
-        master.Read_D3DTX_File(filePath);
-
-        if (master.GetD3DTXObject() == null)
-        {
-            return new ImageProperties();
-        }
+        master.Read_D3DTX_File(filePath, d3DTXConversionType);
 
         return new ImageProperties()
         {
@@ -57,26 +54,27 @@ public class ImageProperties : ObservableObject
     /// <param name="ddsFilePath"></param>
     public static ImageProperties GetDdsProperties(string ddsFilePath)
     {
-        var ddsImage = DDS_DirectXTexNet.GetDDSImage(ddsFilePath);
-        
-        var ddsMetadata = ddsImage.GetMetadata();
+       return DDS_DirectXTexNet.GetDDSProperties(ddsFilePath);
+    }
 
-        DXGIFormat dxgiFormat = (DXGIFormat)ddsMetadata.Format;
-
-        uint channelCount = (uint)Math.Ceiling((double)DirectXTex.BitsPerPixel((int)dxgiFormat) / Math.Max(1, DirectXTex.BitsPerColor((int)dxgiFormat)));
-
-        string hasAlpha = DirectXTex.HasAlpha((int)dxgiFormat) ? "True" : "False";
+    /// <summary>
+    /// Gets the properties of the selected .dds file
+    /// </summary>
+    /// <param name="ddsFilePath"></param>
+    public static ImageProperties GetKtx2Properties(string ddsFilePath)
+    {
+        Texture texture = KTX2_Bindings.GetKTX2Texture(ddsFilePath);
 
         return new ImageProperties
         {
             Name = Path.GetFileNameWithoutExtension(ddsFilePath),
-            Extension = ".dds",
-            Height = ddsMetadata.Height.ToString(),
-            Width = ddsMetadata.Width.ToString(),
-            CompressionType = dxgiFormat.ToString(),
-            HasAlpha = hasAlpha,
-            ChannelCount = channelCount.ToString(),
-            MipMapCount = ddsMetadata.MipLevels.ToString()
+            Extension = ".ktx2",
+            Height = texture.BaseHeight.ToString(),
+            Width = texture.BaseWidth.ToString(),
+            CompressionType = texture.VkFormat.ToString(),
+            HasAlpha = KTX2_HELPER.HasAlpha(texture.VkFormat) ? "True" : "False",
+            //ChannelCount = Helper.GetDataFormatDescriptor(texture.VkFormat).DescriptorBlockSize.ToString(),
+            MipMapCount = texture.NumLevels.ToString()
         };
     }
 
@@ -87,41 +85,27 @@ public class ImageProperties : ObservableObject
     /// <returns></returns>
     public static ImageProperties GetImagePropertiesFromOthers(string filePath)
     {
-        try
+        var imageInfo = SixLabors.ImageSharp.Image.Identify(filePath);
+
+        var image = SixLabors.ImageSharp.Image.Load<Rgba32>(filePath);
+
+        bool hasAlpha = ImageUtilities.IsImageOpaque(image);
+
+        string hasAlphaString = hasAlpha ? "True" : "False";
+
+        return new ImageProperties()
         {
-            var imageInfo = SixLabors.ImageSharp.Image.Identify(filePath);
+            Name = Path.GetFileNameWithoutExtension(filePath),
+            Extension = Path.GetExtension(filePath),
+            CompressionType = imageInfo.Metadata.DecodedImageFormat.Name,
+            ChannelCount = (imageInfo.PixelType.BitsPerPixel / 8).ToString(),
+            Height = imageInfo.Height.ToString(),
+            Width = imageInfo.Width.ToString(),
+            HasAlpha = hasAlphaString,
+            MipMapCount = "N/A"
+        };
 
-            var image = SixLabors.ImageSharp.Image.Load<Rgba32>(filePath);
-
-            bool hasAlpha = ImageUtilities.IsImageOpaque(image);
-
-            string hasAlphaString = hasAlpha ? "True" : "False";
-
-            return new ImageProperties()
-            {
-                Name = Path.GetFileNameWithoutExtension(filePath),
-                Extension = Path.GetExtension(filePath),
-                CompressionType = imageInfo.Metadata.DecodedImageFormat.Name,
-                ChannelCount = (imageInfo.PixelType.BitsPerPixel / 8).ToString(),
-                Height = imageInfo.Height.ToString(),
-                Width = imageInfo.Width.ToString(),
-                HasAlpha = hasAlphaString,
-                MipMapCount = "N/A"
-            };
-        }
-        catch (Exception ex)
-        {
-            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
-            {
-                var mainWindow = lifetime.MainWindow;
-                var messageBox =
-                    MessageBoxes.GetErrorBox("Error during getting image properties. " + ex.Message);
-
-                MessageBoxManager.GetMessageBoxStandard(messageBox).ShowWindowDialogAsync(mainWindow);
-            }
-
-            return GetImagePropertiesFromInvalid();
-        }
+        throw new Exception("Error during getting image properties. ");
     }
 
     /// <summary>

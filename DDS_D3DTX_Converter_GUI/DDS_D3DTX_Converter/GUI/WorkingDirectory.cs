@@ -26,7 +26,7 @@ public class WorkingDirectory
     public List<WorkingDirectoryFile> WorkingDirectoryFiles = [];
 
     //hardcoded filters
-    public List<string> filterFileExtensions = [".d3dtx", ".dds", ".png", ".jpg", ".jpeg", ".tiff", ".tif", ".bmp", ".json", ""];
+    public List<string> filterFileExtensions = [".d3dtx", ".dds", ".png", ".jpg", ".jpeg", ".tiff", ".tif", ".bmp", ".json", ".ktx", ".ktx2", ".tga", ""];
 
     /// <summary>
     /// Gets the files from the provided directory path.

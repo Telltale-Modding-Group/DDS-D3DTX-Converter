@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.PanAndZoom;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -28,32 +29,48 @@ public partial class MainViewModel : ViewModelBase
     #region MEMBERS
 
     private readonly ObservableCollection<FormatItemViewModel> _d3dtxTypes =
-        [new FormatItemViewModel { Name = "dds", ItemStatus = true }];
+    [
+        new FormatItemViewModel { Name = "DDS", ItemStatus = true },
+        new FormatItemViewModel { Name = "PNG", ItemStatus = false },
+        new FormatItemViewModel { Name = "KTX", ItemStatus = false },
+        new FormatItemViewModel { Name = "KTX2", ItemStatus = false }
+    ];
 
     private readonly ObservableCollection<FormatItemViewModel> _ddsTypes =
     [
-        new FormatItemViewModel { Name = "d3dtx", ItemStatus = true},
-        new FormatItemViewModel { Name = "png", ItemStatus = true },
-        new FormatItemViewModel { Name = "jpg", ItemStatus = true },
-        new FormatItemViewModel { Name = "bmp", ItemStatus = true },
-        new FormatItemViewModel { Name = "tif", ItemStatus = true }
+        new FormatItemViewModel { Name = "D3DTX", ItemStatus = true},
+        new FormatItemViewModel { Name = "PNG", ItemStatus = true },
+        new FormatItemViewModel { Name = "JPEG", ItemStatus = true },
+        new FormatItemViewModel { Name = "BMP", ItemStatus = true },
+        new FormatItemViewModel { Name = "TIFF", ItemStatus = true },
+        new FormatItemViewModel { Name = "TGA", ItemStatus = false }
+    ];
+
+    private readonly ObservableCollection<FormatItemViewModel> _ktxTypes =
+    [
+        new FormatItemViewModel { Name = "D3DTX", ItemStatus = true}
     ];
 
     private readonly ObservableCollection<FormatItemViewModel> _otherTypes =
-        [new FormatItemViewModel { Name = "dds", ItemStatus = true }];
+        [new FormatItemViewModel { Name = "DDS", ItemStatus = true }];
 
     private readonly ObservableCollection<FormatItemViewModel> _folderTypes =
     [
-        new FormatItemViewModel { Name = "d3dtx -> dds", ItemStatus = true},
-        new FormatItemViewModel { Name = "dds -> d3dtx", ItemStatus = true},
-        new FormatItemViewModel { Name = "dds -> png", ItemStatus = true},
-        new FormatItemViewModel { Name = "dds -> jpg", ItemStatus = true},
-        new FormatItemViewModel { Name = "dds -> bmp", ItemStatus = true},
-        new FormatItemViewModel { Name = "dds -> tif", ItemStatus = true},
-        new FormatItemViewModel { Name = "png -> dds", ItemStatus = true},
-        new FormatItemViewModel { Name = "jpg -> dds", ItemStatus = true},
-        new FormatItemViewModel { Name = "bmp -> dds", ItemStatus = true},
-        new FormatItemViewModel { Name = "tif -> dds", ItemStatus = true},
+        new FormatItemViewModel { Name = "D3DTX -> DDS", ItemStatus = true},
+        new FormatItemViewModel { Name = "D3DTX -> PNG", ItemStatus = false},
+        new FormatItemViewModel { Name = "D3DTX -> KTX", ItemStatus = false},
+        new FormatItemViewModel { Name = "D3DTX -> KTX2", ItemStatus = false},
+        new FormatItemViewModel { Name = "DDS -> D3DTX", ItemStatus = true},
+        new FormatItemViewModel { Name = "DDS -> PNG", ItemStatus = true},
+        new FormatItemViewModel { Name = "DDS -> JPEG", ItemStatus = true},
+        new FormatItemViewModel { Name = "DDS -> BMP", ItemStatus = true},
+        new FormatItemViewModel { Name = "DDS -> TIFF", ItemStatus = true},
+        new FormatItemViewModel { Name = "DDS -> TGA", ItemStatus = false},
+        new FormatItemViewModel { Name = "PNG -> DDS", ItemStatus = true},
+        new FormatItemViewModel { Name = "JPEG -> DDS", ItemStatus = true},
+        new FormatItemViewModel { Name = "BMP -> DDS", ItemStatus = true},
+        new FormatItemViewModel { Name = "TIFF -> DDS", ItemStatus = true},
+        new FormatItemViewModel { Name = "TGA -> DDS", ItemStatus = false}
     ];
 
     private readonly ObservableCollection<FormatItemViewModel> _versionConvertOptions =
@@ -62,16 +79,24 @@ public partial class MainViewModel : ViewModelBase
         new FormatItemViewModel { Name = "Legacy Version 1", ItemStatus = true},
         new FormatItemViewModel { Name = "Legacy Version 2", ItemStatus = true},
         new FormatItemViewModel { Name = "Legacy Version 3", ItemStatus = true},
+        new FormatItemViewModel { Name = "Legacy Version 4", ItemStatus = true},
+        new FormatItemViewModel { Name = "Legacy Version 5", ItemStatus = true},
+        new FormatItemViewModel { Name = "Legacy Version 6", ItemStatus = true},
+        new FormatItemViewModel { Name = "Legacy Version 7", ItemStatus = true},
+        new FormatItemViewModel { Name = "Legacy Version 8", ItemStatus = true},
+        new FormatItemViewModel { Name = "Legacy Version 9", ItemStatus = true},
+        new FormatItemViewModel { Name = "Legacy Version 10", ItemStatus = true},
+        new FormatItemViewModel { Name = "Legacy Version 11", ItemStatus = true},
     ];
 
-    private readonly List<string> _allTypes = [".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".d3dtx", ".dds"];
+    private readonly List<string> _allTypes = [".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".d3dtx", ".dds", ".ktx", ".ktx2", ".tga"];
 
     // No idea if this is correct
     public static FilePickerFileType AllowedTypes { get; } = new("All Supported Types")
     {
-        Patterns = ["*.png", "*.jpg", "*.jpeg", "*.bmp", "*.tif", "*.tiff", "*.d3dtx", "*.dds", "*.json"],
+        Patterns = ["*.png", "*.jpg", "*.jpeg", "*.bmp", "*.tif", "*.tiff", "*.d3dtx", "*.dds", "*.ktx", "*.ktx2", "*.tga", "*.json"],
         AppleUniformTypeIdentifiers = ["public.image"],
-        MimeTypes = ["image/png", "image/jpeg", "image/bmp", "image/tiff", "image/vnd.ms-dds", "image/vnd.ms-d3dtx"]
+        MimeTypes = ["image/png", "image/jpeg", "image/bmp", "image/tiff", "image/tga", "image/vnd.ms-dds", "image/vnd.ms-d3dtx", "image/vnd.ms-ktx", "image/vnd.ms-ktx2"]
     };
 
     private readonly MainManager mainManager = MainManager.GetInstance();
@@ -127,8 +152,17 @@ public partial class MainViewModel : ViewModelBase
             {
                 _dataGridSelectedItem = value;
                 PreviewImage();
+                ResetPanAndZoomCommand.Execute(null);
             }
         }
+    }
+
+    public RelayCommand ResetPanAndZoomCommand { get; internal set; }
+
+    private void ResetPanAndZoom()
+    {
+        // Logic to reset pan and zoom
+        // This method will be linked with code-behind to reset the ZoomBorder.
     }
 
     #endregion
@@ -512,99 +546,33 @@ public partial class MainViewModel : ViewModelBase
                 outputDirectoryPath = folderPath.First().Path.AbsolutePath;
             }
 
-            D3DTXConversionType conversionType = D3DTXConversionType.DEFAULT;
+            D3DTXConversionType conversionType = GetD3DTXConversionType();
 
-            conversionType = SelectedVersionConvertOption.Name switch
-            {
-                "Legacy Version 1" => D3DTXConversionType.LV1,
-                "Legacy Version 2" => D3DTXConversionType.LV2,
-                "Legacy Version 3" => D3DTXConversionType.LV3,
-                _ => D3DTXConversionType.DEFAULT,
-            };
+            string[] types = SelectedFormat.Name.Split(" -> ");
 
-            // Select the correct convert function from the combobox.
-            switch (SelectedFormat.Name)
+            TextureType oldTextureType;
+            TextureType newTextureType;
+
+            if (types.Length == 2)
             {
-                case "d3dtx":
-                    Converter.ConvertTextureFromDdsToD3Dtx(textureFilePath, outputDirectoryPath);
-                    break;
-                case "dds":
-                    if (workingDirectoryFile.FileType == ".d3dtx")
-                        Converter.ConvertTextureFromD3DtxToDds(textureFilePath,
-                            outputDirectoryPath, conversionType);
-                    else
-                        await Converter.ConvertTextureFileFromOthersToDdsAsync(textureFilePath,
-                              outputDirectoryPath, true);
-                    break;
-                case "png":
-                    await Converter.ConvertTextureFromDdsToOthersAsync(textureFilePath, outputDirectoryPath,
-                         SelectedFormat.Name, true);
-                    break;
-                case "jpg":
-                    await Converter.ConvertTextureFromDdsToOthersAsync(textureFilePath, outputDirectoryPath,
-                         SelectedFormat.Name, true);
-                    break;
-                case "tif":
-                    await Converter.ConvertTextureFromDdsToOthersAsync(textureFilePath, outputDirectoryPath,
-                         SelectedFormat.Name, true);
-                    break;
-                case "bmp":
-                    await Converter.ConvertTextureFromDdsToOthersAsync(textureFilePath, outputDirectoryPath,
-                         SelectedFormat.Name, true);
-                    break;
+                oldTextureType = GetTextureTypeFromExtension(types[0]);
+                newTextureType = GetTextureTypeFromExtension(types[1]);
+
+                if (!ChooseOutputDirectoryCheckboxStatus)
+                {
+                    outputDirectoryPath = textureFilePath;
+                }
+
+                Converter.ConvertBulk(textureFilePath, outputDirectoryPath, oldTextureType, newTextureType, conversionType);
             }
-
-            if (!ChooseOutputDirectoryCheckboxStatus)
+            else
             {
-                outputDirectoryPath = textureFilePath;
+                oldTextureType = GetTextureTypeFromExtension(DataGrid_SelectedItem.FileType);
+                newTextureType = GetTextureTypeFromItem(SelectedFormat.Name);
+                Console.WriteLine("Old Texture Type: " + oldTextureType);
+                Console.WriteLine("New Texture Type: " + newTextureType);
+                await Converter.ConvertTexture(textureFilePath, outputDirectoryPath, oldTextureType, newTextureType, conversionType);
             }
-
-            // Folder options
-            switch (SelectedFormat.Name)
-            {
-                case "d3dtx -> dds":
-                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "d3dtx", "dds", conversionType);
-                    break;
-
-                case "dds -> d3dtx":
-                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "dds", "d3dtx");
-                    break;
-
-                case "dds -> png":
-                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "dds", "png");
-                    break;
-
-                case "dds -> jpg":
-                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "dds", ".jpg");
-                    break;
-
-                case "dds -> bmp":
-                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "dds", "bmp");
-                    break;
-
-                case "dds -> tif":
-                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "dds", "tif");
-                    break;
-
-                case "png -> dds":
-                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "png", "dds");
-                    break;
-
-                case "jpg -> dds":
-                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "jpg", "dds");
-                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "jpeg", "dds");
-                    break;
-
-                case "bmp -> dds":
-                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "bmp", "dds");
-                    break;
-
-                case "tif -> dds":
-                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "tif", "dds");
-                    Converter.ConvertBulk(textureFilePath, outputDirectoryPath, "tiff", "dds");
-                    break;
-            }
-
         }
         catch (Exception ex)
         {
@@ -620,6 +588,49 @@ public partial class MainViewModel : ViewModelBase
             mainManager.RefreshWorkingDirectory();
             await UpdateUiAsync();
         }
+    }
+
+    private static TextureType GetTextureTypeFromItem(string newTextureType)
+    {
+        return newTextureType switch
+        {
+            "D3DTX" => TextureType.D3dtx,
+            "DDS" => TextureType.Dds,
+            "PNG" => TextureType.Png,
+            "JPG" => TextureType.Jpeg,
+            "JPEG" => TextureType.Jpeg,
+            "BMP" => TextureType.Bmp,
+            "TIF" => TextureType.Tiff,
+            "TIFF" => TextureType.Tiff,
+            "KTX" => TextureType.Ktx,
+            "KTX2" => TextureType.Ktx2,
+            "TGA" => TextureType.Tga,
+            _ => TextureType.Unknown
+        };
+    }
+
+    private D3DTXConversionType GetD3DTXConversionType()
+    {
+        return SelectedVersionConvertOption.Name switch
+        {
+            "Legacy Version 1" => D3DTXConversionType.LV1,
+            "Legacy Version 2" => D3DTXConversionType.LV2,
+            "Legacy Version 3" => D3DTXConversionType.LV3,
+            "Legacy Version 4" => D3DTXConversionType.LV4,
+            "Legacy Version 5" => D3DTXConversionType.LV5,
+            "Legacy Version 6" => D3DTXConversionType.LV6,
+            "Legacy Version 7" => D3DTXConversionType.LV7,
+            "Legacy Version 8" => D3DTXConversionType.LV8,
+            "Legacy Version 9" => D3DTXConversionType.LV9,
+            "Legacy Version 10" => D3DTXConversionType.LV10,
+            "Legacy Version 11" => D3DTXConversionType.LV11,
+            _ => D3DTXConversionType.DEFAULT
+        };
+    }
+
+    private static TextureType GetTextureTypeFromExtension(string newTextureType)
+    {
+        return GetTextureTypeFromItem(newTextureType.ToUpper().Remove(0, 1));
     }
 
     /// <summary>
@@ -641,15 +652,7 @@ public partial class MainViewModel : ViewModelBase
             if (!File.Exists(textureFilePath))
                 throw new DirectoryNotFoundException("File was not found.");
 
-            D3DTXConversionType conversionType = D3DTXConversionType.DEFAULT;
-
-            conversionType = SelectedVersionConvertOption.Name switch
-            {
-                "Legacy Version 1" => D3DTXConversionType.LV1,
-                "Legacy Version 2" => D3DTXConversionType.LV2,
-                "Legacy Version 3" => D3DTXConversionType.LV3,
-                _ => D3DTXConversionType.DEFAULT,
-            };
+            D3DTXConversionType conversionType = GetD3DTXConversionType();
 
             var d3dtx = new D3DTX_Master();
 
@@ -751,6 +754,8 @@ public partial class MainViewModel : ViewModelBase
         {
             { ".dds", _ddsTypes },
             { ".d3dtx", _d3dtxTypes },
+            {".ktx", _otherTypes},
+            {".ktx2", _otherTypes},
             { ".png", _otherTypes },
             { ".jpg", _otherTypes },
             { ".jpeg", _otherTypes },
@@ -778,9 +783,9 @@ public partial class MainViewModel : ViewModelBase
             ConvertButtonStatus = true;
             SelectedComboboxIndex = 0;
             ComboBoxStatus = true;
-            //There is an issue in Avalonia relating to dynamic sources and binding indexes.
-            //Github issue: https://github.com/AvaloniaUI/Avalonia/issues/13736
-            //When fixed, the line below can be removed.
+            // There is an issue in Avalonia relating to dynamic sources and binding indexes.
+            // Github issue: https://github.com/AvaloniaUI/Avalonia/issues/13736
+            // When fixed, the line below can be removed.
             SelectedFormat = selectedItems[0];
         }
         else
@@ -933,7 +938,7 @@ public partial class MainViewModel : ViewModelBase
     {
         return extension.ToLower() switch
         {
-            ".d3dtx" => ImageUtilities.ConvertD3dtxToBitmap(filePath),
+            ".d3dtx" => ImageUtilities.ConvertD3dtxToBitmap(filePath, GetD3DTXConversionType()),
             ".dds" => ImageUtilities.ConvertFileFromDdsToBitmap(filePath),
             ".tga" => ImageUtilities.ConvertFileFromTgaToBitmap(filePath),
             ".tiff" => ImageUtilities.ConvertTiffToBitmap(filePath),
@@ -941,6 +946,7 @@ public partial class MainViewModel : ViewModelBase
             ".png" => new Bitmap(filePath),
             ".jpg" => new Bitmap(filePath),
             ".jpeg" => new Bitmap(filePath),
+            ".bmp" => new Bitmap(filePath),
             _ => new SvgImage { Source = SvgSource.Load(ErrorSvgFilename, _assetsUri) }
         };
     }
@@ -954,8 +960,9 @@ public partial class MainViewModel : ViewModelBase
         {
             return extension.ToLower() switch
             {
-                ".d3dtx" => ImageProperties.GetImagePropertiesFromD3DTX(filePath),
+                ".d3dtx" => ImageProperties.GetImagePropertiesFromD3DTX(filePath, GetD3DTXConversionType()),
                 ".dds" => ImageProperties.GetDdsProperties(filePath),
+                ".ktx2" => ImageProperties.GetKtx2Properties(filePath),
                 _ => ImageProperties.GetImagePropertiesFromOthers(filePath),
             };
         }
@@ -968,7 +975,6 @@ public partial class MainViewModel : ViewModelBase
     private async Task HandleImagePreviewErrorAsync(Exception ex)
     {
         await HandleExceptionAsync("Error during previewing image.\nError message: " + ex.Message);
-        ImageProperties = ImageProperties.GetImagePropertiesFromInvalid();
         ImagePreview = new SvgImage { Source = SvgSource.Load(ErrorSvgFilename, _assetsUri) };
     }
 

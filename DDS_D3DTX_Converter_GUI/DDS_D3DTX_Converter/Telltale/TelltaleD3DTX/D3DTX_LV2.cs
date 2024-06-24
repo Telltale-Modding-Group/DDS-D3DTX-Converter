@@ -5,7 +5,8 @@ using D3DTX_Converter.TelltaleEnums;
 using D3DTX_Converter.TelltaleTypes;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
-using HexaEngine.DirectXTex;
+using D3DTX_Converter.Main;
+using Hexa.NET.DirectXTex;
 
 /*
  * NOTE:
@@ -26,7 +27,7 @@ using HexaEngine.DirectXTex;
 namespace D3DTX_Converter.TelltaleD3DTX;
 
 /// <summary>
-/// This is a custom class that matches what is serialized in a legacy D3DTX version supporting the listed titles. (INCOMPLETE)
+/// This is a custom class that matches what is serialized in a legacy D3DTX version supporting the listed titles. (COMPLETE)
 /// </summary>
 public class D3DTX_LV2
 {
@@ -196,11 +197,6 @@ public class D3DTX_LV2
     public int mTextureDataSize { get; set; }
 
     /// <summary>
-    /// [128 bytes] The DDS header of the texture.
-    /// </summary>
-    public DDS_HEADER mDDSHeader { get; set; }
-
-    /// <summary>
     /// A byte array of the pixel regions in a texture. 
     /// </summary>
     public List<byte[]> mPixelData { get; set; }
@@ -283,11 +279,11 @@ public class D3DTX_LV2
                 PrintConsole();
                 throw new Exception("Invalid DDS Header! The texture's header is corrupted!");
             }
-            mDDSHeader = new DDS_HEADER(reader);
+            
             mPixelData = [];
 
-            byte[] pixelArray = new byte[mTextureDataSize - 128];
-            for (int i = 0; i < mTextureDataSize - 128; i++)
+            byte[] pixelArray = new byte[mTextureDataSize];
+            for (int i = 0; i < mTextureDataSize; i++)
             {
                 pixelArray[i] = reader.ReadByte();
             }
@@ -404,7 +400,7 @@ public class D3DTX_LV2
         Console.WriteLine(GetD3DTXInfo());
     }
 
-    public string GetD3DTXInfo()
+    public string GetD3DTXInfo(MetaVersion metaVersion = MetaVersion.UNKNOWN)
     {
         string d3dtxInfo = "";
 
@@ -445,7 +441,6 @@ public class D3DTX_LV2
 
         if (mbHasTextureData.mbTelltaleBoolean)
         {
-            d3dtxInfo += "mDDSHeader = " + mDDSHeader.ToString() + Environment.NewLine;
             d3dtxInfo += "mPixelData Count = " + mPixelData[0].Length + Environment.NewLine;
         }
 

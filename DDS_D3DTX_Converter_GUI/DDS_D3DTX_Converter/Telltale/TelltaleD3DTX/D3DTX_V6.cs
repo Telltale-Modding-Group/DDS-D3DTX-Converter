@@ -6,7 +6,7 @@ using D3DTX_Converter.TelltaleTypes;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
 using System.Runtime.InteropServices;
-using HexaEngine.DirectXTex;
+using Hexa.NET.DirectXTex;
 
 /*
  * NOTE:

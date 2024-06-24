@@ -1,6 +1,6 @@
 using System;
 using D3DTX_Converter.DirectX;
-using HexaEngine.DirectXTex;
+using Hexa.NET.DirectXTex;
 
 public static class PS4TextureDecoder
 {

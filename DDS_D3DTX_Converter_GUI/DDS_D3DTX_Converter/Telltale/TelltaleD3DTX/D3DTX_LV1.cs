@@ -5,7 +5,8 @@ using D3DTX_Converter.TelltaleEnums;
 using D3DTX_Converter.TelltaleTypes;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
-using HexaEngine.DirectXTex;
+using D3DTX_Converter.Main;
+using Hexa.NET.DirectXTex;
 
 /*
  * NOTE:
@@ -24,7 +25,7 @@ using HexaEngine.DirectXTex;
 namespace D3DTX_Converter.TelltaleD3DTX
 {
   /// <summary>
-  /// This is a custom class that matches what is serialized in a legacy D3DTX version supporting the listed titles. (INCOMPLETE)
+  /// This is a custom class that matches what is serialized in a legacy D3DTX version supporting the listed titles. (COMPLETE)
   /// </summary>
   public class D3DTX_LV1
   {
@@ -194,11 +195,6 @@ namespace D3DTX_Converter.TelltaleD3DTX
     public int mTextureDataSize { get; set; }
 
     /// <summary>
-    /// [128 bytes] The DDS header of the texture.
-    /// </summary>
-    public DDS_HEADER mDDSHeader { get; set; }
-
-    /// <summary>
     /// A byte array of the pixel regions in a texture.
     /// </summary>
     public List<byte[]> mPixelData { get; set; }
@@ -276,16 +272,16 @@ namespace D3DTX_Converter.TelltaleD3DTX
           continue;
         }
 
-        if (reader.ReadUInt32() != ByteFunctions.Convert_String_To_UInt32(DDS.MAGIC_WORD))
+        if (reader.BaseStream.Position == reader.BaseStream.Length)
         {
           PrintConsole();
           throw new Exception("Invalid DDS Header! The texture's header is corrupted!");
         }
-        mDDSHeader = new DDS_HEADER(reader);
+
         mPixelData = [];
 
-        byte[] pixelArray = new byte[mTextureDataSize - 128];
-        for (int i = 0; i < mTextureDataSize - 128; i++)
+        byte[] pixelArray = new byte[mTextureDataSize];
+        for (int i = 0; i < mTextureDataSize; i++)
         {
           pixelArray[i] = reader.ReadByte();
         }
@@ -407,7 +403,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
       Console.WriteLine(GetD3DTXInfo());
     }
 
-    public string GetD3DTXInfo()
+    public string GetD3DTXInfo(MetaVersion metaVersion = MetaVersion.UNKNOWN)
     {
       string d3dtxInfo = "";
 
@@ -448,7 +444,6 @@ namespace D3DTX_Converter.TelltaleD3DTX
 
       if (mbHasTextureData.mbTelltaleBoolean)
       {
-        d3dtxInfo += "mDDSHeader = " + mDDSHeader.ToString() + Environment.NewLine;
         d3dtxInfo += "mPixelData Count = " + mPixelData[0].Length + Environment.NewLine;
       }
       

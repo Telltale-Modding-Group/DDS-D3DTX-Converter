@@ -5,7 +5,7 @@ using D3DTX_Converter.TelltaleEnums;
 using D3DTX_Converter.TelltaleTypes;
 using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
-using HexaEngine.DirectXTex;
+using Hexa.NET.DirectXTex;
 
 /*
  * NOTE:

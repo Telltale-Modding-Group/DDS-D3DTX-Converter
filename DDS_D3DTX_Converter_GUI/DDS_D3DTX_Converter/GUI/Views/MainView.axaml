@@ -8,6 +8,7 @@
              d:DesignHeight="550"
              x:Class="DDS_D3DTX_Converter.Views.MainView"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:paz="using:Avalonia.Controls.PanAndZoom"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              x:DataType="vm:MainViewModel">
     <Design.DataContext>
@@ -379,14 +380,36 @@
                        Content="Image Preview"
                        Margin="10,40,10,0"
                        VerticalAlignment="Top" />
-                <Border Name="ImagepreviewImageBorder"
-                        BorderBrush="Black"
-                        BorderThickness="1"
-                        Margin="10,70,10,10">
-                    <Image Name="ImagepreviewImage"
-                           Source="{Binding ImagePreview}"
-                           Stretch="Uniform" />
-                </Border>
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Auto">
+                    <paz:ZoomBorder Name="ZoomBorder1"
+                                    Stretch="None"
+                                    ZoomSpeed="1.5"
+                                    RenderTransform=""
+                                    EnableConstrains="False"
+                                    Margin="10,70,10,10"
+                                    BorderBrush="Black"
+                                    BorderThickness="1"
+                                    EnablePan="True"
+                                    PanButton="Left"
+                                    ZIndex="3"
+                                    ClipToBounds="True"
+                                    Focusable="True"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalAlignment="Stretch">
+                        <Border>
+                            <Border.Transitions>
+                                <Transitions>
+                                    <TransformOperationsTransition Property="RenderTransform"
+                                                                   Duration="0:0:0.1" />
+                                </Transitions>
+                            </Border.Transitions>
+                            <Image Name="ImagepreviewImage"
+                                   Source="{Binding ImagePreview}"
+                                   Stretch="Uniform" />
+                        </Border>
+                    </paz:ZoomBorder>
+                </ScrollViewer>
             </Grid>
             <Grid Grid.Row="1"
                   Background="{DynamicResource PanelSplitterColor}" />

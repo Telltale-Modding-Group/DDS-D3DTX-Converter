@@ -41,9 +41,9 @@
                        HorizontalAlignment="Center"
                        TextAlignment="Center">                
                 This tool is designed to convert
-            <Bold>Telltale textures</Bold> (files with the <Bold>.d3dtx</Bold>
+            <Bold>Telltale textures</Bold> (files with the <Bold>.d3dtx</Bold>                
                 extension) into more accessible formats like
-            <Bold>.dds (Direct Draw Surface)</Bold>, <Bold>.png</Bold>
+            <Bold>.dds (Direct Draw Surface)</Bold>, <Bold>.png</Bold>                
                 and others, and vice versa.
             </TextBlock>
             <TextBlock FontWeight="Bold"

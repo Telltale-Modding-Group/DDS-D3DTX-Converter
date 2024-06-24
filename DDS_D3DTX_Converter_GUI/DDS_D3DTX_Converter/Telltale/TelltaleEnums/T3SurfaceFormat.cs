@@ -17,9 +17,8 @@ public enum T3SurfaceFormat
     // Equivalent to DXGI_FORMAT_B8G8R8A8_UNORM or Direct3D9 D3DFMT_A8R8G8B8
     eSurface_ARGB8 = 0x0,
 
-    // Equivalent to DXGI_FORMAT_B16G16R16A16_UNORM or Direct3D9 D3DFMT_A16B16G16R16 with blue and red channel reversed
-    // EDIT: The channels may not be reversed at all. Poker Knight 2 has a single texture with this format.
-    // When it was converted, the colours were OK.
+    // Equivalent to DXGI_FORMAT_R16G16B16A16_UNORM or Direct3D9 D3DFMT_A16B16G16R16
+    // Note: Despite the name, the channels are not reversed. Poker Knight 2 has a single texture with this format and the colors are correct.
     eSurface_ARGB16 = 0x1,
 
     // Equivalent to DXGI_FORMAT_B5G6R5_UNORM or Direct3D9 D3DFMT_R5G6B5
@@ -31,7 +30,8 @@ public enum T3SurfaceFormat
     // Equivalent to DXGI_FORMAT_B4G4R4A4_UNORM or Direct3D9 D3DFMT_A4R4G4B4
     eSurface_ARGB4 = 0x4,
 
-    // Equivalent to DXGI_FORMAT_B2G3R3A8_UNORM or Direct3D9 D3DFMT_A8R3G3B2
+    // Equivalent to DXGI_FORMAT_R10G10B10A2_UNORM or Direct3D9 D3DFMT_A2B10G10R10
+    // Note: Despite the name, the channels are not reversed. Poker Knight 2 has a single texture with this format and the colors are correct.
     eSurface_ARGB2101010 = 0x5,
 
     // Equivalent to DXGI_FORMAT_R16_UNORM or Direct3D9 D3DFMT_R16F
@@ -193,9 +193,16 @@ public enum T3SurfaceFormat
     // ETC2_RG
     // ATSC_RGBA_4x4 
 
+    // PVRTC1 2bpp RGB
     eSurface_PVRTC2 = 0x50, //50h
+
+    // PVRTC1 4bpp RGB
     eSurface_PVRTC4 = 0x51, //51h
+
+    // PVRTC 1 or 2 2bpp RGBA
     eSurface_PVRTC2a = 0x52, //52h
+
+    // PVRTC 1 or 2 4bpp RGBA
     eSurface_PVRTC4a = 0x53, //53h
     eSurface_ATC_RGB = 0x60, //60h
     eSurface_ATC_RGB1A = 0x61, //61h
@@ -203,8 +210,12 @@ public enum T3SurfaceFormat
     eSurface_ETC1_RGB = 0x70, //70h
     eSurface_ETC2_RGB = 0x71, //71h
     eSurface_ETC2_RGB1A = 0x72, //72h
+
+    // ETC2 EAC RGBA
     eSurface_ETC2_RGBA = 0x73, //73h
+    // ETC2 EAC R11
     eSurface_ETC2_R = 0x74, //74h
+    // ETC2 EAC RG11
     eSurface_ETC2_RG = 0x75, //75h
 
     // Presumably eSurface_ETC2_RGBM exists, but it is not used. 

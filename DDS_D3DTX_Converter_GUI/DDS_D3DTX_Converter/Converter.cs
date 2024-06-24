@@ -11,7 +11,7 @@ using System.Threading;
 using System.Linq;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using HexaEngine.DirectXTex;
+using Hexa.NET.DirectXTex;
 
 namespace DDS_D3DTX_Converter;
 
@@ -28,6 +28,24 @@ public class Converter
         return _instance ??= new Converter();
     }
 
+    private static string[] GetExtension(TextureType textureType)
+    {
+        return textureType switch
+        {
+            TextureType.D3dtx => [Main_Shared.d3dtxExtension],
+            TextureType.Dds => [Main_Shared.ddsExtension],
+            TextureType.Ktx => [Main_Shared.ktxExtension],
+            TextureType.Ktx2 => [Main_Shared.ktx2Extension],
+            TextureType.Png => [Main_Shared.pngExtension],
+            TextureType.Jpeg => [Main_Shared.jpegExtension, Main_Shared.jpgExtension],
+            TextureType.Bmp => [Main_Shared.bmpExtension],
+            TextureType.Tiff => [Main_Shared.tiffExtension, Main_Shared.tifExtension],
+            TextureType.Tga => [Main_Shared.tgaExtension],
+            _ => throw new InvalidEnumArgumentException("Invalid texture type."),
+        };
+    }
+
+
     /// <param name="texPath"></param>
     /// <param name="resultPath"></param>
     /// <param name="fixesGenericToDds"></param>
@@ -42,22 +60,19 @@ public class Converter
     /// <returns>True if the bulk conversion is successful; otherwise, false.</returns>
     /// <exception cref="FileNotFoundException">Thrown when no files with the specified file type were found in the directory.</exception>
     /// <exception cref="Exception">Thrown when an invalid file type is provided or when one or more conversions fail.</exception>
-    public static bool ConvertBulk(string texPath, string resultPath, string oldFileType, string newFileType = "", D3DTXConversionType conversionType = D3DTXConversionType.DEFAULT)
+    public static bool ConvertBulk(string texPath, string resultPath, TextureType oldTextureType, TextureType newTextureType = TextureType.Unknown, D3DTXConversionType conversionType = D3DTXConversionType.DEFAULT)
     {
         // Gather the files from the texture folder path into an array
         List<string> textures = new(Directory.GetFiles(texPath));
 
         // Filter the array so we only get the files required to convert
-        textures = IOManagement.FilterFiles(textures, "." + oldFileType);
+        textures = IOManagement.FilterFiles(textures, GetExtension(oldTextureType));
 
         // If no image files were found, throw an exception
         if (textures.Count < 1)
         {
-            throw new FileNotFoundException($"No files with file type {oldFileType} were found in the directory.");
+            throw new FileNotFoundException($"No files with file type {Enum.GetName(oldTextureType)} were found in the directory.");
         }
-
-        // Determine the conversion mode based on the file types
-        short mode = GetConversionMode(oldFileType, newFileType);
 
         // Create an array of threads
         Thread[] threads = new Thread[(int)Math.Ceiling(textures.Count / (double)30)];
@@ -73,7 +88,7 @@ public class Converter
                 {
                     try
                     {
-                        await PerformConversionAsync(mode, texture, resultPath, newFileType, conversionType);
+                        await ConvertTexture(texture, resultPath, oldTextureType, newTextureType, conversionType);
                     }
                     catch (Exception)
                     {
@@ -103,34 +118,77 @@ public class Converter
         return true;
     }
 
-    private static short GetConversionMode(string oldFileType, string newFileType)
+    public static async Task ConvertTexture(string sourcePath, string resultPath, TextureType oldTextureType, TextureType newTextureType, D3DTXConversionType conversionType = D3DTXConversionType.DEFAULT)
     {
-        if ("d3dtx".Equals(oldFileType))
+        if (oldTextureType == TextureType.D3dtx)
         {
-            return 0; // d3dtx to dds
+            switch (newTextureType)
+            {
+                case TextureType.Dds:
+                    ConvertTextureFromD3DtxToDds(sourcePath, resultPath, conversionType);
+                    break;
+                case TextureType.Png:
+                case TextureType.Ktx:
+                    throw new NotImplementedException("Conversion to KTX and KTX2 is not supported.");
+                case TextureType.Ktx2:
+                    ConvertTextureFromD3DtxToKtx2(sourcePath, resultPath, conversionType);
+                    break;
+                default:
+                    throw new Exception("Invalid file type.");
+            }
         }
-        else if ("dds".Equals(oldFileType) && "d3dtx".Equals(newFileType))
+        else if (oldTextureType == TextureType.Dds)
         {
-            return 1; // dds to d3dtx
+            switch (newTextureType)
+            {
+                case TextureType.D3dtx:
+                    ConvertTextureFromD3DtxToDds(sourcePath, resultPath, conversionType);
+                    break;
+                case TextureType.Png:
+                case TextureType.Jpeg:
+                case TextureType.Bmp:
+                case TextureType.Tiff:
+                case TextureType.Tga:
+                    await ConvertTextureFromDdsToOthersAsync(sourcePath, resultPath, newTextureType, true);
+                    break;
+                default:
+                    throw new Exception("Invalid file type.");
+            }
         }
-        else if ("dds".Equals(oldFileType) &&
-            ("png".Equals(newFileType)
-            || "jpg".Equals(newFileType)
-            || "jpeg".Equals(newFileType)
-            || "bmp".Equals(newFileType)
-            || "tiff".Equals(newFileType)
-            || "tif".Equals(newFileType)))
+        else if (oldTextureType == TextureType.Ktx)
         {
-            return 2; // dds to others
+            switch (newTextureType)
+            {
+                case TextureType.D3dtx:
+                    ConvertTextureFromD3DtxToDds(sourcePath, resultPath, conversionType);
+                    break;
+                default:
+                    throw new Exception("Invalid file type.");
+            }
         }
-        else if ("png".Equals(oldFileType)
-            || "jpg".Equals(oldFileType)
-            || "jpeg".Equals(oldFileType)
-            || "bmp".Equals(oldFileType)
-            || "tiff".Equals(oldFileType)
-            || "tif".Equals(oldFileType))
+        else if (oldTextureType == TextureType.Ktx2)
         {
-            return 3; // others to dds
+            switch (newTextureType)
+            {
+                case TextureType.D3dtx:
+                    ConvertTextureFromD3DtxToDds(sourcePath, resultPath, conversionType);
+                    break;
+                default:
+                    throw new Exception("Invalid file type.");
+            }
+        }
+        else if (oldTextureType == TextureType.Png
+            || oldTextureType == TextureType.Jpeg
+            || oldTextureType == TextureType.Bmp
+            || oldTextureType == TextureType.Tiff || oldTextureType == TextureType.Tga)
+        {
+            switch (newTextureType)
+            {
+                case TextureType.Dds:
+                    await ConvertTextureFileFromOthersToDdsAsync(sourcePath, resultPath, true); break;
+                default:
+                    throw new Exception("Invalid file type.");
+            }
         }
         else
         {
@@ -138,26 +196,32 @@ public class Converter
         }
     }
 
-    private static async Task PerformConversionAsync(short mode, string sourceFilePath, string destinationDirectory, string newFileType, D3DTXConversionType conversionType = D3DTXConversionType.DEFAULT)
+
+    /// <summary>
+    /// The main function for reading and converting said .d3dtx into a .dds file
+    /// </summary>
+    /// <param name="sourceFilePath"></param>
+    /// <param name="destinationDirectory"></param>
+    public static void ConvertTextureFromD3DtxToKtx2(string? sourceFilePath, string destinationDirectory, D3DTXConversionType conversionType = D3DTXConversionType.DEFAULT)
     {
-        switch (mode)
+        // Null safety validation of inputs.
+        if (string.IsNullOrEmpty(sourceFilePath) || string.IsNullOrEmpty(destinationDirectory))
         {
-            case 0:
-                ConvertTextureFromD3DtxToDds(sourceFilePath, destinationDirectory, conversionType);
-                break;
-            case 1:
-                ConvertTextureFromDdsToD3Dtx(sourceFilePath, destinationDirectory);
-                break;
-            case 2:
-                await ConvertTextureFromDdsToOthersAsync(sourceFilePath, destinationDirectory, newFileType, true);
-                break;
-            case 3:
-                await ConvertTextureFileFromOthersToDdsAsync(sourceFilePath, destinationDirectory, true);
-                break;
-            default:
-                throw new Exception("Invalid conversion mode.");
+            throw new ArgumentException("Arguments cannot be null in D3DtxToDds function.");
         }
+
+        D3DTX_Master d3dtxFile = new();
+        d3dtxFile.Read_D3DTX_File(sourceFilePath, conversionType);
+
+        KTX2_Master ktx2File = new(d3dtxFile);
+
+        // Write the dds file to disk
+        ktx2File.WriteD3DTXAsKTX2(d3dtxFile, destinationDirectory);
+
+        // Write the d3dtx data into a file
+        d3dtxFile.WriteD3DTXJSON(Path.GetFileNameWithoutExtension(d3dtxFile.filePath), destinationDirectory);
     }
+
 
     /// <summary>
     /// The main function for reading and converting said .d3dtx into a .dds file
@@ -226,7 +290,7 @@ public class Converter
             d3dtxMaster.ReadD3DTXJSON(textureFilePathJson);
 
             // If the d3dtx is a legacy D3DTX, force the use of the DX9 legacy flag
-            DDSFlags flags = d3dtxMaster.isLegacyD3DTX() ? DDSFlags.ForceDx9Legacy : DDSFlags.None;
+            DDSFlags flags = d3dtxMaster.IsLegacyD3DTX() ? DDSFlags.ForceDx9Legacy : DDSFlags.None;
 
             // Get the image
             var image = DDS_DirectXTexNet.GetDDSImage(sourceFilePath, flags);
@@ -234,6 +298,7 @@ public class Converter
             // Modify the d3dtx file using our dds data
             d3dtxMaster.Modify_D3DTX(image); //ISSUE HERE WITH DXT5 AND MIP MAPS WITH UPSCALED TEXTURES // Edit: This may not be an issue anymore
 
+            image.Release();
             // Write our final d3dtx file to disk
             d3dtxMaster.WriteFinalD3DTX(textureResultPathD3Dtx);
         }
@@ -350,11 +415,10 @@ public class Converter
     /// <param name="newFileType"></param>
     /// <param name="fixesDdsToGeneric"></param>
     public static async Task ConvertTextureFromDdsToOthersAsync(string? sourceFilePath, string destinationDirectory,
-        string newFileType, bool fixesDdsToGeneric)
+        TextureType newTextureType, bool fixesDdsToGeneric)
     {
         // Null safety validation of inputs.
-        if (string.IsNullOrEmpty(sourceFilePath) || string.IsNullOrEmpty(destinationDirectory) ||
-            string.IsNullOrEmpty(newFileType))
+        if (string.IsNullOrEmpty(sourceFilePath) || string.IsNullOrEmpty(destinationDirectory))
         {
             throw new ArgumentException("Arguments cannot be null in DdsToOthers function.");
         }
@@ -363,8 +427,8 @@ public class Converter
         string? textureFileDirectory = Path.GetDirectoryName(sourceFilePath);
         string textureFileNameOnly = Path.GetFileNameWithoutExtension(sourceFilePath);
 
-        D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes fileType =
-            GetEnumFileType(newFileType);
+        D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes newFileType =
+            GetEnumFileType(newTextureType);
 
         // Create the names of the following files
         string textureFileNameWithJson = textureFileNameOnly + Main_Shared.jsonExtension;
@@ -372,7 +436,7 @@ public class Converter
         // Create the path of these files. If things go well, these files (depending on the version) should exist in the same directory at the original .dds file.
         string textureFilePathJson = textureFileDirectory + Path.DirectorySeparatorChar + textureFileNameWithJson;
         string outputTextureFilePath =
-            destinationDirectory + Path.DirectorySeparatorChar + textureFileNameOnly + "." + newFileType;
+            destinationDirectory + Path.DirectorySeparatorChar + textureFileNameOnly + GetExtension(newTextureType)[0];
 
         // If a json file exists (for newer 5VSM and 6VSM)
         if (File.Exists(textureFilePathJson))
@@ -395,7 +459,7 @@ public class Converter
                 {
                     outputDirectory = new() { directory = destinationDirectory },
                     outputOverwrite = new(),
-                    outputFileType = new() { fileType = fileType }
+                    outputFileType = new() { fileType = newFileType }
                 };
 
                 if (fixesDdsToGeneric)
@@ -408,7 +472,7 @@ public class Converter
                 if (fixesDdsToGeneric)
                     NormalMapProcessing.FromDDS_NormalMapReconstructZ(sourceFilePath, outputTextureFilePath);
                 else
-                    NormalMapConvert.ConvertNormalMapToOthers(sourceFilePath, newFileType);
+                    NormalMapConvert.ConvertNormalMapToOthers(sourceFilePath, GetExtension(newTextureType)[0]);
             }
             else
             {
@@ -416,7 +480,7 @@ public class Converter
                 {
                     outputDirectory = new() { directory = destinationDirectory },
                     outputOverwrite = new(),
-                    outputFileType = new() { fileType = fileType }
+                    outputFileType = new() { fileType = newFileType }
                 };
                 await TexconvApp.RunTexconvAsync(sourceFilePath, options);
             }
@@ -428,7 +492,7 @@ public class Converter
             {
                 outputDirectory = new() { directory = destinationDirectory },
                 outputOverwrite = new(),
-                outputFileType = new() { fileType = fileType }
+                outputFileType = new() { fileType = newFileType }
             };
             await TexconvApp.RunTexconvAsync(sourceFilePath, options);
             throw new FileNotFoundException(
@@ -446,21 +510,21 @@ public class Converter
     /// <summary>
     /// Helper function for the converter. Gets the Texconv enum from the provided extension.
     /// </summary>
-    private static D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes GetEnumFileType(string extension)
+    private static D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes GetEnumFileType(TextureType extension)
     {
-        if (string.IsNullOrEmpty(extension))
+        if (extension == TextureType.Unknown)
         {
             throw new ArgumentNullException("File type cannot be null.");
         }
 
         return extension switch
         {
-            "bmp" => D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.bmp,
-            "png" => D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.png,
-            "jpg" => D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.jpg,
-            "jpeg" => D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.jpeg,
-            "tif" => D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.tif,
-            "tiff" => D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.tiff,
+            TextureType.Dds => D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.dds,
+            TextureType.Bmp => D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.bmp,
+            TextureType.Png => D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.png,
+            TextureType.Jpeg => D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.jpeg,
+            TextureType.Tiff => D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.tiff,
+            TextureType.Tga => D3DTX_Converter.TexconvEnums.TexconvEnumFileTypes.tga,
             _ => throw new Exception("File type " + extension + " is not supported."),
         };
     }

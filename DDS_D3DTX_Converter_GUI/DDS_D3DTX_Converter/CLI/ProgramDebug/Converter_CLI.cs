@@ -10,7 +10,7 @@ using D3DTX_Converter.Main;
 using D3DTX_Converter.Texconv;
 using D3DTX_Converter.TexconvOptions;
 using D3DTX_Converter.Utilities;
-using HexaEngine.DirectXTex;
+using Hexa.NET.DirectXTex;
 
 namespace D3DTX_Converter.ProgramDebug;
 
@@ -242,7 +242,7 @@ public class Converter_CLI
             d3dtxMaster.ReadD3DTXJSON(textureFilePathJson);
 
             // If the d3dtx is a legacy D3DTX, force the use of the DX9 legacy flag
-            DDSFlags flags = d3dtxMaster.isLegacyD3DTX() ? DDSFlags.ForceDx9Legacy : DDSFlags.None;
+            DDSFlags flags = d3dtxMaster.IsLegacyD3DTX() ? DDSFlags.ForceDx9Legacy : DDSFlags.None;
 
             // Get the image
             var image = DDS_DirectXTexNet.GetDDSImage(sourceFilePath, flags);

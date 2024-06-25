@@ -1386,7 +1386,7 @@ namespace D3DTX_Converter.Main
                     {
                         Console.WriteLine("Unswizzling Xbox texture data..." + i);
 
-                        GetPixelData()[i] = Xbox360Texture.DecodeXbox360(GetPixelData()[i], surfaceFormat, width / divideBy, height / divideBy);
+                        GetPixelData()[i] = XboxTextureDecoder.UnswizzleXbox(GetPixelData()[i], width / divideBy, height / divideBy, surfaceFormat, false);
                     }
 
                     if (surfaceFormat == T3SurfaceFormat.eSurface_PVRTC4 || surfaceFormat == T3SurfaceFormat.eSurface_PVRTC4a)
@@ -1447,7 +1447,7 @@ namespace D3DTX_Converter.Main
                     {
                         Console.WriteLine("Unswizzling Xbox texture data..." + i);
 
-                        GetPixelData()[i] = Xbox360Texture.DecodeXbox360(GetPixelData()[i], surfaceFormat, width, height);
+                        GetPixelData()[i] = XboxTextureDecoder.UnswizzleXbox(GetPixelData()[i], width, height, surfaceFormat, true);
                     }
 
                     if (surfaceFormat == T3SurfaceFormat.eSurface_PVRTC4 || surfaceFormat == T3SurfaceFormat.eSurface_PVRTC4a)
@@ -1477,7 +1477,14 @@ namespace D3DTX_Converter.Main
 
         public byte[] GetPixelDataByFirstMipmapIndex(T3SurfaceFormat surfaceFormat, int width, int height, PlatformType platformType)
         {
-            return GetPixelDataByMipmapIndex(0, surfaceFormat, width, height, platformType);
+            int index = 0;
+
+            if (GetRegionCount() == 1)
+            {
+                index = GetRegionStreamHeaders()[0].mMipIndex;
+            }
+
+            return GetPixelDataByMipmapIndex(index, surfaceFormat, width, height, platformType);
         }
 
         public static bool IsTextureCompressed(T3SurfaceFormat format)
@@ -1528,6 +1535,21 @@ namespace D3DTX_Converter.Main
                 T3SurfaceFormat.eSurface_PVRTC4 => true,
                 T3SurfaceFormat.eSurface_PVRTC2a => true,
                 T3SurfaceFormat.eSurface_PVRTC4a => true,
+                _ => false,
+            };
+        }
+
+        public bool IsPlatformIncompatibleWithDDS(PlatformType type)
+        {
+            return type switch
+            {
+                PlatformType.ePlatform_PS3 => true,
+                PlatformType.ePlatform_PS4 => true,
+                PlatformType.ePlatform_WiiU => true,
+                PlatformType.ePlatform_Xbox => true,
+                PlatformType.ePlatform_XBOne => true,
+                PlatformType.ePlatform_iPhone => true,
+                PlatformType.ePlatform_Android => true,
                 _ => false,
             };
         }

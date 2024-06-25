@@ -8,6 +8,7 @@ using System.Linq;
 using D3DTX_Converter.TelltaleTypes;
 using Hexa.NET.DirectXTex;
 using D3DTX_Converter.DirectX.Enums;
+using Silk.NET.DXGI;
 
 namespace D3DTX_Converter.Main
 {
@@ -64,10 +65,16 @@ namespace D3DTX_Converter.Main
             dds.header.dwFlags |= d3dtx.IsTextureCompressed() ? DDSD.LINEARSIZE : DDSD.PITCH;
             dds.header.dwFlags |= d3dtx.IsVolumeTexture() ? DDSD.DEPTH : 0x0;
 
+            DXGIFormat dxgiFormat = DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat);
+            if (d3dtx.GetPlatformType() == PlatformType.ePlatform_iPhone)
+            {
+                dxgiFormat = DDS_HELPER.GetDXGIFormatWithSwappedChannels(dxgiFormat);
+            }
+
             // Initialize DDS width, height, depth, pitch, mip level count
             dds.header.dwWidth = (uint)d3dtx.GetWidth();
             dds.header.dwHeight = (uint)d3dtx.GetHeight();
-            dds.header.dwPitchOrLinearSize = DDS_DirectXTexNet.ComputePitch(DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat), dds.header.dwWidth, dds.header.dwHeight);
+            dds.header.dwPitchOrLinearSize = DDS_DirectXTexNet.ComputePitch(dxgiFormat, dds.header.dwWidth, dds.header.dwHeight);
             dds.header.dwDepth = (uint)d3dtx.GetDepth();
 
             // If the texture has more than 1 mip level, set the mip level count
@@ -81,14 +88,10 @@ namespace D3DTX_Converter.Main
                 dds.header.dwPitchOrLinearSize = 0;
             }
 
-            if (surfaceFormat == T3SurfaceFormat.eSurface_PVRTC2 || surfaceFormat == T3SurfaceFormat.eSurface_PVRTC4 || surfaceFormat == T3SurfaceFormat.eSurface_PVRTC2a || surfaceFormat == T3SurfaceFormat.eSurface_PVRTC4a)
-            {
-                //  dds.header.dwPitchOrLinearSize=2048;
-            }
 
-            if(d3dtx.IsFormatIncompatibleWithDDS(surfaceFormat))
+            if (d3dtx.IsFormatIncompatibleWithDDS(surfaceFormat))
             {
-               // dds.header.dwPitchOrLinearSize = 0;
+                // dds.header.dwPitchOrLinearSize = 0;
                 dds.header.dwMipMapCount = 1;
             }
 
@@ -101,7 +104,7 @@ namespace D3DTX_Converter.Main
                 dds.header.ddspf.dwFourCC = ByteFunctions.Convert_String_To_UInt32("DX10");
                 dds.dxt10Header = DDS_HEADER_DXT10.GetPresetDXT10Header();
 
-                dds.dxt10Header.dxgiFormat = DDS_HELPER.GetDXGIFromTelltaleSurfaceFormat(surfaceFormat, surfaceGamma);
+                dds.dxt10Header.dxgiFormat = dxgiFormat;
 
                 // 1D textures don't exist in Telltale games
                 dds.dxt10Header.resourceDimension = d3dtx.IsVolumeTexture() ? D3D10_RESOURCE_DIMENSION.TEXTURE3D : D3D10_RESOURCE_DIMENSION.TEXTURE2D;
@@ -155,8 +158,9 @@ namespace D3DTX_Converter.Main
 
             if (d3dtx.IsVolumeTexture())
             {
-                if (d3dtx.IsFormatIncompatibleWithDDS(surfaceFormat))
+                if (d3dtx.IsFormatIncompatibleWithDDS(surfaceFormat) || d3dtx.IsPlatformIncompatibleWithDDS(d3dtx.GetPlatformType()))
                 {
+                    dds.header.dwMipMapCount = 1;
                     textureData.Add(d3dtx.GetPixelDataByFirstMipmapIndex(d3dtx.GetCompressionType(), (int)d3dtx.GetWidth(), (int)d3dtx.GetHeight(), d3dtx.GetPlatformType()));
                 }
                 else
@@ -171,8 +175,9 @@ namespace D3DTX_Converter.Main
             }
             else
             {
-                if (d3dtx.IsFormatIncompatibleWithDDS(surfaceFormat))
+                if (d3dtx.IsFormatIncompatibleWithDDS(surfaceFormat) || d3dtx.IsPlatformIncompatibleWithDDS(d3dtx.GetPlatformType()))
                 {
+                    dds.header.dwMipMapCount = 1;
                     textureData.Add(d3dtx.GetPixelDataByFirstMipmapIndex(d3dtx.GetCompressionType(), (int)d3dtx.GetWidth(), (int)d3dtx.GetHeight(), d3dtx.GetPlatformType()));
                 }
                 else

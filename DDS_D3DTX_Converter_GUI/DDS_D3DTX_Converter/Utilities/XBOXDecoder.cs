@@ -1,165 +1,130 @@
-
-
 using System;
-using System.Diagnostics;
 using D3DTX_Converter.TelltaleEnums;
 
-public static class Xbox360Texture
+public static class XboxTextureDecoder
 {
-    public static int AppLog2(int n)
+    // Credits to https://github.com/BinarySerializer
+    // https://github.com/BinarySerializer/BinarySerializer.UbiArt/tree/7f8ea72c3b4ede832dd14511f332bceecd320c0a
+    public static byte[] UnswizzleXbox(byte[] imageData, int width, int height, T3SurfaceFormat format, bool swapBytes)
     {
-        int r;
-        for (r = -1; n != 0; n >>= 1, r++) { /*empty*/ }
-        return r;
-    }
+        byte[] imgData = swapBytes ? new byte[imageData.Length] : imageData;
 
-    public static uint GetXbox360TiledOffset(int x, int y, int width, int logBpb)
-    {
-        Debug.Assert(width <= 8192);
-        Debug.Assert(x < width);
-
-        int alignedWidth = Align(width, 32);
-        int macro = ((x >> 5) + (y >> 5) * (alignedWidth >> 5)) << (logBpb + 7);
-        int micro = ((x & 7) + ((y & 0xE) << 2)) << logBpb;
-        int offset = macro + ((micro & ~0xF) << 1) + (micro & 0xF) + ((y & 1) << 4);
-
-        return (uint)((((offset & ~0x1FF) << 3) +
-                        ((y & 16) << 7) +
-                        ((offset & 0x1C0) << 2) +
-                        ((((y & 8) >> 2) + (x >> 3)) & 3) << 6) +
-                        (offset & 0x3F)) >> logBpb;
-    }
-
-    public static void UntileXbox360Texture(uint[] src, uint[] dst, int tiledWidth, int originalWidth, int height, int blockSizeX, int blockSizeY, int bytesPerBlock)
-    {
-        int blockWidth = tiledWidth / blockSizeX;
-        int originalBlockWidth = originalWidth / blockSizeX;
-        int blockHeight = height / blockSizeY;
-        int logBpp = AppLog2(bytesPerBlock);
-
-        int numImageBlocks = blockWidth * blockHeight;
-
-        for (int y = 0; y < blockHeight; y++)
+        if (swapBytes)
         {
-            for (int x = 0; x < originalBlockWidth; x++)
+            for (int i = 0; i < imageData.Length / 2; i++)
             {
-                uint swzAddr = GetXbox360TiledOffset(x, y, blockWidth, logBpp);
-                Debug.Assert(swzAddr < numImageBlocks);
-                int sy = (int)swzAddr / blockWidth;
-                int sx = (int)swzAddr % blockWidth;
-
-                int y2 = y * blockSizeY;
-                int y3 = sy * blockSizeY;
-
-                for (int y1 = 0; y1 < blockSizeY; y1++, y2++, y3++)
-                {
-                    int x2 = x * blockSizeX;
-                    int x3 = sx * blockSizeX;
-                    for (int x1 = 0; x1 < blockSizeX; x1++)
-                        dst[y2 * originalWidth + x2 + x1] = src[y3 * tiledWidth + x3 + x1];
-                }
+                imgData[i * 2] = imageData[i * 2 + 1];
+                imgData[i * 2 + 1] = imageData[i * 2];
             }
         }
+
+        CPixelFormatInfo info = GetPixelFormatInfoFromT3SurfaceFormat(format);
+
+        return UntileTexture(imgData, width, height, info.BytesPerBlock, info.X360AlignX, info.X360AlignY, info.BlockSizeX, info.BlockSizeY);
     }
 
-    public static byte[] UntileCompressedXbox360Texture(byte[] src, int originalWidth, int originalHeight, CPixelFormatInfo info)
+    public enum TextureCompressionType : byte
     {
-        byte[] dst = new byte[src.Length];
+        DXT1 = 0x52,
+        DXT3 = 0x53,
+        DXT5 = 0x54
+    }
 
-        int alignedWidth = Align(originalWidth, info.X360AlignX);
-        int alignedHeight = Align(originalHeight, info.X360AlignY);
+    // Based on https://github.com/gildor2/UEViewer/blob/eaba2837228f9fe39134616d7bff734acd314ffb/Unreal/UnrealMaterial/UnTexture.cpp#L562
+    private static byte[] UntileTexture(byte[] srcData, int originalWidth, int originalHeight, int bytesPerBlock, int alignX, int alignY, int blockSizeX, int blockSizeY)
+    {
+        var dstData = new byte[srcData.Length];
 
-        int tiledBlockWidth = alignedWidth / info.BlockSizeX;
-        int originalBlockWidth = originalWidth / info.BlockSizeX;
-        int tiledBlockHeight = alignedHeight / info.BlockSizeY;
-        int originalBlockHeight = originalHeight / info.BlockSizeY;
-        int logBpp = AppLog2(info.BytesPerBlock);
+        int alignedWidth = Align(originalWidth, alignX);
+        int alignedHeight = Align(originalHeight, alignY);
 
-        int sxOffset = 0, syOffset = 0;
+        int tiledBlockWidth = alignedWidth / blockSizeX;       // width of image in blocks
+        int originalBlockWidth = originalWidth / blockSizeX;   // width of image in blocks
+        int tiledBlockHeight = alignedHeight / blockSizeY;     // height of image in blocks
+        int originalBlockHeight = originalHeight / blockSizeY; // height of image in blocks
+        int logBpp = AppLog2(bytesPerBlock);
+
+        // XBox360 has packed multiple lower mip levels into a single tile - should use special code
+        // to unpack it. Textures are aligned to bottom-right corder.
+        // Packing looks like this:
+        // ....CCCCBBBBBBBBAAAAAAAAAAAAAAAA
+        // ....CCCCBBBBBBBBAAAAAAAAAAAAAAAA
+        // E.......BBBBBBBBAAAAAAAAAAAAAAAA
+        // ........BBBBBBBBAAAAAAAAAAAAAAAA
+        // DD..............AAAAAAAAAAAAAAAA
+        // ................AAAAAAAAAAAAAAAA
+        // ................AAAAAAAAAAAAAAAA
+        // ................AAAAAAAAAAAAAAAA
+        // (Where mips are A,B,C,D,E - E is 1x1, D is 2x2 etc)
+        // Force sxOffset=0 and enable DEBUG_MIPS in UnRender.cpp to visualize this layout.
+        // So we should offset X coordinate when unpacking to the width of mip level.
+        // Note: this doesn't work with non-square textures.
+        var sxOffset = 0;
+        var syOffset = 0;
+
+        // We're handling only size=16 here.
         if (tiledBlockWidth >= originalBlockWidth * 2 && originalWidth == 16)
             sxOffset = originalBlockWidth;
+
         if (tiledBlockHeight >= originalBlockHeight * 2 && originalHeight == 16)
             syOffset = originalBlockHeight;
 
-        int numImageBlocks = tiledBlockWidth * tiledBlockHeight;
+        int numImageBlocks = tiledBlockWidth * tiledBlockHeight;    // used for verification
 
-        int bytesPerBlock = info.BytesPerBlock;
+        // Iterate over image blocks
         for (int dy = 0; dy < originalBlockHeight; dy++)
         {
             for (int dx = 0; dx < originalBlockWidth; dx++)
             {
-                uint swzAddr = GetXbox360TiledOffset(dx + sxOffset, dy + syOffset, tiledBlockWidth, logBpp);
-                Debug.Assert(swzAddr < numImageBlocks);
-                int sy = (int)swzAddr / tiledBlockWidth;
-                int sx = (int)swzAddr % tiledBlockWidth;
+                // Unswizzle only once for a whole block
+                uint swzAddr = GetTiledOffset(dx + sxOffset, dy + syOffset, tiledBlockWidth, logBpp);
 
-                Array.Copy(src, (sy * tiledBlockWidth + sx) * bytesPerBlock, dst, (dy * originalBlockWidth + dx) * bytesPerBlock, bytesPerBlock);
+                if (swzAddr >= numImageBlocks)
+                    throw new Exception("Error in Xbox 360 texture parsing");
+
+                int sy = (int)(swzAddr / tiledBlockWidth);
+                int sx = (int)(swzAddr % tiledBlockWidth);
+
+                int dstStart = (dy * originalBlockWidth + dx) * bytesPerBlock;
+                int srcStart = (sy * tiledBlockWidth + sx) * bytesPerBlock;
+                Array.Copy(srcData, srcStart, dstData, dstStart, bytesPerBlock);
             }
         }
 
-        return dst;
+        return dstData;
     }
 
-    public static byte[] DecodeXbox360(byte[] src, T3SurfaceFormat format, int width, int height)
+    private static uint GetTiledOffset(int x, int y, int width, int logBpb)
     {
-        CPixelFormatInfo info = GetPixelFormatInfoFromT3SurfaceFormat(format);
+        if (width > 8192)
+            throw new Exception($"Xbox 360 texture: Width {width} too large");
 
-        if (info.X360AlignX == 0)
-        {
-            throw new Exception("ERROR: DecodeXBox360 {0}'{1}' mip {2} ({3}={4}): unsupported texture format");
-        }
+        if (width <= x)
+            throw new Exception($"Xbox 360 texture: X {x} too large for width {width}");
 
-        int USize1 = Align(width, info.X360AlignX);
-        int VSize1 = Align(height, info.X360AlignY);
-        int UBlockSize = USize1 / info.BlockSizeX;
-        int VBlockSize = VSize1 / info.BlockSizeY;
-        int TotalBlocks = src.Length / info.BytesPerBlock;
-
-        float bpp = (float)src.Length / (USize1 * VSize1) * info.BlockSizeX * info.BlockSizeY;
-
-        if (UBlockSize * VBlockSize > TotalBlocks)
-            throw new Exception("ERROR: DecodeXBox360 {0}'{1}' mip {2} ({3}={4}): not enough data");
-
-        if (Math.Abs(bpp - info.BytesPerBlock) > 0.001f)
-        {
-            if (height >= 32 || (bpp * 2 != info.BytesPerBlock && bpp * 4 != info.BytesPerBlock))
-            {
-                throw new Exception("ERROR: DecodeXBox360 {0}'{1}' mip {2} ({3}={4}): unsupported texture format");
-            }
-        }
-
-        //START UNTILING 
-        src = UntileCompressedXbox360Texture(src, width, height, info);
-
-        if (format == T3SurfaceFormat.eSurface_ARGB8 || format == T3SurfaceFormat.eSurface_RGBA8 || format == T3SurfaceFormat.eSurface_RGBA8S)
-        {
-            AppReverseBytes(src, src.Length / 4, 4);
-        }
-        else if (info.BytesPerBlock > 1)
-        {
-            AppReverseBytes(src, src.Length / 2, 2);
-        }
-
-        return src;
-        //END UNTILING
+        int alignedWidth = Align(width, 32);
+        // top bits of coordinates
+        int macro = ((x >> 5) + (y >> 5) * (alignedWidth >> 5)) << (logBpb + 7);
+        // lower bits of coordinates (result is 6-bit value)
+        int micro = ((x & 7) + ((y & 0xE) << 2)) << logBpb;
+        // mix micro/macro + add few remaining x/y bits
+        int offset = macro + ((micro & ~0xF) << 1) + (micro & 0xF) + ((y & 1) << 4);
+        // mix bits again
+        return (uint)((((offset & ~0x1FF) << 3) +            // upper bits (offset bits [*-9])
+                       ((y & 16) << 7) +                           // next 1 bit
+                       ((offset & 0x1C0) << 2) +                   // next 3 bits (offset bits [8-6])
+                       (((((y & 8) >> 2) + (x >> 3)) & 3) << 6) +  // next 2 bits
+                       (offset & 0x3F)                             // lower 6 bits (offset bits [5-0])
+            ) >> logBpb);
     }
 
-    private static int Align(int value, int alignment)
-    {
-        return (value + alignment - 1) & ~(alignment - 1);
-    }
+    private static int Align(int value, int align) => (value % align != 0) ? ((value / align) + 1) * (align) : value;
 
-    private static void AppReverseBytes(byte[] buf, int count, int size)
+    private static int AppLog2(int n)
     {
-        for (int i = 0; i < count; i++)
-        {
-            Array.Reverse(buf, i * size, size);
-        }
-    }
-
-    private static void AppNotify(string format, params object[] args)
-    {
-        Console.WriteLine(format, args);
+        int r;
+        for (r = -1; n != 0; n >>= 1, r++) { /*empty*/ }
+        return r;
     }
 
     public struct CPixelFormatInfo
@@ -189,11 +154,11 @@ public static class Xbox360Texture
     public static CPixelFormatInfo[] PixelFormatInfo =
     [
         new CPixelFormatInfo(0, 0, 0, 0, 0, 0, 0, "UNKNOWN"),
-        new CPixelFormatInfo(MakeFourCC('D', 'X', 'T', '1'), 4, 4, 8, 128, 128, 0, "DXT1"),
-        new CPixelFormatInfo(MakeFourCC('D', 'X', 'T', '3'), 4, 4, 16, 128, 128, 0, "DXT3"),
-        new CPixelFormatInfo(MakeFourCC('D', 'X', 'T', '5'), 4, 4, 16, 128, 128, 0, "DXT5"),
-        new CPixelFormatInfo(MakeFourCC('A', 'T', 'I', '1'), 4, 4, 8, 0, 0, 0, "BC4"),
-        new CPixelFormatInfo(MakeFourCC('A', 'T', 'I', '2'), 4, 4, 16, 0, 0, 0, "BC5"),
+        new CPixelFormatInfo(0, 4, 4, 8, 128, 128, 0, "DXT1"),
+        new CPixelFormatInfo(0, 4, 4, 16, 128, 128, 0, "DXT3"),
+        new CPixelFormatInfo(0, 4, 4, 16, 128, 128, 0, "DXT5"),
+        new CPixelFormatInfo(0, 4, 4, 8, 0, 0, 0, "BC4"),
+        new CPixelFormatInfo(0, 4, 4, 16, 0, 0, 0, "BC5"),
         new CPixelFormatInfo(0, 4, 4, 16, 0, 0, 1, "BC6H"),
         new CPixelFormatInfo(0, 4, 4, 16, 0, 0, 0, "BC7"),
         new CPixelFormatInfo(0, 1, 1, 4, 32, 32, 0, "RGBA8"),
@@ -240,11 +205,6 @@ public static class Xbox360Texture
 
             _ => PixelFormatInfo[0],
         };
-    }
-
-    private static int MakeFourCC(char ch0, char ch1, char ch2, char ch3)
-    {
-        return (int)(byte)ch0 | ((int)(byte)ch1 << 8) | ((int)(byte)ch2 << 16) | ((int)(byte)ch3 << 24);
     }
 
     // Other classes and enums needed (CPixelFormatInfo, CMipMap, TexturePixelFormat, etc.)

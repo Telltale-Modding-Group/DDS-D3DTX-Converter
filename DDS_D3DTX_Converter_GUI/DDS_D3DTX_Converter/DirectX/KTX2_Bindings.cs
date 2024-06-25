@@ -1,3 +1,4 @@
+using D3DTX_Converter.DirectX.Enums;
 using Hexa.NET.DirectXTex;
 using Ktx;
 using System;
@@ -30,7 +31,6 @@ public static class KTX2_Bindings
 
         return safeTexture;
     }
-
 
     /// <summary>
     /// Compute the pitch given the Direct3D10/DXGI format, the width and the height.

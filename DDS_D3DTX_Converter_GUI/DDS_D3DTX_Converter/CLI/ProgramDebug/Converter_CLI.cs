@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using D3DTX_Converter.DirectX;
+using D3DTX_Converter.DirectX.Enums;
 using D3DTX_Converter.ImageProcessing;
 using D3DTX_Converter.Main;
 using D3DTX_Converter.Texconv;

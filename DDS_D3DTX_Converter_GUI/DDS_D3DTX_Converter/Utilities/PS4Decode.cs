@@ -1,5 +1,5 @@
 using System;
-using D3DTX_Converter.DirectX;
+using D3DTX_Converter.DirectX.Enums;
 using Hexa.NET.DirectXTex;
 
 public static class PS4TextureDecoder

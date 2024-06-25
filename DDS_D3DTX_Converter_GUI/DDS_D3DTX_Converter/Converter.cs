@@ -12,6 +12,7 @@ using System.Linq;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Hexa.NET.DirectXTex;
+using D3DTX_Converter.DirectX.Enums;
 
 namespace DDS_D3DTX_Converter;
 

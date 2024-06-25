@@ -7,6 +7,7 @@ using D3DTX_Converter.TelltaleEnums;
 using System.Linq;
 using D3DTX_Converter.TelltaleTypes;
 using Hexa.NET.DirectXTex;
+using D3DTX_Converter.DirectX.Enums;
 
 namespace D3DTX_Converter.Main
 {
@@ -51,7 +52,7 @@ namespace D3DTX_Converter.Main
             if (d3dtx.IsLegacyD3DTX())
             {
                 var pixelData = d3dtx.GetLegacyPixelData();
-                dds.header = DDS_HEADER.GetHeaderFromBytes(pixelData[pixelData.Count - 1], true);
+                dds.header = DDS_HEADER.GetHeaderFromBytes(pixelData[0], true);
                 return;
             }
 
@@ -78,6 +79,17 @@ namespace D3DTX_Converter.Main
             {
                 dds.header.dwMipMapCount = (uint)d3dtx.GetMipMapCount();
                 dds.header.dwPitchOrLinearSize = 0;
+            }
+
+            if (surfaceFormat == T3SurfaceFormat.eSurface_PVRTC2 || surfaceFormat == T3SurfaceFormat.eSurface_PVRTC4 || surfaceFormat == T3SurfaceFormat.eSurface_PVRTC2a || surfaceFormat == T3SurfaceFormat.eSurface_PVRTC4a)
+            {
+                //  dds.header.dwPitchOrLinearSize=2048;
+            }
+
+            if(d3dtx.IsFormatIncompatibleWithDDS(surfaceFormat))
+            {
+               // dds.header.dwPitchOrLinearSize = 0;
+                dds.header.dwMipMapCount = 1;
             }
 
             // Set the DDS pixel format info
@@ -143,24 +155,40 @@ namespace D3DTX_Converter.Main
 
             if (d3dtx.IsVolumeTexture())
             {
-                int divideBy = 1;
-                for (int i = 0; i < dds.header.dwMipMapCount; i++)
+                if (d3dtx.IsFormatIncompatibleWithDDS(surfaceFormat))
                 {
-                    textureData.Add(d3dtx.GetPixelDataByMipmapIndex(i, d3dtx.GetCompressionType(), (int)d3dtx.GetWidth() / divideBy, (int)d3dtx.GetHeight() / divideBy, d3dtx.GetPlatformType()));
-                    divideBy *= 2;
+                    textureData.Add(d3dtx.GetPixelDataByFirstMipmapIndex(d3dtx.GetCompressionType(), (int)d3dtx.GetWidth(), (int)d3dtx.GetHeight(), d3dtx.GetPlatformType()));
+                }
+                else
+                {
+                    int divideBy = 1;
+                    for (int i = 0; i < dds.header.dwMipMapCount; i++)
+                    {
+                        textureData.Add(d3dtx.GetPixelDataByMipmapIndex(i, d3dtx.GetCompressionType(), (int)d3dtx.GetWidth() / divideBy, (int)d3dtx.GetHeight() / divideBy, d3dtx.GetPlatformType()));
+                        divideBy *= 2;
+                    }
                 }
             }
             else
             {
-                int totalFaces = (int)(d3dtx.IsCubeTexture() ? d3dtx.GetArraySize() * 6 : d3dtx.GetArraySize());
-
-                // Get each face of the 2D texture
-                for (int i = 0; i < totalFaces; i++)
+                if (d3dtx.IsFormatIncompatibleWithDDS(surfaceFormat))
                 {
-                    textureData.Add(d3dtx.GetPixelDataByFaceIndex(i, d3dtx.GetCompressionType(), (int)d3dtx.GetWidth(), (int)d3dtx.GetHeight(), d3dtx.GetPlatformType()));
+                    textureData.Add(d3dtx.GetPixelDataByFirstMipmapIndex(d3dtx.GetCompressionType(), (int)d3dtx.GetWidth(), (int)d3dtx.GetHeight(), d3dtx.GetPlatformType()));
+                }
+                else
+                {
+                    int totalFaces = (int)(d3dtx.IsCubeTexture() ? d3dtx.GetArraySize() * 6 : d3dtx.GetArraySize());
+
+                    // Get each face of the 2D texture
+                    for (int i = 0; i < totalFaces; i++)
+                    {
+                        textureData.Add(d3dtx.GetPixelDataByFaceIndex(i, d3dtx.GetCompressionType(), (int)d3dtx.GetWidth(), (int)d3dtx.GetHeight(), d3dtx.GetPlatformType()));
+                    }
                 }
 
-                byte[] d3dtxTextureDataArray = textureData.SelectMany(b => b).ToArray();
+
+
+                // byte[] d3dtxTextureDataArray = textureData.SelectMany(b => b).ToArray();
 
                 for (int i = 0; i < streamHeaders.Length; i++)
                 {
@@ -193,6 +221,8 @@ namespace D3DTX_Converter.Main
                     // }
                 }
             }
+
+            dds.Print();
         }
 
         public void InitializeDDSHeaderForMBIN(D3DTX_Master d3dtx)
@@ -240,75 +270,80 @@ namespace D3DTX_Converter.Main
         /// </summary>
         /// <param name="surface">The Telltale surface format.</param>
         /// <returns>DDS Pixelformat object with the correct surface format settings.</returns>
-        private DDS_PIXELFORMAT GetPixelFormatHeaderFromT3Surface(T3SurfaceFormat surface)
+        private DDSPixelFormat GetPixelFormatHeaderFromT3Surface(T3SurfaceFormat surface)
         {
             return surface switch
             {
                 // Uncompressed formats
-                T3SurfaceFormat.eSurface_ARGB8 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'ARGB8'
-                T3SurfaceFormat.eSurface_ARGB16 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0x00, 0x00, 0x00, 0x00),// 'ARGB16'
-                T3SurfaceFormat.eSurface_RGB565 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'RGB565'
-                T3SurfaceFormat.eSurface_ARGB1555 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'ARGB1555'
-                T3SurfaceFormat.eSurface_ARGB4 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.ALPHAPIXELS, DDPF.RGB), 0, 16, 0xf00, 0xf0, 0xf, 0xf000),// 'ARGB4'  //Due to a long-standing issue in DDS readers and writers, it's better to use DX10 header for this format
-                T3SurfaceFormat.eSurface_ARGB2101010 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'ARGB2101010'   
-                T3SurfaceFormat.eSurface_R16 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'R16' TODO, COULD BE L16
-                T3SurfaceFormat.eSurface_RG16 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.ALPHAPIXELS, DDPF.RGB), 0, 32, 0x00, 0x00, 0x00, 0x00),// 'RG16'
-                T3SurfaceFormat.eSurface_RGBA16 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0x00, 0x00, 0x00, 0x00),// 'RGBA16'
-                T3SurfaceFormat.eSurface_RG8 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'RG8'
-                T3SurfaceFormat.eSurface_RGBA8 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RGBA8'
-                T3SurfaceFormat.eSurface_R32 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'R32'
-                T3SurfaceFormat.eSurface_RG32 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0x00, 0x00, 0x00, 0x00),// 'RG32' 
-                T3SurfaceFormat.eSurface_RGBA32 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 128, 0x00, 0x00, 0x00, 0x00),// 'RGBA32'
-                T3SurfaceFormat.eSurface_R8 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 8, 0x00, 0x00, 0x00, 0x00),// 'R8'
-                T3SurfaceFormat.eSurface_RGBA8S => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RGBA8S'
-                T3SurfaceFormat.eSurface_A8 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.ALPHA), 0, 8, 0x00, 0x00, 0x00, 0xff),// 'A8'
-                T3SurfaceFormat.eSurface_L8 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.LUMINANCE), 0, 8, 0xff, 0x00, 0x00, 0x00),// 'L8'
-                T3SurfaceFormat.eSurface_AL8 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.LUMINANCE, DDPF.ALPHAPIXELS), 0, 16, 0x00ff, 0x00, 0x00, 0xff00),// 'AL8'
-                T3SurfaceFormat.eSurface_L16 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.LUMINANCE), 0, 16, 0xffff, 0x00, 0x00, 0x00),// 'L16'
-                T3SurfaceFormat.eSurface_RG16S => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RG16S'
-                T3SurfaceFormat.eSurface_RGBA16S => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0x00, 0x00, 0x00, 0x00),// 'RGBA16S'
-                T3SurfaceFormat.eSurface_R16UI => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'R16UI'
-                T3SurfaceFormat.eSurface_RG16UI => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RG16UI'
-                T3SurfaceFormat.eSurface_RGBA1010102F => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RGBA1010102F'
-                T3SurfaceFormat.eSurface_RGB111110F => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RGB111110F'
-                T3SurfaceFormat.eSurface_R16F => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'R16F'
-                T3SurfaceFormat.eSurface_RG16F => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RG16F'
-                T3SurfaceFormat.eSurface_RGBA16F => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0x00, 0x00, 0x00, 0x00),// 'RGBA16F'
-                T3SurfaceFormat.eSurface_R32F => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'R32F'
-                T3SurfaceFormat.eSurface_RG32F => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0x00, 0x00, 0x00, 0x00),// 'RG32F'
-                T3SurfaceFormat.eSurface_RGBA32F => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 128, 0x00, 0x00, 0x00, 0x00),// 'RGBA32F'
-                T3SurfaceFormat.eSurface_RGB9E5F => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RGB9E5F'  
+                T3SurfaceFormat.eSurface_ARGB8 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'ARGB8'
+                T3SurfaceFormat.eSurface_ARGB16 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0x00, 0x00, 0x00, 0x00),// 'ARGB16'
+                T3SurfaceFormat.eSurface_RGB565 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'RGB565'
+                T3SurfaceFormat.eSurface_ARGB1555 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'ARGB1555'
+                T3SurfaceFormat.eSurface_ARGB4 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'ARGB4'  //Due to a long-standing issue in DDS readers and writers, it's better to use DX10 header for this format
+                T3SurfaceFormat.eSurface_ARGB2101010 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'ARGB2101010'   
+                T3SurfaceFormat.eSurface_R16 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'R16' TODO, COULD BE L16
+                T3SurfaceFormat.eSurface_RG16 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.ALPHAPIXELS, DDPF.RGB), 0, 32, 0x00, 0x00, 0x00, 0x00),// 'RG16'
+                T3SurfaceFormat.eSurface_RGBA16 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0x00, 0x00, 0x00, 0x00),// 'RGBA16'
+                T3SurfaceFormat.eSurface_RG8 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'RG8'
+                T3SurfaceFormat.eSurface_RGBA8 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RGBA8'
+                T3SurfaceFormat.eSurface_R32 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'R32'
+                T3SurfaceFormat.eSurface_RG32 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0x00, 0x00, 0x00, 0x00),// 'RG32' 
+                T3SurfaceFormat.eSurface_RGBA32 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 128, 0x00, 0x00, 0x00, 0x00),// 'RGBA32'
+                T3SurfaceFormat.eSurface_R8 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 8, 0x00, 0x00, 0x00, 0x00),// 'R8'
+                T3SurfaceFormat.eSurface_RGBA8S => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RGBA8S'
+                T3SurfaceFormat.eSurface_A8 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.ALPHA), 0, 8, 0x00, 0x00, 0x00, 0xff),// 'A8'
+                T3SurfaceFormat.eSurface_L8 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.LUMINANCE), 0, 8, 0xff, 0x00, 0x00, 0x00),// 'L8'
+                T3SurfaceFormat.eSurface_AL8 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.LUMINANCE, DDPF.ALPHAPIXELS), 0, 16, 0x00ff, 0x00, 0x00, 0xff00),// 'AL8'
+                T3SurfaceFormat.eSurface_L16 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.LUMINANCE), 0, 16, 0xffff, 0x00, 0x00, 0x00),// 'L16'
+                T3SurfaceFormat.eSurface_RG16S => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RG16S'
+                T3SurfaceFormat.eSurface_RGBA16S => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0x00, 0x00, 0x00, 0x00),// 'RGBA16S'
+                T3SurfaceFormat.eSurface_R16UI => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'R16UI'
+                T3SurfaceFormat.eSurface_RG16UI => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RG16UI'
+                T3SurfaceFormat.eSurface_RGBA1010102F => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RGBA1010102F'
+                T3SurfaceFormat.eSurface_RGB111110F => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RGB111110F'
+                T3SurfaceFormat.eSurface_R16F => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 16, 0x00, 0x00, 0x00, 0x00),// 'R16F'
+                T3SurfaceFormat.eSurface_RG16F => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RG16F'
+                T3SurfaceFormat.eSurface_RGBA16F => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0x00, 0x00, 0x00, 0x00),// 'RGBA16F'
+                T3SurfaceFormat.eSurface_R32F => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'R32F'
+                T3SurfaceFormat.eSurface_RG32F => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 64, 0x00, 0x00, 0x00, 0x00),// 'RG32F'
+                T3SurfaceFormat.eSurface_RGBA32F => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 128, 0x00, 0x00, 0x00, 0x00),// 'RGBA32F'
+                T3SurfaceFormat.eSurface_RGB9E5F => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'RGB9E5F'  
 
                 // Compressed formats
-                T3SurfaceFormat.eSurface_BC1 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXT1'
-                T3SurfaceFormat.eSurface_BC2 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXT3'
-                T3SurfaceFormat.eSurface_BC3 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXT5'
-                T3SurfaceFormat.eSurface_BC4 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXT5'
-                T3SurfaceFormat.eSurface_BC5 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXN'
-                T3SurfaceFormat.eSurface_BC6 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'BC6H'
-                T3SurfaceFormat.eSurface_BC7 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'BC7U'
+                T3SurfaceFormat.eSurface_BC1 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXT1'
+                T3SurfaceFormat.eSurface_BC2 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXT3'
+                T3SurfaceFormat.eSurface_BC3 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXT5'
+                T3SurfaceFormat.eSurface_BC4 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXT5'
+                T3SurfaceFormat.eSurface_BC5 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXN'
+                T3SurfaceFormat.eSurface_BC6 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'BC6H'
+                T3SurfaceFormat.eSurface_BC7 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'BC7U'
 
                 // Unneeded depth conversions. These are probably inaccurate headers if they ever existed
-                T3SurfaceFormat.eSurface_DepthPCF16 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), 80, 16, 0x00, 0x00, 0x00, 0x00),// 'DepthPCF16'
-                T3SurfaceFormat.eSurface_DepthPCF24 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), 77, 24, 0x00, 0x00, 0x00, 0x00),// 'DepthPCF24'
-                T3SurfaceFormat.eSurface_Depth16 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), 80, 16, 0x00, 0x00, 0x00, 0x00),// 'Depth16'
-                T3SurfaceFormat.eSurface_Depth24 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), 77, 24, 0x00, 0x00, 0x00, 0x00),// 'Depth24'
-                T3SurfaceFormat.eSurface_DepthStencil32 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), 71, 32, 0x00, 0x00, 0x00, 0x00),// 'DepthStencil32'
-                T3SurfaceFormat.eSurface_Depth32F => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'Depth32F'
-                T3SurfaceFormat.eSurface_Depth32F_Stencil8 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'Depth32F_Stencil8'
-                T3SurfaceFormat.eSurface_Depth24F_Stencil8 => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), 83, 32, 0x00, 0x00, 0x00, 0x00),// 'Depth24F_Stencil8'
+                T3SurfaceFormat.eSurface_DepthPCF16 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), 80, 16, 0x00, 0x00, 0x00, 0x00),// 'DepthPCF16'
+                T3SurfaceFormat.eSurface_DepthPCF24 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), 77, 24, 0x00, 0x00, 0x00, 0x00),// 'DepthPCF24'
+                T3SurfaceFormat.eSurface_Depth16 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), 80, 16, 0x00, 0x00, 0x00, 0x00),// 'Depth16'
+                T3SurfaceFormat.eSurface_Depth24 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), 77, 24, 0x00, 0x00, 0x00, 0x00),// 'Depth24'
+                T3SurfaceFormat.eSurface_DepthStencil32 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), 71, 32, 0x00, 0x00, 0x00, 0x00),// 'DepthStencil32'
+                T3SurfaceFormat.eSurface_Depth32F => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'Depth32F'
+                T3SurfaceFormat.eSurface_Depth32F_Stencil8 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),// 'Depth32F_Stencil8'
+                T3SurfaceFormat.eSurface_Depth24F_Stencil8 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), 83, 32, 0x00, 0x00, 0x00, 0x00),// 'Depth24F_Stencil8'
 
                 // ATC
-                T3SurfaceFormat.eSurface_ATC_RGB => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("ATC "), 0x00, 0x00, 0x00, 0x00, 0x00),// 'ATC_RGB'
+                T3SurfaceFormat.eSurface_ATC_RGB => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("ATC "), 0x00, 0x00, 0x00, 0x00, 0x00),// 'ATC_RGB'
 
                 // ATCI
-                T3SurfaceFormat.eSurface_ATC_RGBA => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("ATCI"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'ATC_RGBA'
+                T3SurfaceFormat.eSurface_ATC_RGBA => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("ATCI"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'ATC_RGBA'
 
                 // ATCA
-                T3SurfaceFormat.eSurface_ATC_RGB1A => DDS_PIXELFORMAT.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("ATCA"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'ATC_RGB1A'
+                T3SurfaceFormat.eSurface_ATC_RGB1A => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("ATCA"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'ATC_RGB1A'
+
+                T3SurfaceFormat.eSurface_PVRTC2 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),
+                T3SurfaceFormat.eSurface_PVRTC4 => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),
+                T3SurfaceFormat.eSurface_PVRTC2a => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),
+                T3SurfaceFormat.eSurface_PVRTC4a => DDSPixelFormat.Of(32, SetDDPFFlags(DDPF.FOURCC), ByteFunctions.Convert_String_To_UInt32("DX10"), 32, 0x00, 0x00, 0x00, 0x00),
 
                 // Default to DXT1 Compression
-                _ => DDS_PIXELFORMAT.Of(32, 0x04, ByteFunctions.Convert_String_To_UInt32("DXT1"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXT1'
+                _ => DDSPixelFormat.Of(32, 0x04, ByteFunctions.Convert_String_To_UInt32("DXT1"), 0x00, 0x00, 0x00, 0x00, 0x00),// 'DXT1'
             };
         }
 

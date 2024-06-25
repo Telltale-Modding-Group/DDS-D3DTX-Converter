@@ -1,5 +1,5 @@
 ﻿using System;
-using D3DTX_Converter.DirectX;
+using D3DTX_Converter.DirectX.Enums;
 
 namespace D3DTX_Converter.TexconvOptions;
 

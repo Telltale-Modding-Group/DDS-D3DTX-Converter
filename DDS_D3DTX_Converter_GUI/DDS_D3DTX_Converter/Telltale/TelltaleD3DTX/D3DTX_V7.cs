@@ -7,6 +7,7 @@ using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
 using System.Runtime.InteropServices;
 using Hexa.NET.DirectXTex;
+using D3DTX_Converter.DirectX.Enums;
 
 /*
  * NOTE:

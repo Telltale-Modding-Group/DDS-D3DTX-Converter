@@ -11,6 +11,8 @@ using D3DTX_Converter.DirectX;
 using D3DTX_Converter.TelltaleTypes;
 using System.Linq;
 using Hexa.NET.DirectXTex;
+using D3DTX_Converter.DirectX.Enums;
+using Pvrtc;
 
 namespace D3DTX_Converter.Main
 {
@@ -1269,7 +1271,7 @@ namespace D3DTX_Converter.Main
                 return PlatformType.ePlatform_All;
         }
 
-        public D3DFORMAT GetD3DFORMAT()
+        public D3DFormat GetD3DFORMAT()
         {
             if (d3dtxL1 != null)
                 return d3dtxL1.mD3DFormat;
@@ -1294,7 +1296,7 @@ namespace D3DTX_Converter.Main
             else if (d3dtxL11 != null)
                 return d3dtxL11.mD3DFormat;
             else
-                return D3DFORMAT.UNKNOWN;
+                return D3DFormat.UNKNOWN;
         }
 
         public bool HasMipMaps()
@@ -1387,6 +1389,19 @@ namespace D3DTX_Converter.Main
                         GetPixelData()[i] = Xbox360Texture.DecodeXbox360(GetPixelData()[i], surfaceFormat, width / divideBy, height / divideBy);
                     }
 
+                    if (surfaceFormat == T3SurfaceFormat.eSurface_PVRTC4 || surfaceFormat == T3SurfaceFormat.eSurface_PVRTC4a)
+                    {
+                        PvrtcDecoder pvrtcDecoder = new PvrtcDecoder();
+                        GetPixelData()[i] = pvrtcDecoder.DecompressPVRTC(GetPixelData()[i], width / divideBy, height / divideBy, false);
+                        Console.WriteLine("LENGTH " + GetPixelData()[i].Length);
+                    }
+                    else if (surfaceFormat == T3SurfaceFormat.eSurface_PVRTC2 || surfaceFormat == T3SurfaceFormat.eSurface_PVRTC2a)
+                    {
+                        PvrtcDecoder pvrtcDecoder = new PvrtcDecoder();
+                        GetPixelData()[i] = pvrtcDecoder.DecompressPVRTC(GetPixelData()[i], width / divideBy, height / divideBy, true);
+                        Console.WriteLine("LENGTH " + GetPixelData()[i].Length);
+                    }
+
                     divideBy *= 2;
 
                     newPixelData.Add(GetPixelData()[i]);
@@ -1435,6 +1450,19 @@ namespace D3DTX_Converter.Main
                         GetPixelData()[i] = Xbox360Texture.DecodeXbox360(GetPixelData()[i], surfaceFormat, width, height);
                     }
 
+                    if (surfaceFormat == T3SurfaceFormat.eSurface_PVRTC4 || surfaceFormat == T3SurfaceFormat.eSurface_PVRTC4a)
+                    {
+                        PvrtcDecoder pvrtcDecoder = new PvrtcDecoder();
+                        GetPixelData()[i] = pvrtcDecoder.DecompressPVRTC(GetPixelData()[i], width, height, false);
+                        Console.WriteLine("LENGTH " + GetPixelData()[i].Length);
+                    }
+                    else if (surfaceFormat == T3SurfaceFormat.eSurface_PVRTC2 || surfaceFormat == T3SurfaceFormat.eSurface_PVRTC2a)
+                    {
+                        PvrtcDecoder pvrtcDecoder = new PvrtcDecoder();
+                        GetPixelData()[i] = pvrtcDecoder.DecompressPVRTC(GetPixelData()[i], width, height, true);
+                        Console.WriteLine("LENGTH " + GetPixelData()[i].Length);
+                    }
+
                     newPixelData.Add(GetPixelData()[i]);
                 }
             }
@@ -1445,6 +1473,11 @@ namespace D3DTX_Converter.Main
         public bool IsTextureCompressed()
         {
             return IsTextureCompressed(GetCompressionType());
+        }
+
+        public byte[] GetPixelDataByFirstMipmapIndex(T3SurfaceFormat surfaceFormat, int width, int height, PlatformType platformType)
+        {
+            return GetPixelDataByMipmapIndex(0, surfaceFormat, width, height, platformType);
         }
 
         public static bool IsTextureCompressed(T3SurfaceFormat format)
@@ -1459,6 +1492,28 @@ namespace D3DTX_Converter.Main
                 T3SurfaceFormat.eSurface_BC6 => true,
                 T3SurfaceFormat.eSurface_BC7 => true,
                 T3SurfaceFormat.eSurface_CTX1 => true,
+                T3SurfaceFormat.eSurface_ATC_RGB => true,
+                T3SurfaceFormat.eSurface_ATC_RGBA => true,
+                T3SurfaceFormat.eSurface_ATC_RGB1A => true,
+                T3SurfaceFormat.eSurface_ETC1_RGB => true,
+                T3SurfaceFormat.eSurface_ETC2_RGB => true,
+                T3SurfaceFormat.eSurface_ETC2_RGBA => true,
+                T3SurfaceFormat.eSurface_ETC2_RGB1A => true,
+                T3SurfaceFormat.eSurface_ETC2_R => true,
+                T3SurfaceFormat.eSurface_ETC2_RG => true,
+                T3SurfaceFormat.eSurface_ATSC_RGBA_4x4 => true,
+                T3SurfaceFormat.eSurface_PVRTC2 => true,
+                T3SurfaceFormat.eSurface_PVRTC4 => true,
+                T3SurfaceFormat.eSurface_PVRTC2a => true,
+                T3SurfaceFormat.eSurface_PVRTC4a => true,
+                _ => false,
+            };
+        }
+
+        public bool IsFormatIncompatibleWithDDS(T3SurfaceFormat format)
+        {
+            return format switch
+            {
                 T3SurfaceFormat.eSurface_ATC_RGB => true,
                 T3SurfaceFormat.eSurface_ATC_RGBA => true,
                 T3SurfaceFormat.eSurface_ATC_RGB1A => true,

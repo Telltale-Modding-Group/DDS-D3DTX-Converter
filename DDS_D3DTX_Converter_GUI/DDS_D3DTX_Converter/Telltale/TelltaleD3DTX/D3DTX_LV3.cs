@@ -7,6 +7,7 @@ using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
 using Hexa.NET.DirectXTex;
+using D3DTX_Converter.DirectX.Enums;
 
 /*
  * NOTE:
@@ -90,7 +91,7 @@ public class D3DTX_LV3
     /// <summary>
     /// [4 bytes] The old T3SurfaceFormat. Makes use of FourCC but it can be an integer as well. Enums could not be found.
     /// </summary>
-    public D3DFORMAT mD3DFormat { get; set; }
+    public D3DFormat mD3DFormat { get; set; }
 
     /// <summary>
     /// [4 bytes] The pixel width of the texture.
@@ -212,7 +213,7 @@ public class D3DTX_LV3
             mbEmbedMipMaps = new TelltaleBoolean(reader);
 
             mNumMipLevels = reader.ReadUInt32();
-            mD3DFormat = (D3DFORMAT)reader.ReadUInt32();
+            mD3DFormat = (D3DFormat)reader.ReadUInt32();
             mWidth = reader.ReadUInt32();
             mHeight = reader.ReadUInt32();
             mWiiForceWidth = reader.ReadUInt32();
@@ -244,7 +245,7 @@ public class D3DTX_LV3
                 continue;
             }
 
-            if (reader.ReadUInt32() != ByteFunctions.Convert_String_To_UInt32(DDS.MAGIC_WORD))
+            if (reader.BaseStream.Position == reader.BaseStream.Length)
             {
                 PrintConsole();
                 throw new Exception("Invalid DDS Header! The texture's header is corrupted!");
@@ -252,7 +253,7 @@ public class D3DTX_LV3
 
             mPixelData = [];
 
-            byte[] pixelArray = new byte[mTextureDataSize ];
+            byte[] pixelArray = new byte[mTextureDataSize];
             for (int i = 0; i < mTextureDataSize; i++)
             {
                 pixelArray[i] = reader.ReadByte();

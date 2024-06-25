@@ -7,6 +7,7 @@ using D3DTX_Converter.Utilities;
 using D3DTX_Converter.DirectX;
 using D3DTX_Converter.Main;
 using Hexa.NET.DirectXTex;
+using D3DTX_Converter.DirectX.Enums;
 
 /*
  * NOTE:
@@ -82,7 +83,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
     /// <summary>
     /// [4 bytes] The old T3SurfaceFormat. Makes use of FourCC but it can be an integer as well. Enums could not be found.
     /// </summary>
-    public D3DFORMAT mD3DFormat { get; set; }
+    public D3DFormat mD3DFormat { get; set; }
 
     /// <summary>
     /// [4 bytes] The pixel width of the texture.
@@ -228,7 +229,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
         mbIsMipMapped = new TelltaleBoolean(reader);
 
         mNumMipLevels = reader.ReadUInt32();
-        mD3DFormat = (D3DFORMAT)reader.ReadUInt32();
+        mD3DFormat = (D3DFormat)reader.ReadUInt32();
         mWidth = reader.ReadUInt32();
         mHeight = reader.ReadUInt32();
         mFlags = reader.ReadUInt32();
@@ -269,7 +270,12 @@ namespace D3DTX_Converter.TelltaleD3DTX
 
         if (mTextureDataSize == 0)
         {
-          continue;
+          mTextureDataSize = reader.ReadInt32();
+          if (mTextureDataSize <= 60)
+          {
+            continue;
+          }
+
         }
 
         if (reader.BaseStream.Position == reader.BaseStream.Length)
@@ -446,7 +452,7 @@ namespace D3DTX_Converter.TelltaleD3DTX
       {
         d3dtxInfo += "mPixelData Count = " + mPixelData[0].Length + Environment.NewLine;
       }
-      
+
       d3dtxInfo += "|||||||||||||||||||||||||||||||||||||||";
 
       return d3dtxInfo;

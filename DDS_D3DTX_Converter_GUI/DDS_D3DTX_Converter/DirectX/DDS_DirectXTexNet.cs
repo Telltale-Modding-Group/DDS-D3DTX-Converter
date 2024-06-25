@@ -1,5 +1,5 @@
 ﻿
-using D3DTX_Converter.Utilities;
+using D3DTX_Converter.DirectX.Enums;
 using DDS_D3DTX_Converter;
 using Hexa.NET.DirectXTex;
 using System;
@@ -8,6 +8,19 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 namespace D3DTX_Converter.DirectX;
+
+/// <summary>
+/// Image section of a DDS file. Contains width, height, format, slice pitch and row pitch.
+/// </summary>
+public struct DDS_DirectXTexNet_ImageSection
+{
+    public nuint Width;
+    public nuint Height;
+    public DXGIFormat Format;
+    public nuint SlicePitch;
+    public nuint RowPitch;
+    public byte[] Pixels;
+};
 
 /// <summary>
 /// A class that provides methods to interact with DirectXTexNet. Mainly used for loading and saving DDS files.
@@ -239,6 +252,7 @@ public static class DDS_DirectXTexNet
             ScratchImage image1 = DirectXTex.CreateScratchImage();
             if (ddsMainImage.Format != (int)DXGIFormat.R8G8B8A8_UNORM)
                 DirectXTex.Convert(ddsMainImage, (int)DXGIFormat.R8G8B8A8_UNORM, TexFilterFlags.Default, 0.5f, image1);
+           // else image1 = image;
 
             DirectXTex.SaveToDDSMemory(image1.GetImage(0, 0, 0), DDSFlags.None, blob);
             image1.Release();

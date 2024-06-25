@@ -1,4 +1,5 @@
-﻿using D3DTX_Converter.TelltaleEnums;
+﻿using D3DTX_Converter.DirectX.Enums;
+using D3DTX_Converter.TelltaleEnums;
 using Hexa.NET.DirectXTex;
 using Pfim;
 using System;
@@ -53,6 +54,7 @@ public static partial class DDS_HELPER
             DXGIFormat.B5G6R5_UNORM => T3SurfaceFormat.eSurface_RGB565,
             DXGIFormat.B5G5R5A1_UNORM => T3SurfaceFormat.eSurface_ARGB1555,
             DXGIFormat.B4G4R4A4_UNORM => T3SurfaceFormat.eSurface_ARGB4,
+            DXGIFormat.A4B4G4R4_UNORM => T3SurfaceFormat.eSurface_ARGB4,
             DXGIFormat.R10G10B10A2_UNORM => T3SurfaceFormat.eSurface_ARGB2101010,
             DXGIFormat.R16G16_UNORM => T3SurfaceFormat.eSurface_RG16,
             DXGIFormat.R8G8B8A8_UNORM_SRGB => T3SurfaceFormat.eSurface_RGBA8,
@@ -182,7 +184,7 @@ public static partial class DDS_HELPER
             //--------------------ARGB4--------------------
             //ACTUALLY IT'S RGBA4 - IT NEEDS TO BE UPDATED
             case T3SurfaceFormat.eSurface_ARGB4:
-                return DXGIFormat.B4G4R4A4_UNORM;
+                return DXGIFormat.A4B4G4R4_UNORM;
 
             //--------------------ARGB2101010--------------------
             case T3SurfaceFormat.eSurface_ARGB2101010:
@@ -375,6 +377,26 @@ public static partial class DDS_HELPER
             case T3SurfaceFormat.eSurface_ATC_RGBA:
                 return DXGIFormat.UNKNOWN;
 
+            //-------------------PVRTC2--------------------
+            case T3SurfaceFormat.eSurface_PVRTC2:
+                return DXGIFormat.B8G8R8A8_UNORM;
+
+                //-------------------PVRTC2a--------------------
+            case T3SurfaceFormat.eSurface_PVRTC2a:
+                return DXGIFormat.B8G8R8A8_UNORM;
+            
+            //-------------------PVRTC4--------------------
+            case T3SurfaceFormat.eSurface_PVRTC4:
+                return DXGIFormat.B8G8R8A8_UNORM;
+
+                //-------------------PVRTC4a--------------------
+            case T3SurfaceFormat.eSurface_PVRTC4a:
+                return DXGIFormat.B8G8R8A8_UNORM;
+
+            //-------------------CTX1--------------------
+            case T3SurfaceFormat.eSurface_CTX1:
+                return DXGIFormat.BC1_UNORM;
+
             //--------------------UNKNOWN--------------------
             case T3SurfaceFormat.eSurface_Unknown:
                 return DXGIFormat.UNKNOWN;
@@ -388,49 +410,50 @@ public static partial class DDS_HELPER
     /// <param name="dxgiFormat">The DXGI format.</param>
     /// <param name="metadata">The metadata of our .dds file. It is used in determining if the alpha is premultiplied.</param>
     /// <returns>The corresponding Direct3D9 format.</returns>
-    public static D3DFORMAT GetD3DFORMATFromDXGIFormat(DXGIFormat dxgiFormat, TexMetadata metadata)
+    public static D3DFormat GetD3DFORMATFromDXGIFormat(DXGIFormat dxgiFormat, TexMetadata metadata)
     {
         return dxgiFormat switch
         {
-            DXGIFormat.B8G8R8A8_UNORM => D3DFORMAT.A8R8G8B8,
-            DXGIFormat.B8G8R8X8_UNORM => D3DFORMAT.X8R8G8B8,
-            DXGIFormat.B5G6R5_UNORM => D3DFORMAT.R5G6B5,
-            DXGIFormat.B5G5R5A1_UNORM => D3DFORMAT.A1R5G5B5,
-            DXGIFormat.B4G4R4A4_UNORM => D3DFORMAT.A4R4G4B4,
-            DXGIFormat.A8_UNORM => D3DFORMAT.A8,
-            DXGIFormat.R10G10B10A2_UNORM => D3DFORMAT.A2B10G10R10,
-            DXGIFormat.R8G8B8A8_UNORM => D3DFORMAT.A8B8G8R8,
-            DXGIFormat.R8G8B8A8_UNORM_SRGB => D3DFORMAT.A8B8G8R8,
-            DXGIFormat.R16G16_UNORM => D3DFORMAT.G16R16,
-            DXGIFormat.R16G16B16A16_UNORM => D3DFORMAT.A16B16G16R16,
-            DXGIFormat.R8_UNORM => D3DFORMAT.L8,
-            DXGIFormat.R8G8_UNORM => D3DFORMAT.A8L8,
-            DXGIFormat.R8G8_SNORM => D3DFORMAT.V8U8,
-            DXGIFormat.R8G8B8A8_SNORM => D3DFORMAT.Q8W8V8U8,
-            DXGIFormat.R16G16_SNORM => D3DFORMAT.V16U16,
-            DXGIFormat.G8R8_G8B8_UNORM => D3DFORMAT.R8G8_B8G8,
-            DXGIFormat.YUY2 => D3DFORMAT.YUY2,
-            DXGIFormat.R8G8_B8G8_UNORM => D3DFORMAT.G8R8_G8B8,
-            DXGIFormat.BC1_UNORM => D3DFORMAT.DXT1,
-            DXGIFormat.BC2_UNORM => metadata.IsPMAlpha() ? D3DFORMAT.DXT2 : D3DFORMAT.DXT3,
-            DXGIFormat.BC3_UNORM => metadata.IsPMAlpha() ? D3DFORMAT.DXT4 : D3DFORMAT.DXT5,
-            DXGIFormat.BC4_UNORM => D3DFORMAT.ATI1,
-            DXGIFormat.BC4_SNORM => D3DFORMAT.BC4S,
-            DXGIFormat.BC5_UNORM => D3DFORMAT.ATI2,
-            DXGIFormat.BC5_SNORM => D3DFORMAT.BC5S,
-            DXGIFormat.D16_UNORM => D3DFORMAT.D16,
-            DXGIFormat.D32_FLOAT => D3DFORMAT.D32F_LOCKABLE,
-            DXGIFormat.D24_UNORM_S8_UINT => D3DFORMAT.D24S8,
-            DXGIFormat.R16_UNORM => D3DFORMAT.L16,
-            DXGIFormat.R16G16B16A16_SNORM => D3DFORMAT.Q16W16V16U16,
-            DXGIFormat.R16_FLOAT => D3DFORMAT.R16F,
-            DXGIFormat.R16G16_FLOAT => D3DFORMAT.G16R16F,
-            DXGIFormat.R16G16B16A16_FLOAT => D3DFORMAT.A16B16G16R16F,
-            DXGIFormat.R32_FLOAT => D3DFORMAT.R32F,
-            DXGIFormat.R32G32_FLOAT => D3DFORMAT.G32R32F,
-            DXGIFormat.R32G32B32A32_FLOAT => D3DFORMAT.A32B32G32R32F,
+            DXGIFormat.B8G8R8A8_UNORM => D3DFormat.A8R8G8B8,
+            DXGIFormat.B8G8R8X8_UNORM => D3DFormat.X8R8G8B8,
+            DXGIFormat.B5G6R5_UNORM => D3DFormat.R5G6B5,
+            DXGIFormat.B5G5R5A1_UNORM => D3DFormat.A1R5G5B5,
+            DXGIFormat.B4G4R4A4_UNORM => D3DFormat.A4R4G4B4,
+            DXGIFormat.A4B4G4R4_UNORM => D3DFormat.A4R4G4B4,
+            DXGIFormat.A8_UNORM => D3DFormat.A8,
+            DXGIFormat.R10G10B10A2_UNORM => D3DFormat.A2B10G10R10,
+            DXGIFormat.R8G8B8A8_UNORM => D3DFormat.A8B8G8R8,
+            DXGIFormat.R8G8B8A8_UNORM_SRGB => D3DFormat.A8B8G8R8,
+            DXGIFormat.R16G16_UNORM => D3DFormat.G16R16,
+            DXGIFormat.R16G16B16A16_UNORM => D3DFormat.A16B16G16R16,
+            DXGIFormat.R8_UNORM => D3DFormat.L8,
+            DXGIFormat.R8G8_UNORM => D3DFormat.A8L8,
+            DXGIFormat.R8G8_SNORM => D3DFormat.V8U8,
+            DXGIFormat.R8G8B8A8_SNORM => D3DFormat.Q8W8V8U8,
+            DXGIFormat.R16G16_SNORM => D3DFormat.V16U16,
+            DXGIFormat.G8R8_G8B8_UNORM => D3DFormat.R8G8_B8G8,
+            DXGIFormat.YUY2 => D3DFormat.YUY2,
+            DXGIFormat.R8G8_B8G8_UNORM => D3DFormat.G8R8_G8B8,
+            DXGIFormat.BC1_UNORM => D3DFormat.DXT1,
+            DXGIFormat.BC2_UNORM => metadata.IsPMAlpha() ? D3DFormat.DXT2 : D3DFormat.DXT3,
+            DXGIFormat.BC3_UNORM => metadata.IsPMAlpha() ? D3DFormat.DXT4 : D3DFormat.DXT5,
+            DXGIFormat.BC4_UNORM => D3DFormat.ATI1,
+            DXGIFormat.BC4_SNORM => D3DFormat.BC4S,
+            DXGIFormat.BC5_UNORM => D3DFormat.ATI2,
+            DXGIFormat.BC5_SNORM => D3DFormat.BC5S,
+            DXGIFormat.D16_UNORM => D3DFormat.D16,
+            DXGIFormat.D32_FLOAT => D3DFormat.D32F_LOCKABLE,
+            DXGIFormat.D24_UNORM_S8_UINT => D3DFormat.D24S8,
+            DXGIFormat.R16_UNORM => D3DFormat.L16,
+            DXGIFormat.R16G16B16A16_SNORM => D3DFormat.Q16W16V16U16,
+            DXGIFormat.R16_FLOAT => D3DFormat.R16F,
+            DXGIFormat.R16G16_FLOAT => D3DFormat.G16R16F,
+            DXGIFormat.R16G16B16A16_FLOAT => D3DFormat.A16B16G16R16F,
+            DXGIFormat.R32_FLOAT => D3DFormat.R32F,
+            DXGIFormat.R32G32_FLOAT => D3DFormat.G32R32F,
+            DXGIFormat.R32G32B32A32_FLOAT => D3DFormat.A32B32G32R32F,
 
-            _ => D3DFORMAT.UNKNOWN
+            _ => D3DFormat.UNKNOWN
         };
     }
 
@@ -441,51 +464,51 @@ public static partial class DDS_HELPER
     /// <param name="dxgiFormat">The DXGI format.</param>
     /// <param name="metadata">The metadata of our .dds file. It is used in determining if the alpha is premultiplied.</param>
     /// <returns>The corresponding Direct3D9 format.</returns>
-    public static DxgiFormat GetDXGIFormatFromD3DFormat(D3DFORMAT format)
+    public static DxgiFormat GetDXGIFormatFromD3DFormat(D3DFormat format)
     {
         return format switch
         {
-            D3DFORMAT.A8R8G8B8 => DxgiFormat.B8G8R8A8_UNORM,
-            D3DFORMAT.X8R8G8B8 => DxgiFormat.B8G8R8X8_UNORM,
-            D3DFORMAT.X8L8V8U8 => DxgiFormat.B8G8R8A8_UNORM,
-            D3DFORMAT.R5G6B5 => DxgiFormat.B5G6R5_UNORM,
-            D3DFORMAT.X1R5G5B5 => DxgiFormat.B5G5R5A1_UNORM,
-            D3DFORMAT.A1R5G5B5 => DxgiFormat.B5G5R5A1_UNORM,
-            D3DFORMAT.A4R4G4B4 => DxgiFormat.B4G4R4A4_UNORM,
-            D3DFORMAT.A8 => DxgiFormat.A8_UNORM,
-            D3DFORMAT.A2B10G10R10 => DxgiFormat.R10G10B10A2_UNORM,
-            D3DFORMAT.A8B8G8R8 => DxgiFormat.R8G8B8A8_UNORM,
-            D3DFORMAT.X8B8G8R8 => DxgiFormat.R8G8B8A8_UNORM,
-            D3DFORMAT.G16R16 => DxgiFormat.R16G16_UNORM,
-            D3DFORMAT.A16B16G16R16 => DxgiFormat.R16G16B16A16_UNORM,
-            D3DFORMAT.L8 => DxgiFormat.R8_UNORM,
-            D3DFORMAT.A8L8 => DxgiFormat.R8G8_UNORM,
-            D3DFORMAT.V8U8 => DxgiFormat.R8G8_SNORM,
-            D3DFORMAT.Q8W8V8U8 => DxgiFormat.R8G8B8A8_SNORM,
-            D3DFORMAT.V16U16 => DxgiFormat.R16G16_SNORM,
-            D3DFORMAT.R8G8_B8G8 => DxgiFormat.G8R8_G8B8_UNORM,
-            D3DFORMAT.YUY2 => DxgiFormat.YUY2,
-            D3DFORMAT.G8R8_G8B8 => DxgiFormat.R8G8_B8G8_UNORM,
-            D3DFORMAT.DXT1 => DxgiFormat.BC1_UNORM,
-            D3DFORMAT.DXT2 => DxgiFormat.BC2_UNORM,
-            D3DFORMAT.DXT3 => DxgiFormat.BC2_UNORM,
-            D3DFORMAT.DXT4 => DxgiFormat.BC3_UNORM,
-            D3DFORMAT.DXT5 => DxgiFormat.BC3_UNORM,
-            D3DFORMAT.ATI1 => DxgiFormat.BC4_UNORM,
-            D3DFORMAT.BC4S => DxgiFormat.BC4_SNORM,
-            D3DFORMAT.ATI2 => DxgiFormat.BC5_UNORM,
-            D3DFORMAT.BC5S => DxgiFormat.BC5_SNORM,
-            D3DFORMAT.D16 => DxgiFormat.D16_UNORM,
-            D3DFORMAT.D32F_LOCKABLE => DxgiFormat.D32_FLOAT,
-            D3DFORMAT.D24S8 => DxgiFormat.D24_UNORM_S8_UINT,
-            D3DFORMAT.L16 => DxgiFormat.R16_UNORM,
-            D3DFORMAT.Q16W16V16U16 => DxgiFormat.R16G16B16A16_SNORM,
-            D3DFORMAT.R16F => DxgiFormat.R16_FLOAT,
-            D3DFORMAT.G16R16F => DxgiFormat.R16G16_FLOAT,
-            D3DFORMAT.A16B16G16R16F => DxgiFormat.R16G16B16A16_FLOAT,
-            D3DFORMAT.R32F => DxgiFormat.R32_FLOAT,
-            D3DFORMAT.G32R32F => DxgiFormat.R32G32_FLOAT,
-            D3DFORMAT.A32B32G32R32F => DxgiFormat.R32G32B32A32_FLOAT,
+            D3DFormat.A8R8G8B8 => DxgiFormat.B8G8R8A8_UNORM,
+            D3DFormat.X8R8G8B8 => DxgiFormat.B8G8R8X8_UNORM,
+            D3DFormat.X8L8V8U8 => DxgiFormat.B8G8R8A8_UNORM,
+            D3DFormat.R5G6B5 => DxgiFormat.B5G6R5_UNORM,
+            D3DFormat.X1R5G5B5 => DxgiFormat.B5G5R5A1_UNORM,
+            D3DFormat.A1R5G5B5 => DxgiFormat.B5G5R5A1_UNORM,
+            D3DFormat.A4R4G4B4 => DxgiFormat.B4G4R4A4_UNORM,
+            D3DFormat.A8 => DxgiFormat.A8_UNORM,
+            D3DFormat.A2B10G10R10 => DxgiFormat.R10G10B10A2_UNORM,
+            D3DFormat.A8B8G8R8 => DxgiFormat.R8G8B8A8_UNORM,
+            D3DFormat.X8B8G8R8 => DxgiFormat.R8G8B8A8_UNORM,
+            D3DFormat.G16R16 => DxgiFormat.R16G16_UNORM,
+            D3DFormat.A16B16G16R16 => DxgiFormat.R16G16B16A16_UNORM,
+            D3DFormat.L8 => DxgiFormat.R8_UNORM,
+            D3DFormat.A8L8 => DxgiFormat.R8G8_UNORM,
+            D3DFormat.V8U8 => DxgiFormat.R8G8_SNORM,
+            D3DFormat.Q8W8V8U8 => DxgiFormat.R8G8B8A8_SNORM,
+            D3DFormat.V16U16 => DxgiFormat.R16G16_SNORM,
+            D3DFormat.R8G8_B8G8 => DxgiFormat.G8R8_G8B8_UNORM,
+            D3DFormat.YUY2 => DxgiFormat.YUY2,
+            D3DFormat.G8R8_G8B8 => DxgiFormat.R8G8_B8G8_UNORM,
+            D3DFormat.DXT1 => DxgiFormat.BC1_UNORM,
+            D3DFormat.DXT2 => DxgiFormat.BC2_UNORM,
+            D3DFormat.DXT3 => DxgiFormat.BC2_UNORM,
+            D3DFormat.DXT4 => DxgiFormat.BC3_UNORM,
+            D3DFormat.DXT5 => DxgiFormat.BC3_UNORM,
+            D3DFormat.ATI1 => DxgiFormat.BC4_UNORM,
+            D3DFormat.BC4S => DxgiFormat.BC4_SNORM,
+            D3DFormat.ATI2 => DxgiFormat.BC5_UNORM,
+            D3DFormat.BC5S => DxgiFormat.BC5_SNORM,
+            D3DFormat.D16 => DxgiFormat.D16_UNORM,
+            D3DFormat.D32F_LOCKABLE => DxgiFormat.D32_FLOAT,
+            D3DFormat.D24S8 => DxgiFormat.D24_UNORM_S8_UINT,
+            D3DFormat.L16 => DxgiFormat.R16_UNORM,
+            D3DFormat.Q16W16V16U16 => DxgiFormat.R16G16B16A16_SNORM,
+            D3DFormat.R16F => DxgiFormat.R16_FLOAT,
+            D3DFormat.G16R16F => DxgiFormat.R16G16_FLOAT,
+            D3DFormat.A16B16G16R16F => DxgiFormat.R16G16B16A16_FLOAT,
+            D3DFormat.R32F => DxgiFormat.R32_FLOAT,
+            D3DFormat.G32R32F => DxgiFormat.R32G32_FLOAT,
+            D3DFormat.A32B32G32R32F => DxgiFormat.R32G32B32A32_FLOAT,
 
             _ => DxgiFormat.UNKNOWN
         };
@@ -498,12 +521,12 @@ public static partial class DDS_HELPER
     /// <param name="dxgiFormat">The DXGI format.</param>
     /// <param name="metadata">The metadata of our .dds file. It is used in determining if the alpha is premultiplied.</param>
     /// <returns>The corresponding Direct3D9 format.</returns>
-    public static bool IsPremultipliedAlpha(D3DFORMAT format)
+    public static bool IsPremultipliedAlpha(D3DFormat format)
     {
         return format switch
         {
-            D3DFORMAT.DXT2 => true,
-            D3DFORMAT.DXT4 => true,
+            D3DFormat.DXT2 => true,
+            D3DFormat.DXT4 => true,
 
             _ => false
         };

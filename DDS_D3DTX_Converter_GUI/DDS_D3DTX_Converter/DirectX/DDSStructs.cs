@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.IO;
+using D3DTX_Converter.DirectX.Enums;
 using D3DTX_Converter.Utilities;
 
 namespace D3DTX_Converter.DirectX;
@@ -128,7 +129,7 @@ public struct DDS_HEADER
     /// <summary>
     /// [36 bytes] Surface pixel format.
     /// </summary>
-    public DDS_PIXELFORMAT ddspf;
+    public DDSPixelFormat ddspf;
 
     /// <summary>
     /// [4 bytes] Specifies the complexity of the surfaces stored.
@@ -168,7 +169,7 @@ public struct DDS_HEADER
 
             if (ByteFunctions.Convert_String_To_UInt32("DDS ") != word)
             {
-                throw new Exception("Invalid DDS Header");
+               // throw new Exception("Invalid DDS Header");
             }
         }
 
@@ -190,7 +191,7 @@ public struct DDS_HEADER
         dwReserved9 = reader.ReadUInt32();
         dwReserved10 = reader.ReadUInt32();
         dwReserved11 = reader.ReadUInt32();
-        ddspf = new DDS_PIXELFORMAT(reader);
+        ddspf = new DDSPixelFormat(reader);
         dwCaps = (DDSCAPS)reader.ReadUInt32();
         dwCaps2 = (DDSCAPS2)reader.ReadUInt32();
         dwCaps3 = reader.ReadUInt32();
@@ -251,7 +252,7 @@ public struct DDS_HEADER
         {
             dwSize = 32,
             dwFlags = 4,
-            dwFourCC = (uint)D3DFORMAT.DXT1,
+            dwFourCC = (uint)D3DFormat.DXT1,
             dwRGBBitCount = 0,
         },
         dwCaps = DDSCAPS.TEXTURE,
@@ -318,5 +319,210 @@ public struct DDS_HEADER
         result += $"dwReserved12: {dwReserved12}";
 
         return result;
+    }
+}
+
+/// <summary>
+/// DDS header extension to handle resource arrays, DXGI pixel formats that don't map to the legacy Microsoft DirectDraw pixel format structures, and additional metadata.
+/// </summary>
+public struct DDS_HEADER_DXT10
+{
+    /// <summary>
+    /// [4 bytes] The surface pixel format.
+    /// </summary>
+    public DXGIFormat dxgiFormat;
+
+    /// <summary>
+    /// [4 bytes] Identifies the type of resource.
+    /// </summary>
+    public D3D10_RESOURCE_DIMENSION resourceDimension;
+
+    /// <summary>
+    /// [4 bytes] Identifies other, less common options for resources.
+    /// </summary>
+    public DDS_RESOURCE miscFlag;
+
+    /// <summary>
+    /// [4 bytes] The number of elements in the array.
+    /// <para>For a 2D texture that is also a cube-map texture, this number represents the number of cubes.</para>
+    /// </summary>
+    public uint arraySize;
+
+    /// <summary>
+    /// [4 bytes] Contains additional metadata (formerly was reserved). 
+    /// </summary>
+    public uint miscFlags2;
+
+    public DDS_HEADER_DXT10(BinaryReader reader)
+    {
+        dxgiFormat = (DXGIFormat)reader.ReadUInt32();
+        resourceDimension = (D3D10_RESOURCE_DIMENSION)reader.ReadUInt32();
+        miscFlag = (DDS_RESOURCE)reader.ReadUInt32();
+        arraySize = reader.ReadUInt32();
+        miscFlags2 = reader.ReadUInt32();
+    }
+
+    public void Write(BinaryWriter writer)
+    {
+        writer.Write((uint)dxgiFormat);
+        writer.Write((uint)resourceDimension);
+        writer.Write((uint)miscFlag);
+        writer.Write(arraySize);
+        writer.Write(miscFlags2);
+    }
+
+    public static DDS_HEADER_DXT10 GetHeaderFromBytes(byte[] byteArray)
+    {
+        using MemoryStream stream = new(byteArray);
+        using BinaryReader reader = new(stream);
+
+        return new DDS_HEADER_DXT10(reader);
+    }
+
+    /// <summary>
+    /// Returns a preset DDS_Header_DXT10, when the compression format is DXT10. We modify it later when we need it.
+    /// </summary>
+    /// <returns></returns>
+    public static DDS_HEADER_DXT10 GetPresetDXT10Header() => new()
+    {
+        dxgiFormat = DXGIFormat.R8G8B8A8_UNORM,
+        resourceDimension = D3D10_RESOURCE_DIMENSION.TEXTURE2D,
+        arraySize = 1,
+    };
+
+    public void Print(){
+        Console.WriteLine("DDS_HEADER_DXT10");
+        Console.WriteLine($"\tdxgiFormat: {dxgiFormat}");
+        Console.WriteLine($"\tresourceDimension: {resourceDimension}");
+        Console.WriteLine($"\tmiscFlag: {miscFlag}");
+        Console.WriteLine($"\tarraySize: {arraySize}");
+        Console.WriteLine($"\tmiscFlags2: {miscFlags2}");
+    }
+}
+
+/// <summary>
+/// Surface pixel format.
+/// </summary>
+public struct DDSPixelFormat
+{
+    /// <summary>
+    /// [4 bytes] Structure size; set to 32 (bytes).
+    /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
+    /// </summary>
+    public uint dwSize;
+
+    /// <summary>
+    /// [4 bytes] Values which indicate what type of data is in the surface.
+    /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
+    /// </summary>
+    public uint dwFlags;
+
+    /// <summary>
+    /// [4 bytes] Four-character codes for specifying compressed or custom formats.
+    /// <para>Possible values include: DXT1, DXT2, DXT3, DXT4, or DXT5.</para>
+    /// <para>A FourCC of DX10 indicates the presence of the DDS_HEADER_DXT10 extended header, and the dxgiFormat member of that structure indicates the true format.</para>
+    /// <para>When using a four-character code, dwFlags must include DDPF_FOURCC.</para>
+    /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
+    /// </summary>
+    public uint dwFourCC;
+
+    /// <summary>
+    /// [4 bytes] Number of bits in an RGB (possibly including alpha) format.
+    /// <para>Valid when dwFlags includes DDPF_RGB, DDPF_LUMINANCE, or DDPF_YUV.</para>
+    /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
+    /// </summary>
+    public uint dwRGBBitCount;
+
+    /// <summary>
+    /// [4 bytes] Red (or luminance or Y) mask for reading color data.
+    /// <para>For instance, given the A8R8G8B8 format, the red mask would be 0x00ff0000.</para>
+    /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
+    /// </summary>
+    public uint dwRBitMask;
+
+    /// <summary>
+    /// [4 bytes] Green (or U) mask for reading color data.
+    /// <para>For instance, given the A8R8G8B8 format, the green mask would be 0x0000ff00.</para>
+    /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
+    /// </summary>
+    public uint dwGBitMask;
+
+    /// <summary>
+    /// [4 bytes] Blue (or V) mask for reading color data.
+    /// <para>For instance, given the A8R8G8B8 format, the blue mask would be 0x000000ff.</para>
+    /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
+    /// </summary>
+    public uint dwBBitMask;
+
+    /// <summary>
+    /// [4 bytes] Alpha mask for reading alpha data.
+    /// <para>dwFlags must include DDPF_ALPHAPIXELS or DDPF_ALPHA. For instance, given the A8R8G8B8 format, the alpha mask would be 0xff000000.</para>
+    /// <para>Is a DWORD, which is a 32-bit unsigned integer.</para>
+    /// </summary>
+    public uint dwABitMask;
+
+    public DDSPixelFormat(BinaryReader reader)
+    {
+        dwSize = reader.ReadUInt32();
+        dwFlags = reader.ReadUInt32();
+        dwFourCC = reader.ReadUInt32();
+        dwRGBBitCount = reader.ReadUInt32();
+        dwRBitMask = reader.ReadUInt32();
+        dwGBitMask = reader.ReadUInt32();
+        dwBBitMask = reader.ReadUInt32();
+        dwABitMask = reader.ReadUInt32();
+    }
+
+    public void Write(BinaryWriter writer)
+    {
+        writer.Write(dwSize);
+        writer.Write(dwFlags);
+        writer.Write(dwFourCC);
+        writer.Write(dwRGBBitCount);
+        writer.Write(dwRBitMask);
+        writer.Write(dwGBitMask);
+        writer.Write(dwBBitMask);
+        writer.Write(dwABitMask);
+    }
+
+    public void Print()
+    {
+        Console.WriteLine("DDS_PIXELFORMAT");
+        Console.WriteLine($"\tdwSize: {dwSize}");
+        Console.WriteLine($"\tdwFlags: {dwFlags}");
+        Console.WriteLine($"\tdwFourCC: {dwFourCC}");
+        Console.WriteLine($"\tdwRGBBitCount: {dwRGBBitCount}");
+        Console.WriteLine($"\tdwRBitMask: {dwRBitMask}");
+        Console.WriteLine($"\tdwGBitMask: {dwGBitMask}");
+        Console.WriteLine($"\tdwBBitMask: {dwBBitMask}");
+        Console.WriteLine($"\tdwABitMask: {dwABitMask}");
+    }
+
+    public static DDSPixelFormat Of(uint dwSize, uint dwFlags, uint dwFourCC, uint dwRGBBitCount, uint dwRBitMask, uint dwGBitMask, uint dwBBitMask, uint dwABitMask)
+    {
+        return new DDSPixelFormat()
+        {
+            dwSize = dwSize,
+            dwFlags = dwFlags,
+            dwFourCC = dwFourCC,
+            dwRGBBitCount = dwRGBBitCount,
+            dwRBitMask = dwRBitMask,
+            dwGBitMask = dwGBitMask,
+            dwBBitMask = dwBBitMask,
+            dwABitMask = dwABitMask
+        };
+    }
+
+    public override string ToString()
+    {
+        return $"DDS_PIXELFORMAT" +
+            $"{Environment.NewLine}\tdwSize: {dwSize}" +
+            $"{Environment.NewLine}\tdwFlags: {dwFlags}" +
+            $"{Environment.NewLine}\tdwFourCC: {dwFourCC}" +
+            $"{Environment.NewLine}\tdwRGBBitCount: {dwRGBBitCount}" +
+            $"{Environment.NewLine}\tdwRBitMask: {dwRBitMask}" +
+            $"{Environment.NewLine}\tdwGBitMask: {dwGBitMask}" +
+            $"{Environment.NewLine}\tdwBBitMask: {dwBBitMask}" +
+            $"{Environment.NewLine}\tdwABitMask: {dwABitMask}" + Environment.NewLine;
     }
 }

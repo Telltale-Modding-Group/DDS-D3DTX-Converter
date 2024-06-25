@@ -251,10 +251,12 @@ public static class DDS_DirectXTexNet
             //  (TODO Insert a link to the code)
             ScratchImage image1 = DirectXTex.CreateScratchImage();
             if (ddsMainImage.Format != (int)DXGIFormat.R8G8B8A8_UNORM)
+            {
                 DirectXTex.Convert(ddsMainImage, (int)DXGIFormat.R8G8B8A8_UNORM, TexFilterFlags.Default, 0.5f, image1);
-           // else image1 = image;
+                DirectXTex.SaveToDDSMemory(image1.GetImage(0, 0, 0), DDSFlags.None, blob);
+            }
+            else DirectXTex.SaveToDDSMemory(ddsMainImage, DDSFlags.None, blob);
 
-            DirectXTex.SaveToDDSMemory(image1.GetImage(0, 0, 0), DDSFlags.None, blob);
             image1.Release();
         }
 

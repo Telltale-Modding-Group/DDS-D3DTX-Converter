@@ -182,9 +182,8 @@ public static partial class DDS_HELPER
                 return DXGIFormat.B5G5R5A1_UNORM;
 
             //--------------------ARGB4--------------------
-            //ACTUALLY IT'S RGBA4 - IT NEEDS TO BE UPDATED
             case T3SurfaceFormat.eSurface_ARGB4:
-                return DXGIFormat.A4B4G4R4_UNORM;
+                return DXGIFormat.B4G4R4A4_UNORM;
 
             //--------------------ARGB2101010--------------------
             case T3SurfaceFormat.eSurface_ARGB2101010:
@@ -379,19 +378,31 @@ public static partial class DDS_HELPER
 
             //-------------------PVRTC2--------------------
             case T3SurfaceFormat.eSurface_PVRTC2:
-                return DXGIFormat.B8G8R8A8_UNORM;
+               if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                    return DXGIFormat.R8G8B8A8_UNORM_SRGB;
+                else
+                    return DXGIFormat.R8G8B8A8_UNORM;
 
-                //-------------------PVRTC2a--------------------
+            //-------------------PVRTC2a--------------------
             case T3SurfaceFormat.eSurface_PVRTC2a:
-                return DXGIFormat.B8G8R8A8_UNORM;
-            
+                if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                    return DXGIFormat.R8G8B8A8_UNORM_SRGB;
+                else
+                    return DXGIFormat.R8G8B8A8_UNORM;
+
             //-------------------PVRTC4--------------------
             case T3SurfaceFormat.eSurface_PVRTC4:
-                return DXGIFormat.B8G8R8A8_UNORM;
+                if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                    return DXGIFormat.R8G8B8A8_UNORM_SRGB;
+                else
+                    return DXGIFormat.R8G8B8A8_UNORM;
 
-                //-------------------PVRTC4a--------------------
+            //-------------------PVRTC4a--------------------
             case T3SurfaceFormat.eSurface_PVRTC4a:
-                return DXGIFormat.B8G8R8A8_UNORM;
+                if (gamma == T3SurfaceGamma.eSurfaceGamma_sRGB)
+                    return DXGIFormat.R8G8B8A8_UNORM_SRGB;
+                else
+                    return DXGIFormat.R8G8B8A8_UNORM;
 
             //-------------------CTX1--------------------
             case T3SurfaceFormat.eSurface_CTX1:
@@ -401,6 +412,20 @@ public static partial class DDS_HELPER
             case T3SurfaceFormat.eSurface_Unknown:
                 return DXGIFormat.UNKNOWN;
         }
+    }
+
+    public static DXGIFormat GetDXGIFormatWithSwappedChannels(DXGIFormat dxgiFormat)
+    {
+        return dxgiFormat switch
+        {
+            DXGIFormat.B8G8R8A8_UNORM => DXGIFormat.R8G8B8A8_UNORM,
+            DXGIFormat.R8G8B8A8_UNORM => DXGIFormat.B8G8R8A8_UNORM,
+            DXGIFormat.A4B4G4R4_UNORM => DXGIFormat.B4G4R4A4_UNORM,
+            DXGIFormat.B4G4R4A4_UNORM => DXGIFormat.A4B4G4R4_UNORM,
+            DXGIFormat.B8G8R8A8_UNORM_SRGB => DXGIFormat.R8G8B8A8_UNORM_SRGB,
+            DXGIFormat.R8G8B8A8_UNORM_SRGB => DXGIFormat.B8G8R8A8_UNORM_SRGB,
+            _ => dxgiFormat
+        };
     }
 
     /// <summary>

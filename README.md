@@ -10,7 +10,7 @@ Older Versions:
 [![Github All Releases](https://img.shields.io/github/downloads/Telltale-Modding-Group/DDS-D3DTX-Converter/total.svg)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/releases)  
 
 ## Description
-This is an application designed to preview and convert **Telltale textures** (files with the **.d3dtx** extension) to a more accessible format like  **DDS (Direct Draw Surface)** and vice versa. There is also support for converting **DDS** to other image formats and back, although this is not recommended due to potential data loss. It works only on **Windows**.
+This is an application designed to preview and convert **Telltale Tool textures** (files with the **.d3dtx** extension) to a more accessible format like  **DDS (Direct Draw Surface)** and vice versa. There is also support for converting **DDS** to other image formats and back, although this is not recommended due to potential data loss. It works only on **Windows**.
 
 **[DOWNLOAD THE LATEST VERSION HERE](https://github.com/iMrShadow/DDS-D3DTX-Converter/releases)**
 
@@ -38,6 +38,9 @@ This is an application designed to preview and convert **Telltale textures** (fi
 - The Walking Dead Collection
 - Minecraft: Story Mode
 - Minecraft: Story Mode – Season Two
+- Sam & Max: The Devil's Playhouse
+- Sam & Max: Beyond Time And Space
+- Sam & Max: Save The World
 - The Wolf Among Us
 - Tales from the Borderlands
 - Batman: The Telltale Series
@@ -57,11 +60,10 @@ This is an application designed to preview and convert **Telltale textures** (fi
 - Cube Array Textures
 
 ## Notes and Limitations
-
-1. This is primarily aimed for PC-platform games. In the future we may add Android/iOS support, but it's **not guaranteed**. More information can be found in the wiki.
-2. If you want support on other legacy titles, please open an issue.
+1. This is primarily aimed for PC-platform games. Other platforms are supported in the [beta branch](https://github.com/iMrShadow/DDS-D3DTX-Converter/tree/beta) of this project, but it is not stable enough.
+2. Other legacy Telltale titles are supported in the [beta branch](https://github.com/iMrShadow/DDS-D3DTX-Converter/tree/beta), but decrypting is not finished yet.
 3. Older games do not support some texture layouts such as volumemaps or cubemaps. Please be cautious.
-4. Linux/MacOS are not supported even with Wine due to DirectXTexNet's mixed mode assembly.
+4. Linux/MacOS are not supported even with Wine due to DirectXTexNet's mixed mode assembly. In the [beta branch](https://github.com/iMrShadow/DDS-D3DTX-Converter/tree/beta) the library is changed to [Hexa.NET.DirectXTex](https://github.com/HexaEngine/Hexa.NET.DirectXTex) which supports Linux and MacOS natively.
 
 ## Developers
 

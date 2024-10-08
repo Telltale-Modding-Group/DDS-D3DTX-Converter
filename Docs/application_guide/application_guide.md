@@ -2,12 +2,12 @@
 
 This page is meant to introduce users to the software's UI. The application window is resizable, and each column section can be scaled as well to suit your viewing needs.
 
-![Main Thumb](/wiki/tutorial-screenshots/mainThumb.png)
+![Main Thumb](/Docs/tutorial-screenshots/mainThumb.png)
 
 ---
 ## Top Menu Bar
 
-![ui-guide1](/wiki/application_guide/ui_1.png)
+![ui-guide1](/Docs/application_guide/ui_1.png)
 
 On the top left of the application menu bar the following buttons are located:
 - **Open** - It opens a folder browser dialog window where you can select the folder that contains your extracted textures.
@@ -21,7 +21,7 @@ On the top left of the application menu bar the following buttons are located:
 ## Left Column Section
 
 #### Textures Directory
-![ui-guide2](/wiki/application_guide/ui_2.png)
+![ui-guide2](/Docs/application_guide/ui_2.png)
 
 This section contains a simple file browser for selecting and viewing all of your texture files.
 - **Textures Directory** - The section title.
@@ -30,13 +30,13 @@ This section contains a simple file browser for selecting and viewing all of you
 - **Refresh Directory Button** - Refreshes the **file browser** in case there are any changes to the folder content and the application does not update the interface.
 
 #### File Browser
-![ui-guide3](/wiki/application_guide/ui_3.png)
+![ui-guide3](/Docs/application_guide/ui_3.png)
 
 This section contains a simple file browser for selecting and viewing all of your texture files.
 - **File Browser** - A viewer of the all supported image file formats, including **PNG, JPEG, NMP, TIFF, DDS, D3DTX and JSON**. It also supports folders. 
 
 #### Context Menu
-![ui-guide4](/wiki/application_guide/ui_4.png)
+![ui-guide4](/Docs/application_guide/ui_4.png)
 
 ##### There is also a context menu for the middle section (Right-click on this section in the application)
 - **Add** - Same functionality as **Add Button**.
@@ -54,20 +54,20 @@ This section contains a simple file browser for selecting and viewing all of you
 ## Right Column Selection
 
 #### Image Preview
-![ui-guide5](/wiki/application_guide/ui_5.png)
+![ui-guide5](/Docs/application_guide/ui_5.png)
 
 This section contains an image viewer. It displays **PNG, JPEG, BMP, TIFF, DDS and D3DTX** files and their names.
 
 #### Conversion Section
-![ui-guide6](/wiki/application_guide/ui_6.png)
+![ui-guide6](/Docs/application_guide/ui_6.png)
 - **Convert Options** - A combo box containing all possible options of the selected image format.
 - **Choose Output Directory Checkbox** - A checkbox if you want to specify the path when converting.
 - **Conversion Type** - A combo box containing all possible conversion options. Users should stick to the **Default** option for all games **after The Walking Dead (2012)**.
 - **Convert Button** - Converts the texture into the chosen format.
-- **[Debug Info](/wiki/application_guide/application_guide.md#debug-window)** - Shows all information regarding the texture in a new window. Works **only** on **D3DTX** and **DDS** files.
+- **[Debug Info](/Docs/application_guide/application_guide.md#debug-window)** - Shows all information regarding the texture in a new window. Works **only** on **D3DTX** and **DDS** files.
 
 #### Image Properties
-![ui-guide7](/wiki/application_guide/ui_7.png)
+![ui-guide7](/Docs/application_guide/ui_7.png)
 
 This section contains and shows the properties of an image when it is selected from the **File Browser** in the Textures Directory section.
 
@@ -84,7 +84,7 @@ This section contains and shows the properties of an image when it is selected f
 When you click on **Debug Info**, a new window will appear, containing all debug texture data.
 
 > Example: The D3DTX variant of the  texture:
-![ui-guide8](/wiki/application_guide/ui_8.png)
+![ui-guide8](/Docs/application_guide/ui_8.png)
 
 > Example: The DDS variant of the same texture:
-![ui-guide9](/wiki/application_guide/ui_9.png)
+![ui-guide9](/Docs/application_guide/ui_9.png)

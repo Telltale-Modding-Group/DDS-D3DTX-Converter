@@ -14,13 +14,13 @@ This is an application designed to preview and convert **Telltale textures** (fi
 **[DOWNLOAD THE LATEST VERSION HERE](https://github.com/iMrShadow/DDS-D3DTX-Converter/releases)**
 
 ## Screenshots
-![Main 1](wiki/tutorial-screenshots/mainThumb.png)
+![Main 1](Docs/tutorial-screenshots/mainThumb.png)
 
 ## Getting started
 
 #### [Quick Video Tutorial](https://www.youtube.com/watch?v=pjRhuKe72Qo)
 
-#### [Wiki (WIP)](wiki/home.md)
+#### [Documentation (WIP)](Docs/home.md)
 
 #### [Outdated wiki, but it still has some relevant information.](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki)
 

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TelltaleTextureTool": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

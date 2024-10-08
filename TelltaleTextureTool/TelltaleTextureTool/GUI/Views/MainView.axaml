@@ -1,0 +1,786 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:TelltaleTextureTool.ViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="1500"
+             d:DesignHeight="1000"
+             x:Class="TelltaleTextureTool.Views.MainView"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:paz="using:Avalonia.Controls.PanAndZoom"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             x:DataType="vm:MainViewModel">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainViewModel />
+    </Design.DataContext>
+    <UserControl.Resources>
+        <vm:EnumDisplayNameConverter x:Key="EnumDisplayNameConverter" />
+    </UserControl.Resources>
+    <DockPanel Background="{DynamicResource PanelSplitterColor}">
+        <Menu DockPanel.Dock="Top"
+              Background="{DynamicResource MainPanelColor}"
+              Height="38">
+            <MenuItem Name="MenuOpenFolder"
+                      Command="{Binding OpenDirectoryButton_Click}"
+                      ToolTip.Tip="Open Folder/File">
+                <MenuItem.Header>
+                    <!-- Open -->
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="3"
+                                VerticalAlignment="Top"
+                                HorizontalAlignment="Center">
+                        <Image Source="{SvgImage /Assets/open_folder_icon.svg}"
+                               Width="24"
+                               Height="24" />
+                        <TextBlock Text="Open Folder"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="12" />
+                    </StackPanel>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem IsEnabled="{Binding SaveButtonStatus}"
+                      ToolTip.Tip="Save File"
+                      Command="{Binding SaveFileButton_Click}">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="3"
+                                VerticalAlignment="Top"
+                                HorizontalAlignment="Center">
+                        <Image Source="{SvgImage /Assets/save_icon.svg}"
+                               Width="24"
+                               Height="24" />
+                        <TextBlock Text="Save"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="12" />
+                    </StackPanel>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem ToolTip.Tip="Add files to workspace"
+                      Command="{Binding AddFilesButton_Click}"
+                      IsEnabled="True">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="3"
+                                VerticalAlignment="Top"
+                                HorizontalAlignment="Center">
+                        <Image Source="{SvgImage /Assets/add_icon.svg}"
+                               Width="24"
+                               Height="24" />
+                        <TextBlock Text="Add"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="12" />
+                    </StackPanel>
+                </MenuItem.Header>
+                <MenuItem Header="Exit" />
+            </MenuItem>
+            <MenuItem ToolTip.Tip="Delete file"
+                      Command="{Binding DeleteFileButton_Click}"
+                      IsEnabled="{Binding DeleteButtonStatus}">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="3"
+                                VerticalAlignment="Top"
+                                HorizontalAlignment="Center">
+                        <Image Source="{SvgImage /Assets/delete_icon.svg}"
+                               Width="24"
+                               Height="24" />
+                        <TextBlock Text="Delete"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="12" />
+                    </StackPanel>
+                </MenuItem.Header>
+                <MenuItem Header="Exit" />
+            </MenuItem>
+            <MenuItem ToolTip.Tip="Help">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="3"
+                                VerticalAlignment="Top"
+                                HorizontalAlignment="Center">
+                        <Image Source="{SvgImage /Assets/help_icon.svg}"
+                               Width="24"
+                               Height="24   " />
+                        <TextBlock Text="Help"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="12" />
+                    </StackPanel>
+                </MenuItem.Header>
+                <MenuItem Header="Help"
+                          Opacity="1.0"
+                          Command="{Binding HelpButton_Click}"
+                          Icon="{SvgImage /Assets/help_icon.svg}" />
+                <MenuItem Header="About"
+                          Command="{Binding AboutButton_Click}"
+                          Icon="{SvgImage /Assets/about_icon.svg}" />
+            </MenuItem>
+        </Menu>
+        <Grid Margin="0, 5, 0, 0">
+            <!-- MAIN COLUMN DEFINITIONS -->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="450"
+                                  MinWidth="300" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="600"
+                                  MinWidth="156" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*"
+                                  MinWidth="128" />
+            </Grid.ColumnDefinitions>
+            <GridSplitter Grid.Column="1"
+                          HorizontalAlignment="Stretch"
+                          ResizeDirection="Columns"
+                          Background="{DynamicResource PanelSplitterColor}" />
+            <GridSplitter Grid.Column="3"
+                          HorizontalAlignment="Stretch"
+                          ResizeDirection="Columns"
+                          Background="{DynamicResource PanelSplitterColor}" />
+            <Grid Grid.Column="0"
+                  MinWidth="250"
+                  Background="{DynamicResource MainPanelColor}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="1"
+                      Background="{DynamicResource PanelSplitterColor}" />
+                <!-- COLUMN 1 ROW 1 DEFINITIONS -->
+                <Grid Grid.Row="0"
+                      Background="{DynamicResource MainPanelColor}"
+                      RowDefinitions="auto, auto, *">
+                    <Label Grid.Row="0"
+                           Name="TextureDirectoryTitleLabel"
+                           Content="Current Directory"
+                           Margin="10,5,10,0"
+                           Height="30"
+                           Width="150"
+                           VerticalAlignment="Top"
+                           VerticalContentAlignment="Bottom"
+                           HorizontalAlignment="Left" />
+                    <Grid Grid.Row="1"
+                          ColumnDefinitions="*, auto, auto"
+                          Margin="10,10,10,0">
+                        <TextBox Grid.Row="1"
+                                 Grid.Column="0"
+                                 Name="TextureDirectoryDirectorypathTextBox"
+                                 Height="35"
+                                 HorizontalAlignment="Stretch"
+                                 ToolTip.Tip="{Binding DirectoryPath}"
+                                 Text="{Binding DirectoryPath}"
+                                 IsReadOnly="True"
+                                 VerticalAlignment="Top"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+                        <Button Grid.Row="1"
+                                Grid.Column="1"
+                                Name="ReturnDirectory"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Width="36"
+                                Height="36"
+                                Padding="0"
+                                Margin="5,0,0,0"
+                                ToolTip.Tip="Return to parent directory"
+                                Command="{Binding ReturnDirectory_Click}"
+                                Background="Transparent"
+                                IsEnabled="{Binding ReturnDirectoryButtonStatus}"
+                                BorderThickness="0.4"
+                                RelativePanel.RightOf="TextureDirectoryDirectorypathTextBox">
+                            <Button.Content>
+                                <Image Source="{SvgImage /Assets/folder_parent_icon.svg}" />
+                            </Button.Content>
+                        </Button>
+                        <Button Grid.Row="1"
+                                Grid.Column="2"
+                                Name="RefreshDirectory"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Width="36"
+                                Height="36"
+                                Padding="0"
+                                Margin="5,0,0,0"
+                                ToolTip.Tip="Refresh the current directory"
+                                Command="{Binding RefreshDirectoryButton_Click}"
+                                Background="Transparent"
+                                IsEnabled="{Binding RefreshDirectoryButtonStatus}"
+                                BorderThickness="0.4"
+                                RelativePanel.RightOf="ReturnDirectory"
+                                RelativePanel.AlignRightWith="True">
+                            <Button.Content>
+                                <Image Source="{SvgImage /Assets/refresh_icon.svg}" />
+                            </Button.Content>
+                        </Button>
+                    </Grid>
+                    <!-- FILE LIST -->
+                    <DataGrid Grid.Row="2"
+                              Margin="10"
+                              Name="TextureDirectoryFilesDataGrid"
+                              ItemsSource="{Binding WorkingDirectoryFiles}"
+                              SelectedItem="{Binding DataGridSelectedItem}"
+                              BorderThickness="1"
+                              BorderBrush="Black"
+                              CanUserResizeColumns="True"
+                              IsReadOnly="true"
+                              Background="#454545"
+                              VerticalAlignment="Stretch">
+                        <i:Interaction.Behaviors>
+                            <ia:EventTriggerBehavior EventName="DoubleTapped"
+                                                     SourceObject="TextureDirectoryFilesDataGrid">
+                                <ia:CallMethodAction TargetObject="{Binding}"
+                                                     MethodName="RowDoubleTappedCommand" />
+                            </ia:EventTriggerBehavior>
+                            <ia:EventTriggerBehavior EventName="SelectionChanged"
+                                                     SourceObject="TextureDirectoryFilesDataGrid">
+                                <ia:CallMethodAction TargetObject="{Binding}"
+                                                     MethodName="UpdateUIElementsOnItemChange" />
+                            </ia:EventTriggerBehavior>
+                        </i:Interaction.Behaviors>
+                        <DataGrid.Resources>
+                            <DataTemplate x:Key="HeaderTemplate">
+                                <TextBlock Text="{Binding}"
+                                           Foreground="White"
+                                           FontSize="12"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </DataTemplate>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="File Name"
+                                                Binding="{Binding FileName}"
+                                                FontSize="12"
+                                                HeaderTemplate="{StaticResource HeaderTemplate}"
+                                                Width="250" />
+                            <DataGridTextColumn Header="File Type"
+                                                Binding="{Binding FileType}"
+                                                HeaderTemplate="{StaticResource HeaderTemplate}"
+                                                FontSize="12"
+                                                Width="120" />
+                            <DataGridTextColumn Header="Data Modified"
+                                                Binding="{Binding FileLastWrite}"
+                                                HeaderTemplate="{StaticResource HeaderTemplate}"
+                                                Width="200"
+                                                IsVisible="False" />
+                        </DataGrid.Columns>
+                        <DataGrid.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuItem Name="ContextMenuOpenFile"
+                                          Header="Open File"
+                                          Command="{Binding ContextMenuOpenFileCommand}" />
+                                <MenuItem Name="ContextMenuOpenFolder"
+                                          Header="Open Folder"
+                                          Command="{Binding ContextMenuOpenFolderCommand}"
+                                          IsEnabled="{Binding ContextOpenFolderStatus}" />
+                                <MenuItem Name="ContextMenuOpenFileInFileExplorer"
+                                          Header="Open in Еxplorer"
+                                          Command="{Binding ContextMenuOpenFileExplorerCommand}" />
+                                <Separator />
+                                <MenuItem Name="ContextMenuAddFiles"
+                                          Header="Add File"
+                                          Icon="{SvgImage /Assets/add_icon.svg}"
+                                          Command="{Binding ContextMenuAddFilesCommand}" />
+                                <MenuItem Name="ContextMenuRefreshDirectory"
+                                          Header="Refresh Directory"
+                                          Icon="{SvgImage /Assets/refresh_icon.svg}"
+                                          Command="{Binding ContextMenuRefreshDirectoryCommand}" />
+                                <MenuItem Name="ContextMenuDeleteFile"
+                                          Header="Delete File"
+                                          Icon="{SvgImage /Assets/delete_icon.svg}"
+                                          Command="{Binding ContextDeleteFileCommand}" />
+                            </MenuFlyout>
+                        </DataGrid.ContextFlyout>
+                    </DataGrid>
+                </Grid>
+            </Grid>
+            <Grid Grid.Column="4"
+                  Background="{DynamicResource MainPanelColor}">
+                <!-- ROW COLUMN 2 DEFINITIONS -->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <!-- IMAGE PREVIEW -->
+                <!-- Image Properties -->
+                <Grid Grid.Row="0"
+                      Background="{DynamicResource MainPanelColor}"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch">
+                    <ScrollViewer>
+                        <StackPanel Spacing="5">
+                            <Expander Header="Image Information"
+                                      VerticalAlignment="Top"
+                                      HorizontalAlignment="Stretch"
+                                      Background="{DynamicResource MainPanelColor}"
+                                      IsExpanded="{Binding IsImageInformationVisible}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Name="ImagepreviewImageNameLabel"
+                                               Width="130"
+                                               Content="File Name:"
+                                               HorizontalAlignment="Left" />
+                                        <SelectableTextBlock Name="ImagepreviewImageNameTextblock"
+                                                             Text="{Binding ImageNamePreview}"
+                                                             ToolTip.Tip="{Binding ImageNamePreview}"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center"
+                                                             ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Name="ImagepropertiesFilenameLabel"
+                                               Content="Image Name:"
+                                               Width="130"
+                                               HorizontalAlignment="Left" />
+                                        <SelectableTextBlock Name="ImagepropertiesFilenameTextblock"
+                                                             Text="{Binding ImageProperties.Name}"
+                                                             ToolTip.Tip="{Binding ImageProperties.Name}"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center"
+                                                             ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Width -->
+                                        <Label Name="WidthLabel"
+                                               Content="Pixel Width:"
+                                               Width="130"
+                                               HorizontalAlignment="Left" />
+                                        <SelectableTextBlock Name="WidthTextblock"
+                                                             Text="{Binding ImageProperties.Width}"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Height -->
+                                        <Label Name="HeightLabel"
+                                               Content="Pixel Height:"
+                                               Width="130"
+                                               HorizontalAlignment="Left" />
+                                        <SelectableTextBlock Name="HeightTextblock"
+                                                             Text="{Binding ImageProperties.Height}"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Surface Format -->
+                                        <Label Name="CompressionTypeLabel"
+                                               Content="Surface Format:"
+                                               Width="130"
+                                               HorizontalAlignment="Left" />
+                                        <SelectableTextBlock Name="CompressiontypeTextblock"
+                                                             Text="{Binding ImageProperties.SurfaceFormat}"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Bits Per Pixel -->
+                                        <Label Name="ColorSpaceCountLabel"
+                                               Content="Color Space"
+                                               Width="130"
+                                               HorizontalAlignment="Left" />
+                                        <SelectableTextBlock Name="ColorSpaceCountTextblock"
+                                                             Text="{Binding ImageProperties.SurfaceGamma}"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Mipmap Count -->
+                                        <Label Name="MipMapcountLabel"
+                                               Content="Mipmap Count:"
+                                               Width="130"
+                                               HorizontalAlignment="Left" />
+                                        <SelectableTextBlock Name="MipMapCountTextblock"
+                                                             Text="{Binding ImageProperties.MipMapCount}"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Array Size -->
+                                        <Label Content="Array Size:"
+                                               Width="130"
+                                               HorizontalAlignment="Left" />
+                                        <SelectableTextBlock Text="{Binding ImageProperties.ArraySize}"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Has Alpha Count -->
+                                        <Label Name="HasAlphaLabel"
+                                               Content="Has Transparency:"
+                                               Width="130"
+                                               HorizontalAlignment="Left" />
+                                        <SelectableTextBlock Name="HasAlphaTextblock"
+                                                             Text="{Binding ImageProperties.HasAlpha}"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Alpha Mode -->
+                                        <Label Content="Alpha Mode:"
+                                               Width="130"
+                                               HorizontalAlignment="Left" />
+                                        <SelectableTextBlock Text="{Binding ImageProperties.AlphaMode}"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Texture Layout Count -->
+                                        <Label Content="Texture Layout:"
+                                               Width="130"
+                                               HorizontalAlignment="Left" />
+                                        <SelectableTextBlock Text="{Binding ImageProperties.TextureLayout}"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" />
+                                    <StackPanel Orientation="Horizontal" />
+                                </StackPanel>
+                            </Expander>
+                            <Expander Header="Advanced Options"
+                                      VerticalAlignment="Top"
+                                      HorizontalAlignment="Stretch"
+                                      Background="{DynamicResource MainPanelColor}"
+                                      IsExpanded="False">
+                                <StackPanel Margin="0,0,10,10"
+                                            Spacing="4">
+                                    <Grid ColumnDefinitions="auto,*">
+                                        <Label Content="Select Game:"
+                                               VerticalAlignment="Top"
+                                               HorizontalAlignment="Left"
+                                               VerticalContentAlignment="Center"
+                                               Height="30" />
+                                        <ComboBox Grid.Column="1"
+                                                  ItemsSource="{Binding Games}"
+                                                  SelectedItem="{Binding ImageAdvancedOptions.GameID, Mode=TwoWay}"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalAlignment="Bottom"
+                                                  Height="30"
+                                                  IsEnabled="{Binding VersionConvertComboBoxStatus}"
+                                                  ToolTip.Tip="Choose the conversion option. Use the default option unless you want to edit legacy titles.">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Converter={StaticResource EnumDisplayNameConverter}}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
+                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.IsLegacyConsole}"
+                                              ToolTip.Tip="Enable this option if you are converting textures from older console Telltale games.">Legacy Console</CheckBox>
+                                    <Border Background="Gray"
+                                            HorizontalAlignment="Stretch"
+                                            Height="3"
+                                            CornerRadius="10" />
+                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableAutomaticCompression, Mode=TwoWay}"
+                                              ToolTip.Tip="Enable this option if you want to compress your textures. Works only for DXT/BC compression.">Auto Compression</CheckBox>
+                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableTelltaleNormalMap, Mode=TwoWay}"
+                                              ToolTip.Tip="When enabled, the channels are reversed for RGB normal maps and BC5 compression is used on RG normal maps.">Auto Normal Maps</CheckBox>
+                                    <Border Background="Gray"
+                                            HorizontalAlignment="Stretch"
+                                            Height="3"
+                                            CornerRadius="10" />
+                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableMips, Mode=TwoWay}">Enable Mipmaps</CheckBox>
+                                    <Grid RowDefinitions="auto, auto"
+                                          ColumnDefinitions="auto, 10, *"
+                                          IsVisible="{Binding ImageAdvancedOptions.EnableMips}">
+                                        <RadioButton Grid.Column="0"
+                                                     IsChecked="{Binding ImageAdvancedOptions.AutoGenerateMips, Mode=TwoWay}">Automatic</RadioButton>
+                                        <RadioButton Grid.Column="2"
+                                                     IsChecked="{Binding ImageAdvancedOptions.ManualGenerateMips, Mode=TwoWay}">Manual</RadioButton>
+                                        <Grid Grid.Row="1"
+                                              Grid.ColumnSpan="3"
+                                              ColumnDefinitions="auto, 150"
+                                              IsVisible="{Binding ImageAdvancedOptions.ManualGenerateMips, Mode=TwoWay}">
+                                            <Label Grid.Column="0"
+                                                   Content="Mips:"
+                                                   HorizontalAlignment="Left"
+                                                   VerticalContentAlignment="Center"
+                                                   Height="30" />
+                                            <NumericUpDown Grid.Column="1"
+                                                           HorizontalAlignment="Stretch"
+                                                           Value="{Binding ImageAdvancedOptions.SetMips, Mode=TwoWay}"
+                                                           Minimum="1"
+                                                           Increment="1"
+                                                           Maximum="{Binding MaxMipCountButton}"
+                                                           Background="{DynamicResource ButtonColor}" />
+                                        </Grid>
+                                    </Grid>
+                                    <Border Background="Gray"
+                                            HorizontalAlignment="Stretch"
+                                            Height="3"
+                                            CornerRadius="10" />
+                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableSwizzle, Mode=TwoWay}">Enable Swizzling</CheckBox>
+                                    <Grid RowDefinitions="auto, auto"
+                                          ColumnDefinitions="auto, 10,  *"
+                                          IsVisible="{Binding ImageAdvancedOptions.EnableSwizzle}">
+                                        <Grid Grid.Row="0"
+                                              ColumnDefinitions="auto, *"
+                                              IsVisible="{Binding ImageAdvancedOptions.EnableSwizzle}">
+                                            <Label Grid.Row="0"
+                                                   Grid.Column="0"
+                                                   Content="Platform:"
+                                                   HorizontalAlignment="Left"
+                                                   VerticalContentAlignment="Center"
+                                                   Height="30" />
+                                            <ComboBox Grid.Row="0"
+                                                      Grid.Column="2"
+                                                      ItemsSource="{Binding SwizzlePlatforms}"
+                                                      SelectedItem="{Binding ImageAdvancedOptions.PlatformType, Mode=TwoWay}"
+                                                      VerticalAlignment="Top"
+                                                      HorizontalAlignment="Stretch"
+                                                      Height="30"
+                                                      ToolTip.Tip="Platforms">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Converter={StaticResource EnumDisplayNameConverter}}" />
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                        </Grid>
+                                        <StackPanel Grid.Row="1"
+                                                    Grid.ColumnSpan="3"
+                                                    Orientation="Horizontal"
+                                                    Spacing="10">
+                                            <RadioButton IsChecked="{Binding ImageAdvancedOptions.IsSwizzle}">Swizzle</RadioButton>
+                                            <RadioButton IsChecked="{Binding ImageAdvancedOptions.IsDeswizzle}">Deswizzle</RadioButton>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Border Background="Gray"
+                                            HorizontalAlignment="Stretch"
+                                            Height="3"
+                                            CornerRadius="10" />
+                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableEditing}">Enable Effects</CheckBox>
+                                    <Grid ColumnDefinitions="auto, *"
+                                          IsVisible="{Binding ImageAdvancedOptions.EnableEditing}">
+                                        <Label Grid.Column="0"
+                                               Content="Effect:"
+                                               HorizontalAlignment="Left"
+                                               VerticalContentAlignment="Center"
+                                               Height="30" />
+                                        <ComboBox Grid.Column="1"
+                                                  ItemsSource="{Binding ImageConversionModes}"
+                                                  SelectedItem="{Binding ImageAdvancedOptions.ImageEffect, Mode=TwoWay}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Converter={StaticResource EnumDisplayNameConverter}}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
+                                    <Border Background="Gray"
+                                            HorizontalAlignment="Stretch"
+                                            Height="3"
+                                            CornerRadius="10" />
+                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableNormalMap}">Create Normal Map</CheckBox>
+                                    <Border Background="Gray"
+                                            HorizontalAlignment="Stretch"
+                                            Height="3"
+                                            CornerRadius="10" />
+                                    <!-- <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableAlpha, Mode=TwoWay}">Enable Alpha</CheckBox>
+                                    <Grid ColumnDefinitions="auto, auto"
+                                          IsVisible="{Binding ImageAdvancedOptions.EnableAlpha}">
+                                        <Label Content="D3DTX Alpha:"
+                                               HorizontalAlignment="Left"
+                                               VerticalContentAlignment="Center"
+                                               Height="30" />
+                                        <ComboBox Grid.Column="2"
+                                                  ItemsSource="{Binding FormatsList}"
+                                                  SelectedItem="{Binding SelectedFormat}"
+                                                  VerticalAlignment="Top"
+                                                  Width="160"
+                                                  Height="30"
+                                                  IsEnabled="{Binding ComboBoxStatus}"
+                                                  ToolTip.Tip="Games List">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Name}"
+                                                               IsEnabled="{Binding ItemStatus}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid> -->
+                                </StackPanel>
+                            </Expander>
+                            <Expander Header="Debug Information"
+                                      VerticalAlignment="Top"
+                                      HorizontalAlignment="Stretch"
+                                      Background="{DynamicResource MainPanelColor}"
+                                      IsExpanded="False">
+                                <Expander.Header />
+                                <TextBox Background="{DynamicResource PanelSplitterColor}"
+                                         HorizontalAlignment="Stretch"
+                                         VerticalAlignment="Stretch"
+                                         Text="{Binding DebugInfo}"
+                                         IsReadOnly="True" />
+                            </Expander>
+                            <StackPanel Margin="10,10,10,10"
+                                        Spacing="4">
+                                <Label Name="ConvertOptionsLabel"
+                                       Content="Convert Options:"
+                                       VerticalAlignment="Top"
+                                       HorizontalAlignment="Left"
+                                       VerticalContentAlignment="Center"
+                                       Height="30"
+                                       Width="120" />
+                                <!-- SelectedIndex="{Binding SelectedConvertOptionsComboBoxIndex}" -->
+                                <Grid ColumnDefinitions="auto, auto, auto, auto">
+                                    <Label Grid.Column="0"
+                                           Content="From:"
+                                           HorizontalAlignment="Left"
+                                           VerticalContentAlignment="Center" />
+                                    <ComboBox Grid.Column="1"
+                                              ItemsSource="{Binding FromFormatsList}"
+                                              SelectedItem="{Binding SelectedFromFormat}"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Top"
+                                              IsEnabled="{Binding IsFromSelectedComboboxEnable}"
+                                              ToolTip.Tip="Available image formats.">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}"
+                                                           IsEnabled="{Binding ItemStatus}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                    <Label Grid.Column="2"
+                                           Content="To:"
+                                           HorizontalAlignment="Left"
+                                           VerticalContentAlignment="Center" />
+                                    <ComboBox Grid.Column="3"
+                                              ItemsSource="{Binding ToFormatsList}"
+                                              SelectedItem="{Binding SelectedToFormat}"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Top"
+                                              IsEnabled="{Binding IsToSelectedComboboxEnable}"
+                                              ToolTip.Tip="Available image formats.">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}"
+                                                           IsEnabled="{Binding ItemStatus}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </Grid>
+                                <!-- IsChecked="{Binding ChooseOutputDirectoryCheckBoxStatus}" -->
+                                <CheckBox Name="ChooseOutputDirectoryCheckBox"
+                                          IsEnabled="{Binding ChooseOutputDirectoryCheckBoxEnabledStatus}"
+                                          Content="Choose Output Directory"
+                                          VerticalAlignment="Top"
+                                          HorizontalAlignment="Left"
+                                          Width="200" />
+                                <Button Name="ConvertButton"
+                                        Content="Convert"
+                                        VerticalAlignment="Top"
+                                        HorizontalAlignment="Left"
+                                        HorizontalContentAlignment="Center"
+                                        Width="100"
+                                        Command="{Binding ConvertButton_Click}"
+                                        IsEnabled="{Binding ConvertButtonStatus}"
+                                        ToolTip.Tip="Convert the file into the desired format." />
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+                <!-- Convert Panel -->
+            </Grid>
+            <Grid Grid.Column="2"
+                  Background="{DynamicResource MainPanelColor}">
+                <Grid Grid.Row="1">
+                    <Grid Grid.Row="0"
+                          Margin="0,5,0,0"
+                          Background="{DynamicResource MainPanelColor}">
+                        <!-- Ensure the Grid can expand -->
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <!-- For the Label -->
+                            <RowDefinition Height="*" />
+                            <!-- For the ScrollViewer and ZoomBorder -->
+                        </Grid.RowDefinitions>
+                        <WrapPanel Grid.Row="0"
+                                   Margin="10,0,10,0"
+                                   Orientation="Horizontal"
+                                   VerticalAlignment="Stretch">
+                            <Label Name="ImagepreviewLabel"
+                                   Content="Image Preview"
+                                   VerticalAlignment="Center"
+                                   Margin="5,0,0,0" />
+                            <Grid Margin="5,0,5,0"
+                                  MinWidth="150"
+                                  IsVisible="{Binding IsMipSliderVisible}">
+                                <Slider x:Name="MipSlider"
+                                        VerticalAlignment="Center"
+                                        MinWidth="100"
+                                        MaxWidth="150"
+                                        Minimum="0"
+                                        Maximum="{Binding MaxMipCount}"
+                                        Value="{Binding MipValue}"
+                                        IsSnapToTickEnabled="True"
+                                        TickFrequency="1.0" />
+                                <Label Content="{Binding MipValue, StringFormat='Mip: {0}'}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"
+                                       MaxWidth="180" />
+                            </Grid>
+                            <Grid Margin="5,0,5,0"
+                                  MinWidth="150"
+                                  IsVisible="{Binding IsFaceSliderVisible}">
+                                <Slider x:Name="FaceSlider"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Stretch"
+                                        Minimum="0"
+                                        MaxWidth="150"
+                                        Maximum="{Binding MaxFaceCount}"
+                                        Value="{Binding FaceValue} "
+                                        IsSnapToTickEnabled="True"
+                                        TickFrequency="1" />
+                                <Label Content="{Binding FaceValue, StringFormat='Face/Slice: {0}'}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"
+                                       MaxWidth="180" />
+                            </Grid>
+                        </WrapPanel>
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      Margin="10">
+                            <paz:ZoomBorder Name="ZoomBorder1"
+                                            ZoomSpeed="1.4"
+                                            EnableConstrains="False"
+                                            BorderBrush="Black"
+                                            BorderThickness="1"
+                                            EnablePan="True"
+                                            PanButton="Left"
+                                            ZIndex="3"
+                                            ClipToBounds="True"
+                                            Focusable="True"
+                                            MinWidth="100"
+                                            MinHeight="100"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch">
+                                <!-- Image Preview (Don't change) -->
+                                <Border HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        MaxWidth="700"
+                                        Background="#454545">
+                                    <Border.Transitions>
+                                        <Transitions>
+                                            <TransformOperationsTransition Property="RenderTransform"
+                                                                           Duration="0:0:0.1" />
+                                        </Transitions>
+                                    </Border.Transitions>
+                                    <!-- Set Stretch to Fill to ignore aspectf ratio -->
+                                    <Image Name="ImagepreviewImage"
+                                           Source="{Binding ImagePreview}"
+                                           Stretch="Uniform"
+                                           Margin="10" />
+                                </Border>
+                            </paz:ZoomBorder>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</UserControl>

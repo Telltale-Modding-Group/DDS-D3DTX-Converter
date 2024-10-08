@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "DDS_D3DTX_Converter": {
-      "commandName": "Project",
-      "nativeDebugging": true
-    }
-  }
-}

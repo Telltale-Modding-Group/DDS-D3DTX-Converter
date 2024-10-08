@@ -5,12 +5,12 @@ name: .NET
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "beta" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "beta" ]
     
 env:
-  GUI_PROJECT_PATH : 'DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/DDS_D3DTX_Converter.csproj'
+  GUI_PROJECT_PATH : 'TelltaleTextureTool/TelltaleTextureTool/TelltaleTextureTool.csproj'
   OUTPUT_PROJECT_PATH : 'Builds'
 
 jobs:
@@ -33,9 +33,9 @@ jobs:
     - name: Publish
       run: dotnet publish ${{env.GUI_PROJECT_PATH}} --configuration Release --no-build
     - name: Zip
-      run: zip -r DDS_D3DTX_Converter.zip ./DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/bin/Release/net8.0/publish/
+      run: zip -r TelltaleTextureTool.zip ./TelltaleTextureTool/TelltaleTextureTool/bin/Release/net8.0/publish/
     - name: Upload build artifact
       uses: actions/upload-artifact@v4
       with:
-        name: DDS_D3DTX_Converter
-        path: ./DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/bin/Release/net8.0/publish/
+        name: TelltaleTextureTool
+        path: ./TelltaleTextureTool/TelltaleTextureTool/bin/Release/net8.0/publish/

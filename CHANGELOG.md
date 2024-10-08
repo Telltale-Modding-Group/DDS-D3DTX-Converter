@@ -22,7 +22,7 @@
 - Added volumemap texture support (They usually do not exist. Please report if you find any).
 - Added support to export a DDS image even if the version is not recognized (it will not generate a JSON file). This is a feature parity with Telltale Explorer and should work for any Telltale game.
 - Reworked the JSON file - it now has an additional field class that includes the conversion type used. The app is still compatible with older versions.
-- Added the Debug CLI back, which will act as the main one for now. In the future I may add a proper one.
+- Added the Debug CLI back, which will act as the main one for now.
 - Improved the bulk conversion performance, it now converts more textures per thread.
 
 #### GUI: 
@@ -31,11 +31,11 @@
 - Added a Debug info button. When clicked on, it will display in a dialog the information about DDS images and D3DTX files.
 - Added a new exporting feature, when the mVersion is unknown. It is used when the "Default" option is used.
 - Changed the names of some Telltale surface formats. They are now shown a little bit more consistent with their more known DXGI counterparts.
-    - DXT1  now shows as BC1
-    - DXT3  now shows as BC2
-    - DXT5  now shows as BC3
+    - DXT1   now shows as BC1
+    - DXT3   now shows as BC2
+    - DXT5   now shows as BC3
     - DXT5a now shows as BC4
-    - DXN   now shows as BC5
+    - DXN    now shows as BC5
 - Reorganized some elements. 
     - Image preview should be a little bigger than before.
     - Image properties take the whole panel space.

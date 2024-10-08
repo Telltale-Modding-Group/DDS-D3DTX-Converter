@@ -1,7 +1,6 @@
-# Telltale Texture Mod Tool
+# Telltale Texture Tool
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/iMrShadow/DDS-D3DTX-Converter)](https://github.com/iMrShadow/DDS-D3DTX-Converter/releases/)
-
 
 Newer (Fork) Versions:
 [![Github All Releases](https://img.shields.io/github/downloads/iMrShadow/DDS-D3DTX-Converter/total.svg)](https://github.com/iMrShadow/DDS-D3DTX-Converter/releases/)
@@ -10,7 +9,7 @@ Older Versions:
 [![Github All Releases](https://img.shields.io/github/downloads/Telltale-Modding-Group/DDS-D3DTX-Converter/total.svg)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/releases)  
 
 ## Description
-This is an application designed to preview and convert **Telltale Tool textures** (files with the **.d3dtx** extension) to a more accessible format like  **DDS (Direct Draw Surface)** and vice versa. There is also support for converting **DDS** to other image formats and back, although this is not recommended due to potential data loss. It works only on **Windows**.
+This is an application designed to preview and convert **Telltale textures** (files with the **.d3dtx** extension) to more accessible formats like **PNG**, **JPEG**, **DDS**, **TGA**, **HDR**, **TIFF* and vice versa.
 
 **[DOWNLOAD THE LATEST VERSION HERE](https://github.com/iMrShadow/DDS-D3DTX-Converter/releases)**
 
@@ -38,9 +37,6 @@ This is an application designed to preview and convert **Telltale Tool textures*
 - The Walking Dead Collection
 - Minecraft: Story Mode
 - Minecraft: Story Mode – Season Two
-- Sam & Max: The Devil's Playhouse
-- Sam & Max: Beyond Time And Space
-- Sam & Max: Save The World
 - The Wolf Among Us
 - Tales from the Borderlands
 - Batman: The Telltale Series
@@ -51,34 +47,29 @@ This is an application designed to preview and convert **Telltale Tool textures*
 - Poker Knight 2
 - Back to the Future: The Game
 
-#### Supported Texture Layouts
-
-- 2D Textures
-- Volume Textures
-- Cube Textures
-- 2D Array Textures
-- Cube Array Textures
-
 ## Notes and Limitations
-1. This is primarily aimed for PC-platform games. Other platforms are supported in the [beta branch](https://github.com/iMrShadow/DDS-D3DTX-Converter/tree/beta) of this project, but it is not stable enough.
-2. Other legacy Telltale titles are supported in the [beta branch](https://github.com/iMrShadow/DDS-D3DTX-Converter/tree/beta), but decrypting is not finished yet.
-3. Older games do not support some texture layouts such as volumemaps or cubemaps. Please be cautious.
-4. Linux/MacOS are not supported even with Wine due to DirectXTexNet's mixed mode assembly. In the [beta branch](https://github.com/iMrShadow/DDS-D3DTX-Converter/tree/beta) the library is changed to [Hexa.NET.DirectXTex](https://github.com/HexaEngine/Hexa.NET.DirectXTex) which supports Linux and MacOS natively.
+
+1. This is primarily aimed for PC-platform games. There's some support for console and mobile platforms. More information can be found in the wiki.
+2. If you want support on other legacy titles, please open an issue.
+3. Older games do not support some texture layouts like volumemaps, cubemaps or 2D arraymaps. Please be cautious.
+4. Linux/MacOS are not supported even with Wine due to DirectXTexNet's mixed mode assembly.
 
 ## Developers
 
 *Only for modders/developers who plan on forking/modifying/downloading the project.*
 
 There are 3 projects in this repository:
-- **DDS_D3DTX_Converter_GUI** is the currently-maintained application with a GUI built with **Avalonia UI**. It has the latest features and improvements. It also has a Debug CLI. 
-- **D3DTX_TextureConverter** is a CLI app. It's older than **DDS_D3DTX_Converter_GUI**, which is not recommended to use. It can be still used for some of the latest Telltale games.
+- **TelltaleTextureTool** is the currently-maintained application with a GUI built with **Avalonia UI**. It has the latest features and improvements.
+
+The other 2 projects are located in the Archive folder.
+- **D3DTX_TextureConverter** is an older CLI app version of the tool, which is not recommended to use. It can be still used for some of the latest Telltale games.
 - **TextureMod_GUI** is the original GUI application built with **WPF (Mahapps)**. It is not recommended to use as it's extremely outdated.
 
-We utilize [DirectXTexNet](https://github.com/deng0/DirectXTexNet), a .NET wrapper around [DirectXTex](https://github.com/microsoft/DirectXTex), allowing us to work better with DDS files.
+We utilize [Hexa.NET.DirectXTex](https://github.com/HexaEngine/Hexa.NET.DirectXTex), a .NET wrapper around [DirectXTex](https://github.com/microsoft/DirectXTex), allowing us to work better with DDS files.
 
 If you want to use the console applications, you can open their relative solutions in Visual Studio. It would require you to change the code to set some parameters.
 
-**If you want to learn about the D3DTX file format** we suggest you looking in the **DDS_D3DTX_Converter_GUI** project at **[TelltaleD3DTX folder](/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/Telltale/TelltaleD3DTX)**. The classes there are well documented and describe the D3DTX format. Preferably, start with D3DTX_V9.cs and go upwards.
+**If you want to learn about the D3DTX file format** we suggest you looking in the **TelltaleTextureTool** project at **[TelltaleD3DTX folder](/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/Telltale/TelltaleD3DTX)**. The classes there are well documented and describe the D3DTX format. Preferably, start with D3DTX_V9.cs and go upwards.
 **Direct Surface Draw (.dds)** is a Microsoft file format, which is described in detail [here](https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds). You can also check out in [this folder](DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/DirectX) the following classes:
 - DDS_HEADER.cs
 - DDS_HEADER_DX10.cs

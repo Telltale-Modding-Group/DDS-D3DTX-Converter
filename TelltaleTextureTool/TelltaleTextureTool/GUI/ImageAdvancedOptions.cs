@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TelltaleTextureTool.DirectX;
+using TelltaleTextureTool.Graphics;
 using TelltaleTextureTool.TelltaleEnums;
 using TelltaleTextureTool.ViewModels;
 

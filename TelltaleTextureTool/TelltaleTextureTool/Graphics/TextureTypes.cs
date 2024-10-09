@@ -1,4 +1,4 @@
-
+namespace TelltaleTextureTool.Graphics;
 
 public enum TextureType
 {

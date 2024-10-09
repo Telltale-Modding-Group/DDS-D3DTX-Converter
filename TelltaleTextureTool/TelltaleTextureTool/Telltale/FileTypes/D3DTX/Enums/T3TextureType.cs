@@ -1,10 +1,10 @@
 ﻿namespace TelltaleTextureTool.TelltaleEnums;
 
-//this name is not original, can't find the original name but the enum names are correct
+// I can't find the original name but the enum names are correct.
 public enum T3TextureType
 {
 
-    //missing numbers - 4, 20, 21
+    // Missing numbers - 4, 20, 21
     eTxUnknown = 0,
     eTxStandard = 15,
     eTxLightmap_V0 = 1,

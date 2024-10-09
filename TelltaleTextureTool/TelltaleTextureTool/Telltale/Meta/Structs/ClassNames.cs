@@ -34,6 +34,4 @@ public struct ClassNames
 
         return totalByteSize;
     }
-
-    public override readonly string ToString() => string.Format("[ClassNames] mTypeNameCRC: ({0}) mVersionCRC: {1}", mTypeNameCRC, mVersionCRC);
 }

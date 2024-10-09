@@ -171,7 +171,6 @@ public enum T3SurfaceFormat
     // https://forum.xen-tax.com/viewtopic.php@p=83846.html 
     // https://github.com/Xenomega/Alteration/blob/master/Alteration/Halo%203/Map%20File/Raw/BitmapRaw/DXTDecoder.cs 
     // https://fileadmin.cs.lth.se/cs/Personal/Michael_Doggett/talks/unc-xenos-doggett.pdf)
-
     CTX1 = 0x45,
 
     // Equivalent to DXGI_FORMAT_BC6H_UF16
@@ -195,9 +194,17 @@ public enum T3SurfaceFormat
 
     // PVRTC 1 4bpp RGBA
     PVRTC4a = 0x53, //53h
-    ATC_RGB = 0x60, //60h ATC
-    ATC_RGB1A = 0x61, //61h ATC Explicit Alpha
-    ATC_RGBA = 0x62, //62h ATC Interpolated Alpha
+
+    // ATC RGB
+    ATC_RGB = 0x60, //60h 
+
+    // ATC Explicit Alpha
+    ATC_RGB1A = 0x61, //61h
+
+    // ATC Interpolated Alpha
+    ATC_RGBA = 0x62, //62h
+
+    // ETC1 RGB
     ETC1_RGB = 0x70, //70h
 
     // VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK = 148,
@@ -213,7 +220,8 @@ public enum T3SurfaceFormat
     // ETC2 EAC RG11
     ETC2_RG = 0x75, //75h
 
-    ATSC_RGBA_4x4 = 0x80, //80h
+    // ASTC 4x4
+    ASTC_RGBA_4x4 = 0x80, //80h
 
     #endregion
     FrontBuffer = 0x90, //90h

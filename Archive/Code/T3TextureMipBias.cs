@@ -1,4 +1,5 @@
 ﻿namespace TelltaleTextureTool.TelltaleEnums;
+
 public enum T3TextureMipBias
 {
     eTextureMipBias_None,

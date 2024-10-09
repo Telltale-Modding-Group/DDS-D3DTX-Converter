@@ -6,7 +6,7 @@ namespace TelltaleTextureTool.DirectX.Enums;
 // DDS File Layout https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-file-layout-for-textures
 // Texture Block Compression in D3D11 - https://docs.microsoft.com/en-us/windows/win32/direct3d11/texture-block-compression-in-direct3d-11
 // DDS Programming Guide - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide
-// D3DFORMAT - https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat
+// D3DFormat - https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat
 // Map Direct3D 9 Formats to Direct3D 10 - https://learn.microsoft.com/en-gb/windows/win32/direct3d10/d3d10-graphics-programming-guide-resources-legacy-formats?redirectedfrom=MSDN
 
 /// <summary>

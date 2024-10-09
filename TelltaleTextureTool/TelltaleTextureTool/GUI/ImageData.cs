@@ -7,6 +7,7 @@ using Avalonia.Media.Imaging;
 using SkiaSharp;
 using System.Runtime.InteropServices;
 using TelltaleTextureTool.TelltaleEnums;
+using TelltaleTextureTool.Graphics;
 
 namespace TelltaleTextureTool;
 
@@ -178,7 +179,7 @@ public class ImageData
             DDSImage = new Texture(CurrentFilePath, CurrentTextureType);
         }
 
-        imageProperties = TextureManager.GetDDSProperties(CurrentFilePath, DDSImage.Metadata);
+        imageProperties = TextureManager.GetTextureProperties(CurrentFilePath, DDSImage.Metadata);
     }
 
     /// <summary>

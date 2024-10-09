@@ -8,6 +8,7 @@ using System.Linq;
 using Hexa.NET.DirectXTex;
 using TelltaleTextureTool.Telltale.FileTypes.D3DTX;
 using TelltaleTextureTool.Graphics.PVR;
+using TelltaleTextureTool.Graphics;
 
 namespace TelltaleTextureTool.Main
 {

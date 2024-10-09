@@ -2,6 +2,7 @@
 using TelltaleTextureTool.Utilities;
 
 namespace TelltaleTextureTool.TelltaleTypes;
+
 public struct ToolProps
 {
     public bool mbHasProps;

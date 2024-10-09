@@ -1,7 +1,6 @@
 ﻿namespace TelltaleTextureTool.TelltaleEnums;
 
 // In Telltale the enum is represented using Hungarian notation (eTextureLayout_layoutName).
-
 public enum T3TextureLayout
 {
     Unknown = -1, //0FFFFFFFFh

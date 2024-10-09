@@ -25,6 +25,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Reflection;
 using TelltaleTextureTool.TelltaleEnums;
+using TelltaleTextureTool.Graphics;
 
 namespace TelltaleTextureTool.ViewModels;
 
@@ -712,9 +713,10 @@ public partial class MainViewModel : ViewModelBase
 
                 debugInfo = d3dtx.GetD3DTXDebugInfo();
             }
-            else if (workingDirectoryFile.FileType == ".dds")
+            else if (workingDirectoryFile.FileType is ".dds" or ".png" or ".jpg" or ".jpeg" or ".bmp" or ".tga" or ".tif" or ".tiff" or ".hdr")
             {
-                debugInfo = TextureManager.GetDDSDebugInfo(textureFilePath);
+                TextureType textureType = GetTextureTypeFromItem(workingDirectoryFile.FileType.ToUpperInvariant().Remove(0, 1));
+                debugInfo = TextureManager.GetTextureDebugInfo(textureFilePath, textureType);
             }
             else
             {

@@ -1,7 +1,6 @@
 ﻿using TelltaleTextureTool.DirectX.Enums;
 using TelltaleTextureTool.TelltaleEnums;
 using Hexa.NET.DirectXTex;
-using SkiaSharp;
 
 namespace TelltaleTextureTool.DirectX;
 
@@ -11,7 +10,7 @@ namespace TelltaleTextureTool.DirectX;
 // DDS File Layout https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-file-layout-for-textures
 // Texture Block Compression in D3D11 - https://docs.microsoft.com/en-us/windows/win32/direct3d11/texture-block-compression-in-direct3d-11
 // DDS Programming Guide - https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds-pguide
-// D3DFORMAT - https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat
+// D3DFormat - https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat
 // Map Direct3D 9 Formats to Direct3D 10 - https://learn.microsoft.com/en-gb/windows/win32/direct3d10/d3d10-graphics-programming-guide-resources-legacy-formats?redirectedfrom=MSDN
 
 /// <summary>
@@ -210,7 +209,7 @@ public static partial class DDSHelper
             //--------------------Depth24--------------------
             T3SurfaceFormat.Depth24 => DXGIFormat.D24_UNORM_S8_UINT,
             //--------------------DepthStencil32--------------------
-            T3SurfaceFormat.DepthStencil32 => DXGIFormat.D32_FLOAT_S8X24_UINT,
+            T3SurfaceFormat.DepthStencil32 => DXGIFormat.D24_UNORM_S8_UINT,
             //--------------------Depth32F--------------------
             T3SurfaceFormat.Depth32F => DXGIFormat.D32_FLOAT,
             //--------------------Depth32F_Stencil8--------------------
@@ -283,7 +282,7 @@ public static partial class DDSHelper
         T3SurfaceFormat.ETC2_RGB1A => surfaceGamma == T3SurfaceGamma.sRGB ? DXGIFormat.BC1_UNORM_SRGB : DXGIFormat.BC1_UNORM,
         T3SurfaceFormat.ETC2_R => surfaceGamma == T3SurfaceGamma.sRGB ? DXGIFormat.BC1_UNORM_SRGB : DXGIFormat.BC1_UNORM,
         T3SurfaceFormat.ETC2_RG => surfaceGamma == T3SurfaceGamma.sRGB ? DXGIFormat.BC3_UNORM_SRGB : DXGIFormat.BC3_UNORM,
-        T3SurfaceFormat.ATSC_RGBA_4x4 => surfaceGamma == T3SurfaceGamma.sRGB ? DXGIFormat.BC3_UNORM_SRGB : DXGIFormat.BC3_UNORM,
+        T3SurfaceFormat.ASTC_RGBA_4x4 => surfaceGamma == T3SurfaceGamma.sRGB ? DXGIFormat.BC3_UNORM_SRGB : DXGIFormat.BC3_UNORM,
         T3SurfaceFormat.PVRTC2 => surfaceGamma == T3SurfaceGamma.sRGB ? DXGIFormat.BC1_UNORM_SRGB : DXGIFormat.BC1_UNORM,
         T3SurfaceFormat.PVRTC2a => surfaceGamma == T3SurfaceGamma.sRGB ? DXGIFormat.BC1_UNORM_SRGB : DXGIFormat.BC1_UNORM,
         T3SurfaceFormat.PVRTC4 => surfaceGamma == T3SurfaceGamma.sRGB ? DXGIFormat.BC1_UNORM_SRGB : DXGIFormat.BC1_UNORM,
@@ -300,7 +299,7 @@ public static partial class DDSHelper
     /// <param name="dxgiFormat">The DXGI format.</param>
     /// <param name="metadata">The metadata of our .dds file. It is used in determining if the alpha is premultiplied.</param>
     /// <returns>The corresponding Direct3D9 format.</returns>
-    public static LegacyFormat GetD3DFORMAT(DXGIFormat dxgiFormat, TexMetadata metadata) => dxgiFormat switch
+    public static LegacyFormat GetD3DFormat(DXGIFormat dxgiFormat, TexMetadata metadata) => dxgiFormat switch
     {
         DXGIFormat.B8G8R8A8_UNORM => LegacyFormat.A8R8G8B8,
         DXGIFormat.B8G8R8X8_UNORM => LegacyFormat.X8R8G8B8,
@@ -561,55 +560,4 @@ public static partial class DDSHelper
             return metadata.IsCubemap() ? T3TextureLayout.TextureCubemap : T3TextureLayout.Texture2D;
         }
     }
-
-    public static SKColorType GetSKColorType(DXGIFormat format) => format switch
-    {
-        DXGIFormat.R32G32B32A32_TYPELESS => SKColorType.RgbaF32,
-        DXGIFormat.R32G32B32A32_FLOAT => SKColorType.RgbaF32,
-        DXGIFormat.R32G32B32A32_UINT => SKColorType.RgbaF32,
-        DXGIFormat.R32G32B32A32_SINT => SKColorType.RgbaF32,
-        //DXGIFormat.R32G32B32_TYPELESS => SKColorType.RgbaF32,
-        //DXGIFormat.R32G32B32_FLOAT => SKColorType.RgbaF32,
-        //DXGIFormat.R32G32B32_UINT => SKColorType.RgbaF32,
-        //DXGIFormat.R32G32B32_SINT => SKColorType.RgbaF32,
-        DXGIFormat.R16G16B16A16_TYPELESS => SKColorType.Rgba16161616,
-        DXGIFormat.R16G16B16A16_FLOAT => SKColorType.Rgba16161616,
-        DXGIFormat.R16G16B16A16_UNORM => SKColorType.Rgba16161616,
-        DXGIFormat.R16G16B16A16_UINT => SKColorType.Rgba16161616,
-        DXGIFormat.R16G16B16A16_SNORM => SKColorType.Rgba16161616,
-        DXGIFormat.R16G16B16A16_SINT => SKColorType.Rgba16161616,
-        DXGIFormat.R10G10B10A2_TYPELESS => SKColorType.Rgba1010102,
-        DXGIFormat.R10G10B10A2_UNORM => SKColorType.Rgba1010102,
-        DXGIFormat.R10G10B10A2_UINT => SKColorType.Rgba1010102,
-        DXGIFormat.R8G8B8A8_TYPELESS => SKColorType.Rgba8888,
-        DXGIFormat.R8G8B8A8_UNORM => SKColorType.Rgba8888,
-        DXGIFormat.R8G8B8A8_UNORM_SRGB => SKColorType.Rgba8888,
-        DXGIFormat.R8G8B8A8_UINT => SKColorType.Rgba8888,
-        DXGIFormat.R8G8B8A8_SNORM => SKColorType.Rgba8888,
-        DXGIFormat.R8G8B8A8_SINT => SKColorType.Rgba8888,
-        DXGIFormat.R16G16_TYPELESS => SKColorType.Rg1616,
-        DXGIFormat.R16G16_FLOAT => SKColorType.Rg1616,
-        DXGIFormat.R16G16_UNORM => SKColorType.Rg1616,
-        DXGIFormat.R16G16_UINT => SKColorType.Rg1616,
-        DXGIFormat.R16G16_SNORM => SKColorType.Rg1616,
-        DXGIFormat.R16G16_SINT => SKColorType.Rg1616,
-        DXGIFormat.R8G8_TYPELESS => SKColorType.Rg88,
-        DXGIFormat.R8G8_UNORM => SKColorType.Rg88,
-        DXGIFormat.R8G8_UINT => SKColorType.Rg88,
-        DXGIFormat.R8G8_SNORM => SKColorType.Rg88,
-        DXGIFormat.R8G8_SINT => SKColorType.Rg88,
-        DXGIFormat.R8_TYPELESS => SKColorType.Gray8,
-        DXGIFormat.R8_UNORM => SKColorType.Gray8,
-        DXGIFormat.R8_UINT => SKColorType.Gray8,
-        DXGIFormat.R8_SNORM => SKColorType.Gray8,
-        DXGIFormat.R8_SINT => SKColorType.Gray8,
-        DXGIFormat.A8_UNORM => SKColorType.Alpha8,
-        DXGIFormat.B5G6R5_UNORM => SKColorType.Rgba8888,
-        DXGIFormat.B8G8R8A8_UNORM => SKColorType.Bgra8888,
-        DXGIFormat.B8G8R8A8_TYPELESS => SKColorType.Bgra8888,
-        DXGIFormat.B8G8R8A8_UNORM_SRGB => SKColorType.Bgra8888,
-        DXGIFormat.B4G4R4A4_UNORM => SKColorType.Argb4444,
-        DXGIFormat.A4B4G4R4_UNORM => SKColorType.Argb4444,
-        _ => SKColorType.Unknown // Default or unknown format
-    };
 }

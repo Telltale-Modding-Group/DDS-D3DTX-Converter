@@ -39,12 +39,3 @@ public struct T3SamplerStateBlock
     return string.Format("[T3SamplerStateBlock] mData: {0}", enumFlags);
   }
 }
-
-public struct T3SamplerStateBlock_SamplerStateEntry
-{
-  public int mShift;
-  public int mMask;
-
-  public override string ToString() => string.Format("[T3SamplerStateBlock::SamplerStateEntry] mShift: {0} mMask: {1}", mShift, mMask);
-}
-

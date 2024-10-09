@@ -23,13 +23,13 @@ namespace TelltaleTextureTool.Main
     {
         public string FilePath { get; set; } = string.Empty;
 
-        public IMetaHeader metaHeaderObject;
+        public IMetaHeader? metaHeaderObject;
 
         public MetaVersion metaVersion;
 
-        public ID3DTX d3dtxObject;
+        public ID3DTX? d3dtxObject;
 
-        public D3DTXMetadata d3dtxMetadata;
+        public D3DTXMetadata? d3dtxMetadata;
 
         public TelltaleToolGame Game { get; set; } = TelltaleToolGame.DEFAULT;
         public T3PlatformType Platform { get; set; } = T3PlatformType.ePlatform_None;
@@ -198,7 +198,7 @@ namespace TelltaleTextureTool.Main
                     reader.BaseStream.Position = startPos;
                     return game;
                 }
-                catch (PixelDataNotFoundException e)
+                catch (PixelDataNotFoundException)
                 {
                     throw new PixelDataNotFoundException("The texture does not have any pixel data!");
                 }
@@ -218,7 +218,7 @@ namespace TelltaleTextureTool.Main
                     Platform = T3PlatformType.ePlatform_PS3;
                     return game;
                 }
-                catch (PixelDataNotFoundException e)
+                catch (PixelDataNotFoundException)
                 {
                     throw new PixelDataNotFoundException("The texture does not have any pixel data!");
                 }
@@ -661,7 +661,7 @@ namespace TelltaleTextureTool.Main
                 T3SurfaceFormat.ETC2_RGB1A => true,
                 T3SurfaceFormat.ETC2_R => true,
                 T3SurfaceFormat.ETC2_RG => true,
-                T3SurfaceFormat.ATSC_RGBA_4x4 => true,
+                T3SurfaceFormat.ASTC_RGBA_4x4 => true,
                 T3SurfaceFormat.PVRTC2 => true,
                 T3SurfaceFormat.PVRTC4 => true,
                 T3SurfaceFormat.PVRTC2a => true,
@@ -683,7 +683,7 @@ namespace TelltaleTextureTool.Main
                 T3SurfaceFormat.ETC2_RGB1A => true,
                 T3SurfaceFormat.ETC2_R => true,
                 T3SurfaceFormat.ETC2_RG => true,
-                T3SurfaceFormat.ATSC_RGBA_4x4 => true,
+                T3SurfaceFormat.ASTC_RGBA_4x4 => true,
                 T3SurfaceFormat.PVRTC2 => true,
                 T3SurfaceFormat.PVRTC4 => true,
                 T3SurfaceFormat.PVRTC2a => true,

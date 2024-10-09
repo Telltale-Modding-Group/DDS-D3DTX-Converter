@@ -65,7 +65,7 @@ internal class PVR_Main
             T3SurfaceFormat.ETC2_RGB1A => PVRTexLibPixelFormat.ETC2_RGB_A1,
             T3SurfaceFormat.ETC2_R => PVRTexLibPixelFormat.EAC_R11,
             T3SurfaceFormat.ETC2_RG => PVRTexLibPixelFormat.EAC_RG11,
-            T3SurfaceFormat.ATSC_RGBA_4x4 => PVRTexLibPixelFormat.ASTC_4x4,
+            T3SurfaceFormat.ASTC_RGBA_4x4 => PVRTexLibPixelFormat.ASTC_4x4,
             T3SurfaceFormat.PVRTC2 => PVRTexLibPixelFormat.PVRTCI_2bpp_RGB,
             T3SurfaceFormat.PVRTC4 => PVRTexLibPixelFormat.PVRTCI_4bpp_RGB,
             T3SurfaceFormat.PVRTC2a => PVRTexLibPixelFormat.PVRTCI_2bpp_RGBA,

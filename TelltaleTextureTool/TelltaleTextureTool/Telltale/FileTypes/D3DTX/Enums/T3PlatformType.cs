@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace TelltaleTextureTool.TelltaleEnums;
+
 public enum T3PlatformType
 {
     [Display(Name = "Default Mode")]

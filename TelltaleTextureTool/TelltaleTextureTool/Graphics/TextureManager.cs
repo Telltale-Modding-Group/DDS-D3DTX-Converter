@@ -14,6 +14,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 using Image = Hexa.NET.DirectXTex.Image;
+using TelltaleTextureTool.Graphics;
 
 namespace TelltaleTextureTool.DirectX;
 
@@ -30,6 +31,9 @@ public class ImageSection
     public byte[] Pixels { get; set; } = [];
 };
 
+/// <summary>
+/// Effects that can be applied to an image.
+/// </summary>
 public enum ImageEffect
 {
     [Display(Name = "Default Mode")]
@@ -46,51 +50,69 @@ public enum ImageEffect
 }
 
 /// <summary>
-/// A class that provides methods to interact with DirectXTexNet. Mainly used for loading and saving DDS files.
+/// A class that provides methods to interact with DirectXTex. Mainly used for loading and saving DDS files.
 /// </summary>
 public unsafe static partial class TextureManager
 {
 
-    /// <summary>
-    /// Get the DDS image from DirectXTexNet.
-    /// </summary>
-    /// <param name="ddsFilePath">The file path of the .dds file.</param>
-    /// <param name="flags">(Optional) The mode in which the DirectXTexNet will load the .dds file. If not provided, it defaults to NONE.</param>
-    /// <returns>ScratchImage instance of the DDS file.</returns>
-    public static void GetDDSImage(string ddsFilePath, out ScratchImage image, out TexMetadata metadata, DDSFlags flags = DDSFlags.None)
+    public static string GetTextureDebugInfo(string filePath, TextureType textureType)
     {
-        image = GetDDSImage(ByteFunctions.LoadTexture(ddsFilePath), flags);
-        metadata = image.GetMetadata();
-    }
+        ScratchImage scratchImage = DirectXTex.CreateScratchImage();
+        TexMetadata texMetadata = new();
 
-    public static string GetDDSDebugInfo(string ddsFilePath)
-    {
-        ScratchImage image = GetDDSImage(ByteFunctions.LoadTexture(ddsFilePath));
+        try
+        {
+            switch (textureType)
+            {
+                case TextureType.DDS: DirectXTex.LoadFromDDSFile(filePath, DDSFlags.None, ref texMetadata, ref scratchImage).ThrowIf(); break;
+                case TextureType.PNG:
+                    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                    {
+                        DirectXTex.LoadFromWICFile(filePath, WICFlags.AllFrames, ref texMetadata, ref scratchImage, default).ThrowIf(); break;
+                    }
+                    else if (Environment.OSVersion.Platform == PlatformID.Unix)
+                    {
+                        DirectXTex.LoadFromPNGFile(filePath, ref texMetadata, ref scratchImage).ThrowIf();
+                    }
+                    break;
+                case TextureType.HDR: DirectXTex.LoadFromHDRFile(filePath, ref texMetadata, ref scratchImage).ThrowIf(); break;
+                case TextureType.JPEG: DirectXTex.LoadFromJPEGFile(filePath, ref texMetadata, ref scratchImage).ThrowIf(); break;
+                case TextureType.TGA: DirectXTex.LoadFromTGAFile2(filePath, ref texMetadata, ref scratchImage).ThrowIf(); break;
+                case TextureType.TIFF: DirectXTex.LoadFromWICFile(filePath, WICFlags.AllFrames, ref texMetadata, ref scratchImage, default).ThrowIf(); break;
+                case TextureType.BMP: DirectXTex.LoadFromWICFile(filePath, WICFlags.AllFrames, ref texMetadata, ref scratchImage, default).ThrowIf(); break;
+                default: break;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            scratchImage.Release();
+            throw new Exception("Failed to load image!");
+        }   
 
-        string debugInfo = GetDDSDebugInfo(image.GetMetadata());
+        string debugInfo = GetTextureDebugInfo(scratchImage.GetMetadata());
 
-        image.Release();
+        scratchImage.Release();
 
         return debugInfo;
     }
 
-    public static ImageProperties GetDDSProperties(string ddsFilePath, TexMetadata ddsMetadata)
+    public static ImageProperties GetTextureProperties(string filePath, TexMetadata metadata)
     {
-        DXGIFormat dxgiFormat = (DXGIFormat)ddsMetadata.Format;
+        DXGIFormat dxgiFormat = (DXGIFormat)metadata.Format;
 
         ImageProperties properties = new()
         {
-            Name = Path.GetFileNameWithoutExtension(ddsFilePath),
-            Extension = ".dds",
-            Height = ddsMetadata.Height.ToString(),
-            Width = ddsMetadata.Width.ToString(),
+            Name = Path.GetFileNameWithoutExtension(filePath),
+            Height = metadata.Height.ToString(),
+            Width = metadata.Width.ToString(),
             SurfaceFormat = dxgiFormat.ToString(),
             HasAlpha = DirectXTex.HasAlpha((int)dxgiFormat) ? "True" : "False",
             SurfaceGamma = DirectXTex.IsSRGB((int)dxgiFormat) ? "sRGB" : "Linear",
-            MipMapCount = ddsMetadata.MipLevels.ToString(),
-            ArraySize = ddsMetadata.ArraySize.ToString(),
-            TextureLayout = ddsMetadata.Dimension.ToString(),
-            AlphaMode = ddsMetadata.GetAlphaMode().ToString(),
+            MipMapCount = metadata.MipLevels.ToString(),
+            ArraySize = metadata.ArraySize.ToString(),
+            TextureLayout = metadata.Dimension.ToString(),
+            AlphaMode = metadata.GetAlphaMode().ToString(),
         };
 
         return properties;
@@ -113,32 +135,6 @@ public unsafe static partial class TextureManager
     }
 
     /// <summary>
-    /// Returns a DirectXTexNet DDS image from a byte array.
-    /// </summary>
-    /// <param name="array">The byte array containing the DDS data.</param>
-    /// <param name="flags">(Optional) The mode in which the DirectXTexNet will load the .dds file. If not provided, it defaults to NONE.</param>
-    /// <returns>The DirectXTexNet DDS image.</returns>
-    unsafe public static ScratchImage GetDDSImage(byte[] array, DDSFlags flags = DDSFlags.None)
-    {
-        GCHandle handle = GCHandle.Alloc(array, GCHandleType.Pinned);
-        try
-        {
-            ScratchImage image = DirectXTex.CreateScratchImage();
-            TexMetadata metadata;
-
-            // Obtain a pointer to the data
-            IntPtr ptr = handle.AddrOfPinnedObject();
-            DirectXTex.LoadFromDDSMemory((void*)ptr, (nuint)array.Length, flags, &metadata, ref image).ThrowIf();
-            return image;
-        }
-        finally
-        {
-            // Release the handle to allow the garbage collector to reclaim the memory
-            handle.Free();
-        }
-    }
-
-    /// <summary>
     /// Returns a byte array from a DirectXTexNet DDS image.
     /// </summary>
     /// <param name="image">The DirectXTexNet DDS image.</param>
@@ -149,17 +145,11 @@ public unsafe static partial class TextureManager
         Blob blob = DirectXTex.CreateBlob();
         try
         {
-            Console.WriteLine("Image count: " + image.GetImageCount());
-            Console.WriteLine("Image format: " + image.GetMetadata().Format);
             TexMetadata metadata = image.GetMetadata();
             DirectXTex.SaveToDDSMemory2(image.GetImages(), image.GetImageCount(), ref metadata, flags, ref blob);
             // Create a byte array to hold the data
-            Console.WriteLine(blob.GetBufferSize());
-            Console.WriteLine((nint)blob.GetBufferPointer());
 
             byte[] ddsArray = new byte[blob.GetBufferSize()];
-
-            Console.WriteLine("BLOB BUFFER SIZE: " + blob.GetBufferSize());
 
             // Read the data from the Blob into the byte array
             Marshal.Copy((nint)blob.GetBufferPointer(), ddsArray, 0, ddsArray.Length);
@@ -171,17 +161,7 @@ public unsafe static partial class TextureManager
         }
     }
 
-    public static void GetDDSInformation(string ddsFilePath, out D3DTXMetadata metadata, out ImageSection[] sections, DDSFlags flags = DDSFlags.None)
-    {
-        ScratchImage image = GetDDSImage(ByteFunctions.LoadTexture(ddsFilePath), flags);
-
-        metadata = GetDDSInformation(image.GetMetadata());
-        sections = GetDDSImageSections(image, flags);
-
-        image.Release();
-    }
-
-    public static D3DTXMetadata GetDDSInformation(TexMetadata metadata)
+    public static D3DTXMetadata GetTextureInformation(TexMetadata metadata)
     {
         return new D3DTXMetadata
         {
@@ -192,15 +172,15 @@ public unsafe static partial class TextureManager
             MipLevels = (uint)metadata.MipLevels,
             Format = DDSHelper.GetTelltaleSurfaceFormat((DXGIFormat)metadata.Format),
             SurfaceGamma = DirectXTex.IsSRGB(metadata.Format) ? T3SurfaceGamma.sRGB : T3SurfaceGamma.Linear,
-            D3DFormat = DDSHelper.GetD3DFORMAT((DXGIFormat)metadata.Format, metadata),
+            D3DFormat = DDSHelper.GetD3DFormat((DXGIFormat)metadata.Format, metadata),
             Dimension = DDSHelper.GetDimensionFromDDS(metadata),
         };
     }
 
     /// <summary>
-    /// Returns a byte array List containing the pixel data from a DDS_DirectXTexNet_ImageSection array.
+    /// Returns a byte array List containing the pixel data from an ImageSection array.
     /// </summary>
-    /// <param name="sections">The sections of the DDS image.</param>
+    /// <param name="sections">The sections of the image.</param>
     /// <returns></returns>
     public static List<byte[]> GetPixelDataListFromSections(ImageSection[] sections)
     {
@@ -215,9 +195,9 @@ public unsafe static partial class TextureManager
     }
 
     /// <summary>
-    /// Returns a byte array List containing the pixel data from a DDS_DirectXTexNet_ImageSection array.
+    /// Returns a byte array List containing the pixel data from an ImageSection array.
     /// </summary>
-    /// <param name="sections">The sections of the DDS image.</param>
+    /// <param name="sections">The sections of the image.</param>
     /// <returns></returns>
     public static byte[] GetPixelDataArrayFromSections(ImageSection[] sections)
     {
@@ -335,29 +315,12 @@ public unsafe static partial class TextureManager
         return images;
     }
 
-    public static byte[] AsBytes(Blob blob)
-    {
-        byte[] bytes = new byte[blob.GetBufferSize()];
-        Marshal.Copy((nint)blob.GetBufferPointer(), bytes, 0, bytes.Length);
-        return bytes;
-    }
-
-    /// <summary>
-    /// Returns a boolean if a Direct3D10/DXGI format is sRGB.
-    /// </summary>
-    /// <param name="dxgiFormat">The Direct3D10/DXGI format.</param>
-    /// <returns>True, if it is SRGB. Otherwise - false.</returns>
-    public static bool IsSRGB(DXGIFormat dxgiFormat)
-    {
-        return DirectXTex.IsSRGB((int)dxgiFormat);
-    }
-
     /// <summary>
     /// Returns information about the DDS image.
     /// </summary>
     /// <param name="metadata">The metadata of the DDS image.</param>
     /// <returns>The string containing the DDS metadata information</returns>
-    public static string GetDDSDebugInfo(TexMetadata metadata)
+    public static string GetTextureDebugInfo(TexMetadata metadata)
     {
         StringBuilder information = new();
 
@@ -424,6 +387,9 @@ public unsafe static partial class TextureManager
     }
 }
 
+/// <summary>
+/// Main Texture Class
+/// </summary>
 public unsafe partial class Texture
 {
     public string FilePath { get; set; } = string.Empty;
@@ -510,7 +476,7 @@ public unsafe partial class Texture
 
     public string GetDDSDebugInfo()
     {
-        return TextureManager.GetDDSDebugInfo(Metadata);
+        return GetTextureDebugInfo(Metadata);
     }
 
     public void ConvertToRGBA()
@@ -1211,23 +1177,9 @@ public unsafe partial class Texture
         }
     }
 
-    public void ApplyTexFilter(TexFilterFlags filter = TexFilterFlags.Default)
-    {
-        Decompress();
-
-        TexMetadata texMetadata = Image.GetMetadata();
-
-        ScratchImage transformedImage = DirectXTex.CreateScratchImage();
-
-        DirectXTex.Convert2(Image.GetImages(), Image.GetImageCount(), ref texMetadata, (int)DXGIFormat.R8G8B8A8_UNORM, filter, 0.5f, ref transformedImage).ThrowIf();
-
-        Image.Release();
-        Image = transformedImage;
-    }
-
     public void GetDDSInformation(out D3DTXMetadata metadata, out ImageSection[] sections, DDSFlags flags = DDSFlags.None)
     {
-        metadata = TextureManager.GetDDSInformation(Image.GetMetadata());
+        metadata = GetTextureInformation(Image.GetMetadata());
         sections = GetDDSImageSections(Image, flags);
     }
 

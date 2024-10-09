@@ -73,35 +73,6 @@ public static class IOManagement
     }
 
     /// <summary>
-    /// Opens a FolderBrowserDialog for the user to select a folder path and return it.
-    /// </summary>
-    /// <param name="dialogTitle"></param>
-    public static async Task<string> GetFolderPathAsync(string dialogTitle = "Select a Folder Path")
-    {
-        // Create a TaskCompletionSource to handle the result of the folder dialog
-        var tcs = new TaskCompletionSource<string>();
-
-        // Run on the UI thread
-        await Dispatcher.UIThread.InvokeAsync(async () =>
-        {
-            // Create an instance of the OpenFolderDialog
-            var openFolderDialog = new OpenFolderDialog
-            {
-                Title = dialogTitle
-            };
-
-            // Open the dialog and cache the result
-            var result = await openFolderDialog.ShowAsync(null);
-
-            // If the user selects a folder, set the result
-            tcs.SetResult(!string.IsNullOrWhiteSpace(result) ? result : null);
-        });
-
-        // Wait for the task to complete and return the result
-        return await tcs.Task;
-    }
-
-    /// <summary>
     /// Opens a FileBrowserDialog for the user to select a file path and return it.
     /// </summary>
     /// <param name="provider"></param>

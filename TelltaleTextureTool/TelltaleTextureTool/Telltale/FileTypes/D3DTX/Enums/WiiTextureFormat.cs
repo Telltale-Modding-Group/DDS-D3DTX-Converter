@@ -1,4 +1,5 @@
 ﻿namespace TelltaleTextureTool.TelltaleEnums;
+
 public enum WiiTextureFormat
 {
     eTxWiiFormatDefault,

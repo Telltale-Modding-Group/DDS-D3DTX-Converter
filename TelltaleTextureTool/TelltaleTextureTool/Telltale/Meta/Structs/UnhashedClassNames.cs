@@ -38,6 +38,4 @@ public struct UnhashedClassNames
 
         return totalByteSize;
     }
-
-    public override readonly string ToString() => string.Format("[UnhashedClassNames] length: {0} className: {1} mVersionCRC: {2}", length, className, mVersionCRC);
 }

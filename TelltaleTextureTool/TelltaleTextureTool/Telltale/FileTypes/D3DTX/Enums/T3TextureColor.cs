@@ -1,6 +1,6 @@
 ﻿namespace TelltaleTextureTool.TelltaleEnums;
-// Note: Original name could not be found, so just using the prefix eTxColor
 
+// Note: Original name could not be found, so just using the prefix eTxColor.
 public enum T3TextureColor
 {
     eTxColorUnknown = -1,

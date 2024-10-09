@@ -18,8 +18,8 @@ using TelltaleTextureTool.Telltale.FileTypes.D3DTX;
  * Also, Telltale uses Hungarian Notation for variable naming.
 */
 
-/* - D3DTX Legacy Version 1 games
- * The Walking Dead Season 1 (TESTED)
+/* - D3DTX Legacy Version  Games
+- All games before The Walking Dead: Season One
 */
 
 namespace TelltaleTextureTool.TelltaleD3DTX

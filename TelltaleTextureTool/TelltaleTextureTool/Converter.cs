@@ -10,6 +10,7 @@ using System.ComponentModel;
 using Hexa.NET.DirectXTex;
 using TelltaleTextureTool.Telltale.FileTypes.D3DTX;
 using TelltaleTextureTool.TelltaleEnums;
+using TelltaleTextureTool.Graphics;
 
 namespace TelltaleTextureTool;
 
@@ -66,7 +67,7 @@ public static class Converter
             var texturesMiniBulkList = textures.Skip(30 * i).Take(30);
 
             // Create a new thread and pass the conversion method as a parameter
-            threads[i] = new Thread(async () =>
+            threads[i] = new Thread(() =>
             {
                 foreach (var texture in texturesMiniBulkList)
                 {
@@ -136,10 +137,7 @@ public static class Converter
                     throw new Exception("Invalid file type.");
             }
         }
-        else if (oldTextureType == TextureType.PNG
-            || oldTextureType == TextureType.JPEG
-            || oldTextureType == TextureType.BMP
-            || oldTextureType == TextureType.TIFF || oldTextureType == TextureType.TGA || oldTextureType == TextureType.HDR)
+        else if (oldTextureType is TextureType.PNG or TextureType.JPEG or TextureType.BMP or TextureType.TIFF or TextureType.TGA or TextureType.HDR)
         {
             switch (newTextureType)
             {
@@ -235,17 +233,18 @@ public static class Converter
 
             Texture texture = new(sourceFilePath, oldTextureType, flags);
 
-            if (d3dtxMaster.d3dtxMetadata.TextureType == T3TextureType.eTxBumpmap ||
-                            d3dtxMaster.d3dtxMetadata.TextureType == T3TextureType.eTxNormalMap)
+            // Set the options for the converter
+            if (d3dtxMaster.d3dtxMetadata.TextureType is T3TextureType.eTxBumpmap or
+                            T3TextureType.eTxNormalMap)
             {
                 options.IsTelltaleNormalMap = true;
             }
-            else if (d3dtxMaster.d3dtxMetadata.TextureType == T3TextureType.eTxNormalXYMap)
+            else if (d3dtxMaster.d3dtxMetadata.TextureType is T3TextureType.eTxNormalXYMap)
             {
                 options.IsTelltaleNormalMap = true;
             }
 
-            if (d3dtxMaster.d3dtxMetadata.SurfaceGamma == T3SurfaceGamma.sRGB)
+            if (d3dtxMaster.d3dtxMetadata.SurfaceGamma is T3SurfaceGamma.sRGB)
             {
                 options.IsSRGB = true;
             }

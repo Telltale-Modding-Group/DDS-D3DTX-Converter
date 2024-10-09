@@ -2,6 +2,7 @@ using System.IO;
 using TelltaleTextureTool.Utilities;
 
 namespace TelltaleTextureTool.TelltaleTypes;
+
 public struct TelltaleBoolean
 {
     public bool mbTelltaleBoolean;

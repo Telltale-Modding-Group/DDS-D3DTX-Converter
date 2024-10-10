@@ -317,22 +317,20 @@
                                       IsExpanded="{Binding IsImageInformationVisible}">
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <Label Name="ImagepreviewImageNameLabel"
-                                               Width="130"
+                                        <Label Width="130"
                                                Content="File Name:"
                                                HorizontalAlignment="Left" />
-                                        <SelectableTextBlock Name="ImagepreviewImageNameTextblock"
-                                                             Text="{Binding ImageNamePreview}"
+                                        <SelectableTextBlock Text="{Binding ImageNamePreview}"
                                                              ToolTip.Tip="{Binding ImageNamePreview}"
                                                              HorizontalAlignment="Left"
                                                              VerticalAlignment="Center"
                                                              ScrollViewer.HorizontalScrollBarVisibility="Auto" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <Label Name="ImagepropertiesFilenameLabel"
-                                               Content="Image Name:"
+                                        <Label Content="Image Name:"
                                                Width="130"
-                                               HorizontalAlignment="Left" />
+                                               HorizontalAlignment="Left"
+                                               ToolTip.Tip="The embedded texture name inside D3DTX files." />
                                         <SelectableTextBlock Name="ImagepropertiesFilenameTextblock"
                                                              Text="{Binding ImageProperties.Name}"
                                                              ToolTip.Tip="{Binding ImageProperties.Name}"
@@ -342,56 +340,51 @@
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <!-- Width -->
-                                        <Label Name="WidthLabel"
-                                               Content="Pixel Width:"
+                                        <Label Content="Pixel Width:"
                                                Width="130"
-                                               HorizontalAlignment="Left" />
-                                        <SelectableTextBlock Name="WidthTextblock"
-                                                             Text="{Binding ImageProperties.Width}"
+                                               HorizontalAlignment="Left"
+                                               ToolTip.Tip="The main width of the image." />
+                                        <SelectableTextBlock Text="{Binding ImageProperties.Width}"
                                                              HorizontalAlignment="Left"
                                                              VerticalAlignment="Center" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <!-- Height -->
-                                        <Label Name="HeightLabel"
-                                               Content="Pixel Height:"
+                                        <Label Content="Pixel Height:"
                                                Width="130"
-                                               HorizontalAlignment="Left" />
-                                        <SelectableTextBlock Name="HeightTextblock"
-                                                             Text="{Binding ImageProperties.Height}"
+                                               HorizontalAlignment="Left"
+                                               ToolTip.Tip="The main height of the image." />
+                                        <SelectableTextBlock Text="{Binding ImageProperties.Height}"
                                                              HorizontalAlignment="Left"
                                                              VerticalAlignment="Center" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <!-- Surface Format -->
-                                        <Label Name="CompressionTypeLabel"
-                                               Content="Surface Format:"
+                                        <Label Content="Surface Format:"
                                                Width="130"
-                                               HorizontalAlignment="Left" />
-                                        <SelectableTextBlock Name="CompressiontypeTextblock"
-                                                             Text="{Binding ImageProperties.SurfaceFormat}"
+                                               HorizontalAlignment="Left"
+                                               ToolTip.Tip="The pixel format of the image. BC stands for Block Compression." />
+                                        <SelectableTextBlock Text="{Binding ImageProperties.SurfaceFormat}"
                                                              HorizontalAlignment="Left"
                                                              VerticalAlignment="Center" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <!-- Bits Per Pixel -->
-                                        <Label Name="ColorSpaceCountLabel"
-                                               Content="Color Space:"
+                                        <Label Content="Color Space:"
                                                Width="130"
-                                               HorizontalAlignment="Left" />
-                                        <SelectableTextBlock Name="ColorSpaceCountTextblock"
-                                                             Text="{Binding ImageProperties.SurfaceGamma}"
+                                               HorizontalAlignment="Left"
+                                               ToolTip.Tip="There are mainly two color spaces: Linear and sRGB. Newer games use sRGB color space. If your texture appears brighter in the game, make sure the color space is sRGB." />
+                                        <SelectableTextBlock Text="{Binding ImageProperties.SurfaceGamma}"
                                                              HorizontalAlignment="Left"
                                                              VerticalAlignment="Center" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <!-- Mipmap Count -->
-                                        <Label Name="MipMapcountLabel"
-                                               Content="Mipmap Count:"
+                                        <!-- Mip Count -->
+                                        <Label Content="Mip Count:"
                                                Width="130"
-                                               HorizontalAlignment="Left" />
-                                        <SelectableTextBlock Name="MipMapCountTextblock"
-                                                             Text="{Binding ImageProperties.MipMapCount}"
+                                               HorizontalAlignment="Left"
+                                               ToolTip.Tip="The mip (mipmap) count of the texture. If the mip count is 1, then the texture does NOT have mips." />
+                                        <SelectableTextBlock Text="{Binding ImageProperties.MipMapCount}"
                                                              HorizontalAlignment="Left"
                                                              VerticalAlignment="Center" />
                                     </StackPanel>
@@ -399,19 +392,19 @@
                                         <!-- Array Size -->
                                         <Label Content="Array Size:"
                                                Width="130"
-                                               HorizontalAlignment="Left" />
+                                               HorizontalAlignment="Left"
+                                               ToolTip.Tip="If the count is above 1, that means the texture is an array map. Array maps are used for lighting." />
                                         <SelectableTextBlock Text="{Binding ImageProperties.ArraySize}"
                                                              HorizontalAlignment="Left"
                                                              VerticalAlignment="Center" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <!-- Has Alpha Count -->
-                                        <Label Name="HasAlphaLabel"
-                                               Content="Has Transparency:"
+                                        <Label Content="Has Transparency:"
                                                Width="130"
-                                               HorizontalAlignment="Left" />
-                                        <SelectableTextBlock Name="HasAlphaTextblock"
-                                                             Text="{Binding ImageProperties.HasAlpha}"
+                                               HorizontalAlignment="Left"
+                                               ToolTip.Tip="This mainly represents if the pixel format can support alpha data (transparency)." />
+                                        <SelectableTextBlock Text="{Binding ImageProperties.HasAlpha}"
                                                              HorizontalAlignment="Left"
                                                              VerticalAlignment="Center" />
                                     </StackPanel>
@@ -419,7 +412,8 @@
                                         <!-- Alpha Mode -->
                                         <Label Content="Alpha Mode:"
                                                Width="130"
-                                               HorizontalAlignment="Left" />
+                                               HorizontalAlignment="Left"
+                                               ToolTip.Tip="Some additional alpha-related information." />
                                         <SelectableTextBlock Text="{Binding ImageProperties.AlphaMode}"
                                                              HorizontalAlignment="Left"
                                                              VerticalAlignment="Center" />
@@ -428,7 +422,8 @@
                                         <!-- Texture Layout Count -->
                                         <Label Content="Texture Layout:"
                                                Width="130"
-                                               HorizontalAlignment="Left" />
+                                               HorizontalAlignment="Left"
+                                               ToolTip.Tip="This is usually 2DTexture. Cubemap indicates that the texture is used for environmental lighting." />
                                         <SelectableTextBlock Text="{Binding ImageProperties.TextureLayout}"
                                                              HorizontalAlignment="Left"
                                                              VerticalAlignment="Center" />
@@ -449,7 +444,8 @@
                                                VerticalAlignment="Top"
                                                HorizontalAlignment="Left"
                                                VerticalContentAlignment="Center"
-                                               Height="30" />
+                                               Height="30"
+                                               ToolTip.Tip="Select the correct game to load the texture faster. Use default if it is a newer game." />
                                         <ComboBox Grid.Column="1"
                                                   ItemsSource="{Binding Games}"
                                                   SelectedItem="{Binding ImageAdvancedOptions.GameID, Mode=TwoWay}"
@@ -457,7 +453,7 @@
                                                   VerticalAlignment="Bottom"
                                                   Height="30"
                                                   IsEnabled="{Binding VersionConvertComboBoxStatus}"
-                                                  ToolTip.Tip="Choose the conversion option. Use the default option unless you want to edit legacy titles.">
+                                                  ToolTip.Tip="Select the correct game to load the texture faster. Use default if it is a newer game.">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding Converter={StaticResource EnumDisplayNameConverter}}" />
@@ -472,14 +468,15 @@
                                             Height="3"
                                             CornerRadius="10" />
                                     <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableAutomaticCompression, Mode=TwoWay}"
-                                              ToolTip.Tip="Enable this option if you want to compress your textures. Works only for DXT/BC compression.">Auto Compression</CheckBox>
+                                              ToolTip.Tip="Enable this option if you want to compress your textures. Works only for DXT/BC compressions.">Auto Compression</CheckBox>
                                     <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableTelltaleNormalMap, Mode=TwoWay}"
-                                              ToolTip.Tip="When enabled, the channels are reversed for RGB normal maps and BC5 compression is used on RG normal maps.">Auto Normal Maps</CheckBox>
+                                              ToolTip.Tip="When enabled, the channels are reversed for RGBA normal maps and BC5 compression is used on RG normal maps.">Auto Normal Maps</CheckBox>
                                     <Border Background="Gray"
                                             HorizontalAlignment="Stretch"
                                             Height="3"
                                             CornerRadius="10" />
-                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableMips, Mode=TwoWay}">Enable Mipmaps</CheckBox>
+                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableMips, Mode=TwoWay}"
+                                              ToolTip.Tip="When enabled, you can auto generate mips or select the number manually. The latter option is be used for console and mobile games.">Enable Mipmaps</CheckBox>
                                     <Grid RowDefinitions="auto, auto"
                                           ColumnDefinitions="auto, 10, *"
                                           IsVisible="{Binding ImageAdvancedOptions.EnableMips}">
@@ -509,7 +506,8 @@
                                             HorizontalAlignment="Stretch"
                                             Height="3"
                                             CornerRadius="10" />
-                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableSwizzle, Mode=TwoWay}">Enable Swizzling</CheckBox>
+                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableSwizzle, Mode=TwoWay}"
+                                              ToolTip.Tip="When enabled, you can select to either swizzle or deswizzle the texture. It is used for console games.">Enable Swizzling</CheckBox>
                                     <Grid RowDefinitions="auto, auto"
                                           ColumnDefinitions="auto, 10,  *"
                                           IsVisible="{Binding ImageAdvancedOptions.EnableSwizzle}">
@@ -549,7 +547,8 @@
                                             HorizontalAlignment="Stretch"
                                             Height="3"
                                             CornerRadius="10" />
-                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableEditing}">Enable Effects</CheckBox>
+                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableEditing}"
+                                              ToolTip.Tip="You can apply an effect to your texture. This is mainly used for normal maps.">Enable Effects</CheckBox>
                                     <Grid ColumnDefinitions="auto, *"
                                           IsVisible="{Binding ImageAdvancedOptions.EnableEditing}">
                                         <Label Grid.Column="0"
@@ -571,34 +570,12 @@
                                             HorizontalAlignment="Stretch"
                                             Height="3"
                                             CornerRadius="10" />
-                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableNormalMap}">Create Normal Map</CheckBox>
+                                    <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableNormalMap}"
+                                              ToolTip.Tip="When enabled, the converted texture becomes a normal map. However, the current quality is not good enough.">Create Normal Map</CheckBox>
                                     <Border Background="Gray"
                                             HorizontalAlignment="Stretch"
                                             Height="3"
                                             CornerRadius="10" />
-                                    <!-- <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableAlpha, Mode=TwoWay}">Enable Alpha</CheckBox>
-                                    <Grid ColumnDefinitions="auto, auto"
-                                          IsVisible="{Binding ImageAdvancedOptions.EnableAlpha}">
-                                        <Label Content="D3DTX Alpha:"
-                                               HorizontalAlignment="Left"
-                                               VerticalContentAlignment="Center"
-                                               Height="30" />
-                                        <ComboBox Grid.Column="2"
-                                                  ItemsSource="{Binding FormatsList}"
-                                                  SelectedItem="{Binding SelectedFormat}"
-                                                  VerticalAlignment="Top"
-                                                  Width="160"
-                                                  Height="30"
-                                                  IsEnabled="{Binding ComboBoxStatus}"
-                                                  ToolTip.Tip="Games List">
-                                            <ComboBox.ItemTemplate>
-                                                <DataTemplate>
-                                                    <TextBlock Text="{Binding Name}"
-                                                               IsEnabled="{Binding ItemStatus}" />
-                                                </DataTemplate>
-                                            </ComboBox.ItemTemplate>
-                                        </ComboBox>
-                                    </Grid> -->
                                 </StackPanel>
                             </Expander>
                             <Expander Header="Debug Information"

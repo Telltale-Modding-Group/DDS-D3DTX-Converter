@@ -50,7 +50,6 @@ This is an application designed to preview and convert **Telltale textures** (fi
 - Guardians of the Galaxy: The Telltale Series 
 - Game of Thrones
 - Jurassic Park
-- Poker Knight 2
 - Back to the Future: The Game
 - Hector: Badge of Carnage
 - Telltale Texas Hold’em
@@ -61,8 +60,9 @@ This is an application designed to preview and convert **Telltale textures** (fi
 - Tales of Monkey Island
 - Hector: Badge of Carnage
 - Nelson Tethers: Puzzle Agent
-- Poker Night at the Inventory
 - Puzzle Agent 2
+- Poker Night at the Inventory
+- Poker Knight 2
 - CSI: 3 Dimensions of Murder
 - CSI: Hard Evidence
 - CSI: Deadly Intent
@@ -71,7 +71,7 @@ This is an application designed to preview and convert **Telltale textures** (fi
 
 ## Notes and Limitations
 
-1. This is primarily aimed for PC-platform games. There's some support for console and mobile platforms. More information can be found in the documentation.
+1. This is primarily aimed for PC-platform games. There is some support for console and mobile platforms. More information can be found in the documentation.
 2. It does not decrypt textures, please use Telltale Explorer to get the converted ones.
 3. MacOS support is not tested. Please report any issues!
 
@@ -100,7 +100,7 @@ The latest CLI version is on v2.4.0 and it will not support v2.5.0.
 - Thanks to [Lucas Saragosa](https://github.com/LucasSaragosa) for figuring out the Telltale formats and for his help for parsing the D3DTX correctly for all supported games. His [TelltaleToolLib](https://github.com/LucasSaragosa/TelltaleToolLib) project served as a reference, which had a lot of influence in the conversion process.
 - Thanks to [Knollad Knolladious](https://github.com/LBPHaxMods) for his outstanding feedback and research. His discoveries from **Minecraft: Story mode** series led to array textures and volumemaps support, as well as many other things.
 - Thanks to [Arrizble](https://www.youtube.com/@arizzble2005) for creating a tutorial, testing the software on **Minecraft: Story mode** series and providing critical feedback.
-- Thanks to the [Juna Meinhold](https://github.com/JunaMeinhold) for her DirectXTex wrapper.
+- Thanks to [Juna Meinhold](https://github.com/JunaMeinhold) for their cross-platform DirectXTex wrapper.
 - Thanks to the [DirectXTexNet's](https://github.com/deng0/DirectXTexNet) authors for providing an amazing stable and reliable wrapper.
 - Thanks to [Chuck Walbourn](https://github.com/walbourn) for DirectXTex and adding support for obsolete Direct3D9 formats, which are used by older Telltale games.
 - Thanks to [SVG Repo](https://www.svgrepo.com/) for their amazing GUI icons.

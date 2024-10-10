@@ -376,7 +376,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <!-- Bits Per Pixel -->
                                         <Label Name="ColorSpaceCountLabel"
-                                               Content="Color Space"
+                                               Content="Color Space:"
                                                Width="130"
                                                HorizontalAlignment="Left" />
                                         <SelectableTextBlock Name="ColorSpaceCountTextblock"

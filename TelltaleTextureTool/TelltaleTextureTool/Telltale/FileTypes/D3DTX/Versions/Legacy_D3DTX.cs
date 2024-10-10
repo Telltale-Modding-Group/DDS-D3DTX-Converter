@@ -253,12 +253,12 @@ namespace TelltaleTextureTool.TelltaleD3DTX
 
         public void WriteToBinary(BinaryWriter writer, TelltaleToolGame game = TelltaleToolGame.DEFAULT, T3PlatformType platform = T3PlatformType.ePlatform_None, bool printDebug = false)
         {
-            if (game == TelltaleToolGame.DEFAULT || game == TelltaleToolGame.UNKNOWN)
+            if (game is TelltaleToolGame.DEFAULT || game is TelltaleToolGame.UNKNOWN)
             {
                 throw new Exception("The game is not supported.");
             }
 
-            if (game == TelltaleToolGame.TEXAS_HOLD_EM_OG)
+            if (game is TelltaleToolGame.TEXAS_HOLD_EM_OG)
             {
                 writer.Write(mName_BlockSize);
                 ByteFunctions.WriteString(writer, mName);
@@ -271,7 +271,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 writer.Write(mHeight);
             }
 
-            if (game == TelltaleToolGame.THE_WALKING_DEAD)
+            if (game is TelltaleToolGame.THE_WALKING_DEAD)
             {
                 writer.Write(mSamplerState_BlockSize);
                 writer.Write(mSamplerState.mData);
@@ -307,9 +307,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 mUVScale.WriteBinaryData(writer);
             }
 
-            if (game == TelltaleToolGame.PUZZLE_AGENT_2 ||
-            game == TelltaleToolGame.LAW_AND_ORDER_LEGACIES ||
-            game == TelltaleToolGame.JURASSIC_PARK_THE_GAME)
+            if (game is TelltaleToolGame.PUZZLE_AGENT_2 or TelltaleToolGame.LAW_AND_ORDER_LEGACIES or TelltaleToolGame.JURASSIC_PARK_THE_GAME)
             {
                 writer.Write(mSamplerState_BlockSize);
                 writer.Write(mSamplerState.mData);
@@ -346,11 +344,11 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 mUVScale.WriteBinaryData(writer);
             }
 
-            if (game == TelltaleToolGame.NELSON_TETHERS_PUZZLE_AGENT ||
-            game == TelltaleToolGame.CSI_FATAL_CONSPIRACY ||
-            game == TelltaleToolGame.HECTOR_BADGE_OF_CARNAGE ||
-            game == TelltaleToolGame.BACK_TO_THE_FUTURE_THE_GAME ||
-            game == TelltaleToolGame.POKER_NIGHT_AT_THE_INVENTORY)
+            if (game is TelltaleToolGame.NELSON_TETHERS_PUZZLE_AGENT or
+            TelltaleToolGame.CSI_FATAL_CONSPIRACY or
+            TelltaleToolGame.HECTOR_BADGE_OF_CARNAGE or
+            TelltaleToolGame.BACK_TO_THE_FUTURE_THE_GAME or
+            TelltaleToolGame.POKER_NIGHT_AT_THE_INVENTORY)
             {
                 writer.Write(mSamplerState_BlockSize);
                 writer.Write(mSamplerState.mData);
@@ -382,11 +380,11 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 writer.Write(mNormalMapFmt);
             }
 
-            if (game == TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_104 ||
-            game == TelltaleToolGame.TALES_OF_MONKEY_ISLAND ||
-            game == TelltaleToolGame.CSI_DEADLY_INTENT ||
-            game == TelltaleToolGame.SAM_AND_MAX_THE_DEVILS_PLAYHOUSE ||
-            game == TelltaleToolGame.SAM_AND_MAX_SAVE_THE_WORLD_2007)
+            if (game is TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_104 or
+            TelltaleToolGame.TALES_OF_MONKEY_ISLAND or
+            TelltaleToolGame.CSI_DEADLY_INTENT or
+            TelltaleToolGame.SAM_AND_MAX_THE_DEVILS_PLAYHOUSE or
+            TelltaleToolGame.SAM_AND_MAX_SAVE_THE_WORLD_2007)
             {
                 writer.Write(mName_BlockSize);
                 ByteFunctions.WriteString(writer, mName);
@@ -418,9 +416,9 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 writer.Write(mNormalMapFmt);
             }
 
-            if (game == TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_101 ||
-            game == TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_102 ||
-            game == TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_103)
+            if (game is TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_101 or
+            TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_102 or
+            TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_103)
             {
                 writer.Write(mName_BlockSize);
                 ByteFunctions.WriteString(writer, mName);
@@ -452,7 +450,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 writer.Write(mNormalMapFmt);
             }
 
-            if (game == TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_105)
+            if (game is TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_105)
             {
                 writer.Write(mName_BlockSize);
                 ByteFunctions.WriteString(writer, mName);
@@ -482,7 +480,8 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 writer.Write(mDetailMapBrightness);
             }
 
-            if (game == TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_103 || game == TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_104)
+            if (game is TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_103 or
+            TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_104)
             {
                 writer.Write(mName_BlockSize);
                 ByteFunctions.WriteString(writer, mName);
@@ -514,68 +513,8 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 writer.Write(mDetailMapBrightness);
             }
 
-            if (game == TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_102 || game == TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_101)
-            {
-                writer.Write(mName_BlockSize);
-                ByteFunctions.WriteString(writer, mName);
-                writer.Write(mImportName_BlockSize);
-                ByteFunctions.WriteString(writer, mImportName);
-                ByteFunctions.WriteBoolean(writer, mbHasTextureData.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbIsMipMapped.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbIsWrapU.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbIsWrapV.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbIsFiltered.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbEmbedMipMaps.mbTelltaleBoolean);
-                writer.Write(mNumMipLevels);
-                writer.Write((uint)mD3DFormat);
-                writer.Write(mWidth);
-                writer.Write(mHeight);
-                writer.Write(mWiiForceWidth);
-                writer.Write(mWiiForceHeight);
-                ByteFunctions.WriteBoolean(writer, mbWiiForceUncompressed.mbTelltaleBoolean);
-                writer.Write(mTextureDataFormats);
-                writer.Write(mTplTextureDataSize);
-                writer.Write(mJPEGTextureDataSize);
-                writer.Write((int)mAlphaMode);
-                writer.Write((int)mWiiTextureFormat);
-                ByteFunctions.WriteBoolean(writer, mbAlphaHDR.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbEncrypted.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbUsedAsBumpmap.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbUsedAsDetailMap.mbTelltaleBoolean);
-                writer.Write(mDetailMapBrightness);
-            }
-
-            if (game == TelltaleToolGame.TEXAS_HOLD_EM_V1 || game == TelltaleToolGame.SAM_AND_MAX_BEYOND_TIME_AND_SPACE_NEW)
-            {
-                writer.Write(mName_BlockSize);
-                ByteFunctions.WriteString(writer, mName);
-                writer.Write(mImportName_BlockSize);
-                ByteFunctions.WriteString(writer, mImportName);
-                ByteFunctions.WriteBoolean(writer, mbHasTextureData.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbIsMipMapped.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbIsWrapU.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbIsWrapV.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbIsFiltered.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbEmbedMipMaps.mbTelltaleBoolean);
-                writer.Write(mNumMipLevels);
-                writer.Write((uint)mD3DFormat);
-                writer.Write(mWidth);
-                writer.Write(mHeight);
-                writer.Write(mWiiForceWidth);
-                writer.Write(mWiiForceHeight);
-                ByteFunctions.WriteBoolean(writer, mbWiiForceUncompressed.mbTelltaleBoolean);
-                writer.Write(mTplTextureDataSize);
-                writer.Write(mTextureDataFormats);
-                writer.Write((int)mAlphaMode);
-                writer.Write((int)mWiiTextureFormat);
-                ByteFunctions.WriteBoolean(writer, mbAlphaHDR.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbEncrypted.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbUsedAsBumpmap.mbTelltaleBoolean);
-                ByteFunctions.WriteBoolean(writer, mbUsedAsDetailMap.mbTelltaleBoolean);
-                writer.Write(mDetailMapBrightness);
-            }
-
-            if (game == TelltaleToolGame.CSI_HARD_EVIDENCE || game == TelltaleToolGame.SAM_AND_MAX_BEYOND_TIME_AND_SPACE_OG)
+            if (game is TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_101 or
+            TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_102)
             {
                 writer.Write(mName_BlockSize);
                 ByteFunctions.WriteString(writer, mName);
@@ -606,7 +545,71 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 writer.Write(mDetailMapBrightness);
             }
 
-            if (game == TelltaleToolGame.BONE_OUT_FROM_BONEVILLE || game == TelltaleToolGame.BONE_THE_GREAT_COW_RACE)
+            if (game is TelltaleToolGame.TEXAS_HOLD_EM_V1 or
+            TelltaleToolGame.SAM_AND_MAX_BEYOND_TIME_AND_SPACE_NEW)
+            {
+                writer.Write(mName_BlockSize);
+                ByteFunctions.WriteString(writer, mName);
+                writer.Write(mImportName_BlockSize);
+                ByteFunctions.WriteString(writer, mImportName);
+                ByteFunctions.WriteBoolean(writer, mbHasTextureData.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbIsMipMapped.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbIsWrapU.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbIsWrapV.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbIsFiltered.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbEmbedMipMaps.mbTelltaleBoolean);
+                writer.Write(mNumMipLevels);
+                writer.Write((uint)mD3DFormat);
+                writer.Write(mWidth);
+                writer.Write(mHeight);
+                writer.Write(mWiiForceWidth);
+                writer.Write(mWiiForceHeight);
+                ByteFunctions.WriteBoolean(writer, mbWiiForceUncompressed.mbTelltaleBoolean);
+                writer.Write(mType);
+                writer.Write(mTextureDataFormats);
+                writer.Write(mTplTextureDataSize);
+                writer.Write((int)mAlphaMode);
+                ByteFunctions.WriteBoolean(writer, mbAlphaHDR.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbEncrypted.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbUsedAsBumpmap.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbUsedAsDetailMap.mbTelltaleBoolean);
+                writer.Write(mDetailMapBrightness);
+            }
+
+            if (game is TelltaleToolGame.CSI_HARD_EVIDENCE or
+            TelltaleToolGame.SAM_AND_MAX_BEYOND_TIME_AND_SPACE_OG)
+            {
+                writer.Write(mName_BlockSize);
+                ByteFunctions.WriteString(writer, mName);
+                writer.Write(mImportName_BlockSize);
+                ByteFunctions.WriteString(writer, mImportName);
+                ByteFunctions.WriteBoolean(writer, mbHasTextureData.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbIsMipMapped.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbIsWrapU.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbIsWrapV.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbIsFiltered.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbEmbedMipMaps.mbTelltaleBoolean);
+                writer.Write(mNumMipLevels);
+                writer.Write((uint)mD3DFormat);
+                writer.Write(mWidth);
+                writer.Write(mHeight);
+                writer.Write(mWiiForceWidth);
+                writer.Write(mWiiForceHeight);
+                ByteFunctions.WriteBoolean(writer, mbWiiForceUncompressed.mbTelltaleBoolean);
+                writer.Write(mType);
+                writer.Write(mTextureDataFormats);
+                writer.Write(mTplTextureDataSize);
+                writer.Write((int)mAlphaMode);
+                writer.Write((int)mWiiTextureFormat);
+                ByteFunctions.WriteBoolean(writer, mbAlphaHDR.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbEncrypted.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbUsedAsBumpmap.mbTelltaleBoolean);
+                ByteFunctions.WriteBoolean(writer, mbUsedAsDetailMap.mbTelltaleBoolean);
+                writer.Write(mDetailMapBrightness);
+            }
+
+            if (game is TelltaleToolGame.BONE_OUT_FROM_BONEVILLE or
+            TelltaleToolGame.BONE_THE_GREAT_COW_RACE)
             {
                 writer.Write(mName_BlockSize);
                 ByteFunctions.WriteString(writer, mName);
@@ -629,7 +632,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 writer.Write(mDetailMapBrightness);
             }
 
-            if (game == TelltaleToolGame.CSI_3_DIMENSIONS)
+            if (game is TelltaleToolGame.CSI_3_DIMENSIONS)
             {
                 writer.Write(mName_BlockSize);
                 ByteFunctions.WriteString(writer, mName);
@@ -649,7 +652,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 ByteFunctions.WriteBoolean(writer, mbAlphaHDR.mbTelltaleBoolean);
             }
 
-            if (game == TelltaleToolGame.SAM_AND_MAX_SAVE_THE_WORLD_2006)
+            if (game is TelltaleToolGame.SAM_AND_MAX_SAVE_THE_WORLD_2006)
             {
                 writer.Write(mName_BlockSize);
                 ByteFunctions.WriteString(writer, mName);
@@ -675,7 +678,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 ByteFunctions.WriteBoolean(writer, mbUsedAsDetailMap.mbTelltaleBoolean);
             }
 
-            if (platform != T3PlatformType.ePlatform_None)
+            if (platform is not T3PlatformType.ePlatform_None)
             {
                 writer.Write(mEmptyBuffer);
             }
@@ -713,7 +716,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                 isValid = true;
                 // I know there is a lot of repetition and ifs, but the way Telltale have updated their textures is unreliable and I would prefer to have an easier time reading the data.
 
-                if (game == TelltaleToolGame.TEXAS_HOLD_EM_OG)
+                if (game is TelltaleToolGame.TEXAS_HOLD_EM_OG)
                 {
                     mName_BlockSize = reader.ReadInt32();
                     mName = ByteFunctions.ReadString(reader);
@@ -727,7 +730,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mHeight = reader.ReadUInt32();
                 }
 
-                if (game == TelltaleToolGame.THE_WALKING_DEAD)
+                if (game is TelltaleToolGame.THE_WALKING_DEAD)
                 {
                     mSamplerState_BlockSize = reader.ReadInt32();
                     mSamplerState = new T3SamplerStateBlock() //mSamplerState [4 bytes]
@@ -767,9 +770,9 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mUVScale = new Vector2(reader); //mUVScale [8 bytes]
                 }
 
-                if (game == TelltaleToolGame.PUZZLE_AGENT_2 ||
-                game == TelltaleToolGame.LAW_AND_ORDER_LEGACIES ||
-                game == TelltaleToolGame.JURASSIC_PARK_THE_GAME)
+                if (game is TelltaleToolGame.PUZZLE_AGENT_2 or
+                TelltaleToolGame.LAW_AND_ORDER_LEGACIES or
+                TelltaleToolGame.JURASSIC_PARK_THE_GAME)
                 {
                     mSamplerState_BlockSize = reader.ReadInt32();
                     mSamplerState = new T3SamplerStateBlock() //mSamplerState [4 bytes]
@@ -810,11 +813,11 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mUVScale = new Vector2(reader); //mUVScale [8 bytes]
                 }
 
-                if (game == TelltaleToolGame.NELSON_TETHERS_PUZZLE_AGENT ||
-                game == TelltaleToolGame.CSI_FATAL_CONSPIRACY ||
-                game == TelltaleToolGame.HECTOR_BADGE_OF_CARNAGE ||
-                game == TelltaleToolGame.BACK_TO_THE_FUTURE_THE_GAME ||
-                game == TelltaleToolGame.POKER_NIGHT_AT_THE_INVENTORY)
+                if (game is TelltaleToolGame.NELSON_TETHERS_PUZZLE_AGENT or
+                TelltaleToolGame.CSI_FATAL_CONSPIRACY or
+                TelltaleToolGame.HECTOR_BADGE_OF_CARNAGE or
+                TelltaleToolGame.BACK_TO_THE_FUTURE_THE_GAME or
+                TelltaleToolGame.POKER_NIGHT_AT_THE_INVENTORY)
                 {
                     mSamplerState_BlockSize = reader.ReadInt32();
                     mSamplerState = new T3SamplerStateBlock(reader); //mSamplerState [4 bytes]
@@ -849,11 +852,11 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mNormalMapFmt = reader.ReadInt32();
                 }
 
-                if (game == TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_104 ||
-                game == TelltaleToolGame.TALES_OF_MONKEY_ISLAND ||
-                game == TelltaleToolGame.CSI_DEADLY_INTENT ||
-                game == TelltaleToolGame.SAM_AND_MAX_THE_DEVILS_PLAYHOUSE ||
-                game == TelltaleToolGame.SAM_AND_MAX_SAVE_THE_WORLD_2007)
+                if (game is TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_104 or
+                TelltaleToolGame.TALES_OF_MONKEY_ISLAND or
+                TelltaleToolGame.CSI_DEADLY_INTENT or
+                TelltaleToolGame.SAM_AND_MAX_THE_DEVILS_PLAYHOUSE or
+                TelltaleToolGame.SAM_AND_MAX_SAVE_THE_WORLD_2007)
                 {
                     mName_BlockSize = reader.ReadInt32();
                     mName = ByteFunctions.ReadString(reader);
@@ -886,9 +889,9 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mNormalMapFmt = reader.ReadInt32();
                 }
 
-                if (game == TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_101 ||
-                game == TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_102 ||
-                game == TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_103)
+                if (game is TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_101 or
+                TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_102 or
+                TelltaleToolGame.WALLACE_AND_GROMITS_GRAND_ADVENTURES_103)
                 {
                     mName_BlockSize = reader.ReadInt32();
                     mName = ByteFunctions.ReadString(reader);
@@ -921,7 +924,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mNormalMapFmt = reader.ReadInt32();
                 }
 
-                if (game == TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_105)
+                if (game is TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_105)
                 {
                     mName_BlockSize = reader.ReadInt32();
                     mName = ByteFunctions.ReadString(reader);
@@ -953,7 +956,8 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mDetailMapBrightness = reader.ReadSingle();
                 }
 
-                if (game == TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_103 || game == TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_104)
+                if (game is TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_103 or
+                TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_104)
                 {
                     mName_BlockSize = reader.ReadInt32();
                     mName = ByteFunctions.ReadString(reader);
@@ -986,7 +990,8 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mDetailMapBrightness = reader.ReadSingle();
                 }
 
-                if (game == TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_102 || game == TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_101)
+                if (game is TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_102 or
+                TelltaleToolGame.STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_101)
                 {
                     mName_BlockSize = reader.ReadInt32();
                     mName = ByteFunctions.ReadString(reader);
@@ -1006,11 +1011,10 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mWiiForceWidth = reader.ReadUInt32();
                     mWiiForceHeight = reader.ReadUInt32();
                     mbWiiForceUncompressed = new TelltaleBoolean(reader);
+                    mType = reader.ReadUInt32();
                     mTextureDataFormats = reader.ReadUInt32();
                     mTplTextureDataSize = reader.ReadUInt32();
-                    mJPEGTextureDataSize = reader.ReadUInt32();
                     mAlphaMode = (T3TextureAlphaMode)reader.ReadInt32();
-
                     mWiiTextureFormat = (WiiTextureFormat)reader.ReadInt32();
                     mbAlphaHDR = new TelltaleBoolean(reader);
                     mbUsedAsBumpmap = new TelltaleBoolean(reader);
@@ -1019,7 +1023,8 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mDetailMapBrightness = reader.ReadSingle();
                 }
 
-                if (game == TelltaleToolGame.TEXAS_HOLD_EM_V1 || game == TelltaleToolGame.SAM_AND_MAX_BEYOND_TIME_AND_SPACE_NEW)
+                if (game is TelltaleToolGame.TEXAS_HOLD_EM_V1 or
+                TelltaleToolGame.SAM_AND_MAX_BEYOND_TIME_AND_SPACE_NEW)
                 {
                     mName_BlockSize = reader.ReadInt32();
                     mName = ByteFunctions.ReadString(reader);
@@ -1031,7 +1036,6 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mbIsWrapV = new TelltaleBoolean(reader);
                     mbIsFiltered = new TelltaleBoolean(reader);
                     mbEmbedMipMaps = new TelltaleBoolean(reader);
-
                     mNumMipLevels = reader.ReadUInt32();
                     mD3DFormat = (LegacyFormat)reader.ReadUInt32();
                     mWidth = reader.ReadUInt32();
@@ -1039,10 +1043,10 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mWiiForceWidth = reader.ReadUInt32();
                     mWiiForceHeight = reader.ReadUInt32();
                     mbWiiForceUncompressed = new TelltaleBoolean(reader);
-                    mTplTextureDataSize = reader.ReadUInt32();
+                    mType = reader.ReadUInt32();
                     mTextureDataFormats = reader.ReadUInt32();
+                    mTplTextureDataSize = reader.ReadUInt32();
                     mAlphaMode = (T3TextureAlphaMode)reader.ReadInt32();
-
                     mWiiTextureFormat = (WiiTextureFormat)reader.ReadInt32();
                     mbAlphaHDR = new TelltaleBoolean(reader);
                     mbEncrypted = new TelltaleBoolean(reader);
@@ -1051,7 +1055,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mDetailMapBrightness = reader.ReadSingle();
                 }
 
-                if (game == TelltaleToolGame.CSI_HARD_EVIDENCE)
+                if (game is TelltaleToolGame.CSI_HARD_EVIDENCE)
                 {
                     mName_BlockSize = reader.ReadInt32();
                     mName = ByteFunctions.ReadString(reader);
@@ -1078,7 +1082,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mDetailMapBrightness = reader.ReadSingle();
                 }
 
-                if (game == TelltaleToolGame.SAM_AND_MAX_BEYOND_TIME_AND_SPACE_OG)
+                if (game is TelltaleToolGame.SAM_AND_MAX_BEYOND_TIME_AND_SPACE_OG)
                 {
                     mName_BlockSize = reader.ReadInt32();
                     mName = ByteFunctions.ReadString(reader);
@@ -1109,7 +1113,8 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mDetailMapBrightness = reader.ReadSingle();
                 }
 
-                if (game == TelltaleToolGame.BONE_OUT_FROM_BONEVILLE || game == TelltaleToolGame.BONE_THE_GREAT_COW_RACE)
+                if (game is TelltaleToolGame.BONE_OUT_FROM_BONEVILLE or
+                TelltaleToolGame.BONE_THE_GREAT_COW_RACE)
                 {
                     mName_BlockSize = reader.ReadInt32();
                     mName = ByteFunctions.ReadString(reader);
@@ -1134,7 +1139,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mDetailMapBrightness = reader.ReadSingle();
                 }
 
-                if (game == TelltaleToolGame.CSI_3_DIMENSIONS)
+                if (game is TelltaleToolGame.CSI_3_DIMENSIONS)
                 {
                     mName_BlockSize = reader.ReadInt32();
                     mName = ByteFunctions.ReadString(reader);
@@ -1154,7 +1159,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mbEncrypted = new TelltaleBoolean(reader);
                 }
 
-                if (game == TelltaleToolGame.SAM_AND_MAX_SAVE_THE_WORLD_2006)
+                if (game is TelltaleToolGame.SAM_AND_MAX_SAVE_THE_WORLD_2006)
                 {
                     mName_BlockSize = reader.ReadInt32();
                     mName = ByteFunctions.ReadString(reader);
@@ -1183,9 +1188,13 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     mbUsedAsDetailMap = new TelltaleBoolean(reader);
                 }
 
-                if (platform != T3PlatformType.ePlatform_None)
+                if (platform is not T3PlatformType.ePlatform_None)
                 {
                     mEmptyBuffer = reader.ReadInt32(); //mEmptyBuffer [4 bytes]
+                    if (mEmptyBuffer != 0)
+                    {
+                        throw new Exception("The empty buffer is not 0!");
+                    }
                 }
 
                 PrintConsole(game);
@@ -1241,6 +1250,12 @@ namespace TelltaleTextureTool.TelltaleD3DTX
                     {
                         mJPEGTextureData[i] = reader.ReadByte();
                     }
+                }
+
+                if (reader.BaseStream.Position != reader.BaseStream.Length)
+                {
+                    PrintConsole();
+                    continue;
                 }
 
                 read = false;
@@ -1322,7 +1337,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
 
             string d3dtxInfo = "Game: " + Enum.GetName(typeof(TelltaleToolGame), game) + "\n";
 
-            d3dtxInfo = "|||||| D3DTX Info ||||||\n";
+            d3dtxInfo += "|||||| D3DTX Info ||||||\n";
             d3dtxInfo += "Name: " + mName + "\n";
             d3dtxInfo += "Import Name: " + mImportName + "\n";
             d3dtxInfo += "Has Texture Data: " + mbHasTextureData.mbTelltaleBoolean + "\n";

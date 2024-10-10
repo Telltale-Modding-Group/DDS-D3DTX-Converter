@@ -262,9 +262,9 @@
                                                 Width="120" />
                             <DataGridTextColumn Header="Data Modified"
                                                 Binding="{Binding FileLastWrite}"
+                                                FontSize="12"
                                                 HeaderTemplate="{StaticResource HeaderTemplate}"
-                                                Width="200"
-                                                IsVisible="False" />
+                                                Width="20" />
                         </DataGrid.Columns>
                         <DataGrid.ContextFlyout>
                             <MenuFlyout>

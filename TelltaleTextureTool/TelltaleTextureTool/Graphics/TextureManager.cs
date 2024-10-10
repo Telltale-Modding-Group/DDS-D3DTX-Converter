@@ -88,7 +88,7 @@ public unsafe static partial class TextureManager
             Console.WriteLine(e.Message);
             scratchImage.Release();
             throw new Exception("Failed to load image!");
-        }   
+        }
 
         string debugInfo = GetTextureDebugInfo(scratchImage.GetMetadata());
 
@@ -392,16 +392,14 @@ public unsafe static partial class TextureManager
 /// </summary>
 public unsafe partial class Texture
 {
-    public string FilePath { get; set; } = string.Empty;
-    private ScratchImage Image { get; set; }
     public TexMetadata Metadata { get; set; }
-
-    private ScratchImage OriginalImage { get; set; }
-    private TexMetadata OriginalMetadata { get; set; }
-
     public ImageAdvancedOptions CurrentOptions { get; set; } = new ImageAdvancedOptions();
     public TextureType TextureType { get; set; } = TextureType.Unknown;
+
+    private ScratchImage Image { get; set; }
+    private ScratchImage OriginalImage { get; set; }
     private DXGIFormat PreviewFormat { get; set; }
+    private string FilePath { get; set; } = string.Empty;
     private ulong PreviewWidth { get; set; }
     private ulong PreviewHeight { get; set; }
     private uint PreviewMip { get; set; } = 0;
@@ -440,7 +438,6 @@ public unsafe partial class Texture
         Blob blob = DirectXTex.CreateBlob();
         TexMetadata meta = new();
 
-        Console.WriteLine("DDS LENGTH: " + ddsData.Length);
         fixed (byte* srcPtr = src)
         {
             DirectXTex.LoadFromDDSMemory(srcPtr, (nuint)src.Length, flags, ref meta, ref Image).ThrowIf();
@@ -454,7 +451,6 @@ public unsafe partial class Texture
         else
         {
             OriginalImage = Image;
-            OriginalMetadata = meta;
         }
 
         blob.Release();
@@ -479,35 +475,8 @@ public unsafe partial class Texture
         return GetTextureDebugInfo(Metadata);
     }
 
-    public void ConvertToRGBA()
-    {
-        ScratchImage destImage = DirectXTex.CreateScratchImage();
-
-        TexMetadata ogMeta = Image.GetMetadata();
-        Decompress(DXGIFormat.R8G8B8A8_UNORM);
-
-        if (Image.GetMetadata().Format != (uint)DXGIFormat.R8G8B8A8_UNORM)
-        {
-            DirectXTex.Convert2(Image.GetImages(), Image.GetImageCount(), ref ogMeta, (int)DXGIFormat.R8G8B8A8_UNORM, TexFilterFlags.Default, 0.5f, ref destImage).ThrowIf();
-
-            Image.Release();
-            Image = destImage;
-        }
-        else
-        {
-            destImage.Release();
-        }
-
-        Metadata = Image.GetMetadata();
-    }
-
     public byte[] GetSectionPixelData(uint mip, uint face)
     {
-        if ((uint)Image.GetMetadata().Format != (uint)DXGIFormat.R8G8B8A8_UNORM)
-        {
-            ConvertToRGBA();
-        }
-
         uint slice = 0;
 
         // Swap slice and face if it's a 3D texture, because they don't have faces.
@@ -519,14 +488,46 @@ public unsafe partial class Texture
 
         var image = DirectXTex.GetImage(Image, (ulong)mip, (ulong)face, (ulong)slice);
 
-        PreviewFormat = (DXGIFormat)image->Format;
-        PreviewWidth = image->Width;
-        PreviewHeight = image->Height;
-        PreviewMip = mip;
+        ScratchImage destImage = DirectXTex.CreateScratchImage();
+        byte[] pixels;
 
-        byte[] pixels = new byte[image->SlicePitch];
+        try
+        {
+            DirectXTex.InitializeFromImage(destImage, *image, false, CPFlags.None);
 
-        Marshal.Copy((nint)image->Pixels, pixels, 0, pixels.Length);
+            if (DirectXTex.IsCompressed(destImage.GetMetadata().Format))
+            {
+                ScratchImage newDestImage = DirectXTex.CreateScratchImage();
+
+                DirectXTex.Decompress(destImage.GetImage(0, 0, 0), (int)DXGIFormat.R8G8B8A8_UNORM, ref newDestImage).ThrowIf();
+
+                destImage.Release();
+                destImage = newDestImage;
+            }
+
+            if (destImage.GetMetadata().Format != (uint)DXGIFormat.R8G8B8A8_UNORM)
+            {
+                ScratchImage newDestImage = DirectXTex.CreateScratchImage();
+
+                DirectXTex.Convert(destImage.GetImage(0, 0, 0), (int)DXGIFormat.R8G8B8A8_UNORM, TexFilterFlags.Default, 0.5f, ref newDestImage).ThrowIf();
+
+                destImage.Release();
+                destImage = newDestImage;
+            }
+
+            PreviewFormat = (DXGIFormat)destImage.GetMetadata().Format;
+            PreviewWidth = destImage.GetMetadata().Width;
+            PreviewHeight = destImage.GetMetadata().Height;
+            PreviewMip = mip;
+
+            pixels = new byte[destImage.GetImage(0, 0, 0)->SlicePitch];
+
+            Marshal.Copy((nint)destImage.GetImage(0, 0, 0)->Pixels, pixels, 0, pixels.Length);
+        }
+        finally
+        {
+            destImage.Release();
+        }
 
         return pixels;
     }
@@ -635,8 +636,6 @@ public unsafe partial class Texture
 
         DirectXTex.TransformImage2(Image.GetImages(), Image.GetImageCount(), ref texMetadata, transformFunction, ref transformedImage).ThrowIf();
 
-        Console.WriteLine("Transforming image" + Image.GetImageCount());
-
         Image.Release();
 
         Image = transformedImage;
@@ -693,7 +692,6 @@ public unsafe partial class Texture
                     OriginalImage.Release();
                 }
                 OriginalImage = scratchImage;
-                OriginalMetadata = texMetadata;
             }
 
         }
@@ -707,8 +705,6 @@ public unsafe partial class Texture
 
     private void ResetImageToOriginal()
     {
-        Metadata = OriginalMetadata;
-
         if (TextureType != TextureType.D3DTX)
         {
             Initialize(FilePath, TextureType, true, DDSFlags.None);
@@ -720,7 +716,13 @@ public unsafe partial class Texture
         }
     }
 
-    public void ChangePreviewImage(ImageAdvancedOptions options, bool keepOriginal = false)
+    /// <summary>
+    /// Changes the image itself based on the options provided.
+    /// </summary>
+    /// <param name="options"></param>
+    /// <param name="keepOriginal"></param>
+    /// <param name="convertingOnly"></param>
+    public void TransformTexture(ImageAdvancedOptions options, bool keepOriginal = false, bool convertingOnly = false)
     {
         ResetImageToOriginal();
 
@@ -800,6 +802,7 @@ public unsafe partial class Texture
         {
             Compress((DXGIFormat)OriginalImage.GetMetadata().Format);
         }
+
 
         if (options.EnableSwizzle && options.IsSwizzle)
         {

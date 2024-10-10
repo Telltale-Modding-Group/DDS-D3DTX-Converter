@@ -33,7 +33,7 @@ public class EnumDisplayNameConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value == null)
+        if (value is null)
             return string.Empty;
 
         // Get the field in the enum type that matches the current enum value
@@ -395,7 +395,7 @@ public partial class MainViewModel : ViewModelBase
                 var result = await MessageBoxManager.GetMessageBoxStandard(messageBox)
                     .ShowWindowDialogAsync(mainWindow);
 
-                if (result != ButtonResult.Yes) return;
+                if (result is not ButtonResult.Yes) return;
 
                 Directory.Delete(textureFilePath);
             }
@@ -489,7 +489,7 @@ public partial class MainViewModel : ViewModelBase
     {
         try
         {
-            if (DataGridSelectedItem == null)
+            if (DataGridSelectedItem is null)
                 return;
 
             var workingDirectoryFile =
@@ -514,7 +514,7 @@ public partial class MainViewModel : ViewModelBase
         try
         {
             // if there is no valid item selected, don't continue
-            if (DataGridSelectedItem == null)
+            if (DataGridSelectedItem is null)
                 return;
 
             // get our selected file object from the working directory
@@ -540,9 +540,9 @@ public partial class MainViewModel : ViewModelBase
     {
         try
         {
-            if (DirectoryPath == null) return;
+            if (DirectoryPath is null) return;
 
-            if (DataGridSelectedItem == null)
+            if (DataGridSelectedItem is null)
             {
                 if (Directory.Exists(DirectoryPath))
                     await OpenFileExplorer(DirectoryPath);
@@ -564,7 +564,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     public async Task RefreshDirectoryButton_Click()
     {
-        if (DirectoryPath != null && DirectoryPath != string.Empty)
+        if (DirectoryPath is not null && DirectoryPath != string.Empty)
         {
             await RefreshUiAsync();
         }
@@ -601,7 +601,7 @@ public partial class MainViewModel : ViewModelBase
     {
         try
         {
-            if (DataGridSelectedItem == null) return;
+            if (DataGridSelectedItem is null) return;
 
             var workingDirectoryFile =
                 DataGridSelectedItem;
@@ -624,7 +624,7 @@ public partial class MainViewModel : ViewModelBase
                     AllowMultiple = false,
                 });
 
-                if (folderPath is null || folderPath.Count == 0)
+                if (folderPath is null || folderPath.Count is 0)
                 {
                     return;
                 }
@@ -697,7 +697,7 @@ public partial class MainViewModel : ViewModelBase
     {
         try
         {
-            if (DataGridSelectedItem == null) return;
+            if (DataGridSelectedItem is null) return;
 
             var workingDirectoryFile =
                 DataGridSelectedItem;
@@ -706,7 +706,7 @@ public partial class MainViewModel : ViewModelBase
 
             string debugInfo = string.Empty;
 
-            if (workingDirectoryFile.FileType == ".d3dtx")
+            if (workingDirectoryFile.FileType is ".d3dtx")
             {
                 var d3dtx = new D3DTX_Master();
                 d3dtx.ReadD3DTXFile(textureFilePath, ImageAdvancedOptions.GameID, ImageAdvancedOptions.IsLegacyConsole);
@@ -777,7 +777,7 @@ public partial class MainViewModel : ViewModelBase
     {
         try
         {
-            if (Directory.GetParent(DirectoryPath) == null) return;
+            if (Directory.GetParent(DirectoryPath) is null) return;
             WorkingDirectoryFiles.Clear();
             await mainManager.SetWorkingDirectoryPath(Directory.GetParent(DirectoryPath).ToString());
             DataGridSelectedItem = null;
@@ -828,7 +828,7 @@ public partial class MainViewModel : ViewModelBase
             {string.Empty, _folderTypes}
         };
 
-        if (itemExtension == null)
+        if (itemExtension is null)
         {
             FromFormatsList = null;
             ToFormatsList = null;
@@ -908,7 +908,7 @@ public partial class MainViewModel : ViewModelBase
             if (source is null) return;
             if (source is Border)
             {
-                if (DataGridSelectedItem == null)
+                if (DataGridSelectedItem is null)
                     return;
 
                 var workingDirectoryFile =
@@ -946,7 +946,7 @@ public partial class MainViewModel : ViewModelBase
 
     private void UpdateUIElementsAsync()
     {
-        if (DataGridSelectedItem != null)
+        if (DataGridSelectedItem is not null)
         {
             var workingDirectoryFile = DataGridSelectedItem;
             var path = workingDirectoryFile.FilePath;
@@ -960,7 +960,7 @@ public partial class MainViewModel : ViewModelBase
                 throw new Exception("File or directory do not exist anymore! Refreshing the directory.");
             }
 
-            DebugButtonStatus = extension == ".d3dtx" || extension == ".dds";
+            DebugButtonStatus = extension is ".d3dtx" || extension is ".dds";
             SaveButtonStatus = File.Exists(path);
             DeleteButtonStatus = true;
             ContextOpenFolderStatus = Directory.Exists(path);
@@ -1029,7 +1029,7 @@ public partial class MainViewModel : ViewModelBase
         {
             UpdateUIElementsAsync();
 
-            if (DataGridSelectedItem == null)
+            if (DataGridSelectedItem is null)
                 return;
 
             var workingDirectoryFile = DataGridSelectedItem;
@@ -1049,9 +1049,14 @@ public partial class MainViewModel : ViewModelBase
 
             ImageData.Initialize(filePath, textureType, ImageAdvancedOptions.GameID, ImageAdvancedOptions.IsLegacyConsole);
 
+            if (textureType is TextureType.Unknown)
+            {
+                ImageData.Reset();
+            }
+
             ImageAdvancedOptions = ImageData.GetImageAdvancedOptions(ImageAdvancedOptions);
 
-            if (textureType != TextureType.Unknown)
+            if (textureType is not TextureType.Unknown)
             {
                 ImageData.ApplyEffects(ImageAdvancedOptions);
             }
@@ -1068,7 +1073,7 @@ public partial class MainViewModel : ViewModelBase
 
             ImageProperties = ImageData.ImageProperties;
 
-            if (textureType != TextureType.Unknown)
+            if (textureType is not TextureType.Unknown)
             {
                 ImagePreview = ImageData.GetBitmapFromScratchImage(MipValue, FaceValue);
             }
@@ -1092,7 +1097,7 @@ public partial class MainViewModel : ViewModelBase
     {
         try
         {
-            if (DataGridSelectedItem == null)
+            if (DataGridSelectedItem is null)
                 return;
 
             var workingDirectoryFile = DataGridSelectedItem;
@@ -1103,7 +1108,7 @@ public partial class MainViewModel : ViewModelBase
             if (extension != string.Empty)
                 textureType = GetTextureTypeFromItem(extension.ToUpperInvariant().Remove(0, 1));
 
-            if (textureType == TextureType.Unknown)
+            if (textureType is TextureType.Unknown)
             {
                 return;
             }
@@ -1118,7 +1123,10 @@ public partial class MainViewModel : ViewModelBase
 
             ImageProperties = ImageData.ImageProperties;
 
-            ImagePreview = ImageData.GetBitmapFromScratchImage(MipValue, FaceValue);
+            if (textureType is not TextureType.Unknown)
+            {
+                ImagePreview = ImageData.GetBitmapFromScratchImage(MipValue, FaceValue);
+            }
         }
         catch (Exception ex)
         {
@@ -1130,11 +1138,13 @@ public partial class MainViewModel : ViewModelBase
     protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
-        if (e.PropertyName == nameof(MipValue) || e.PropertyName == nameof(FaceValue))
+        if (e.PropertyName is nameof(MipValue) || e.PropertyName is nameof(FaceValue))
         {
-            ImagePreview = ImageData.GetBitmapFromScratchImage(MipValue, FaceValue);
+            if (ImageData.CurrentTextureType is not TextureType.Unknown)
+                ImagePreview = ImageData.GetBitmapFromScratchImage(MipValue, FaceValue);
+            else { ImagePreview = new SvgImage { Source = SvgSource.Load(ErrorSvgFilename, _assetsUri) }; }
         }
-        if (e.PropertyName == nameof(ImageAdvancedOptions))
+        if (e.PropertyName is nameof(ImageAdvancedOptions))
         {
             await UpdateBitmap();
         }

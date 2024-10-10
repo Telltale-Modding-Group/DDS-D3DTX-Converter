@@ -8,6 +8,8 @@ using SkiaSharp;
 using System.Runtime.InteropServices;
 using TelltaleTextureTool.TelltaleEnums;
 using TelltaleTextureTool.Graphics;
+using Avalonia;
+using Avalonia.Platform;
 
 namespace TelltaleTextureTool;
 
@@ -15,15 +17,13 @@ public class ImageData
 {
     public ImageProperties ImageProperties { get; set; } = new ImageProperties();
     public Texture DDSImage { get; set; } = new Texture();
-
+    public TextureType CurrentTextureType { get; set; }
     public uint MaxMip { get; set; }
     public uint MaxFace { get; set; }
 
     private string CurrentFilePath { get; set; } = string.Empty;
     private bool IsSamePath { get; set; }
     private bool HasPixelData { get; set; }
-    private TextureType CurrentTextureType { get; set; }
-
     private TelltaleToolGame Game { get; set; }
     private bool IsLegacyConsole { get; set; }
 
@@ -70,7 +70,7 @@ public class ImageData
     {
         try
         {
-            DDSImage.ChangePreviewImage(options);
+            DDSImage.TransformTexture(options, false, true);
 
             DDSImage.GetBounds(out uint maxMip, out uint maxFace);
             MaxMip = maxMip;
@@ -188,11 +188,11 @@ public class ImageData
     /// <param name="mip"></param>
     /// <param name="face"></param>
     /// <returns>The bitmap from the mip and face. </returns>
-    public Bitmap GetBitmapFromScratchImage(uint mip = 0, uint face = 0)
+    public WriteableBitmap GetBitmapFromScratchImage(uint mip = 0, uint face = 0)
     {
         if (TextureType.Unknown == CurrentTextureType)
         {
-            return new Bitmap(MemoryStream.Null);
+            return null;
         }
 
         DDSImage.GetBounds(out uint maxMip, out uint maxFace);
@@ -210,26 +210,24 @@ public class ImageData
 
         DDSImage.GetData(mip, face, out ulong width, out ulong height, out ulong pitch, out ulong length, out byte[] pixelData);
 
-        // Converts the data into writeableBitmap. (TODO Insert a link to the code)
-        var imageInfo = new SKImageInfo((int)width, (int)height, SKColorType.Rgba8888);
-        var handle = GCHandle.Alloc(pixelData, GCHandleType.Pinned);
-        var ptr = Marshal.UnsafeAddrOfPinnedArrayElement(pixelData, 0);
-        using var data = SKData.Create(ptr, (int)length, (_, _) => handle.Free());
-        using var skImage = SKImage.FromPixels(imageInfo, data, (int)pitch);
-        using var bitmap = SKBitmap.FromImage(skImage);
+        // Create a WriteableBitmap in RGBA8888 format
+        var bitmap = new WriteableBitmap(
+            new PixelSize((int)width, (int)height),
+            new Vector(96, 96), // Set DPI as necessary
+            PixelFormat.Rgba8888,
+            AlphaFormat.Unpremul);
 
-        // Create a memory stream to hold the PNG data
-        var memoryStream = new MemoryStream();
+        // Lock the WriteableBitmap's back buffer to write pixel data
+        using (var framebuffer = bitmap.Lock())
+        {
+            IntPtr framebufferPtr = framebuffer.Address;
+            int framebufferRowBytes = framebuffer.RowBytes;
 
-        // Encode the bitmap to PNG and write it to the memory stream
-        var wstream = new SKManagedWStream(memoryStream);
+            // Copy pixelData to the WriteableBitmap's memory
+            Marshal.Copy(pixelData, 0, framebufferPtr, (int)length);
+        }
 
-        var success = bitmap.Encode(wstream, SKEncodedImageFormat.Png, 95);
-        Console.WriteLine(success ? "Image converted successfully" : "Image conversion failed");
-
-        memoryStream.Position = 0;
-
-        return new Bitmap(memoryStream);
+        return bitmap; 
     }
 
     private static void GetImageDataFromInvalid(out ImageProperties imageProperties)

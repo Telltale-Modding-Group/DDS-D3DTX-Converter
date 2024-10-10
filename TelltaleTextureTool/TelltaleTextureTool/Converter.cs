@@ -175,7 +175,7 @@ public static class Converter
 
         Texture texture = new(array, TextureType.D3DTX);
 
-        texture.ChangePreviewImage(options, true);
+        texture.TransformTexture(options, true, false);
         texture.SaveTexture(Path.Combine(destinationDirectory, Path.GetFileNameWithoutExtension(sourceFilePath)), newTextureType);
         texture.Release();
 
@@ -249,7 +249,7 @@ public static class Converter
                 options.IsSRGB = true;
             }
 
-            texture.ChangePreviewImage(options, true);
+            texture.TransformTexture(options, true, false);
 
             // Get the image
             texture.GetDDSInformation(out D3DTXMetadata metadata, out ImageSection[] sections, flags);
@@ -259,8 +259,6 @@ public static class Converter
                 metadata.Platform = options.PlatformType;
             }
 
-            Console.WriteLine("DXGI: " + texture.Metadata.Format);
-            Console.WriteLine(metadata.Format);
             // Modify the d3dtx file using our dds data
             d3dtxMaster.ModifyD3DTX(metadata, sections);
 

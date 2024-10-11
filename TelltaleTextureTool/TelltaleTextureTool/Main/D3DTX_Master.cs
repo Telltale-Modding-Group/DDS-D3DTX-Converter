@@ -127,7 +127,7 @@ namespace TelltaleTextureTool.Main
                         Platform = isLegacyConsole ? T3PlatformType.ePlatform_PS3 : T3PlatformType.ePlatform_None;
                     }
 
-                    d3dtxObject = new LegacyD3DTX();
+                    d3dtxObject = new D3DTX_Legacy();
 
                     break;
                 default:
@@ -153,7 +153,7 @@ namespace TelltaleTextureTool.Main
                 return;
             }
 
-            d3dtxObject = jsonObject.ToObject<LegacyD3DTX>();
+            d3dtxObject = jsonObject.ToObject<D3DTX_Legacy>();
         }
 
         public static class MetaHeaderFactory
@@ -193,7 +193,7 @@ namespace TelltaleTextureTool.Main
             {
                 try
                 {
-                    d3dtxObject = new LegacyD3DTX();
+                    d3dtxObject = new D3DTX_Legacy();
                     d3dtxObject.ReadFromBinary(reader, game, T3PlatformType.ePlatform_None, true);
                     reader.BaseStream.Position = startPos;
                     return game;
@@ -212,7 +212,7 @@ namespace TelltaleTextureTool.Main
             {
                 try
                 {
-                    d3dtxObject = new LegacyD3DTX();
+                    d3dtxObject = new D3DTX_Legacy();
                     d3dtxObject.ReadFromBinary(reader, game, T3PlatformType.ePlatform_PS3, true);
                     reader.BaseStream.Position = startPos;
                     Platform = T3PlatformType.ePlatform_PS3;

@@ -27,7 +27,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
     /// <summary>
     /// This is a custom class that matches what is serialized in a legacy D3DTX version supporting the listed titles. (COMPLETE)
     /// </summary>
-    public class LegacyD3DTX : ID3DTX
+    public class D3DTX_Legacy : ID3DTX
     {
         /// <summary>
         /// [4 bytes] The mSamplerState state block size in bytes. Note: the parsed value is always 8.
@@ -249,7 +249,7 @@ namespace TelltaleTextureTool.TelltaleD3DTX
         /// </summary>
         public byte[] mJPEGTextureData { get; set; } = [];
 
-        public LegacyD3DTX() { }
+        public D3DTX_Legacy() { }
 
         public void WriteToBinary(BinaryWriter writer, TelltaleToolGame game = TelltaleToolGame.DEFAULT, T3PlatformType platform = T3PlatformType.ePlatform_None, bool printDebug = false)
         {

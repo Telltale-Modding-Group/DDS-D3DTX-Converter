@@ -70,7 +70,7 @@ public class ImageData
     {
         try
         {
-            DDSImage.TransformTexture(options, false, true);
+            DDSImage.TransformTexture(options, true, false);
 
             DDSImage.GetBounds(out uint maxMip, out uint maxFace);
             MaxMip = maxMip;

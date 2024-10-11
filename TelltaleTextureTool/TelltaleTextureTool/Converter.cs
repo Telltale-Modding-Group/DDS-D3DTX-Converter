@@ -248,7 +248,7 @@ public static class Converter
                 options.IsSRGB = true;
             }
 
-            texture.TransformTexture(options, true, false);
+            texture.TransformTexture(options, true, true);
 
             // Get the image
             texture.GetDDSInformation(out D3DTXMetadata metadata, out ImageSection[] sections, flags);

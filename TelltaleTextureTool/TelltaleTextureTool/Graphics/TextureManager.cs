@@ -499,7 +499,7 @@ public unsafe partial class Texture
             {
                 ScratchImage newDestImage = DirectXTex.CreateScratchImage();
 
-                DirectXTex.Decompress(destImage.GetImage(0, 0, 0), (int)DXGIFormat.R8G8B8A8_UNORM, ref newDestImage).ThrowIf();
+                DirectXTex.Decompress(destImage.GetImage(0, 0, 0), (int)DXGIFormat.UNKNOWN, ref newDestImage).ThrowIf();
 
                 destImage.Release();
                 destImage = newDestImage;
@@ -509,7 +509,10 @@ public unsafe partial class Texture
             {
                 ScratchImage newDestImage = DirectXTex.CreateScratchImage();
 
-                DirectXTex.Convert(destImage.GetImage(0, 0, 0), (int)DXGIFormat.R8G8B8A8_UNORM, TexFilterFlags.Default, 0.5f, ref newDestImage).ThrowIf();
+                if (DirectXTex.IsSRGB(destImage.GetMetadata().Format))
+                    DirectXTex.Convert(destImage.GetImage(0, 0, 0), (int)DXGIFormat.R8G8B8A8_UNORM, TexFilterFlags.SrgbOut, 0.5f, ref newDestImage).ThrowIf();
+                else
+                    DirectXTex.Convert(destImage.GetImage(0, 0, 0), (int)DXGIFormat.R8G8B8A8_UNORM, TexFilterFlags.Default, 0.5f, ref newDestImage).ThrowIf();
 
                 destImage.Release();
                 destImage = newDestImage;
@@ -577,7 +580,18 @@ public unsafe partial class Texture
         {
             TexMetadata originalMetadata = Image.GetMetadata();
 
-            DirectXTex.Compress2(Image.GetImages(), Image.GetImageCount(), ref originalMetadata, (int)format, TexCompressFlags.Default, 0.5f, ref transformedImage).ThrowIf();
+            TexCompressFlags flags = TexCompressFlags.Default;
+
+            if (DirectXTex.IsSRGB(Image.GetMetadata().Format))
+            {
+                flags |= TexCompressFlags.SrgbOut;
+            }
+
+            if (DirectXTex.IsSRGB((int)format)){
+                flags |= TexCompressFlags.SrgbIn;
+            }
+
+            DirectXTex.Compress2(Image.GetImages(), Image.GetImageCount(), ref originalMetadata, (int)format, flags, 0.5f, ref transformedImage).ThrowIf();
 
             Image.Release();
             Image = transformedImage;
@@ -731,7 +745,7 @@ public unsafe partial class Texture
             Deswizzle(options.PlatformType);
         }
 
-        Decompress(DXGIFormat.R8G8B8A8_UNORM);
+        Decompress();
 
         if (options.EnableNormalMap)
         {
@@ -769,32 +783,35 @@ public unsafe partial class Texture
             }
         }
 
-        if (options.EnableAutomaticCompression)
+        if (convertingOnly)
         {
-            if (options.EnableNormalMap && options.IsTelltaleXYNormalMap)
+            if (options.EnableAutomaticCompression)
             {
-                Compress(DXGIFormat.BC5_UNORM);
-            }
-            else if (OriginalImage.IsAlphaAllOpaque())
-            {
-                if (options.IsSRGB)
+                if (options.EnableNormalMap && options.IsTelltaleXYNormalMap)
                 {
-                    Compress(DXGIFormat.BC1_UNORM_SRGB);
+                    Compress(DXGIFormat.BC5_UNORM);
+                }
+                else if (OriginalImage.IsAlphaAllOpaque())
+                {
+                    if (options.IsSRGB)
+                    {
+                        Compress(DXGIFormat.BC1_UNORM_SRGB);
+                    }
+                    else
+                    {
+                        Compress(DXGIFormat.BC1_UNORM);
+                    }
                 }
                 else
                 {
-                    Compress(DXGIFormat.BC1_UNORM);
-                }
-            }
-            else
-            {
-                if (options.IsSRGB)
-                {
-                    Compress(DXGIFormat.BC3_UNORM_SRGB);
-                }
-                else
-                {
-                    Compress(DXGIFormat.BC3_UNORM);
+                    if (options.IsSRGB)
+                    {
+                        Compress(DXGIFormat.BC3_UNORM_SRGB);
+                    }
+                    else
+                    {
+                        Compress(DXGIFormat.BC3_UNORM);
+                    }
                 }
             }
         }
@@ -802,7 +819,6 @@ public unsafe partial class Texture
         {
             Compress((DXGIFormat)OriginalImage.GetMetadata().Format);
         }
-
 
         if (options.EnableSwizzle && options.IsSwizzle)
         {

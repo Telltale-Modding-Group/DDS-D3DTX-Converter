@@ -173,14 +173,13 @@ public static class Converter
 
         var array = ddsFile.GetData(d3dtxFile);
 
+        d3dtxFile.WriteD3DTXJSON(Path.GetFileNameWithoutExtension(d3dtxFile.FilePath), destinationDirectory);
+
         Texture texture = new(array, TextureType.D3DTX);
 
         texture.TransformTexture(options, true, false);
         texture.SaveTexture(Path.Combine(destinationDirectory, Path.GetFileNameWithoutExtension(sourceFilePath)), newTextureType);
         texture.Release();
-
-        // Write the d3dtx data into a file
-        d3dtxFile.WriteD3DTXJSON(Path.GetFileNameWithoutExtension(d3dtxFile.FilePath), destinationDirectory);
     }
 
     /// <summary>

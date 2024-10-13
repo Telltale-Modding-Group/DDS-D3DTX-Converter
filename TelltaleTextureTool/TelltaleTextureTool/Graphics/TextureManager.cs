@@ -324,7 +324,7 @@ public unsafe static partial class TextureManager
     {
         StringBuilder information = new();
 
-        information.AppendLine("||||||||||| DDS Debug Information |||||||||||");
+        information.AppendLine("||||||||||| Debug Information |||||||||||");
         information.AppendLine($"Width: {metadata.Width}");
         information.AppendLine($"Height: {metadata.Height}");
         information.AppendLine($"Depth: {metadata.Depth}");

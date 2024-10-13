@@ -4,7 +4,6 @@ using TelltaleTextureTool.DirectX;
 using TelltaleTextureTool.Main;
 using TelltaleTextureTool.Telltale.FileTypes.D3DTX;
 using Avalonia.Media.Imaging;
-using SkiaSharp;
 using System.Runtime.InteropServices;
 using TelltaleTextureTool.TelltaleEnums;
 using TelltaleTextureTool.Graphics;

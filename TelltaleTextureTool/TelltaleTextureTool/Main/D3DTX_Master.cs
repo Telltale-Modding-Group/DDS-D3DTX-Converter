@@ -241,7 +241,7 @@ namespace TelltaleTextureTool.Main
         {
             using BinaryWriter writer = new(File.Create(destinationPath));
 
-            metaHeaderObject.WriteToBinary(writer,Game, Platform, true);
+            metaHeaderObject.WriteToBinary(writer, Game, Platform, true);
             d3dtxObject.WriteToBinary(writer, Game, Platform, true);
         }
 
@@ -284,6 +284,7 @@ namespace TelltaleTextureTool.Main
             int d3dtxObjectIndex = 2;
 
             Game = TelltaleToolGameExtensions.GetTelltaleToolGameFromString(firstObject.ToObject<D3DTX_JSON>().GameID);
+            Platform = firstObject.ToObject<D3DTX_JSON>().PlatformType;
 
             // I am creating the metaObject again instead of using the firstObject variable and i am aware of the performance hit.
             JObject? metaObject = jarray[metaObjectIndex] as JObject;
@@ -296,11 +297,6 @@ namespace TelltaleTextureTool.Main
             CreateD3DTX(Game, jsond3dtxObject);
 
             d3dtxMetadata = d3dtxObject.GetD3DTXMetadata();
-
-            Console.WriteLine("METADATA JSON");
-            Console.WriteLine(d3dtxMetadata.MipLevels);
-            Console.WriteLine(d3dtxMetadata.RegionHeaders.Length);
-            Console.WriteLine(d3dtxMetadata.Format);
         }
 
         public void ConvertJSONObjectToD3dtx(JObject jObject)

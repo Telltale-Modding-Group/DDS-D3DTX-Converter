@@ -476,7 +476,7 @@
                                             Height="3"
                                             CornerRadius="10" />
                                     <CheckBox IsChecked="{Binding ImageAdvancedOptions.EnableMips, Mode=TwoWay}"
-                                              ToolTip.Tip="When enabled, you can auto generate mips or select the number manually. The latter option is be used for console and mobile games.">Enable Mipmaps</CheckBox>
+                                              ToolTip.Tip="When enabled, you can auto generate mips or select the number manually. The latter option is used for console and mobile games.">Generate Mips</CheckBox>
                                     <Grid RowDefinitions="auto, auto"
                                           ColumnDefinitions="auto, 10, *"
                                           IsVisible="{Binding ImageAdvancedOptions.EnableMips}">

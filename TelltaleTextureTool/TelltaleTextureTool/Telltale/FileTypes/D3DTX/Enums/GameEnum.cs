@@ -1,61 +1,171 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace TelltaleTextureTool.TelltaleEnums;
 
 public enum TelltaleToolGame
 {
     UNKNOWN = -1,
+
+    [Display(Name = "Default Mode")]
     DEFAULT = 0,
+
+    [Display(Name = "Texas Hold'em (Original)")]
     TEXAS_HOLD_EM_OG,  // LV9
+
+    [Display(Name = "Bone: Out from Boneville")]
     BONE_OUT_FROM_BONEVILLE, // LV11 WORKS
+
+    [Display(Name = "CSI: 3 Dimensions of Murder")]
     CSI_3_DIMENSIONS, // LV12 WORKS
+
+    [Display(Name = "Sam & Max Save the World (2006)")]
     SAM_AND_MAX_SAVE_THE_WORLD_2006, // LV13
+
+    [Display(Name = "Bone: The Great Cow Race")]
     BONE_THE_GREAT_COW_RACE, // LV11 WORKS
+
+    [Display(Name = "CSI: Hard Evidence")]
     CSI_HARD_EVIDENCE, // LV10
+
+    [Display(Name = "Texas Hold'em (Steam)")]
     TEXAS_HOLD_EM_V1, // LV9
+
+    [Display(Name = "Sam & Max Beyond Time and Space (Original)")]
     SAM_AND_MAX_BEYOND_TIME_AND_SPACE_OG, // LV9
+
+    [Display(Name = "Sam & Max Beyond Time and Space (Steam)")]
     SAM_AND_MAX_BEYOND_TIME_AND_SPACE_NEW, // LV9
+
+    [Display(Name = "Strong Bad's Cool Game for Attractive People Ep. 1")]
     STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_101, // LV8
+
+    [Display(Name = "Strong Bad's Cool Game for Attractive People Ep. 2")]
     STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_102, // LV8
+
+    [Display(Name = "Strong Bad's Cool Game for Attractive People Ep. 3")]
     STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_103, // LV7
+
+    [Display(Name = "Strong Bad's Cool Game for Attractive People Ep. 4")]
     STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_104, // LV7
+
+    [Display(Name = "Strong Bad's Cool Game for Attractive People Ep. 5")]
     STRONG_BADS_COOL_GAME_FOR_ATTRACTIVE_PEOPLE_105, // LV6
+
+    [Display(Name = "Wallace & Gromit's Grand Adventures Ep. 1")]
     WALLACE_AND_GROMITS_GRAND_ADVENTURES_101, // LV5
+
+    [Display(Name = "Wallace & Gromit's Grand Adventures Ep. 2")]
     WALLACE_AND_GROMITS_GRAND_ADVENTURES_102, // LV5
+
+    [Display(Name = "Wallace & Gromit's Grand Adventures Ep. 3")]
     WALLACE_AND_GROMITS_GRAND_ADVENTURES_103, // LV5
+
+    [Display(Name = "Wallace & Gromit's Grand Adventures Ep. 4")]
     WALLACE_AND_GROMITS_GRAND_ADVENTURES_104, // LV4
+
+    [Display(Name = "Sam & Max Save the World (2007)")]
     SAM_AND_MAX_SAVE_THE_WORLD_2007, // LV4
+
+    [Display(Name = "CSI: Deadly Intent")]
     CSI_DEADLY_INTENT, // LV4
+
+    [Display(Name = "Tales of Monkey Island")]
     TALES_OF_MONKEY_ISLAND, // LV4
+
+    [Display(Name = "CSI: Fatal Conspiracy")]
     CSI_FATAL_CONSPIRACY, // LV4
+
+    [Display(Name = "Nelson Tethers: Puzzle Agent")]
     NELSON_TETHERS_PUZZLE_AGENT, // LV3
+
+    [Display(Name = "Poker Night at the Inventory")]
     POKER_NIGHT_AT_THE_INVENTORY, // LV3
+
+    [Display(Name = "Sam & Max: The Devil's Playhouse")]
     SAM_AND_MAX_THE_DEVILS_PLAYHOUSE, // LV4
+
+    [Display(Name = "Back to the Future: The Game")]
     BACK_TO_THE_FUTURE_THE_GAME, // LV3
+
+    [Display(Name = "Hector: Badge of Carnage")]
     HECTOR_BADGE_OF_CARNAGE, // LV3
+
+    [Display(Name = "Jurassic Park: The Game")]
     JURASSIC_PARK_THE_GAME, // LV2
+
+    [Display(Name = "Puzzle Agent 2")]
     PUZZLE_AGENT_2, // LV2
+
+    [Display(Name = "Law & Order: Legacies")]
     LAW_AND_ORDER_LEGACIES, // LV2
+
+    [Display(Name = "The Walking Dead")]
     THE_WALKING_DEAD, // LV1
+
+    [Display(Name = "Poker Night 2")]
     POKER_NIGHT_2, // V3
+
+    [Display(Name = "The Walking Dead: Season 2")]
     THE_WALKING_DEAD_SEASON_2, // V4
+
+    [Display(Name = "The Wolf Among Us")]
     THE_WOLF_AMONG_US, // V4
+
+    [Display(Name = "Game of Thrones")]
     GAME_OF_THRONES, // V5
+
+    [Display(Name = "Tales from the Borderlands (Original)")]
     TALES_FROM_THE_BORDERLANDS_OG, // V5
+
+    [Display(Name = "Back to the Future: The Game 30th Anniversary Edition")]
     BACK_TO_THE_FUTURE_THE_GAME_30TH_ANNIVERSARY_EDITION, // V5?
+
+    [Display(Name = "Minecraft: Story Mode")]
     MINECRAFT_STORY_MODE, // V5
+
+    [Display(Name = "Minecraft: Story Mode (Xbox One)")]
     MINECRAFT_STORY_MODE_XBOX_ONE, // V6
+
+    [Display(Name = "The Walking Dead: Michonne")]
     THE_WALKING_DEAD_MICHONNE, // V7
+
+    [Display(Name = "Tales from the Borderlands")]
     TALES_FROM_THE_BORDERLANDS, // V7
+
+    [Display(Name = "Batman: The Telltale Series (Pre-December Patch)")]
     BATMAN_THE_TELLTALE_SERIES_OG, // V8
+
+    [Display(Name = "Batman: The Telltale Series")]
     BATMAN_THE_TELLTALE_SERIES, // V9
+
+    [Display(Name = "The Walking Dead: A New Frontier")]
     THE_WALKING_DEAD_A_NEW_FRONTIER, // V9
+
+    [Display(Name = "Minecraft: Story Mode Season 2")]
     MINECRAFT_STORY_MODE_SEASON_2, // V9
+
+    [Display(Name = "Batman: The Enemy Within")]
     BATMAN_THE_ENEMY_WITHIN, // V9
+
+    [Display(Name = "Guardians of the Galaxy: The Telltale Series")]
     GUARDIANS_OF_THE_GALAXY, // V9
+
+    [Display(Name = "The Walking Dead: Final Season")]
     THE_WALKING_DEAD_FINAL_SEASON, // V9
+
+    [Display(Name = "Batman: Shadows Edition")]
     BATMAN_SHADOWS_EDITION, // V9
+
+    [Display(Name = "The Walking Dead: Definitive Series")]
     THE_WALKING_DEAD_DEFINITIVE_SERIES, // V9
+
+    [Display(Name = "Sam & Max Save the World Remastered")]
     SAM_AND_MAX_SAVE_THE_WORLD_REMASTERED, // V9
+
+    [Display(Name = "Sam & Max Beyond Time and Space Remastered")]
     SAM_AND_MAX_BEYOND_TIME_AND_SPACE_REMASTERED, // V9
+
+    [Display(Name = "Sam & Max: The Devil's Playhouse Remastered")]
     SAM_AND_MAX_THE_DEVILS_PLAYHOUSE_REMASTERED, // V9
 }
 public static class TelltaleToolGameExtensions

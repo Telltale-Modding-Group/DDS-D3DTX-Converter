@@ -2,7 +2,7 @@
 
 # How to use the Telltale Texture Tool
 
-#### Welcome to the second part of the tutorial on how to make a texture mod for Telltale's games. In this section we focus on how to use the Telltale Texture Mod Tool! In this tutorial, we will try to mod Clementine's Season 2 hat in The Walking Dead: The Telltale Definitive Series. The same principles apply to ALL GAMES!
+#### Welcome to the second part of the tutorial on how to make a texture mod for Telltale's games. In this section we focus on how to use the Telltale Texture Tool! In this tutorial, we will try to mod Clementine's Season 2 hat in The Walking Dead: The Telltale Definitive Series. The same principles apply to ALL GAMES!
 
 > [!IMPORTANT]
 > Make sure you have read the [application guide](/Docs/application_guide.md)!

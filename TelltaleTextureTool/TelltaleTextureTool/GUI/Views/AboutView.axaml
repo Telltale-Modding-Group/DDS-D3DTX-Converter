@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:TelltaleTextureTool.ViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="500"
+             d:DesignHeight="500"
+             Width="450"
+             Height="400"
+             x:Class="TelltaleTextureTool.Views.AboutView">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:AboutViewModel />
+    </Design.DataContext>
+    <Panel>
+        <ExperimentalAcrylicBorder IsHitTestVisible="False">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial BackgroundSource="Digger"
+                                             TintColor="Black"
+                                             TintOpacity="1"
+                                             MaterialOpacity="0.65" />
+            </ExperimentalAcrylicBorder.Material>
+        </ExperimentalAcrylicBorder>
+        <StackPanel Margin="10">
+            <!-- <controls:Hyperlink  Alias="{Binding Alias}" Url="{Binding Url}" -->
+            <!-- Command="{Binding OpenUrl}" -->
+            <!-- CommandParameter="{Binding HyperlinkContentProvider}" -->
+            <!-- /> -->
+            <Image Source="/Assets/telltale_modding_community.png"
+                   Width="200"
+                   Height="200" />
+            <TextBlock FontWeight="Bold"
+                       FontSize="18"
+                       Margin="0,10,0,0"
+                       HorizontalAlignment="Center">Telltale Texture Tool v2.5.0</TextBlock>
+            <TextBlock Margin="0,5,0,0"
+                       TextWrapping="Wrap"
+                       Width="360"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center">                
+                This tool is designed to convert
+            <Bold>D3DTX</Bold>
+                files into more accessible formats like PNG,
+                DDS, and others, and vice versa. It allows you to easily create or edit textures for Telltale games.
+            </TextBlock>
+            <TextBlock FontWeight="Bold"
+                       Margin="0,20,0,0"
+                       FontSize="18"
+                       HorizontalAlignment="Center">Developed by the Telltale Modding Group</TextBlock>
+        </StackPanel>
+    </Panel>
+</UserControl>

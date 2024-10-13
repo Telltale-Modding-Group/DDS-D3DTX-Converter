@@ -1,18 +1,13 @@
 # Telltale Texture Tool
 
-[![Wiki](https://img.shields.io/badge/Wiki-grey)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/iMrShadow/DDS-D3DTX-Converter)](https://github.com/iMrShadow/DDS-D3DTX-Converter/releases/) [![Discord](https://img.shields.io/badge/Discord-blue?logo=Discord&logoColor=fff)](https://discord.com/invite/HqpnTenqwp)
-
-Newer (Fork) Versions:
-[![Github All Releases](https://img.shields.io/github/downloads/iMrShadow/DDS-D3DTX-Converter/total.svg)](https://github.com/iMrShadow/DDS-D3DTX-Converter/releases/)
-
-Older Versions:
-[![Github All Releases](https://img.shields.io/github/downloads/Telltale-Modding-Group/DDS-D3DTX-Converter/total.svg)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/releases)  
+[![Wiki](https://img.shields.io/badge/Wiki-grey)](https://github.com/Telltale-Modding-Group/Telltale-Texture-Tool/wiki)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Telltale-Modding-Group/Telltale-Texture-Tool)](https://github.com/Telltale-Modding-Group/Telltale-Texture-Tool/releases/) [![Discord](https://img.shields.io/badge/Discord-blue?logo=Discord&logoColor=fff)](https://discord.com/invite/HqpnTenqwp)
+[![Github All Releases](https://img.shields.io/github/downloads/Telltale-Modding-Group/Telltale-Texture-Tool/total.svg)](https://github.com/Telltale-Modding-Group/Telltale-Texture-Tool/releases)  
 
 ## Description
 This is an application designed to preview and convert **Telltale textures** (files with the **.d3dtx** extension) to more accessible formats like **PNG**, **JPEG**, **DDS**, **TGA**, **HDR**, **TIFF**, **BMP** and vice versa.
 
-**[DOWNLOAD THE LATEST VERSION HERE](https://github.com/iMrShadow/DDS-D3DTX-Converter/releases)**
+**[DOWNLOAD THE LATEST VERSION HERE](https://github.com/Telltale-Modding-Group/Telltale-Texture-Tool/releases)**
 
 ## Screenshots
 ![Main 1](Docs/tutorial-screenshots/mainThumb.png)
@@ -21,11 +16,9 @@ This is an application designed to preview and convert **Telltale textures** (fi
 
 #### [Quick Video Tutorial](https://www.youtube.com/watch?v=pjRhuKe72Qo)
 
-#### [Documentation (WIP)](Docs/home.md)
+#### [Wiki](https://github.com/Telltale-Modding-Group/Telltale-Texture-Tool/wiki)
 
-#### [Outdated wiki, but it still has some relevant information.](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki)
-
-##### If you have issues or questions, redirect them to the [discord server](https://discord.com/invite/HqpnTenqwp).
+##### If you have issues or questions, please redirect them to the [discord server](https://discord.com/invite/HqpnTenqwp) or open an issue.
 
 ## Supported Games
 
@@ -100,7 +93,7 @@ We utilize [`Hexa.NET.DirectXTex`](https://github.com/HexaEngine/Hexa.NET.Direct
 
 v2.5.0 will not have a CLI version, while v2.4.0 does support it.
 
-**If you want to learn about the `D3DTX` file format** we suggest you looking [here](https://github.com/iMrShadow/DDS-D3DTX-Converter/tree/main/TelltaleTextureTool/TelltaleTextureTool/Telltale/FileTypes/D3DTX/Versions). The classes there are well documented and describe the D3DTX format. Preferably, start with D3DTX_V9.cs and go upwards. There is also [the official documentation](/Docs/home.md).
+**If you want to learn about the `D3DTX` file format** we suggest you looking [here](https://github.com/iMrShadow/Telltale-Texture-Tool/tree/main/TelltaleTextureTool/TelltaleTextureTool/Telltale/FileTypes/D3DTX/Versions). The classes there are well documented and describe the D3DTX format. Preferably, start with D3DTX_V9.cs and go upwards. There is also [the official documentation](/Docs/home.md).
 **Direct Surface Draw (.dds)** is a Microsoft file format, which is described in detail [here](https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds).
 
 ## Credits

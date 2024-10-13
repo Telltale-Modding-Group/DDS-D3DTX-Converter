@@ -1,4 +1,4 @@
-## [Home](/wiki/home.md)
+## [Home](/Docs/home.md)
 
 ## Reporting an Issue/Bug
 

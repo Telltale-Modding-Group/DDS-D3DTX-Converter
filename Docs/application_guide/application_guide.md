@@ -7,84 +7,104 @@ This page is meant to introduce users to the software's UI. The application wind
 ---
 ## Top Menu Bar
 
-![ui-guide1](/Docs/application_guide/ui_1.png)
+![ui-guide1](/Docs/application_guide/top_menu_bar.png)
 
-On the top left of the application menu bar the following buttons are located:
-- **Open** - It opens a folder browser dialog window where you can select the folder that contains your extracted textures.
-- **Save** - Save the selected file to a location.
-- **Add** - Add a file to the directory that is opened.
-- **Delete** - Delete a file from the directory that is opened.
-- **Help** - Opens the wiki page.
-- **About** - Opens a window with information about the software, credits and a version number.
+- `Open Folder` - It opens a folder explorer dialog window where you select the folder that contains your extracted textures.
+- `Save` - Save the selected file to a location.
+- `Add` - Add a file to the directory that is opened.
+- `Delete` - Delete a file from the directory that is opened.
+- `Help -> Help` - Opens the GitHub documentation.
+- `Help -> About` - Opens a dialog window with information about the software.
 
 ---
 ## Left Column Section
 
-#### Textures Directory
-![ui-guide2](/Docs/application_guide/ui_2.png)
-
-This section contains a simple file browser for selecting and viewing all of your texture files.
-- **Textures Directory** - The section title.
-- **Directory Path** - Displays the path of the folder which you selected.
-- **Return Folder Button** - Goes up one level in the directory when clicked. (Like the Previous Button in the File Explorer)
-- **Refresh Directory Button** - Refreshes the **file browser** in case there are any changes to the folder content and the application does not update the interface.
-
 #### File Browser
-![ui-guide3](/Docs/application_guide/ui_3.png)
+![ui-guide2](/Docs/application_guide/file_browser.png)
 
-This section contains a simple file browser for selecting and viewing all of your texture files.
-- **File Browser** - A viewer of the all supported image file formats, including **PNG, JPEG, NMP, TIFF, DDS, D3DTX and JSON**. It also supports folders. 
+This section contains a simple file browser for selecting and viewing all of your texture files, JSON files and folders.
+- `Current Directory` - Displays the currently selected folder path.
+- `Go One Directory Up Button` - When clicked, the current directory level goes up by one level.
+- `Refresh Directory Button` - Refreshes the `file browser`.
+- `File Browser`  - A file explorer which displays `D3DTX`, `DDS`, `TGA`, `PNG`, `JPEG`, `BMP`, `TIFF`, and `JSON` files, as well folders (they do not have a file type). 
 
-#### Context Menu
-![ui-guide4](/Docs/application_guide/ui_4.png)
+Inside the `File Browser`:
+- `Double clicking on a folder` - Opens the folder in Telltale Texture Tool.
+- `Double clicking on a file` - Opens the file with its preferred software.
 
-##### There is also a context menu for the middle section (Right-click on this section in the application)
-- **Add** - Same functionality as **Add Button**.
-- **Open** - Opens the file with the preferred software.
-- **Open Folder** - Opens the selected folder inside the application.
-- **Open in Explorer** - Opens the directory you have opened in File Explorer.
-- **Refresh Directory** - Same functionality as **Refresh Directory Button**.
-- **Delete File** - Same functionality as **Delete Button**.
+#### Context Menu (Right-click Menu)
+![ui-guide4](/Docs/application_guide/context_menu.png)
 
-##### There are also some double click actions 
-- **Double clicking on a folder** - Opens the folder in the current software.
-- **Double clicking on a file** - Opens the file in the preferred software.
+- `Open File` - Opens the file with its preferred software.
+- `Open Folder` - Opens the selected folder inside the application.
+- `Open in Explorer` - Opens the current directory in a `File Explorer.
+- `Add File` - Same functionality as `Add Button`.
+- `Refresh Directory` - Same functionality as `Refresh Directory Button`.
+- `Delete File` - Same functionality as `Delete Button`.
+
+
+---
+## Middle Column Selection
+
+#### Image Preview
+
+This section contains an image viewer. It displays all supported image formats. Additionally, there are `mip` and `face` sliders, which allow you to view them.
+
+There is also `Pan and Zoom` feature, which means you can zoom in/out using your scroll wheel, and move around by dragging. The camera resets when you change your selected file.
+
+![ui-guide5](/Docs/application_guide/image_preview.png)
 
 ---
 ## Right Column Selection
 
-#### Image Preview
-![ui-guide5](/Docs/application_guide/ui_5.png)
+#### Image Information
+![ui-guide7](/Docs/application_guide/image_information.png)
 
-This section contains an image viewer. It displays **PNG, JPEG, BMP, TIFF, DDS and D3DTX** files and their names.
+This section displays the properties of the currently selected texture.
+
+- `File Name` - The file name of the image.
+- `Image Name` - The name of the texture. If the file is `D3DTX`, its embedded name will be displayed.
+- `Pixel Width` - The width of the image.
+- `Pixel Height`- The height of the image.
+- `Surface Format` - The surface format of the texture.
+- `Color Space` - The color space of the surface format. If it displays `Unknown`, assume it is `Linear`.
+- `Mip Count` - The number of texture mip levels. The minimum number is 1.
+- `Array Size` - The number of textures inside the file. The minimum number is 1.
+- `Has Transparency` - Indicates if the surface format supports transparency.
+- `Alpha Mode` - Indicates the alpha mode of the texture.
+- `Texture Layout` - Displays the layout of the texture.
+
+More information can be found [here](/Docs/articles/textures.md) and [here](/Docs/articles/surfaces.md).
+
+#### Advanced Options
+![ui-guide7](/Docs/application_guide/advanced_options.png)
+
+This section contains advanced settings.
+
+- `Select Game` combobox - If you choose a title, the converter will automatically try to use the `D3DTX` version for that title. `Default Mode` automatically detects the version, but it can be slow.
+- `Legacy Console` checkbox - If checked, that means the texture is from an older console game.
+- `Auto Compression` - Automatically applies `BC1` or `BC3` compression to the textures.
+- `Auto Normal Maps` - Applies some specific normal map effects to make them compatible for Telltale games.
+- `Generate Mips -> Automatic` - Automatically generate the maximum amount of mips.
+- `Generate Mips -> Manual` - Choose the number of generated mips. Use for console and mobile platforms.
+- `Enable Swizzling` - Allows you to swizzle/deswizzle console textures from the selected platform.
+- `Enable Effects` - Allows you to apply image effects to the image. The effects are mainly used for normal maps.
+- `Create Normal Map` - If checked, it creates a normal map from the image. Currently, it is not reliable - I recommend using other `Normal Map` tools like `NVIDIA Texture Tools`.
 
 #### Conversion Section
-![ui-guide6](/Docs/application_guide/ui_6.png)
-- **Convert Options** - A combo box containing all possible options of the selected image format.
-- **Choose Output Directory Checkbox** - A checkbox if you want to specify the path when converting.
-- **Conversion Type** - A combo box containing all possible conversion options. Users should stick to the **Default** option for all games **after The Walking Dead (2012)**.
-- **Convert Button** - Converts the texture into the chosen format.
-- **[Debug Info](/Docs/application_guide/application_guide.md#debug-window)** - Shows all information regarding the texture in a new window. Works **only** on **D3DTX** and **DDS** files.
-
-#### Image Properties
-![ui-guide7](/Docs/application_guide/ui_7.png)
-
-This section contains and shows the properties of an image when it is selected from the **File Browser** in the Textures Directory section.
-
-- **Image Name** - The name of the image. In case of Telltale texture files, their embedded names are shown.
-- **Pixel Width** - The width of the image. (Textures files use the width of the largest mipmap, also known as the main texture).
-- **Pixel Height**- The height of the image. (Textures files use the height of the largest mipmap, also known as the main texture).
-- **Surface Format** - The surface format of the texture. Additional information can be found here.
-- **Transparency** - Indicates if the textures has transparency/alpha (sometimes it is unreliable).
-- **Channel count** - Shows the number of color channels of the surface format (sometimes it is unreliable).
-- **Mipmap Count** - The number of mipmaps in the texture. Telltale textures always have at least 1 mipmap (the main texture).
+![ui-guide6](/Docs/application_guide/conversion_panel.png)
+- `From` and `To` - convert `From` one format `To` another.
+- `Choose Output Directory Checkbox` - A checkbox if you want to specify the path when converting.
+- `Convert Button` - Converts the texture into the chosen format.
 
 ---
-## Debug Window
-When you click on **Debug Info**, a new window will appear, containing all debug texture data.
+## Debug Information
+When you click on `Debug Information`, you will see additional information about the texture. Useful for low-level debugging.
 
-> Example: The D3DTX variant of the  texture:
-![ui-guide8](/Docs/application_guide/ui_8.png)
+Examples:
 
-> Example: The DDS variant of the same texture:
-![ui-guide9](/Docs/application_guide/ui_9.png)
+The D3DTX variant of the texture:
+![ui-guide8](/Docs/application_guide/debug_information_d3dtx.png)
+
+Example: The DDS variant of the texture:
+![ui-guide9](/Docs/application_guide/debug_information_dds.png)

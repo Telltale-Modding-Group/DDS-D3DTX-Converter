@@ -2,7 +2,7 @@
 
 # How to use the Telltale Texture Tool
 
-#### Welcome to the second part of the tutorial on how to make a texture mod for Telltale's games. In this section we focus on how to use the Telltale Texture Mod Tool! In this tutorial, we will try to mod Clementine's Season 2 hat in The Walking Dead: The Telltale Definitive Series.
+#### Welcome to the second part of the tutorial on how to make a texture mod for Telltale's games. In this section we focus on how to use the Telltale Texture Mod Tool! In this tutorial, we will try to mod Clementine's Season 2 hat in The Walking Dead: The Telltale Definitive Series. The same principles apply to ALL GAMES!
 
 > [!IMPORTANT]
 > Make sure you have read the [application guide](/Docs/application_guide.md)!
@@ -46,7 +46,7 @@ Click on `Convert`.
 ---
 ## Step 4/4 - Verifying the outputted texture
 
-Click on the outputted image. If you used the `DDS` option, make sure the image properties between the `D3DTX` and `DDS` files match, like `Width`, `Height`, `Surface Format` and `Mips`.
+Click on the outputted image. If you used the `DDS` option, make sure the image properties with the `D3DTX`, like `Width`, `Height`, `Surface Format` and `Mips`.
 
 You are done! You can now start editing your texture file!
 
@@ -59,13 +59,13 @@ You are done! You can now start editing your texture file!
 ### DDS
 ![p2_4](/Docs/tutorial_part2/p2_4.png)
 
-### PNG
+### PNG - 
 ![p2_5](/Docs/tutorial_part2/p2_5.png)
 
 > [!IMPORTANT]
 > For older games:
 >
-> The conversion process works in similar ways, but this time you two options:
+> The conversion process works in similar ways, but this time you have two options:
 > 1. The `Default` option in the combobox means that the converter will try to recognize the format. This option is reliable, but very slow. The `Legacy Console` checkbox will be checked if the texture is from an older console game.
 > 2. You have to select the right game in the `Advanced Options`, otherwise you will be greeted by a lot of errors. 
 

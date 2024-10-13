@@ -62,29 +62,29 @@ These suffixes indicate and deal with other material properties.
 | --- | --- |
 | NONE | Diffuse texture. |
 | detail | Bump/SDF map. Black lines of the material. |
-| nm | [Normal map.](https://en.wikipedia.org/wiki/Normal_mapping) Note: Telltale have their normal maps reversed. |
+| nm | [Normal map.](https://en.wikipedia.org/wiki/Normal_mapping) Note: Telltale have their normal map color channels reversed (ABGR instead of RGBA). |
 | glow | Glow map. |
 | spec | [Specular texture.]((https://www.modding-forum.com/guide/17-diffuse-specular-and-normal-maps/)) |
 | ink | Black lines of the material. |
-| sss | Subsurface Scattering (Thanks Knollad)
+| sss | Subsurface Scattering. (Thanks Knollad!)
 | gradient | Gradients, probably used for shading.
 
  > [!NOTE]  
  > Example: sk54_lee_head.d3dtx is a diffuse texture, while sk54_lee_head_spec.d3dtx is a specular texture.
 
-#### What are mipmaps?
-A lot of textures have mipmaps. They are basically lower resolution textures that are embedded in the file and are used at a distance in the game engine to prevent **[aliasing and artifacts](https://gdbooks.gitbooks.io/legacyopengl/content/Chapter7/mip1.png)**. 
+#### What are mips (mipmaps)?
+A lot of textures have mips. They are basically lower resolution textures that are embedded in the file and are used at a distance in the game engine to prevent **[aliasing and artifacts](https://gdbooks.gitbooks.io/legacyopengl/content/Chapter7/mip1.png)**. 
 ![mipmaps](http://archive.gamedev.net/archive/reference/programming/features/dxmipmap/mipmaps.gif)
 
 #### What is a surface format/compression type?
-Pixel data is **not** always stored in RGB or RGBA format as one would presume. There can be many different ways of storage for optimization purposes in order to save space. There are compressed and uncompressed formats, stored in different data types with different amount of channels.
+Pixel data is **not** always stored in `RGB` or `RGBA` format as one would presume. There can be many different ways of storage for optimization purposes in order to save space. There are compressed and uncompressed formats, stored in different data types with different amount of channels.
 > [This page](https://www.khronos.org/opengl/wiki/Image_Format) has somewhat compact information if you are more interested. 
 > Check out [this page](/Docs/articles/surfaces.md) for all available surface formats.
 > Check out [this file](/DDS_D3DTX_Converter_GUI/DDS_D3DTX_Converter/Telltale/TelltaleEnums/T3SurfaceFormat.cs) for more technical information of all available Telltale surface formats.
  
  #### What is a texture layout?
-Textures can be 2D, Volumemaps (3D) or Cubemaps. They can also be 2D Array or Cubemap array.
-Telltale commonly uses **2D**. In rare cases - **2D Array or Cubemaps**. Skunkcape have used volumemaps for lookups.
+Textures can be `2D`, `Volumemaps (3D)` `Cubemaps`, `2D Array` or `Cubemap array`.
+Telltale commonly use `2D`. In rare cases - `2D Array` or `Cubemaps`. Skunkcape have used volumemaps for lookups.
 Here are some examples on how they should look like.
 | 2D             |  Cubemap
 :-------------------------:|:-------------------------:
@@ -93,22 +93,20 @@ Here are some examples on how they should look like.
  > [This page](https://www.khronos.org/opengl/wiki/Texture#Theory) has somewhat compact information if you are more interested. 
 
 
-#### This information is overwhelming!
+### This information is overwhelming!
 Take a small break. I suggest looking through it briefly.
-In any case, Telltale mostly uses **BC1, BC2, BC3, BC4 and BC5** compressed formats, and **RGBA8**, **BGRA8** and **A8** uncompressed formats.
+In any case, Telltale mostly uses `BC1`, `BC2`, `BC3`, `BC4` and `BC5` compressed formats, and `RGBA8`, `BGRA8` and `A8` uncompressed formats.
 As for texture layouts - 99.9% are 2D textures.
 > Check out [this page](/Docs/articles/surfaces.md) for all available surface formats.
 
-
 ### This information is still overwhelming!
-The Texture Mod Tool provides Image Properties section, which reveals both information about the compression type format, the mipmap count and the texture layout (if you use the Debug Info button). This gives you information in which format to save and whether you should generate mipmaps or not. Telltale textures always have a mipmap count of at least 1. 
+The `Telltale Texture Tool` provides `Image Properties` section, which reveals the most important information. Generally, try aiming for the same properties. Sometimes you can even change the surface format.
 > Check out [this page](/Docs/articles/surfaces.md) to know in which format to save.
 
 ### What changes can we make to textures?
-Technically you can change the width, height, surface format, mipmap count and potentially the layout (use this only for **creating** custom textures).
+You can change the width, height, surface format and the mip count.
+We can technically make new textures with different layouts.
+> See [this page](/Docs/articles/surfaces.md) to know which format to use depending on the texture type.
 
-See [this page](/Docs/articles/surfaces.md) to know which format to use depending on the texture type.
-> [!WARNING]  
-> Warning: If the game crashes, that means the format is not supported for the game.
- >>Example: BC6H and BC7 are not supported on older Telltale titles. The surface format needs to be changed to a supported one.
- 
+> [!CAUTION]  
+> If the game crashes, that means the format is not supported for the game. An example being BC6H, which is not supported on older Telltale titles. Try different ones! The only one that works on all games is ARGB8 (or RGBA8).

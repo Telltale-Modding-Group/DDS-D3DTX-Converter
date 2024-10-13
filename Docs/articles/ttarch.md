@@ -1,4 +1,4 @@
-## [Home](/wiki/home.md)
+## [Home](/Docs/home.md)
 
 This page has information regarding **Telltale Archives (TTARCH/TTARCH2)**.
 ## [WIP]

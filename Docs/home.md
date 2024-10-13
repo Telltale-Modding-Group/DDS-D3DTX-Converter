@@ -1,6 +1,6 @@
-# Welcome to the Telltale Texture Mod Tool wiki!
+# Welcome to the Telltale Texture Tool wiki!
 
-This is the home page containing all sections with information regarding the Texture Mod Tool. If you have trouble understanding in English, please use an in-built Google Translate.
+This is the home page containing all sections with information regarding the Telltale Texture Tool. If you have trouble understanding in English, please use an in-built Google Translate.
 
 ### Table of Contents
 1. **[Application Guide](/Docs/application_guide/application_guide.md)**
@@ -17,8 +17,12 @@ This is the home page containing all sections with information regarding the Tex
 2. **[Textures Guide](/Docs/articles/textures.md)**
 3. **[Surface Format Lookup Table](/Docs/articles/surfaces.md)**
 
-### Old Tutorials
+### Older Articles and Tutorials
+1. **[Application Guide](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BHelp%5D-Application-Guide)**
+2. **[Reporting issues/bugs](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BHelp%5D---Reporting-an-Issue-or-Bug)**
+---
 1. **[How to make a Texture Mod (Prelude)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BTutorial%5D-How-to-make-a-Texture-Mod-(Prelude))**
 2. **[How to make a Texture Mod (Part 1)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BTutorial%5D--How-to-make-a-Texture-Mod-(Part-1))**
 3. **[How to make a Texture Mod (Part 2)](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BTutorial%5D--How-to-make-a-Texture-Mod-(Part-2))**
-4. For The Walking Dead Season 1 (2012) and older games texture editing check out [this tutorial.](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BTutorial%5D-The-Walking-Dead-Season-1-(and-older-games)-Texture-Editing-Tutorial)
+
+For The Walking Dead Season 1 (2012) and older games texture editing check out [this tutorial.](https://github.com/Telltale-Modding-Group/DDS-D3DTX-Converter/wiki/%5BTutorial%5D-The-Walking-Dead-Season-1-(and-older-games)-Texture-Editing-Tutorial)

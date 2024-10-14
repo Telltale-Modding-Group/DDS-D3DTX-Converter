@@ -19,7 +19,7 @@ public sealed class MainManager
     public readonly string AppVersion = "v2.5.0";
 
     // Weblink for getting help with the application
-    private const string AppHelpLink = "https://github.com/iMrShadow/DDS-D3DTX-Converter/blob/main/wiki/home.md";
+    private const string AppHelpLink = "https://github.com/Telltale-Modding-Group/Telltale-Texture-Tool/wiki";
 
     private WorkingDirectory _workingDirectory;
     private static MainManager? _instance;

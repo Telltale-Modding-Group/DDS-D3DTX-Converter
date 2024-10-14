@@ -85,7 +85,9 @@ Perfect! It looks like it was saved correctly! Let's put it in the game!
 Copy the **modified D3DTX** file and put it inside the game's directory. 
 > [!NOTE]
 > The game will prioritize loading the new files rather than the ones in the game archives. 
-> [!TIP] If you want to put the texture inside a TTARCH, check out this somewhat-outdated [wiki](/Docs/articles/embed_ttarch.md).
+
+> [!TIP] 
+> If you want to put the texture inside a TTARCH, check out this somewhat-outdated [wiki](/Docs/articles/embed_ttarch.md).
 
 Here's how mine looks:
 
